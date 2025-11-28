@@ -118,7 +118,7 @@ export default function Admin() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <a href={createPageUrl('Create')} className="text-white/60 hover:text-white transition-colors">
+              <a href={createPageUrl('Home')} className="text-white/60 hover:text-white transition-colors">
                 <ArrowLeft className="h-5 w-5" />
               </a>
               <Logo size="small" />

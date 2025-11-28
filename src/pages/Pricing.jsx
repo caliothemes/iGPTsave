@@ -105,7 +105,7 @@ export default function Pricing() {
     }
 
     // Redirect to create page
-    window.location.href = createPageUrl('Create');
+    window.location.href = createPageUrl('Home');
   };
 
   return (
