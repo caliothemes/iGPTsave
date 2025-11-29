@@ -166,7 +166,7 @@ export default function Pricing() {
                   {/* Messages */}
                   <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
                     <span className="text-white font-medium">{sub.messages}</span>
-                    <span className="text-white/60 text-sm"> messages</span>
+                    <span className="text-white/60 text-sm"> messages/m</span>
                   </div>
 
                   {/* Cost per message */}
