@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Sparkles, Image, Palette } from 'lucide-react';
+import { Send, Loader2, Sparkles, Image, Palette, X, Info } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -35,6 +35,8 @@ export default function Home() {
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
+  const [showWatermarkNotice, setShowWatermarkNotice] = useState(false);
+  const [showVisualsTooltip, setShowVisualsTooltip] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -268,6 +270,17 @@ export default function Home() {
         setVisuals(prev => [newVisual, ...prev]);
         setSelectedVisual(newVisual);
 
+        // Show watermark notice for 5 seconds
+        if (isAuthenticated && credits?.subscription_type === 'free') {
+          setShowWatermarkNotice(true);
+          setTimeout(() => setShowWatermarkNotice(false), 5000);
+        }
+
+        // Show visuals tooltip after a short delay
+        setTimeout(() => {
+          setShowVisualsTooltip(true);
+        }, 1500);
+
         updatedMessages = updatedMessages.slice(0, -1);
         updatedMessages.push({
           role: 'assistant',
@@ -433,6 +446,56 @@ export default function Home() {
     <div className="min-h-screen relative">
       <AnimatedBackground />
       <GlobalHeader />
+
+      {/* Watermark Notice Toast */}
+      {showWatermarkNotice && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-900/90 to-blue-900/90 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg">
+            <Info className="h-5 w-5 text-violet-300 flex-shrink-0" />
+            <p className="text-white text-sm">
+              {language === 'fr' 
+                ? "🎉 Le filigrane ne sera pas présent sur la version téléchargée !" 
+                : "🎉 The watermark will not appear on the downloaded version!"}
+            </p>
+            <button 
+              onClick={() => setShowWatermarkNotice(false)}
+              className="text-white/60 hover:text-white transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Visuals Tooltip */}
+      {showVisualsTooltip && sidebarOpen && (
+        <div className="fixed left-64 top-48 z-50 animate-in fade-in slide-in-from-left-2 duration-300">
+          <div className="relative bg-gradient-to-r from-violet-900/95 to-blue-900/95 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg p-4 max-w-xs">
+            {/* Arrow pointing left */}
+            <div className="absolute -left-2 top-6 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-violet-900/95" />
+            
+            <div className="flex items-start gap-2">
+              <Sparkles className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-white text-sm font-medium mb-1">
+                  {language === 'fr' ? "Visuels en cours" : "Visuals in progress"}
+                </p>
+                <p className="text-white/70 text-xs leading-relaxed">
+                  {language === 'fr' 
+                    ? "Retrouvez toutes vos créations ici ! Vous pouvez les régénérer, créer des variations ou les télécharger à tout moment." 
+                    : "Find all your creations here! You can regenerate them, create variations, or download them anytime."}
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowVisualsTooltip(false)}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sidebar */}
       <Sidebar
