@@ -120,7 +120,7 @@ export default function AdminLegal() {
             <p className="text-white/60">Gérez les sections des mentions légales</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={addSection} variant="outline" className="border-white/20 text-white hover:bg-white/10">
+            <Button onClick={addSection} variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20">
               <Plus className="h-4 w-4 mr-2" />
               Ajouter
             </Button>

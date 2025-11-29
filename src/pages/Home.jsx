@@ -800,9 +800,12 @@ export default function Home() {
                                                             value={input}
                                                             onChange={(e) => setInput(e.target.value)}
                                                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                                                            placeholder={t('inputPlaceholder')}
-                                                            className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm"
-                                                            disabled={isLoading}
+                                                            placeholder={isAuthenticated && getTotalCredits() <= 0 ? (language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available') : t('inputPlaceholder')}
+                                                            className={cn(
+                                                              "flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm",
+                                                              isAuthenticated && getTotalCredits() <= 0 && "opacity-50 cursor-not-allowed"
+                                                            )}
+                                                            disabled={isLoading || (isAuthenticated && getTotalCredits() <= 0)}
                                                           />
                                                           <Button
                                                             variant="ghost"
