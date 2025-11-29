@@ -449,6 +449,7 @@ export default function Home() {
         onSelectVisual={setSelectedVisual}
         onLogin={() => base44.auth.redirectToLogin(createPageUrl('Home'))}
         onLogout={() => base44.auth.logout()}
+        sidebarTitle={settings.sidebar_title}
       />
       
       <div className={cn(
