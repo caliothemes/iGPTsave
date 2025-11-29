@@ -5,7 +5,7 @@ import { createPageUrl } from '@/utils';
 import { Check, Sparkles, Zap, Crown, ArrowLeft, CreditCard } from 'lucide-react';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Logo from '@/components/Logo';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
@@ -117,14 +117,15 @@ export default function Pricing() {
       
       <div className="relative z-10 min-h-screen py-8 px-4">
         <div className="max-w-6xl mx-auto">
+          <GlobalHeader />
           {/* Header */}
           <div className="flex items-center justify-between mb-12">
             <a href={createPageUrl('Home')} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
               <ArrowLeft className="h-5 w-5" />
               {t('back')}
             </a>
-            <Logo size="small" />
-            <LanguageSwitcher />
+            <Logo size="small" showText={false} />
+            <div className="w-16" />
           </div>
 
           {/* Title */}

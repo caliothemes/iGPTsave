@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { createPageUrl } from '@/utils';
 import { useLanguage } from './LanguageContext';
 import Logo from './Logo';
-import LanguageSwitcher from './LanguageSwitcher';
 import {
   Collapsible,
   CollapsibleContent,
@@ -70,14 +69,10 @@ export default function Sidebar({
         "fixed inset-y-0 left-0 z-40 w-64 bg-black/60 backdrop-blur-xl border-r border-white/10 transition-transform duration-300 flex flex-col",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        {/* Header with Logo and Language */}
+        {/* Header with Logo */}
         <div className="p-4 pt-14 flex flex-col items-center border-b border-white/10">
-          <div className="flex items-center justify-between w-full mb-4">
-            <div className="flex-1" />
-            <Logo size="small" />
-            <div className="flex-1 flex justify-end">
-              <LanguageSwitcher />
-            </div>
+          <div className="mb-4">
+            <Logo size="default" showText={false} />
           </div>
           <Button
             onClick={onNewChat}

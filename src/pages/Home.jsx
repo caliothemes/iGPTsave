@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
 import FormatSelector from '@/components/chat/FormatSelector';
+import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
@@ -309,7 +310,8 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
   return (
     <div className="min-h-screen relative">
       <AnimatedBackground />
-      
+      <GlobalHeader />
+
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
@@ -339,7 +341,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
               {/* Hero - only show if few messages */}
               {messages.length <= 1 && (
                 <div className="flex flex-col items-center justify-center py-8 md:py-12 text-center">
-                  <Logo size="large" />
+                  <Logo size="large" showText={false} animate={true} />
                   <h1 className="text-xl md:text-2xl text-white/80 font-light mt-6 max-w-xl leading-relaxed">
                     {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
                   </h1>
