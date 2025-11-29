@@ -274,9 +274,10 @@ export default function Home() {
         setVisuals(prev => [newVisual, ...prev]);
         setSelectedVisual(newVisual);
 
-        // Show watermark notice if not dismissed
+        // Show watermark notice if not dismissed (for 4 seconds)
         if (isAuthenticated && credits?.subscription_type === 'free' && !localStorage.getItem('hideWatermarkNotice')) {
           setShowWatermarkNotice(true);
+          setTimeout(() => setShowWatermarkNotice(false), 4000);
         }
 
         // Show visuals tooltip after a short delay
@@ -453,10 +454,10 @@ export default function Home() {
       {/* Watermark Notice Toast */}
       {showWatermarkNotice && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex flex-col gap-2 px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg">
+          <div className="flex flex-col gap-2 px-4 py-3 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-xl shadow-lg">
             <div className="flex items-center gap-3">
-              <Info className="h-4 w-4 text-white/60 flex-shrink-0" />
-              <p className="text-white/70 text-sm">
+              <Info className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              <p className="text-blue-100 text-sm">
                 {language === 'fr' 
                   ? "Le filigrane ne sera pas présent sur la version téléchargée" 
                   : "The watermark will not appear on the downloaded version"}
@@ -467,7 +468,7 @@ export default function Home() {
                 setShowWatermarkNotice(false);
                 localStorage.setItem('hideWatermarkNotice', 'true');
               }}
-              className="text-white/40 hover:text-white/60 text-xs transition-colors self-end"
+              className="text-blue-300/60 hover:text-blue-200 text-xs transition-colors self-end"
             >
               {language === 'fr' ? "Ne plus afficher ce message" : "Don't show this again"}
             </button>
@@ -669,9 +670,16 @@ export default function Home() {
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   size="icon"
-                  className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8"
+                  className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8 relative overflow-hidden"
                 >
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {isLoading ? (
+                    <div className="relative">
+                      <div className="absolute inset-0 rounded-full border-2 border-white/20 border-t-white animate-spin" style={{ width: '16px', height: '16px' }} />
+                      <Sparkles className="h-3 w-3 text-white/80 animate-pulse" />
+                    </div>
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               
