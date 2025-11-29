@@ -17,8 +17,8 @@ export default function Logo({ size = 'default', showText = true, animate = fals
       {animate && size === 'large' && (
         <>
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="absolute w-[220px] h-[220px] rounded-full border border-violet-500/30 animate-ping-slow" />
-            <div className="absolute w-[260px] h-[260px] rounded-full border border-blue-500/20 animate-ping-slower" />
+            <div className="absolute w-[220px] h-[220px] rounded-full border-2 border-violet-500/60 animate-ping-slow" />
+            <div className="absolute w-[260px] h-[260px] rounded-full border-2 border-blue-500/50 animate-ping-slower" />
             <div className="absolute w-[240px] h-[240px] rounded-full bg-gradient-to-r from-violet-500/10 to-blue-500/10 animate-pulse-glow" />
           </div>
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -47,21 +47,21 @@ export default function Logo({ size = 'default', showText = true, animate = fals
           animation: float 3s ease-in-out infinite;
         }
         @keyframes ping-slow {
-          0% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.1); opacity: 0; }
-          100% { transform: scale(1); opacity: 0; }
-        }
-        .animate-ping-slow {
-          animation: ping-slow 4s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        @keyframes ping-slower {
-          0% { transform: scale(1); opacity: 0.3; }
+          0% { transform: scale(1); opacity: 0.8; }
           50% { transform: scale(1.15); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
+        .animate-ping-slow {
+          animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes ping-slower {
+          0% { transform: scale(1); opacity: 0.7; }
+          50% { transform: scale(1.2); opacity: 0; }
+          100% { transform: scale(1); opacity: 0; }
+        }
         .animate-ping-slower {
-          animation: ping-slower 5s cubic-bezier(0, 0, 0.2, 1) infinite;
-          animation-delay: 1s;
+          animation: ping-slower 4s cubic-bezier(0, 0, 0.2, 1) infinite;
+          animation-delay: 0.5s;
         }
         @keyframes pulse-glow {
           0%, 100% { opacity: 0.3; transform: scale(1); }
