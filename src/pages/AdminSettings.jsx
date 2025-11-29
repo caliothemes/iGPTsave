@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Globe, FileText, Layout, MessageSquare } from 'lucide-react';
+import { Loader2, Save, Globe, FileText, Layout, MessageSquare, Building2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,18 @@ export default function AdminSettings() {
     welcome_message_fr: '',
     welcome_message_en: '',
     guest_message_fr: '',
-    guest_message_en: ''
+    guest_message_en: '',
+    // Company settings
+    company_name: '',
+    company_address: '',
+    company_postal_code: '',
+    company_city: '',
+    company_country: '',
+    company_siret: '',
+    company_vat: '',
+    company_email: '',
+    company_phone: '',
+    company_logo: ''
   });
 
   useEffect(() => {
@@ -232,6 +243,123 @@ export default function AdminSettings() {
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Company Settings */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-emerald-600/20">
+              <Building2 className="h-5 w-5 text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Paramètres entreprise</h2>
+              <p className="text-sm text-white/50">Informations affichées sur les factures</p>
+            </div>
+          </div>
+          
+          <div className="grid gap-6">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Nom de l'entreprise</label>
+                <Input
+                  value={settings.company_name}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_name: e.target.value }))}
+                  placeholder="Ma Société SAS"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Email de contact</label>
+                <Input
+                  value={settings.company_email}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_email: e.target.value }))}
+                  placeholder="contact@masociete.com"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/60 mb-2">Adresse</label>
+              <Input
+                value={settings.company_address}
+                onChange={(e) => setSettings(prev => ({ ...prev, company_address: e.target.value }))}
+                placeholder="123 Rue de l'Exemple"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Code postal</label>
+                <Input
+                  value={settings.company_postal_code}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_postal_code: e.target.value }))}
+                  placeholder="75001"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Ville</label>
+                <Input
+                  value={settings.company_city}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_city: e.target.value }))}
+                  placeholder="Paris"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Pays</label>
+                <Input
+                  value={settings.company_country}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_country: e.target.value }))}
+                  placeholder="France"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-white/60 mb-2">SIRET</label>
+                <Input
+                  value={settings.company_siret}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_siret: e.target.value }))}
+                  placeholder="123 456 789 00012"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">N° TVA Intracommunautaire</label>
+                <Input
+                  value={settings.company_vat}
+                  onChange={(e) => setSettings(prev => ({ ...prev, company_vat: e.target.value }))}
+                  placeholder="FR12345678901"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/60 mb-2">Téléphone</label>
+              <Input
+                value={settings.company_phone}
+                onChange={(e) => setSettings(prev => ({ ...prev, company_phone: e.target.value }))}
+                placeholder="+33 1 23 45 67 89"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-white/60 mb-2">URL du logo (pour les factures)</label>
+              <Input
+                value={settings.company_logo}
+                onChange={(e) => setSettings(prev => ({ ...prev, company_logo: e.target.value }))}
+                placeholder="https://..."
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+              {settings.company_logo && (
+                <div className="mt-2 p-3 bg-white/5 rounded-lg inline-block">
+                  <img src={settings.company_logo} alt="Logo" className="h-12 object-contain" />
+                </div>
+              )}
             </div>
           </div>
         </div>
