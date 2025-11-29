@@ -19,6 +19,7 @@ const translations = {
     thinking: "Réflexion...",
     
     // Sidebar
+    home: "Accueil",
     newCreation: "Nouvelle création",
     history: "Historique",
     noConversation: "Aucune conversation",
@@ -142,6 +143,7 @@ const translations = {
     thinking: "Thinking...",
     
     // Sidebar
+    home: "Home",
     newCreation: "New creation",
     history: "History",
     noConversation: "No conversation",
