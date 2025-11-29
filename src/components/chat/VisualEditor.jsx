@@ -623,122 +623,136 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   </Button>
                 </div>
               </TabsContent>
-            </ScrollArea>
-          </Tabs>
-
-          {/* Library */}
-          {user && userLibrary.length > 0 && (
-            <div className="border-t border-white/10 pt-3">
-              <p className="text-white/40 text-xs px-1 flex items-center gap-1 mb-2"><Library className="h-3 w-3" />{language === 'fr' ? 'Ma bibliothèque' : 'My library'}</p>
-              <div className="grid grid-cols-4 gap-1">
-                {userLibrary.slice(-8).map((item, idx) => (
-                  <div key={idx} className="relative group">
-                    <button onClick={() => addImageLayer(item.url, 120, 120)} className="aspect-square rounded overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors w-full">
-                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                    </button>
-                    <button onClick={() => removeFromLibrary(userLibrary.length - 8 + idx)} className="absolute -top-1 -right-1 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                      <X className="h-2 w-2 text-white" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Canvas */}
-        <div className="flex-1 flex items-center justify-center bg-black/30 rounded-xl p-4">
-          <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height} className="rounded-lg cursor-move shadow-2xl"
-            onMouseDown={handleCanvasMouseDown} onMouseMove={handleCanvasMouseMove} onMouseUp={handleCanvasMouseUp} onMouseLeave={handleCanvasMouseUp} />
-        </div>
-
-        {/* Right Panel */}
-        <div className="w-52 space-y-3">
-          <div>
-            <p className="text-white/40 text-xs mb-2 flex items-center gap-1"><Layers className="h-3 w-3" />{language === 'fr' ? 'Calques' : 'Layers'}</p>
-            <div className="space-y-1 max-h-28 overflow-y-auto">
-              {layers.map((layer, idx) => (
+          {/* Layers Tab Content */}
+          <TabsContent value="layers" className="mt-0 space-y-2">
+            <div className="space-y-1">
+              {layers.length === 0 ? (
+                <p className="text-white/40 text-xs text-center py-4">{language === 'fr' ? 'Aucun calque' : 'No layers'}</p>
+              ) : layers.map((layer, idx) => (
                 <button key={idx} onClick={() => setSelectedLayer(idx)}
                   className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
                   {layer.type === 'text' ? <Type className="h-3 w-3" /> : layer.type === 'image' ? <ImagePlus className="h-3 w-3" /> : <Square className="h-3 w-3" />}
-                  <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 12) : layer.type === 'image' ? 'Image' : layer.shape}</span>
+                  <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 15) : layer.type === 'image' ? 'Image' : layer.shape}</span>
+                  <button onClick={(e) => { e.stopPropagation(); deleteLayer(idx); }} className="p-1 text-red-400/60 hover:text-red-400"><Trash2 className="h-3 w-3" /></button>
                 </button>
               ))}
             </div>
+          </TabsContent>
+        </ScrollArea>
+      </div>
+
+      {/* Canvas - Responsive */}
+      <div className="flex items-center justify-center bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
+        <canvas 
+          ref={canvasRef} 
+          width={canvasSize.width} 
+          height={canvasSize.height} 
+          className="rounded-lg cursor-move shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain"
+          style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
+          onMouseDown={handleCanvasMouseDown} 
+          onMouseMove={handleCanvasMouseMove} 
+          onMouseUp={handleCanvasMouseUp} 
+          onMouseLeave={handleCanvasMouseUp} 
+          onTouchStart={(e) => {
+            const touch = e.touches[0];
+            handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+          }}
+          onTouchMove={(e) => {
+            const touch = e.touches[0];
+            handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+          }}
+          onTouchEnd={handleCanvasMouseUp}
+        />
+      </div>
+
+      {/* Bottom Panel - Layer Properties */}
+      {currentLayer && (
+        <div className="bg-white/5 rounded-xl p-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-white/60 text-xs flex items-center gap-2">
+              {currentLayer.type === 'text' ? <Type className="h-3 w-3" /> : currentLayer.type === 'image' ? <ImagePlus className="h-3 w-3" /> : <Square className="h-3 w-3" />}
+              {language === 'fr' ? 'Propriétés' : 'Properties'}
+            </span>
+            <div className="flex gap-1">
+              <button onClick={() => moveLayer(selectedLayer, 'up')} className="p-1.5 text-white/40 hover:text-white bg-white/5 rounded"><ChevronUp className="h-3 w-3" /></button>
+              <button onClick={() => moveLayer(selectedLayer, 'down')} className="p-1.5 text-white/40 hover:text-white bg-white/5 rounded"><ChevronDown className="h-3 w-3" /></button>
+              <button onClick={() => deleteLayer(selectedLayer)} className="p-1.5 text-red-400/60 hover:text-red-400 bg-white/5 rounded"><Trash2 className="h-3 w-3" /></button>
+            </div>
           </div>
 
-          {currentLayer ? (
-            <>
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs">#{selectedLayer + 1}</span>
-                <div className="flex gap-1">
-                  <button onClick={() => moveLayer(selectedLayer, 'up')} className="p-1 text-white/40 hover:text-white"><ChevronUp className="h-3 w-3" /></button>
-                  <button onClick={() => moveLayer(selectedLayer, 'down')} className="p-1 text-white/40 hover:text-white"><ChevronDown className="h-3 w-3" /></button>
-                  <button onClick={() => deleteLayer(selectedLayer)} className="p-1 text-red-400/60 hover:text-red-400"><Trash2 className="h-3 w-3" /></button>
+          {currentLayer.type === 'text' && (
+            <div className="space-y-2">
+              <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white text-sm h-8" />
+              <div className="flex gap-2 items-center">
+                <div className="flex-1">
+                  <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={120} step={1} />
+                </div>
+                <span className="text-white/50 text-xs w-12">{currentLayer.fontSize}px</span>
+              </div>
+              <div className="flex gap-1 flex-wrap">
+                <button onClick={() => updateLayer(selectedLayer, { bold: !currentLayer.bold })} className={cn("p-1.5 rounded text-sm", currentLayer.bold ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Bold className="h-3 w-3" /></button>
+                <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("p-1.5 rounded text-sm", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Italic className="h-3 w-3" /></button>
+                <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-1.5 rounded", currentLayer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignLeft className="h-3 w-3" /></button>
+                <button onClick={() => updateLayer(selectedLayer, { align: 'center' })} className={cn("p-1.5 rounded", currentLayer.align === 'center' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignCenter className="h-3 w-3" /></button>
+                <button onClick={() => updateLayer(selectedLayer, { align: 'right' })} className={cn("p-1.5 rounded", currentLayer.align === 'right' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignRight className="h-3 w-3" /></button>
+                <div className="flex gap-1 ml-auto">
+                  {PRESET_COLORS.slice(0, 6).map(color => (
+                    <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                  ))}
+                  <input type="color" value={currentLayer.color} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
                 </div>
               </div>
-
-              {currentLayer.type === 'text' && (
-                <>
-                  <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white text-sm" />
-                  <div>
-                    <label className="text-white/50 text-xs mb-1 block">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer.fontSize}px</label>
-                    <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={120} step={1} />
-                  </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => updateLayer(selectedLayer, { bold: !currentLayer.bold })} className={cn("flex-1 py-1.5 rounded text-sm", currentLayer.bold ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Bold className="h-4 w-4 mx-auto" /></button>
-                    <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("flex-1 py-1.5 rounded text-sm", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Italic className="h-4 w-4 mx-auto" /></button>
-                    <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("flex-1 py-1.5 rounded text-sm", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>S</button>
-                    <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("flex-1 py-1.5 rounded text-sm", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>O</button>
-                  </div>
-                  <div className="flex gap-1">
-                    {['left', 'center', 'right'].map(align => (
-                      <button key={align} onClick={() => updateLayer(selectedLayer, { align })} className={cn("flex-1 py-1.5 rounded", currentLayer.align === align ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
-                        {align === 'left' && <AlignLeft className="h-4 w-4 mx-auto" />}{align === 'center' && <AlignCenter className="h-4 w-4 mx-auto" />}{align === 'right' && <AlignRight className="h-4 w-4 mx-auto" />}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {(currentLayer.type === 'shape' || currentLayer.type === 'image') && (
-                <>
-                  <div>
-                    <label className="text-white/50 text-xs mb-1 block">{language === 'fr' ? 'Largeur' : 'Width'}: {Math.round(currentLayer.width)}px</label>
-                    <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
-                  </div>
-                  <div>
-                    <label className="text-white/50 text-xs mb-1 block">{language === 'fr' ? 'Hauteur' : 'Height'}: {Math.round(currentLayer.height)}px</label>
-                    <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
-                  </div>
-                </>
-              )}
-
-              {currentLayer.type !== 'image' && (
-                <div>
-                  <label className="text-white/50 text-xs mb-1 block">{language === 'fr' ? 'Couleur' : 'Color'}</label>
-                  <div className="flex flex-wrap gap-1">
-                    {PRESET_COLORS.slice(0, 10).map(color => (
-                      <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
-                    ))}
-                  </div>
-                  <Input type="color" value={currentLayer.color} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-full h-7 mt-2 cursor-pointer" />
-                </div>
-              )}
-
-              <div>
-                <label className="text-white/50 text-xs mb-1 block">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
-                <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <Layers className="h-8 w-8 text-white/20 mx-auto mb-2" />
-              <p className="text-white/40 text-xs">{language === 'fr' ? 'Sélectionnez un élément' : 'Select an element'}</p>
             </div>
           )}
+
+          {(currentLayer.type === 'shape' || currentLayer.type === 'image') && (
+            <div className="flex gap-3 items-center flex-wrap">
+              <div className="flex-1 min-w-[100px]">
+                <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Largeur' : 'W'}</label>
+                <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
+              </div>
+              <div className="flex-1 min-w-[100px]">
+                <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Hauteur' : 'H'}</label>
+                <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+              </div>
+              {currentLayer.type === 'shape' && (
+                <div className="flex gap-1">
+                  {PRESET_COLORS.slice(0, 6).map(color => (
+                    <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-2 items-center">
+            <label className="text-white/50 text-xs">{language === 'fr' ? 'Opacité' : 'Opacity'}</label>
+            <div className="flex-1">
+              <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
+            </div>
+            <span className="text-white/50 text-xs w-8">{currentLayer.opacity}%</span>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Library */}
+      {user && userLibrary.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-white/10">
+          <p className="text-white/40 text-xs px-1 flex items-center gap-1 mb-2"><Library className="h-3 w-3" />{language === 'fr' ? 'Ma bibliothèque' : 'My library'}</p>
+          <div className="flex gap-1 overflow-x-auto pb-1">
+            {userLibrary.slice(-8).map((item, idx) => (
+              <div key={idx} className="relative group flex-shrink-0">
+                <button onClick={() => addImageLayer(item.url, 120, 120)} className="w-12 h-12 rounded overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                  <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                </button>
+                <button onClick={() => removeFromLibrary(userLibrary.length - 8 + idx)} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <X className="h-2 w-2 text-white" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Custom Illustration Generator Modal */}
       <Dialog open={showIllustGenerator} onOpenChange={setShowIllustGenerator}>
