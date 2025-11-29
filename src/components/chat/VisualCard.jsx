@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Palette, Wand2 } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 
@@ -10,10 +10,13 @@ export default function VisualCard({
   onDownload,
   onToggleFavorite,
   onVariation,
+  onEdit,
   isRegenerating,
   canDownload,
   hasWatermark,
-  showActions = true
+  showActions = true,
+  showValidation = false,
+  onValidate
 }) {
   const { t, language } = useLanguage();
   const [downloading, setDownloading] = useState(false);
@@ -147,34 +150,72 @@ export default function VisualCard({
             </Button>
           </div>
 
-          {/* Download Button */}
-          <Button
-            size="sm"
-            onClick={handleDownload}
-            disabled={!canDownload || downloading}
-            className={cn(
-              "w-full transition-all",
-              canDownload 
-                ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
-                : "bg-white/10 cursor-not-allowed"
-            )}
-          >
-            {downloading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : downloaded ? (
-              <Check className="h-4 w-4 mr-2" />
-            ) : !canDownload ? (
-              <Lock className="h-4 w-4 mr-2" />
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
-            )}
-            {downloaded ? t('downloaded') : t('download')}
-          </Button>
+          {/* Validation Buttons */}
+          {showValidation && (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => onValidate?.('download')}
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              >
+                <Download className="h-4 w-4 mr-1.5" />
+                <span className="text-xs">{language === 'fr' ? 'Télécharger' : 'Download'}</span>
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => onValidate?.('edit')}
+                className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+              >
+                <Pencil className="h-4 w-4 mr-1.5" />
+                <span className="text-xs">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
+              </Button>
+            </div>
+          )}
 
-          {!canDownload && (
-            <p className="text-xs text-amber-400/80 text-center">
-              {t('noCredits')}
-            </p>
+          {/* Download Button (when not in validation mode) */}
+          {!showValidation && (
+            <>
+              {/* Edit Button */}
+              {onEdit && (
+                <Button
+                  size="sm"
+                  onClick={() => onEdit(visual)}
+                  className="w-full bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600 mb-2"
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  {language === 'fr' ? 'Personnaliser' : 'Customize'}
+                </Button>
+              )}
+              
+              <Button
+                size="sm"
+                onClick={handleDownload}
+                disabled={!canDownload || downloading}
+                className={cn(
+                  "w-full transition-all",
+                  canDownload 
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                    : "bg-white/10 cursor-not-allowed"
+                )}
+              >
+                {downloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : downloaded ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : !canDownload ? (
+                  <Lock className="h-4 w-4 mr-2" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                {downloaded ? t('downloaded') : t('download')}
+              </Button>
+
+              {!canDownload && (
+                <p className="text-xs text-amber-400/80 text-center">
+                  {t('noCredits')}
+                </p>
+              )}
+            </>
           )}
         </div>
       )}
