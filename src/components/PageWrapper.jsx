@@ -107,12 +107,6 @@ export default function PageWrapper({ children, requireAuth = false }) {
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                 {' • '}
                 <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
-                {user?.role === 'admin' && (
-                  <>
-                    {' • '}
-                    <a href={createPageUrl('Admin')} className="hover:text-violet-400 transition-colors">Admin</a>
-                  </>
-                )}
               </p>
             </div>
           </div>

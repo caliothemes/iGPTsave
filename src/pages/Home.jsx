@@ -76,14 +76,18 @@ export default function Home() {
           setVisuals(userVisuals);
           setConversations(userConversations);
 
+          const welcomeFr = settingsMap.welcome_message_fr || `${t('welcomeUser', { name: currentUser.full_name || '' })}\n\n${t('assistantIntro')}`;
+          const welcomeEn = settingsMap.welcome_message_en || `${t('welcomeUser', { name: currentUser.full_name || '' })}\n\n${t('assistantIntro')}`;
           setMessages([{
             role: 'assistant',
-            content: `${t('welcomeUser', { name: currentUser.full_name || '' })}\n\n${t('assistantIntro')}`
+            content: (language === 'fr' ? welcomeFr : welcomeEn).replace('{name}', currentUser.full_name || '')
           }]);
         } else {
+          const guestFr = settings.guest_message_fr || `${t('welcome')}\n\n${t('guestIntro')}`;
+          const guestEn = settings.guest_message_en || `${t('welcome')}\n\n${t('guestIntro')}`;
           setMessages([{
             role: 'assistant',
-            content: `${t('welcome')}\n\n${t('guestIntro')}`
+            content: language === 'fr' ? guestFr : guestEn
           }]);
         }
       } catch (e) {
@@ -673,12 +677,6 @@ export default function Home() {
                   <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                   {' • '}
                   <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
-                  {user?.role === 'admin' && (
-                    <>
-                      {' • '}
-                      <a href={createPageUrl('Admin')} className="hover:text-violet-400 transition-colors">Admin</a>
-                    </>
-                  )}
                 </p>
               </div>
             </div>
