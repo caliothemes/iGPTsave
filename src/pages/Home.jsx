@@ -281,7 +281,7 @@ export default function Home() {
     const userMessage = input.trim();
     setInput('');
     const newMessages = [...messages, { role: 'user', content: userMessage }];
-    setMessages(newMessages);
+    setMessages([...newMessages, { role: 'assistant', content: '' }]); // Add typing indicator
     setIsLoading(true);
     setShowFormatSelector(false);
     setShowStyleSelector(false);
@@ -298,11 +298,28 @@ export default function Home() {
       if (selectedStyle) contextInfo += `Style: ${selectedStyle.name.fr}. `;
       if (selectedPalette) contextInfo += `Palette: ${selectedPalette.name.fr} (${selectedPalette.colors.join(', ')}). `;
 
+      // Check if user is referring to an existing visual
+      const hasExistingVisual = selectedVisual !== null;
+      const existingVisualContext = hasExistingVisual ? `
+CONTEXTE IMPORTANT - VISUEL EXISTANT:
+L'utilisateur a actuellement un visuel affiché avec ces caractéristiques:
+- Titre: ${selectedVisual.title || 'Sans titre'}
+- Type: ${selectedVisual.visual_type || 'autre'}
+- Style: ${selectedVisual.style || 'non défini'}
+- Prompt original utilisé: ${selectedVisual.image_prompt || selectedVisual.original_prompt || 'non disponible'}
+- Couleurs: ${selectedVisual.color_palette?.join(', ') || 'non définies'}
+
+Si l'utilisateur demande une MODIFICATION (ajouter du texte, mettre dans un rond, changer un élément, ajouter une texture, etc.), 
+tu DOIS reprendre le prompt original et l'enrichir avec les modifications demandées.
+NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant ses éléments principaux.
+` : '';
+
       const analysis = await base44.integrations.Core.InvokeLLM({
         prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels.
 
   L'utilisateur demande: "${userMessage}"
   ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
+  ${existingVisualContext}
 
   RÈGLES IMPORTANTES:
   - Tu dois créer des visuels de qualité PROFESSIONNELLE
@@ -310,6 +327,13 @@ export default function Home() {
   - Inclus des détails sur: composition, éclairage, textures, profondeur, style artistique
   - Pour les logos: précise le type (wordmark, emblem, abstract, mascot, etc.)
   - Mentionne toujours "vector style, scalable, clean edges" pour les logos
+  
+  RÈGLE CRUCIALE POUR LES MODIFICATIONS:
+  - Si un visuel existe et que l'utilisateur demande une modification (texte, texture, forme, placement, etc.)
+  - Tu DOIS reprendre EXACTEMENT le prompt du visuel existant et AJOUTER les modifications demandées
+  - Exemple: si le logo est "blue phoenix logo" et l'utilisateur dit "mets-le dans un cercle doré", 
+    ton prompt doit être "blue phoenix logo INSIDE a golden textured circle frame..."
+  - NE CHANGE PAS le design principal, AJOUTE simplement ce que l'utilisateur demande
 
   Réponds en JSON:
   - needs_image: boolean (true si création visuelle demandée)
@@ -335,6 +359,7 @@ export default function Home() {
 
       let updatedMessages = [...newMessages, { role: 'assistant', content: analysis.response }];
       setMessages(updatedMessages);
+      setIsLoading(false);
 
       if (analysis.needs_image && analysis.image_prompt) {
         setIsGenerating(true);
@@ -404,10 +429,9 @@ export default function Home() {
 
       await saveConversation(updatedMessages);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: t('error') }]);
+      setMessages([...newMessages, { role: 'assistant', content: t('error') }]);
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
     setSelectedFormat(null);
     setSelectedStyle(null);
     setSelectedPalette(null);

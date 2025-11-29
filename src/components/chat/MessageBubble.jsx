@@ -33,7 +33,7 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
             ? "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/10 text-white shadow-lg" 
             : "bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 text-white/90 shadow-lg shadow-violet-500/5"
         )}>
-          {isStreaming && !message.content ? (
+          {isStreaming ? (
             <TypingIndicator />
           ) : (
             <ReactMarkdown 
