@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart, Plus, Mic, MicOff, Upload } from 'lucide-react';
+import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart, Plus, Mic, MicOff, Upload, CreditCard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import FavoritesModal from '@/components/FavoritesModal';
 import VisualEditor from '@/components/chat/VisualEditor';
@@ -795,18 +795,25 @@ export default function Home() {
                                         </DropdownMenuItem>
                                       </DropdownMenuContent>
                                     </DropdownMenu>
-                                    <input
-                                                            type="text"
-                                                            value={input}
-                                                            onChange={(e) => setInput(e.target.value)}
-                                                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                                                            placeholder={isAuthenticated && getTotalCredits() <= 0 ? (language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available') : t('inputPlaceholder')}
-                                                            className={cn(
-                                                              "flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm",
-                                                              isAuthenticated && getTotalCredits() <= 0 && "opacity-50 cursor-not-allowed"
-                                                            )}
-                                                            disabled={isLoading || (isAuthenticated && getTotalCredits() <= 0)}
-                                                          />
+                                    {isAuthenticated && getTotalCredits() <= 0 ? (
+                                                            <a 
+                                                              href={createPageUrl('Pricing')}
+                                                              className="flex-1 flex items-center justify-center gap-2 text-violet-400 hover:text-violet-300 text-sm font-medium transition-colors"
+                                                            >
+                                                              <CreditCard className="h-4 w-4" />
+                                                              {language === 'fr' ? 'Recharger mes crédits' : 'Recharge my credits'}
+                                                            </a>
+                                                          ) : (
+                                                            <input
+                                                              type="text"
+                                                              value={input}
+                                                              onChange={(e) => setInput(e.target.value)}
+                                                              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                                                              placeholder={t('inputPlaceholder')}
+                                                              className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm"
+                                                              disabled={isLoading}
+                                                            />
+                                                          )}
                                                           <Button
                                                             variant="ghost"
                                                             size="icon"
