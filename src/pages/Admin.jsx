@@ -630,6 +630,36 @@ export default function Admin() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Sidebar Title */}
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Titre Sidebar
+                  </CardTitle>
+                  <CardDescription className="text-white/50">Titre affiché en haut de la sidebar</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Titre</Label>
+                    <Input
+                      value={settings.sidebar_title?.value || ''}
+                      onChange={(e) => setSettings(prev => ({ ...prev, sidebar_title: { ...prev.sidebar_title, value: e.target.value } }))}
+                      placeholder="iGPT 1.0.1 beta"
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/30"
+                    />
+                  </div>
+                  <Button 
+                    onClick={() => handleSaveSetting('sidebar_title', settings.sidebar_title?.value || '')}
+                    disabled={saving}
+                    className="bg-violet-600 hover:bg-violet-700"
+                  >
+                    {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                    Sauvegarder
+                  </Button>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
