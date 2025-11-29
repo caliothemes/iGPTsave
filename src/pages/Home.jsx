@@ -180,6 +180,20 @@ export default function Home() {
     return prompt;
   };
 
+  // Deduct 1 message/credit
+  const deductCredit = async () => {
+    if (!credits) return;
+    if (credits.subscription_type === 'unlimited') return;
+    
+    if (credits.free_downloads > 0) {
+      await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+      setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
+    } else if (credits.paid_credits > 0) {
+      await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+      setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -190,6 +204,11 @@ export default function Home() {
     setIsLoading(true);
     setShowFormatSelector(false);
     setShowStyleSelector(false);
+
+    // Deduct 1 credit for sending a message
+    if (isAuthenticated) {
+      await deductCredit();
+    }
 
     try {
       // Build context for analysis
@@ -422,15 +441,8 @@ export default function Home() {
       return;
     }
 
-    if (credits.subscription_type !== 'unlimited') {
-      if (credits.free_downloads > 0) {
-        await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
-        setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
-      } else if (credits.paid_credits > 0) {
-        await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
-        setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
-      }
-    }
+    // Deduct 1 credit for download
+    await deductCredit();
 
     if (visual.id) {
       await base44.entities.Visual.update(visual.id, { downloaded: true });
@@ -609,7 +621,9 @@ export default function Home() {
               {showEditor && selectedVisual && (
                 <VisualEditor
                   visual={selectedVisual}
-                  onSave={() => {
+                  onSave={async () => {
+                    // Deduct 1 credit for saving edited visual
+                    await deductCredit();
                     setShowEditor(false);
                     setMessages(prev => [...prev, { 
                       role: 'assistant', 

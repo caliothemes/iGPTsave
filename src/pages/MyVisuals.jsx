@@ -4,9 +4,10 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Grid, List, Heart, Download } from 'lucide-react';
+import { Search, Grid, List, Heart, Download, Pencil } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
+import VisualEditor from '@/components/chat/VisualEditor';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,8 @@ export default function MyVisuals() {
   const [gridSize, setGridSize] = useState('medium');
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingVisual, setEditingVisual] = useState(null);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -41,7 +44,22 @@ export default function MyVisuals() {
     load();
   }, []);
 
+  // Deduct 1 message/credit
+  const deductCredit = async (credits) => {
+    if (!credits) return;
+    if (credits.subscription_type === 'unlimited') return;
+    
+    if (credits.free_downloads > 0) {
+      await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+    } else if (credits.paid_credits > 0) {
+      await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+    }
+  };
+
   const handleDownload = async (visual, credits) => {
+    // Deduct credit for download
+    await deductCredit(credits);
+    
     const link = document.createElement('a');
     link.href = visual.image_url;
     link.download = `${visual.title || 'visual'}.png`;
@@ -54,6 +72,18 @@ export default function MyVisuals() {
       await base44.entities.Visual.update(visual.id, { downloaded: true });
       setVisuals(prev => prev.map(v => v.id === visual.id ? { ...v, downloaded: true } : v));
     }
+  };
+
+  const handleEdit = (visual) => {
+    setEditingVisual(visual);
+    setShowEditor(true);
+  };
+
+  const handleEditorSave = async (credits) => {
+    // Deduct credit for saving edited visual
+    await deductCredit(credits);
+    setShowEditor(false);
+    setEditingVisual(null);
   };
 
   const handleToggleFavorite = async (visual) => {
@@ -76,6 +106,17 @@ export default function MyVisuals() {
     <PageWrapper requireAuth>
       {({ credits }) => (
         <div className="space-y-6">
+          {/* Editor Modal */}
+          {showEditor && editingVisual && (
+            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+              <VisualEditor
+                visual={editingVisual}
+                onSave={() => handleEditorSave(credits)}
+                onCancel={() => { setShowEditor(false); setEditingVisual(null); }}
+              />
+            </div>
+          )}
+
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">{t.title}</h1>
             <p className="text-white/60">{t.subtitle} ({visuals.length})</p>
@@ -118,6 +159,7 @@ export default function MyVisuals() {
                   onToggleFavorite={handleToggleFavorite}
                   onRegenerate={() => {}}
                   onVariation={() => {}}
+                  onEdit={() => handleEdit(visual)}
                   isRegenerating={false}
                   canDownload={true}
                   compact
