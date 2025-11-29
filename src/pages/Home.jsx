@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart } from 'lucide-react';
 import FavoritesModal from '@/components/FavoritesModal';
+import VisualEditor from '@/components/chat/VisualEditor';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -39,6 +40,8 @@ export default function Home() {
   const [showWatermarkNotice, setShowWatermarkNotice] = useState(false);
   const [showVisualsTooltip, setShowVisualsTooltip] = useState(false);
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -275,6 +278,7 @@ export default function Home() {
 
         setVisuals(prev => [newVisual, ...prev]);
         setSelectedVisual(newVisual);
+        setShowValidation(true);
 
         // Show watermark notice if not dismissed (for 4 seconds)
         if (isAuthenticated && credits?.subscription_type === 'free' && !localStorage.getItem('hideWatermarkNotice')) {
@@ -565,7 +569,7 @@ export default function Home() {
               ))}
 
               {/* Selected Visual Preview */}
-              {selectedVisual && (
+              {selectedVisual && !showEditor && (
                 <div className="flex items-start justify-center gap-3">
                   <div className="max-w-sm">
                     <VisualCard
@@ -574,9 +578,19 @@ export default function Home() {
                       onDownload={() => handleDownload(selectedVisual)}
                       onVariation={handleVariation}
                       onToggleFavorite={handleToggleFavorite}
+                      onEdit={() => setShowEditor(true)}
                       isRegenerating={isGenerating}
                       canDownload={isAuthenticated && getTotalCredits() > 0}
                       hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
+                      showValidation={showValidation}
+                      onValidate={(action) => {
+                        setShowValidation(false);
+                        if (action === 'download') {
+                          handleDownload(selectedVisual);
+                        } else if (action === 'edit') {
+                          setShowEditor(true);
+                        }
+                      }}
                     />
                   </div>
                   {isAuthenticated && visuals.filter(v => v.is_favorite).length > 0 && (
@@ -589,6 +603,23 @@ export default function Home() {
                     </button>
                   )}
                 </div>
+              )}
+
+              {/* Visual Editor */}
+              {showEditor && selectedVisual && (
+                <VisualEditor
+                  visual={selectedVisual}
+                  onSave={() => {
+                    setShowEditor(false);
+                    setMessages(prev => [...prev, { 
+                      role: 'assistant', 
+                      content: language === 'fr' 
+                        ? '✨ Visuel personnalisé téléchargé avec succès !' 
+                        : '✨ Customized visual downloaded successfully!' 
+                    }]);
+                  }}
+                  onCancel={() => setShowEditor(false)}
+                />
               )}
 
               <div ref={messagesEndRef} />
