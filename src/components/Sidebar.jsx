@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   PanelLeftClose, PanelLeft, Plus, MessageSquare, Image, 
-  User, CreditCard, Crown, LogOut, LogIn, ChevronDown, Trash2, Shield
+  User, CreditCard, Crown, LogOut, LogIn, ChevronDown, Trash2, Shield, Home
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { createPageUrl } from '@/utils';
@@ -81,6 +81,13 @@ export default function Sidebar({
               Admin
             </a>
           )}
+          <a
+            href={createPageUrl('Home')}
+            className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            {t('home') || 'Accueil'}
+          </a>
           <a
             href={createPageUrl('MyVisuals')}
             className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
