@@ -1,7 +1,17 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+
+function TypingIndicator() {
+  return (
+    <div className="flex items-center gap-1.5 py-1 px-1">
+      <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.2s' }} />
+      <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1.2s' }} />
+      <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1.2s' }} />
+    </div>
+  );
+}
 
 export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ©flexion..." }) {
   const isUser = message.role === 'user';
@@ -24,10 +34,7 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
             : "bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 text-white/90 shadow-lg shadow-violet-500/5"
         )}>
           {isStreaming && !message.content ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-violet-400" />
-              <span className="text-white/50 text-sm">{thinkingText}</span>
-            </div>
+            <TypingIndicator />
           ) : (
             <ReactMarkdown 
               className="prose prose-invert prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
