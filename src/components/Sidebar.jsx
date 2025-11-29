@@ -183,18 +183,25 @@ export default function Sidebar({
                 )}
               </a>
 
-              {/* User Info */}
-              <div className="flex items-center gap-3 px-3 py-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">
-                    {user.full_name?.[0] || user.email?.[0] || 'U'}
-                  </span>
+              {/* User Info - Clickable to Account page */}
+              <a 
+                href={createPageUrl('Account')}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center overflow-hidden">
+                  {user.profile_image ? (
+                    <img src={user.profile_image} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-white text-sm font-medium">
+                      {user.full_name?.[0] || user.email?.[0] || 'U'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm truncate">{user.full_name || 'User'}</p>
                   <p className="text-white/50 text-xs truncate">{user.email}</p>
                 </div>
-              </div>
+              </a>
 
               {/* Logout */}
               <Button
