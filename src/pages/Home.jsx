@@ -620,7 +620,7 @@ export default function Home() {
         sidebarOpen && "md:ml-64"
       )}>
         {/* Main Content */}
-        <main className="flex-1 flex flex-col h-screen pt-16">
+        <main className="flex-1 flex flex-col h-screen pt-16 pb-40">
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
             <div className="max-w-3xl mx-auto space-y-4">
@@ -702,31 +702,37 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Format Selector */}
-          {showFormatSelector && (
-            <div className="px-4 pb-2 max-w-3xl mx-auto w-full">
-              <FormatSelector 
-                onSelect={(format) => { setSelectedFormat(format); setShowFormatSelector(false); }}
-                selectedFormat={selectedFormat}
-              />
-            </div>
-          )}
+        </main>
+      </div>
 
-          {/* Style & Palette Selector */}
-          {showStyleSelector && (
-            <div className="px-4 pb-2 max-w-3xl mx-auto w-full">
-              <StyleSelector
-                selectedStyle={selectedStyle}
-                selectedPalette={selectedPalette}
-                onStyleChange={setSelectedStyle}
-                onPaletteChange={setSelectedPalette}
-              />
-            </div>
-          )}
+      {/* Fixed Input Area at Bottom */}
+      <div className={cn(
+        "fixed bottom-0 left-0 right-0 z-40 transition-all duration-300",
+        sidebarOpen && "md:left-64"
+      )}>
+        <div className="bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent pt-6 pb-4 px-4">
+          <div className="max-w-3xl mx-auto">
+            {/* Format Selector */}
+            {showFormatSelector && (
+              <div className="mb-3">
+                <FormatSelector 
+                  onSelect={(format) => { setSelectedFormat(format); setShowFormatSelector(false); }}
+                  selectedFormat={selectedFormat}
+                />
+              </div>
+            )}
 
-          {/* Input Area */}
-          <div className="p-4 bg-transparent">
-            <div className="max-w-3xl mx-auto">
+            {/* Style & Palette Selector */}
+            {showStyleSelector && (
+              <div className="mb-3">
+                <StyleSelector
+                  selectedStyle={selectedStyle}
+                  selectedPalette={selectedPalette}
+                  onStyleChange={setSelectedStyle}
+                  onPaletteChange={setSelectedPalette}
+                />
+              </div>
+            )}
               {/* Selected Options Display */}
               {(selectedFormat || selectedStyle || selectedPalette) && (
                 <div className="mb-2 flex items-center gap-2 text-xs flex-wrap">
@@ -845,17 +851,16 @@ export default function Home() {
                                                           </Button>
                                                         </div>
               
-              {/* Footer */}
-              <div className="mt-3 flex items-center justify-center">
-                <p className="text-white/25 text-xs">
-                  <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
-                  {' • '}
-                  <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
-                </p>
-              </div>
+            {/* Footer */}
+            <div className="mt-3 flex items-center justify-center">
+              <p className="text-white/25 text-xs">
+                <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
+                {' • '}
+                <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
+              </p>
             </div>
           </div>
-        </main>
+        </div>
       </div>
 
       {/* Favorites Modal */}
