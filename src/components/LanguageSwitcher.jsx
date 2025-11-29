@@ -6,14 +6,14 @@ export default function LanguageSwitcher({ className }) {
   const { language, setLanguage } = useLanguage();
 
   return (
-    <div className={cn("flex items-center gap-1", className)}>
+    <div className={cn("flex items-center gap-0.5 p-1 rounded-full bg-white/5 backdrop-blur-sm border border-white/10", className)}>
       <button
         onClick={() => setLanguage('fr')}
         className={cn(
-          "w-8 h-6 rounded overflow-hidden transition-all duration-300 hover:scale-110",
+          "w-6 h-4 rounded-sm overflow-hidden transition-all duration-300",
           language === 'fr' 
-            ? "ring-2 ring-violet-400 ring-offset-1 ring-offset-transparent animate-float" 
-            : "opacity-50 hover:opacity-80 grayscale hover:grayscale-0"
+            ? "ring-1 ring-white/40 scale-105" 
+            : "opacity-40 hover:opacity-70 grayscale hover:grayscale-0"
         )}
         title="Français"
       >
@@ -26,10 +26,10 @@ export default function LanguageSwitcher({ className }) {
       <button
         onClick={() => setLanguage('en')}
         className={cn(
-          "w-8 h-6 rounded overflow-hidden transition-all duration-300 hover:scale-110",
+          "w-6 h-4 rounded-sm overflow-hidden transition-all duration-300",
           language === 'en' 
-            ? "ring-2 ring-violet-400 ring-offset-1 ring-offset-transparent animate-float" 
-            : "opacity-50 hover:opacity-80 grayscale hover:grayscale-0"
+            ? "ring-1 ring-white/40 scale-105" 
+            : "opacity-40 hover:opacity-70 grayscale hover:grayscale-0"
         )}
         title="English"
       >
@@ -41,16 +41,6 @@ export default function LanguageSwitcher({ className }) {
           <path fill="#C8102E" d="M0 193v96h640v-96H0zM273 0v480h96V0h-96z"/>
         </svg>
       </button>
-      
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-2px); }
-        }
-        .animate-float {
-          animation: float 2s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }
