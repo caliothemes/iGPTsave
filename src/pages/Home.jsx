@@ -554,9 +554,13 @@ export default function Home() {
               )}
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-3 py-2 h-12">
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => { setShowFormatSelector(!showFormatSelector); setShowStyleSelector(false); }}
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => { 
+                        setShowFormatSelector(!showFormatSelector); 
+                        setShowStyleSelector(false); 
+                        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+                      }}
                   className={cn(
                     "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
                     showFormatSelector && "bg-blue-500/20 text-blue-300"
@@ -566,9 +570,13 @@ export default function Home() {
                   <Image className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => { setShowStyleSelector(!showStyleSelector); setShowFormatSelector(false); }}
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => { 
+                        setShowStyleSelector(!showStyleSelector); 
+                        setShowFormatSelector(false); 
+                        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+                      }}
                   className={cn(
                     "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
                     showStyleSelector && "bg-violet-500/20 text-violet-300"
