@@ -1,16 +1,17 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
+import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf } from 'lucide-react';
 
 const STYLES = [
-  { id: 'modern', name: { fr: 'Moderne', en: 'Modern' }, icon: '✨', prompt: 'modern, clean, minimalist, contemporary design' },
-  { id: 'vintage', name: { fr: 'Vintage', en: 'Vintage' }, icon: '🎞️', prompt: 'vintage, retro, classic, nostalgic style' },
-  { id: 'luxe', name: { fr: 'Luxe', en: 'Luxury' }, icon: '💎', prompt: 'luxury, premium, elegant, sophisticated, gold accents' },
-  { id: 'playful', name: { fr: 'Ludique', en: 'Playful' }, icon: '🎨', prompt: 'playful, fun, colorful, creative, dynamic' },
-  { id: 'corporate', name: { fr: 'Corporate', en: 'Corporate' }, icon: '🏢', prompt: 'professional, corporate, business, formal, trustworthy' },
-  { id: 'artistic', name: { fr: 'Artistique', en: 'Artistic' }, icon: '🖼️', prompt: 'artistic, creative, unique, hand-crafted feel' },
-  { id: 'tech', name: { fr: 'Tech', en: 'Tech' }, icon: '💻', prompt: 'tech, futuristic, digital, innovative, sleek' },
-  { id: 'nature', name: { fr: 'Nature', en: 'Nature' }, icon: '🌿', prompt: 'natural, organic, eco-friendly, earthy tones' },
+  { id: 'modern', name: { fr: 'Moderne', en: 'Modern' }, icon: Sparkles, prompt: 'modern, clean, minimalist, contemporary design', color: 'from-violet-500 to-purple-500' },
+  { id: 'vintage', name: { fr: 'Vintage', en: 'Vintage' }, icon: Clock, prompt: 'vintage, retro, classic, nostalgic style', color: 'from-amber-600 to-orange-600' },
+  { id: 'luxe', name: { fr: 'Luxe', en: 'Luxury' }, icon: Gem, prompt: 'luxury, premium, elegant, sophisticated, gold accents', color: 'from-yellow-500 to-amber-500' },
+  { id: 'playful', name: { fr: 'Ludique', en: 'Playful' }, icon: Palette, prompt: 'playful, fun, colorful, creative, dynamic', color: 'from-pink-500 to-rose-500' },
+  { id: 'corporate', name: { fr: 'Corporate', en: 'Corporate' }, icon: Building2, prompt: 'professional, corporate, business, formal, trustworthy', color: 'from-blue-600 to-indigo-600' },
+  { id: 'artistic', name: { fr: 'Artistique', en: 'Artistic' }, icon: Brush, prompt: 'artistic, creative, unique, hand-crafted feel', color: 'from-fuchsia-500 to-pink-500' },
+  { id: 'tech', name: { fr: 'Tech', en: 'Tech' }, icon: Cpu, prompt: 'tech, futuristic, digital, innovative, sleek', color: 'from-cyan-500 to-blue-500' },
+  { id: 'nature', name: { fr: 'Nature', en: 'Nature' }, icon: Leaf, prompt: 'natural, organic, eco-friendly, earthy tones', color: 'from-green-500 to-emerald-500' },
 ];
 
 const COLOR_PALETTES = [
@@ -22,6 +23,8 @@ const COLOR_PALETTES = [
   { id: 'ocean', name: { fr: 'Océan', en: 'Ocean' }, colors: ['#0077B6', '#00B4D8', '#90E0EF', '#CAF0F8', '#03045E'] },
   { id: 'forest', name: { fr: 'Forêt', en: 'Forest' }, colors: ['#2D5A27', '#538D4E', '#95C11F', '#D4E157', '#1B4332'] },
   { id: 'royal', name: { fr: 'Royal', en: 'Royal' }, colors: ['#4A0E4E', '#81267F', '#C879FF', '#FFD700', '#1A1A2E'] },
+  { id: 'candy', name: { fr: 'Candy', en: 'Candy' }, colors: ['#FF69B4', '#FF1493', '#FFB6C1', '#FFC0CB', '#FF85A2'] },
+  { id: 'earth', name: { fr: 'Terre', en: 'Earth' }, colors: ['#8B4513', '#A0522D', '#CD853F', '#DEB887', '#D2691E'] },
 ];
 
 export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange }) {
@@ -31,55 +34,70 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
     <div className="space-y-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
       {/* Styles */}
       <div>
-        <p className="text-white/60 text-xs mb-2 uppercase tracking-wider">
-          {language === 'fr' ? 'Style' : 'Style'}
+        <p className="text-white/50 text-xs mb-3 font-medium">
+          {language === 'fr' ? 'Style visuel' : 'Visual style'}
         </p>
-        <div className="flex flex-wrap gap-2">
-          {STYLES.map((style) => (
-            <button
-              key={style.id}
-              onClick={() => onStyleChange(style)}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-sm transition-all flex items-center gap-1.5",
-                selectedStyle?.id === style.id
-                  ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white"
-                  : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
-              )}
-            >
-              <span>{style.icon}</span>
-              <span>{style.name[language]}</span>
-            </button>
-          ))}
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+          {STYLES.map((style) => {
+            const IconComponent = style.icon;
+            return (
+              <button
+                key={style.id}
+                onClick={() => onStyleChange(selectedStyle?.id === style.id ? null : style)}
+                className={cn(
+                  "p-2 rounded-xl transition-all flex flex-col items-center gap-1.5 border",
+                  selectedStyle?.id === style.id
+                    ? "bg-gradient-to-br " + style.color + " border-white/30 shadow-lg"
+                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                )}
+              >
+                <div className={cn(
+                  "w-7 h-7 rounded-lg flex items-center justify-center",
+                  selectedStyle?.id === style.id ? "bg-white/20" : "bg-white/10"
+                )}>
+                  <IconComponent className={cn("h-4 w-4", selectedStyle?.id === style.id ? "text-white" : "text-white/60")} />
+                </div>
+                <span className={cn("text-[10px] font-medium", selectedStyle?.id === style.id ? "text-white" : "text-white/60")}>
+                  {style.name[language]}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Color Palettes */}
       <div>
-        <p className="text-white/60 text-xs mb-2 uppercase tracking-wider">
+        <p className="text-white/50 text-xs mb-3 font-medium">
           {language === 'fr' ? 'Palette de couleurs' : 'Color palette'}
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {COLOR_PALETTES.map((palette) => (
             <button
               key={palette.id}
-              onClick={() => onPaletteChange(palette)}
+              onClick={() => onPaletteChange(selectedPalette?.id === palette.id ? null : palette)}
               className={cn(
-                "p-2 rounded-xl transition-all border-2",
+                "p-2 rounded-xl transition-all border group",
                 selectedPalette?.id === palette.id
-                  ? "border-violet-500 bg-white/10"
-                  : "border-transparent bg-white/5 hover:bg-white/10"
+                  ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/20"
+                  : "border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20"
               )}
             >
-              <div className="flex gap-0.5 mb-1.5">
+              <div className="flex gap-0.5 mb-1.5 h-5 rounded-lg overflow-hidden">
                 {palette.colors.map((color, idx) => (
                   <div
                     key={idx}
-                    className="h-4 flex-1 first:rounded-l-full last:rounded-r-full"
+                    className="flex-1 transition-transform group-hover:scale-y-110"
                     style={{ backgroundColor: color }}
                   />
                 ))}
               </div>
-              <p className="text-white/70 text-xs text-center">{palette.name[language]}</p>
+              <p className={cn(
+                "text-[10px] text-center font-medium",
+                selectedPalette?.id === palette.id ? "text-violet-300" : "text-white/50"
+              )}>
+                {palette.name[language]}
+              </p>
             </button>
           ))}
         </div>

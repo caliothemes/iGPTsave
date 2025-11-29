@@ -6,13 +6,13 @@ export default function LanguageSwitcher({ className }) {
   const { language, setLanguage } = useLanguage();
 
   return (
-    <div className={cn("flex items-center gap-1.5 px-2 py-1.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10", className)}>
+    <div className={cn("flex items-center gap-1 px-1.5 py-1 rounded-full bg-white/5 backdrop-blur-sm border border-white/10", className)}>
       <button
         onClick={() => setLanguage('fr')}
         className={cn(
-          "w-5 h-5 rounded-full overflow-hidden transition-all duration-300",
+          "w-4 h-4 rounded-full overflow-hidden transition-all duration-300",
           language === 'fr' 
-            ? "ring-2 ring-white/50 scale-110" 
+            ? "ring-1 ring-white/50 scale-110" 
             : "opacity-40 hover:opacity-70 grayscale hover:grayscale-0"
         )}
         title="Français"
@@ -26,9 +26,9 @@ export default function LanguageSwitcher({ className }) {
       <button
         onClick={() => setLanguage('en')}
         className={cn(
-          "w-5 h-5 rounded-full overflow-hidden transition-all duration-300",
+          "w-4 h-4 rounded-full overflow-hidden transition-all duration-300",
           language === 'en' 
-            ? "ring-2 ring-white/50 scale-110" 
+            ? "ring-1 ring-white/50 scale-110" 
             : "opacity-40 hover:opacity-70 grayscale hover:grayscale-0"
         )}
         title="English"
