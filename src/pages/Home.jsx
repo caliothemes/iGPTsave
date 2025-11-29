@@ -628,7 +628,7 @@ export default function Home() {
               {messages.length <= 1 && (
                 <div className="flex flex-col items-center justify-center py-4 md:py-6 text-center">
                   <Logo size="large" showText={false} animate={true} />
-                  <h1 className="text-xl md:text-2xl text-white/80 font-light mt-6 max-w-xl leading-relaxed">
+                  <h1 className="text-xl md:text-2xl text-white/80 font-light mt-10 max-w-xl leading-relaxed">
                     {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
                   </h1>
                   <p className="text-white/50 mt-3 max-w-md text-sm">

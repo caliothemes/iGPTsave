@@ -47,16 +47,20 @@ export default function Logo({ size = 'default', showText = true, animate = fals
           animation: float 3s ease-in-out infinite;
         }
         @keyframes ping-slow {
-          0% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.15); opacity: 0; }
+          0% { transform: scale(1); opacity: 0; }
+          40% { transform: scale(1.1); opacity: 0.6; }
+          50% { transform: scale(1.15); opacity: 0.5; }
+          60% { transform: scale(1.1); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slow {
           animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
         @keyframes ping-slower {
-          0% { transform: scale(1); opacity: 0.7; }
-          50% { transform: scale(1.2); opacity: 0; }
+          0% { transform: scale(1); opacity: 0; }
+          40% { transform: scale(1.15); opacity: 0.5; }
+          50% { transform: scale(1.2); opacity: 0.4; }
+          60% { transform: scale(1.15); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slower {
