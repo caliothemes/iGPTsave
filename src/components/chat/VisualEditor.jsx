@@ -546,84 +546,82 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsTrigger value="ai" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Sparkles className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Layers className="h-4 w-4" /></TabsTrigger>
         </TabsList>
-      </Tabs>
 
-      {/* Tool Content Panel */}
-      <div className="mb-3">
-        <ScrollArea className="max-h-32 md:max-h-40">
-              <TabsContent value="text" className="mt-0 space-y-2">
-                <Button onClick={() => addTextLayer()} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
-                  <Plus className="h-4 w-4 mr-2" />{language === 'fr' ? 'Ajouter texte' : 'Add text'}
-                </Button>
-                <Button onClick={() => setShowTextGenerator(true)} size="sm" className="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300">
-                  <MessageSquare className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer texte IA' : 'Generate AI text'}
-                </Button>
-                <p className="text-white/40 text-xs px-1 mt-3">{language === 'fr' ? 'Polices:' : 'Fonts:'}</p>
-                <div className="grid grid-cols-2 gap-1">
-                  {FONTS.map(font => (
-                    <button key={font.id} onClick={() => currentLayer?.type === 'text' && updateLayer(selectedLayer, { fontFamily: font.family })}
-                      className={cn("p-2 rounded text-xs text-left truncate transition-colors", currentLayer?.fontFamily === font.family ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}
-                      style={{ fontFamily: font.family }}>{font.name}</button>
-                  ))}
-                </div>
-              </TabsContent>
+        {/* Tool Content Panel */}
+        <ScrollArea className="max-h-32 md:max-h-40 mt-3">
+          <TabsContent value="text" className="mt-0 space-y-2">
+            <Button onClick={() => addTextLayer()} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
+              <Plus className="h-4 w-4 mr-2" />{language === 'fr' ? 'Ajouter texte' : 'Add text'}
+            </Button>
+            <Button onClick={() => setShowTextGenerator(true)} size="sm" className="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300">
+              <MessageSquare className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer texte IA' : 'Generate AI text'}
+            </Button>
+            <p className="text-white/40 text-xs px-1 mt-3">{language === 'fr' ? 'Polices:' : 'Fonts:'}</p>
+            <div className="grid grid-cols-2 gap-1">
+              {FONTS.map(font => (
+                <button key={font.id} onClick={() => currentLayer?.type === 'text' && updateLayer(selectedLayer, { fontFamily: font.family })}
+                  className={cn("p-2 rounded text-xs text-left truncate transition-colors", currentLayer?.fontFamily === font.family ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}
+                  style={{ fontFamily: font.family }}>{font.name}</button>
+              ))}
+            </div>
+          </TabsContent>
 
-              <TabsContent value="shapes" className="mt-0 space-y-2">
-                <div className="grid grid-cols-3 gap-2">
-                  {SHAPES.map(shape => (
-                    <button key={shape.id} onClick={() => addShapeLayer(shape.id)} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-1">
-                      <shape.icon className="h-5 w-5" /><span className="text-[10px]">{shape.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </TabsContent>
+          <TabsContent value="shapes" className="mt-0 space-y-2">
+            <div className="grid grid-cols-3 gap-2">
+              {SHAPES.map(shape => (
+                <button key={shape.id} onClick={() => addShapeLayer(shape.id)} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-1">
+                  <shape.icon className="h-5 w-5" /><span className="text-[10px]">{shape.name}</span>
+                </button>
+              ))}
+            </div>
+          </TabsContent>
 
-              <TabsContent value="textures" className="mt-0 space-y-2">
-                <p className="text-white/40 text-xs px-1 flex items-center gap-1"><Sparkles className="h-3 w-3" />{language === 'fr' ? 'Textures IA (plein écran):' : 'AI Textures (full screen):'}</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {allTextures.map(texture => (
-                    <button key={texture.id} onClick={() => generateTexture(texture)} disabled={generatingTexture !== null}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xs flex items-center gap-2">
-                      {generatingTexture === (texture.id || texture.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <Palette className="h-3 w-3" />}
-                      {texture.name[language] || texture.name.fr}
-                    </button>
-                  ))}
-                </div>
-              </TabsContent>
+          <TabsContent value="textures" className="mt-0 space-y-2">
+            <p className="text-white/40 text-xs px-1 flex items-center gap-1"><Sparkles className="h-3 w-3" />{language === 'fr' ? 'Textures IA (plein écran):' : 'AI Textures (full screen):'}</p>
+            <div className="grid grid-cols-2 gap-2">
+              {allTextures.map(texture => (
+                <button key={texture.id} onClick={() => generateTexture(texture)} disabled={generatingTexture !== null}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xs flex items-center gap-2">
+                  {generatingTexture === (texture.id || texture.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <Palette className="h-3 w-3" />}
+                  {texture.name[language] || texture.name.fr}
+                </button>
+              ))}
+            </div>
+          </TabsContent>
 
-              <TabsContent value="illustrations" className="mt-0 space-y-2">
-                <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 text-pink-300">
-                  <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer illustration IA' : 'Create AI illustration'}
-                </Button>
-                <p className="text-white/40 text-xs px-1 flex items-center gap-1 mt-2"><Sparkles className="h-3 w-3" />{language === 'fr' ? 'Illustrations prédéfinies:' : 'Preset illustrations:'}</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {allIllustrations.map(illust => (
-                    <button key={illust.id} onClick={() => generateIllustration(illust)} disabled={generatingIllustration !== null}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xs flex items-center gap-2">
-                      {generatingIllustration === (illust.id || illust.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
-                      {illust.name[language] || illust.name.fr}
-                    </button>
-                  ))}
-                </div>
-              </TabsContent>
+          <TabsContent value="illustrations" className="mt-0 space-y-2">
+            <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 text-pink-300">
+              <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer illustration IA' : 'Create AI illustration'}
+            </Button>
+            <p className="text-white/40 text-xs px-1 flex items-center gap-1 mt-2"><Sparkles className="h-3 w-3" />{language === 'fr' ? 'Illustrations prédéfinies:' : 'Preset illustrations:'}</p>
+            <div className="grid grid-cols-2 gap-2">
+              {allIllustrations.map(illust => (
+                <button key={illust.id} onClick={() => generateIllustration(illust)} disabled={generatingIllustration !== null}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xs flex items-center gap-2">
+                  {generatingIllustration === (illust.id || illust.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
+                  {illust.name[language] || illust.name.fr}
+                </button>
+              ))}
+            </div>
+          </TabsContent>
 
-              <TabsContent value="ai" className="mt-0 space-y-3">
-                <div className="p-3 bg-gradient-to-br from-violet-500/10 to-blue-500/10 rounded-xl border border-violet-500/20">
-                  <h4 className="text-white font-medium text-sm mb-2 flex items-center gap-2"><MessageSquare className="h-4 w-4 text-violet-400" />{language === 'fr' ? 'Générateur de textes' : 'Text generator'}</h4>
-                  <p className="text-white/50 text-xs mb-2">{language === 'fr' ? 'L\'IA génère des titres et slogans pour votre visuel' : 'AI generates titles and slogans for your visual'}</p>
-                  <Button onClick={() => setShowTextGenerator(true)} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
-                    <Sparkles className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer des textes' : 'Generate texts'}
-                  </Button>
-                </div>
-                <div className="p-3 bg-gradient-to-br from-pink-500/10 to-orange-500/10 rounded-xl border border-pink-500/20">
-                  <h4 className="text-white font-medium text-sm mb-2 flex items-center gap-2"><ImagePlus className="h-4 w-4 text-pink-400" />{language === 'fr' ? 'Illustrations personnalisées' : 'Custom illustrations'}</h4>
-                  <p className="text-white/50 text-xs mb-2">{language === 'fr' ? 'Créez des illustrations uniques avec l\'IA' : 'Create unique illustrations with AI'}</p>
-                  <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-pink-500/20 hover:bg-pink-500/30 text-pink-300">
-                    <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer' : 'Create'}
-                  </Button>
-                </div>
-              </TabsContent>
-          {/* Layers Tab Content */}
+          <TabsContent value="ai" className="mt-0 space-y-3">
+            <div className="p-3 bg-gradient-to-br from-violet-500/10 to-blue-500/10 rounded-xl border border-violet-500/20">
+              <h4 className="text-white font-medium text-sm mb-2 flex items-center gap-2"><MessageSquare className="h-4 w-4 text-violet-400" />{language === 'fr' ? 'Générateur de textes' : 'Text generator'}</h4>
+              <p className="text-white/50 text-xs mb-2">{language === 'fr' ? 'L\'IA génère des titres et slogans pour votre visuel' : 'AI generates titles and slogans for your visual'}</p>
+              <Button onClick={() => setShowTextGenerator(true)} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
+                <Sparkles className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer des textes' : 'Generate texts'}
+              </Button>
+            </div>
+            <div className="p-3 bg-gradient-to-br from-pink-500/10 to-orange-500/10 rounded-xl border border-pink-500/20">
+              <h4 className="text-white font-medium text-sm mb-2 flex items-center gap-2"><ImagePlus className="h-4 w-4 text-pink-400" />{language === 'fr' ? 'Illustrations personnalisées' : 'Custom illustrations'}</h4>
+              <p className="text-white/50 text-xs mb-2">{language === 'fr' ? 'Créez des illustrations uniques avec l\'IA' : 'Create unique illustrations with AI'}</p>
+              <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-pink-500/20 hover:bg-pink-500/30 text-pink-300">
+                <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer' : 'Create'}
+              </Button>
+            </div>
+          </TabsContent>
+
           <TabsContent value="layers" className="mt-0 space-y-2">
             <div className="space-y-1">
               {layers.length === 0 ? (
@@ -639,7 +637,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </div>
           </TabsContent>
         </ScrollArea>
-      </div>
+      </Tabs>
 
       {/* Canvas - Responsive */}
       <div className="flex items-center justify-center bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
