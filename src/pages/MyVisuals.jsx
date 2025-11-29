@@ -76,12 +76,7 @@ export default function MyVisuals() {
     window.location.href = createPageUrl('Home') + `?editVisual=${visual.id}`;
   };
 
-  const handleEditorSave = async (credits) => {
-    // Deduct credit for saving edited visual
-    await deductCredit(credits);
-    setShowEditor(false);
-    setEditingVisual(null);
-  };
+
 
   const handleToggleFavorite = async (visual) => {
     const newState = !visual.is_favorite;
