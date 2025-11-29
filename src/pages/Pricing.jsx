@@ -121,11 +121,7 @@ export default function Pricing() {
               Retour
             </a>
             <Logo size="small" />
-            {user && (
-              <a href={createPageUrl('Create')} className="text-violet-400 hover:text-violet-300 transition-colors">
-                Créer →
-              </a>
-            )}
+            <div className="w-16" />
           </div>
 
           {/* Title */}
