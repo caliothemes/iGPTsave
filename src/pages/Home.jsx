@@ -755,40 +755,47 @@ export default function Home() {
                   )}
                 </div>
               )}
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-3 py-2 h-12">
-                <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => { 
-                        setShowFormatSelector(!showFormatSelector); 
-                        setShowStyleSelector(false); 
-                        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-                      }}
-                  className={cn(
-                    "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
-                    showFormatSelector && "bg-blue-500/20 text-blue-300"
-                  )}
-                  title={language === 'fr' ? 'Format' : 'Format'}
-                >
-                  <Image className="h-4 w-4" />
-                </Button>
-                <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => { 
-                        setShowStyleSelector(!showStyleSelector); 
-                        setShowFormatSelector(false); 
-                        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-                      }}
-                  className={cn(
-                    "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
-                    showStyleSelector && "bg-violet-500/20 text-violet-300"
-                  )}
-                  title={language === 'fr' ? 'Style & Couleurs' : 'Style & Colors'}
-                >
-                  <Palette className="h-4 w-4" />
-                </Button>
-                <input
+              <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
+                                  <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-3 py-2 h-12">
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className={cn(
+                                            "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
+                                            (showFormatSelector || showStyleSelector) && "bg-violet-500/20 text-violet-300"
+                                          )}
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="start" className="bg-gray-900 border-white/10">
+                                        <DropdownMenuItem 
+                                          onClick={() => { setShowFormatSelector(!showFormatSelector); setShowStyleSelector(false); }}
+                                          className="text-white hover:bg-white/10 cursor-pointer"
+                                        >
+                                          <Image className="h-4 w-4 mr-2" />
+                                          {language === 'fr' ? 'Format' : 'Format'}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem 
+                                          onClick={() => { setShowStyleSelector(!showStyleSelector); setShowFormatSelector(false); }}
+                                          className="text-white hover:bg-white/10 cursor-pointer"
+                                        >
+                                          <Palette className="h-4 w-4 mr-2" />
+                                          {language === 'fr' ? 'Style & Couleurs' : 'Style & Colors'}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem 
+                                          onClick={() => fileInputRef.current?.click()}
+                                          className="text-white hover:bg-white/10 cursor-pointer"
+                                          disabled={uploadingImage}
+                                        >
+                                          <Upload className="h-4 w-4 mr-2" />
+                                          {language === 'fr' ? 'Importer une image' : 'Upload image'}
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
