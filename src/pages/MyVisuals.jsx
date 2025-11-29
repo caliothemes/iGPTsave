@@ -98,17 +98,6 @@ export default function MyVisuals() {
     <PageWrapper requireAuth>
       {({ credits }) => (
         <div className="space-y-6">
-          {/* Editor Modal */}
-          {showEditor && editingVisual && (
-            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-              <VisualEditor
-                visual={editingVisual}
-                onSave={() => handleEditorSave(credits)}
-                onCancel={() => { setShowEditor(false); setEditingVisual(null); }}
-              />
-            </div>
-          )}
-
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">{t.title}</h1>
             <p className="text-white/60">{t.subtitle} ({visuals.length})</p>
