@@ -5,6 +5,8 @@ import { createPageUrl } from '@/utils';
 import { Check, Sparkles, Zap, Crown, ArrowLeft, CreditCard } from 'lucide-react';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Logo from '@/components/Logo';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
 const creditPacks = [
@@ -13,42 +15,43 @@ const creditPacks = [
   { id: 'pack_100', credits: 100, price: 24.99, popular: false },
 ];
 
-const subscriptions = [
-  {
-    id: 'limited',
-    name: 'Pro',
-    price: 14.99,
-    period: '/mois',
-    credits: 50,
-    features: [
-      '50 téléchargements/mois',
-      'Sans filigrane',
-      'Formats HD',
-      'Support prioritaire'
-    ],
-    icon: Zap,
-    gradient: 'from-blue-600 to-cyan-600'
-  },
-  {
-    id: 'unlimited',
-    name: 'Unlimited',
-    price: 29.99,
-    period: '/mois',
-    credits: Infinity,
-    features: [
-      'Téléchargements illimités',
-      'Sans filigrane',
-      'Formats HD & Print',
-      'Support VIP',
-      'API Access'
-    ],
-    icon: Crown,
-    gradient: 'from-violet-600 to-purple-600',
-    popular: true
-  }
-];
-
 export default function Pricing() {
+  const { t } = useLanguage();
+  
+  const subscriptions = [
+    {
+      id: 'limited',
+      name: 'Pro',
+      price: 14.99,
+      period: t('perMonth'),
+      credits: 50,
+      features: [
+        `50 ${t('downloadsMonth')}`,
+        t('noWatermark'),
+        t('hdFormats'),
+        t('prioritySupport')
+      ],
+      icon: Zap,
+      gradient: 'from-blue-600 to-cyan-600'
+    },
+    {
+      id: 'unlimited',
+      name: 'Unlimited',
+      price: 29.99,
+      period: t('perMonth'),
+      credits: Infinity,
+      features: [
+        t('unlimited'),
+        t('noWatermark'),
+        t('hdPrintFormats'),
+        t('vipSupport'),
+        t('apiAccess')
+      ],
+      icon: Crown,
+      gradient: 'from-violet-600 to-purple-600',
+      popular: true
+    }
+  ];
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -118,25 +121,25 @@ export default function Pricing() {
           <div className="flex items-center justify-between mb-12">
             <a href={createPageUrl('Home')} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
               <ArrowLeft className="h-5 w-5" />
-              Retour
+              {t('back')}
             </a>
             <Logo size="small" />
-            <div className="w-16" />
+            <LanguageSwitcher />
           </div>
 
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Choisissez votre formule
+              {t('chooseFormula')}
             </h1>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              Débloquez tout le potentiel de VisualGPT avec nos offres flexibles
+              {t('unlockPotential')}
             </p>
             
             {credits && (
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80">
                 <CreditCard className="h-4 w-4" />
-                <span>Crédits actuels: {credits.subscription_type === 'unlimited' ? '∞' : (credits.free_downloads || 0) + (credits.paid_credits || 0)}</span>
+                <span>{t('currentCredits')}: {credits.subscription_type === 'unlimited' ? '∞' : (credits.free_downloads || 0) + (credits.paid_credits || 0)}</span>
               </div>
             )}
           </div>
@@ -145,7 +148,7 @@ export default function Pricing() {
           <div className="mb-16">
             <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-violet-400" />
-              Packs de crédits
+              {t('creditPacks')}
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {creditPacks.map((pack) => (
@@ -160,7 +163,7 @@ export default function Pricing() {
                 >
                   {pack.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-600 to-blue-600 rounded-full text-white text-xs font-medium">
-                      Populaire
+                      {t('popular')}
                     </div>
                   )}
                   <div className="text-center">
@@ -177,7 +180,7 @@ export default function Pricing() {
                           : "bg-white/10 hover:bg-white/20 text-white"
                       )}
                     >
-                      {purchasing === pack.id ? 'Achat...' : 'Acheter'}
+                      {purchasing === pack.id ? t('buying') : t('buy')}
                     </Button>
                   </div>
                 </div>
@@ -189,7 +192,7 @@ export default function Pricing() {
           <div>
             <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
               <Crown className="h-5 w-5 text-amber-400" />
-              Abonnements
+              {t('subscriptions')}
             </h2>
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {subscriptions.map((sub) => (
@@ -204,7 +207,7 @@ export default function Pricing() {
                 >
                   {sub.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full text-white text-xs font-medium">
-                      Recommandé
+                      {t('recommended')}
                     </div>
                   )}
                   
@@ -242,7 +245,7 @@ export default function Pricing() {
                       sub.gradient
                     )}
                   >
-                    {purchasing === sub.id ? 'Souscription...' : 'Souscrire'}
+                    {purchasing === sub.id ? t('subscribing') : t('subscribe')}
                   </Button>
                 </div>
               ))}
@@ -251,9 +254,9 @@ export default function Pricing() {
 
           {/* Footer */}
           <div className="text-center mt-12 text-white/40 text-sm">
-            <p>Paiement sécurisé • Annulation à tout moment • Support 24/7</p>
+            <p>{t('securePayment')}</p>
             <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">
-              Mentions légales
+              {t('legal')}
             </a>
           </div>
         </div>
