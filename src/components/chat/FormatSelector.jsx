@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Monitor, Printer, Ruler, Instagram, Facebook, Linkedin, Globe, CreditCard, FileText, Image, Square, RectangleHorizontal, RectangleVertical } from 'lucide-react';
+import { Monitor, Printer, Ruler } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 
-const FormatIcon = ({ ratio }) => {
-  const [w, h] = ratio.split(':').map(Number);
-  const maxSize = 20;
+// Format shape illustration component
+const FormatShape = ({ w, h, selected, isCircle }) => {
+  const maxSize = 24;
   const scale = maxSize / Math.max(w, h);
-  const width = w * scale;
-  const height = h * scale;
+  const width = Math.max(w * scale, 8);
+  const height = Math.max(h * scale, 8);
   
   return (
-    <div className="w-6 h-6 flex items-center justify-center">
+    <div className="w-8 h-8 flex items-center justify-center">
       <div 
-        className="border-2 border-current rounded-sm"
+        className={cn(
+          "transition-all",
+          isCircle ? "rounded-full" : "rounded-sm",
+          selected ? "bg-violet-400" : "bg-white/40 group-hover:bg-white/60"
+        )}
         style={{ width: `${width}px`, height: `${height}px` }}
       />
     </div>
@@ -30,26 +34,28 @@ export default function FormatSelector({ onSelect, selectedFormat }) {
 
   const formats = {
     digital: [
-      { id: 'post_instagram', name: language === 'fr' ? 'Post Instagram' : 'Instagram Post', dimensions: '1080x1080', ratio: '1:1', icon: Instagram },
-      { id: 'story_instagram', name: language === 'fr' ? 'Story Instagram' : 'Instagram Story', dimensions: '1080x1920', ratio: '9:16', icon: Instagram },
-      { id: 'reel_instagram', name: language === 'fr' ? 'Reel Instagram' : 'Instagram Reel', dimensions: '1080x1920', ratio: '9:16', icon: Instagram },
-      { id: 'post_facebook', name: language === 'fr' ? 'Post Facebook' : 'Facebook Post', dimensions: '1200x630', ratio: '1.91:1', icon: Facebook },
-      { id: 'cover_facebook', name: language === 'fr' ? 'Couverture Facebook' : 'Facebook Cover', dimensions: '820x312', ratio: '2.63:1', icon: Facebook },
-      { id: 'post_linkedin', name: language === 'fr' ? 'Post LinkedIn' : 'LinkedIn Post', dimensions: '1200x627', ratio: '1.91:1', icon: Linkedin },
-      { id: 'banner_linkedin', name: language === 'fr' ? 'Bannière LinkedIn' : 'LinkedIn Banner', dimensions: '1584x396', ratio: '4:1', icon: Linkedin },
-      { id: 'banner_web', name: language === 'fr' ? 'Bannière Web' : 'Web Banner', dimensions: '1920x600', ratio: '16:5', icon: Globe },
-      { id: 'thumbnail_youtube', name: 'YouTube Thumbnail', dimensions: '1280x720', ratio: '16:9', icon: RectangleHorizontal },
-      { id: 'pinterest', name: 'Pinterest Pin', dimensions: '1000x1500', ratio: '2:3', icon: RectangleVertical },
+      { id: 'square', name: language === 'fr' ? 'Carré 1:1' : 'Square 1:1', dimensions: '1080x1080', ratio: '1:1', w: 1, h: 1 },
+      { id: 'portrait_4_5', name: language === 'fr' ? 'Portrait 4:5' : 'Portrait 4:5', dimensions: '1080x1350', ratio: '4:5', w: 4, h: 5 },
+      { id: 'story', name: 'Story 9:16', dimensions: '1080x1920', ratio: '9:16', w: 9, h: 16 },
+      { id: 'portrait_2_3', name: language === 'fr' ? 'Portrait 2:3' : 'Portrait 2:3', dimensions: '1000x1500', ratio: '2:3', w: 2, h: 3 },
+      { id: 'landscape_16_9', name: language === 'fr' ? 'Paysage 16:9' : 'Landscape 16:9', dimensions: '1920x1080', ratio: '16:9', w: 16, h: 9 },
+      { id: 'landscape_4_3', name: language === 'fr' ? 'Paysage 4:3' : 'Landscape 4:3', dimensions: '1200x900', ratio: '4:3', w: 4, h: 3 },
+      { id: 'banner', name: language === 'fr' ? 'Bannière 16:5' : 'Banner 16:5', dimensions: '1920x600', ratio: '16:5', w: 16, h: 5 },
+      { id: 'ultra_wide', name: language === 'fr' ? 'Ultra large 4:1' : 'Ultra Wide 4:1', dimensions: '1584x396', ratio: '4:1', w: 4, h: 1 },
     ],
     print: [
-      { id: 'carte_visite', name: language === 'fr' ? 'Carte de visite' : 'Business Card', dimensions: '1050x600', ratio: '1.75:1', icon: CreditCard },
-      { id: 'flyer_a5', name: language === 'fr' ? 'Flyer A5' : 'A5 Flyer', dimensions: '1748x2480', ratio: '1:1.42', icon: FileText },
-      { id: 'flyer_a4', name: language === 'fr' ? 'Flyer A4' : 'A4 Flyer', dimensions: '2480x3508', ratio: '1:1.41', icon: FileText },
-      { id: 'affiche_a3', name: language === 'fr' ? 'Affiche A3' : 'A3 Poster', dimensions: '3508x4961', ratio: '1:1.41', icon: Image },
-      { id: 'affiche_a2', name: language === 'fr' ? 'Affiche A2' : 'A2 Poster', dimensions: '4961x7016', ratio: '1:1.41', icon: Image },
-      { id: 'logo', name: language === 'fr' ? 'Logo HD' : 'HD Logo', dimensions: '2000x2000', ratio: '1:1', icon: Square },
-      { id: 'menu_restaurant', name: language === 'fr' ? 'Menu Restaurant' : 'Restaurant Menu', dimensions: '2550x3300', ratio: '1:1.29', icon: FileText },
-      { id: 'invitation', name: language === 'fr' ? 'Invitation' : 'Invitation', dimensions: '2100x1500', ratio: '1.4:1', icon: FileText },
+      { id: 'carte_visite_paysage', name: language === 'fr' ? 'Carte de visite paysage' : 'Business Card Landscape', dimensions: '1050x600', w: 1.75, h: 1 },
+      { id: 'carte_visite_portrait', name: language === 'fr' ? 'Carte de visite portrait' : 'Business Card Portrait', dimensions: '600x1050', w: 1, h: 1.75 },
+      { id: 'flyer_portrait', name: language === 'fr' ? 'Flyer portrait' : 'Flyer Portrait', dimensions: '2480x3508', w: 1, h: 1.41 },
+      { id: 'flyer_paysage', name: language === 'fr' ? 'Flyer paysage' : 'Flyer Landscape', dimensions: '3508x2480', w: 1.41, h: 1 },
+      { id: 'affiche_portrait', name: language === 'fr' ? 'Affiche portrait' : 'Poster Portrait', dimensions: '3508x4961', w: 1, h: 1.41 },
+      { id: 'affiche_paysage', name: language === 'fr' ? 'Affiche paysage' : 'Poster Landscape', dimensions: '4961x3508', w: 1.41, h: 1 },
+      { id: 'sticker_rond', name: language === 'fr' ? 'Sticker rond' : 'Round Sticker', dimensions: '1000x1000', w: 1, h: 1, isCircle: true },
+      { id: 'sticker_carre', name: language === 'fr' ? 'Sticker carré' : 'Square Sticker', dimensions: '1000x1000', w: 1, h: 1 },
+      { id: 'carte_cadeau', name: language === 'fr' ? 'Carte cadeau' : 'Gift Card', dimensions: '1500x1000', w: 1.5, h: 1 },
+      { id: 'logo_carre', name: language === 'fr' ? 'Logo carré' : 'Square Logo', dimensions: '2000x2000', w: 1, h: 1 },
+      { id: 'invitation_paysage', name: language === 'fr' ? 'Invitation paysage' : 'Invitation Landscape', dimensions: '2100x1500', w: 1.4, h: 1 },
+      { id: 'invitation_portrait', name: language === 'fr' ? 'Invitation portrait' : 'Invitation Portrait', dimensions: '1500x2100', w: 1, h: 1.4 },
     ]
   };
 
@@ -114,33 +120,27 @@ export default function FormatSelector({ onSelect, selectedFormat }) {
 
       {/* Format Grid */}
       {category !== 'custom' ? (
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
-          {formats[category].map((format) => {
-            const IconComponent = format.icon;
-            return (
-              <button
-                key={format.id}
-                onClick={() => onSelect(format)}
-                className={cn(
-                  "p-2 rounded-xl text-center transition-all border group",
-                  selectedFormat?.id === format.id
-                    ? "bg-violet-500/20 border-violet-500/50"
-                    : "bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10"
-                )}
-              >
-                <div className="flex flex-col items-center gap-1.5">
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
-                    selectedFormat?.id === format.id ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 group-hover:text-white"
-                  )}>
-                    <IconComponent className="h-4 w-4" />
-                  </div>
-                  <p className="text-white text-[10px] font-medium leading-tight">{format.name}</p>
-                  <p className="text-white/40 text-[9px]">{format.ratio}</p>
-                </div>
-              </button>
-            );
-          })}
+        <div className="grid grid-cols-4 md:grid-cols-4 gap-2">
+          {formats[category].map((format) => (
+            <button
+              key={format.id}
+              onClick={() => onSelect(format)}
+              className={cn(
+                "p-2.5 rounded-xl text-center transition-all border group",
+                selectedFormat?.id === format.id
+                  ? "bg-violet-500/20 border-violet-500/50"
+                  : "bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10"
+              )}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <FormatShape w={format.w} h={format.h} selected={selectedFormat?.id === format.id} isCircle={format.isCircle} />
+                <p className={cn(
+                  "text-[10px] font-medium leading-tight text-center",
+                  selectedFormat?.id === format.id ? "text-violet-300" : "text-white/70"
+                )}>{format.name}</p>
+              </div>
+            </button>
+          ))}
         </div>
       ) : (
         <div className="p-4 bg-white/5 rounded-xl space-y-4">
