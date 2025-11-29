@@ -274,10 +274,9 @@ export default function Home() {
         setVisuals(prev => [newVisual, ...prev]);
         setSelectedVisual(newVisual);
 
-        // Show watermark notice for 5 seconds
-        if (isAuthenticated && credits?.subscription_type === 'free') {
+        // Show watermark notice if not dismissed
+        if (isAuthenticated && credits?.subscription_type === 'free' && !localStorage.getItem('hideWatermarkNotice')) {
           setShowWatermarkNotice(true);
-          setTimeout(() => setShowWatermarkNotice(false), 5000);
         }
 
         // Show visuals tooltip after a short delay
@@ -454,18 +453,23 @@ export default function Home() {
       {/* Watermark Notice Toast */}
       {showWatermarkNotice && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-900/90 to-blue-900/90 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg">
-            <Info className="h-5 w-5 text-violet-300 flex-shrink-0" />
-            <p className="text-white text-sm">
-              {language === 'fr' 
-                ? "🎉 Le filigrane ne sera pas présent sur la version téléchargée !" 
-                : "🎉 The watermark will not appear on the downloaded version!"}
-            </p>
+          <div className="flex flex-col gap-2 px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg">
+            <div className="flex items-center gap-3">
+              <Info className="h-4 w-4 text-white/60 flex-shrink-0" />
+              <p className="text-white/70 text-sm">
+                {language === 'fr' 
+                  ? "Le filigrane ne sera pas présent sur la version téléchargée" 
+                  : "The watermark will not appear on the downloaded version"}
+              </p>
+            </div>
             <button 
-              onClick={() => setShowWatermarkNotice(false)}
-              className="text-white/60 hover:text-white transition-colors"
+              onClick={() => {
+                setShowWatermarkNotice(false);
+                localStorage.setItem('hideWatermarkNotice', 'true');
+              }}
+              className="text-white/40 hover:text-white/60 text-xs transition-colors self-end"
             >
-              <X className="h-4 w-4" />
+              {language === 'fr' ? "Ne plus afficher ce message" : "Don't show this again"}
             </button>
           </div>
         </div>
