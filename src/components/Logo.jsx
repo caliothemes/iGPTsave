@@ -44,31 +44,31 @@ export default function Logo({ size = 'default', showText = true, animate = fals
           50% { transform: translateY(-8px); }
         }
         .animate-float {
-          animation: float 3s ease-in-out infinite;
+          animation: float 4s ease-in-out infinite;
         }
         @keyframes ping-slow {
           0% { transform: scale(1); opacity: 0; }
-          40% { transform: scale(1); opacity: 0; }
-          45% { transform: scale(1.02); opacity: 0.25; }
-          50% { transform: scale(1.06); opacity: 0.2; }
-          55% { transform: scale(1.02); opacity: 0.1; }
-          60% { transform: scale(1); opacity: 0; }
+          35% { transform: scale(1); opacity: 0; }
+          42% { transform: scale(1.02); opacity: 0.2; }
+          50% { transform: scale(1.06); opacity: 0.18; }
+          58% { transform: scale(1.02); opacity: 0.1; }
+          65% { transform: scale(1); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slow {
-          animation: ping-slow 3s ease-in-out infinite;
+          animation: ping-slow 4s ease-in-out infinite;
         }
         @keyframes ping-slower {
           0% { transform: scale(1); opacity: 0; }
-          40% { transform: scale(1); opacity: 0; }
-          45% { transform: scale(1.04); opacity: 0.2; }
-          50% { transform: scale(1.08); opacity: 0.15; }
-          55% { transform: scale(1.04); opacity: 0.08; }
-          60% { transform: scale(1); opacity: 0; }
+          35% { transform: scale(1); opacity: 0; }
+          42% { transform: scale(1.04); opacity: 0.15; }
+          50% { transform: scale(1.08); opacity: 0.12; }
+          58% { transform: scale(1.04); opacity: 0.06; }
+          65% { transform: scale(1); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slower {
-          animation: ping-slower 3s ease-in-out infinite;
+          animation: ping-slower 4s ease-in-out infinite;
         }
         @keyframes pulse-glow {
           0%, 100% { opacity: 0.3; transform: scale(1); }
