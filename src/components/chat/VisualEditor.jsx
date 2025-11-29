@@ -538,14 +538,14 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
       <div className="flex gap-4">
         {/* Left Panel */}
-        <div className="w-80 space-y-3">
+        <div className="w-80 flex-shrink-0 space-y-3">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-5 bg-white/5 h-11">
-              <TabsTrigger value="text" className="data-[state=active]:bg-violet-500/30 py-2"><Type className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="shapes" className="data-[state=active]:bg-violet-500/30 py-2"><Square className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="textures" className="data-[state=active]:bg-violet-500/30 py-2"><Brush className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="illustrations" className="data-[state=active]:bg-violet-500/30 py-2"><ImagePlus className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="ai" className="data-[state=active]:bg-violet-500/30 py-2"><Sparkles className="h-5 w-5" /></TabsTrigger>
+            <TabsList className="flex w-full bg-white/10 rounded-lg p-1 h-12 gap-1">
+              <TabsTrigger value="text" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Type className="h-5 w-5" /></TabsTrigger>
+              <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-5 w-5" /></TabsTrigger>
+              <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-5 w-5" /></TabsTrigger>
+              <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-5 w-5" /></TabsTrigger>
+              <TabsTrigger value="ai" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Sparkles className="h-5 w-5" /></TabsTrigger>
             </TabsList>
 
             <ScrollArea className="h-[350px] mt-3">
