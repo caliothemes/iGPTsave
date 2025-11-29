@@ -190,7 +190,7 @@ export default function Sidebar({
               >
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-violet-400" />
-                  <span className="text-white/80 text-sm">{getTotalCredits()} {t('credits')}</span>
+                  <span className="text-white/80 text-sm">{getTotalCredits()} messages</span>
                 </div>
                 {badge && (
                   <span className={cn("text-xs px-2 py-0.5 rounded-full", badge.color)}>

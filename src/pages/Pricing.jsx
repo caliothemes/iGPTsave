@@ -20,7 +20,7 @@ const subscriptions = [
     price: 0,
     messages: 50,
     pricePerMsg: 0,
-    features: ['50 messages', 'Génération de visuels', 'Filigrane'],
+    features: ['50 messages', 'Génération de visuels', 'Sans filigrane'],
     icon: MessageSquare,
     gradient: 'from-gray-600 to-gray-700',
     isFree: true
@@ -135,7 +135,7 @@ export default function Pricing() {
               <Crown className="h-5 w-5 text-amber-400" />
               {language === 'fr' ? 'Abonnements' : 'Subscriptions'}
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {subscriptions.map((sub) => (
                 <div key={sub.id} className={cn(
                   "relative rounded-2xl p-5 transition-all duration-300 hover:scale-105 flex flex-col",
@@ -220,7 +220,7 @@ export default function Pricing() {
               <Sparkles className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Recharges de crédits' : 'Credit packs'}
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {creditPacks.map((pack) => (
                 <div key={pack.id} className={cn(
                   "relative rounded-2xl p-6 transition-all duration-300 hover:scale-105",
