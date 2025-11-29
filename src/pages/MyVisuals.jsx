@@ -23,8 +23,6 @@ export default function MyVisuals() {
   const [gridSize, setGridSize] = useState('medium');
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [showEditor, setShowEditor] = useState(false);
-  const [editingVisual, setEditingVisual] = useState(null);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
