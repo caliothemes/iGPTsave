@@ -70,8 +70,8 @@ export default function Sidebar({
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Header */}
-        <div className="p-2 pt-4 flex flex-col border-b border-white/10">
-          <p className="text-white/60 text-sm font-medium mb-3">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
+        <div className="p-3 pt-4 flex flex-col border-b border-white/10">
+          <p className="text-white/50 text-xs font-medium mb-3 ml-1">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
           <a
             href={createPageUrl('MyVisuals')}
             className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
