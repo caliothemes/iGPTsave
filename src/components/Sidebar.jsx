@@ -8,7 +8,6 @@ import {
 import { cn } from "@/lib/utils";
 import { createPageUrl } from '@/utils';
 import { useLanguage } from './LanguageContext';
-import Logo from './Logo';
 import {
   Collapsible,
   CollapsibleContent,
@@ -28,7 +27,8 @@ export default function Sidebar({
   onDeleteConversation,
   onSelectVisual,
   onLogin,
-  onLogout
+  onLogout,
+  sidebarTitle
 }) {
   const { t } = useLanguage();
   const [visualsOpen, setVisualsOpen] = useState(false);
@@ -69,11 +69,9 @@ export default function Sidebar({
         "fixed inset-y-0 left-0 z-40 w-64 bg-black/60 backdrop-blur-xl border-r border-white/10 transition-transform duration-300 flex flex-col",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        {/* Header with Logo */}
-        <div className="p-4 pt-4 flex flex-col items-center border-b border-white/10">
-          <div className="mb-3">
-            <Logo size="large" showText={false} />
-          </div>
+        {/* Header */}
+        <div className="p-4 pt-14 flex flex-col border-b border-white/10">
+          <p className="text-white/50 text-xs mb-3">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
           <a
             href={createPageUrl('MyVisuals')}
             className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
