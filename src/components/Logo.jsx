@@ -1,12 +1,12 @@
 import React from 'react';
 
-const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/ae6dde733_3.png";
+const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/3c3d66954_1.png";
 
 export default function Logo({ size = 'default', showText = true, animate = false }) {
   const sizes = {
     small: { img: 32, text: 'text-xl' },
     default: { img: 48, text: 'text-2xl' },
-    large: { img: 240, text: 'text-4xl' }
+    large: { img: 160, text: 'text-4xl' }
   };
 
   const { img, text } = sizes[size];

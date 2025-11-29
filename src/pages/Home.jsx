@@ -462,7 +462,7 @@ export default function Home() {
             <div className="max-w-3xl mx-auto space-y-4">
               {/* Hero - only show if few messages */}
               {messages.length <= 1 && (
-                <div className="flex flex-col items-center justify-center py-8 md:py-12 text-center">
+                <div className="flex flex-col items-center justify-center py-4 md:py-6 text-center">
                   <Logo size="large" showText={false} animate={true} />
                   <h1 className="text-xl md:text-2xl text-white/80 font-light mt-6 max-w-xl leading-relaxed">
                     {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
