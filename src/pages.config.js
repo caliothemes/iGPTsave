@@ -8,6 +8,7 @@ import AdminVisuals from './pages/AdminVisuals';
 import AdminSettings from './pages/AdminSettings';
 import Account from './pages/Account';
 import AdminLegal from './pages/AdminLegal';
+import AdminAssets from './pages/AdminAssets';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +23,7 @@ export const PAGES = {
     "AdminSettings": AdminSettings,
     "Account": Account,
     "AdminLegal": AdminLegal,
+    "AdminAssets": AdminAssets,
 }
 
 export const pagesConfig = {
