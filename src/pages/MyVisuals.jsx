@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Grid, List, Heart, Download, Pencil } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
-import VisualEditor from '@/components/chat/VisualEditor';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
