@@ -74,6 +74,13 @@ export default function Sidebar({
           <div className="mb-3">
             <Logo size="large" showText={false} />
           </div>
+          <a
+            href={createPageUrl('MyVisuals')}
+            className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
+            <Image className="h-4 w-4 mr-2" />
+            {t('myVisuals')}
+          </a>
           <Button
             onClick={onNewChat}
             className="w-full bg-gradient-to-r from-violet-600/80 to-blue-600/80 hover:from-violet-600 hover:to-blue-600 text-white border-0"
@@ -123,19 +130,19 @@ export default function Sidebar({
             </CollapsibleContent>
           </Collapsible>
 
-          {/* Visuals Gallery */}
+          {/* Current Session Visuals */}
           {visuals.length > 0 && (
             <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4">
               <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors">
                 <span className="flex items-center gap-2">
                   <Image className="h-4 w-4" />
-                  {t('myVisuals')} ({visuals.length})
+                  {t('visualsInProgress')} ({visuals.length > 4 ? '4+' : visuals.length})
                 </span>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", visualsOpen && "rotate-180")} />
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="grid grid-cols-2 gap-2 p-2">
-                  {visuals.slice(0, 8).map((visual, idx) => (
+                  {visuals.slice(0, 4).map((visual, idx) => (
                     <div
                       key={visual.id || idx}
                       onClick={() => onSelectVisual(visual)}
@@ -145,8 +152,13 @@ export default function Sidebar({
                     </div>
                   ))}
                 </div>
-                {visuals.length > 8 && (
-                  <p className="text-white/40 text-xs text-center py-2">+{visuals.length - 8} {t('others')}</p>
+                {visuals.length > 4 && (
+                  <a 
+                    href={createPageUrl('MyVisuals')}
+                    className="block text-violet-400 text-xs text-center py-2 hover:text-violet-300 transition-colors"
+                  >
+                    {t('seeAll')} ({visuals.length})
+                  </a>
                 )}
               </CollapsibleContent>
             </Collapsible>
