@@ -796,30 +796,44 @@ export default function Home() {
                                       </DropdownMenuContent>
                                     </DropdownMenu>
                                     <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                  placeholder={t('inputPlaceholder')}
-                  className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm"
-                  disabled={isLoading}
-                />
-                <Button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  size="icon"
-                  className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8 relative overflow-hidden"
-                >
-                  {isLoading ? (
-                    <div className="relative">
-                      <div className="absolute inset-0 rounded-full border-2 border-white/20 border-t-white animate-spin" style={{ width: '16px', height: '16px' }} />
-                      <Sparkles className="h-3 w-3 text-white/80 animate-pulse" />
-                    </div>
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+                                                            type="text"
+                                                            value={input}
+                                                            onChange={(e) => setInput(e.target.value)}
+                                                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                                                            placeholder={t('inputPlaceholder')}
+                                                            className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm"
+                                                            disabled={isLoading}
+                                                          />
+                                                          <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={toggleVoice}
+                                                            className={cn(
+                                                              "flex-shrink-0 h-8 w-8 transition-colors",
+                                                              isListening 
+                                                                ? "text-red-400 bg-red-500/20 hover:bg-red-500/30 animate-pulse" 
+                                                                : "text-white/50 hover:text-white hover:bg-white/10"
+                                                            )}
+                                                            title={language === 'fr' ? 'Commande vocale' : 'Voice command'}
+                                                          >
+                                                            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                                                          </Button>
+                                                          <Button
+                                                            onClick={handleSend}
+                                                            disabled={!input.trim() || isLoading}
+                                                            size="icon"
+                                                            className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8 relative overflow-hidden"
+                                                          >
+                                                            {isLoading ? (
+                                                              <div className="relative">
+                                                                <div className="absolute inset-0 rounded-full border-2 border-white/20 border-t-white animate-spin" style={{ width: '16px', height: '16px' }} />
+                                                                <Sparkles className="h-3 w-3 text-white/80 animate-pulse" />
+                                                              </div>
+                                                            ) : (
+                                                              <Send className="h-4 w-4" />
+                                                            )}
+                                                          </Button>
+                                                        </div>
               
               {/* Footer */}
               <div className="mt-3 flex items-center justify-center">
