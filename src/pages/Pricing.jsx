@@ -32,7 +32,7 @@ export default function Pricing() {
         t('prioritySupport')
       ],
       icon: Zap,
-      gradient: 'from-blue-600 to-cyan-600'
+      gradient: 'from-blue-800 to-cyan-800'
     },
     {
       id: 'unlimited',
@@ -48,7 +48,7 @@ export default function Pricing() {
         t('apiAccess')
       ],
       icon: Crown,
-      gradient: 'from-violet-600 to-purple-600',
+      gradient: 'from-violet-800 to-purple-800',
       popular: true
     }
   ];
@@ -158,12 +158,12 @@ export default function Pricing() {
                   className={cn(
                     "relative rounded-2xl p-6 transition-all duration-300 hover:scale-105",
                     pack.popular 
-                      ? "bg-gradient-to-br from-violet-600/20 to-blue-600/20 border-2 border-violet-500/50" 
+                      ? "bg-gradient-to-br from-violet-800/20 to-blue-800/20 border-2 border-violet-700/50" 
                       : "bg-white/5 border border-white/10 hover:border-white/30"
                   )}
                 >
                   {pack.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-600 to-blue-600 rounded-full text-white text-xs font-medium">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-800 to-blue-800 rounded-full text-white text-xs font-medium">
                       {t('popular')}
                     </div>
                   )}
@@ -177,7 +177,7 @@ export default function Pricing() {
                       className={cn(
                         "w-full",
                         pack.popular 
-                          ? "bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700" 
+                          ? "bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900" 
                           : "bg-white/10 hover:bg-white/20 text-white"
                       )}
                     >
@@ -202,12 +202,12 @@ export default function Pricing() {
                   className={cn(
                     "relative rounded-2xl p-8 transition-all duration-300 hover:scale-105",
                     sub.popular 
-                      ? "bg-gradient-to-br from-violet-600/20 to-purple-600/20 border-2 border-violet-500/50" 
+                      ? "bg-gradient-to-br from-violet-800/20 to-purple-800/20 border-2 border-violet-700/50" 
                       : "bg-white/5 border border-white/10 hover:border-white/30"
                   )}
                 >
                   {sub.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full text-white text-xs font-medium">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-800 to-purple-800 rounded-full text-white text-xs font-medium">
                       {t('recommended')}
                     </div>
                   )}
