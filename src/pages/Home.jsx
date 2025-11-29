@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Sparkles, Image, Palette, X, Info } from 'lucide-react';
+import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -553,17 +553,28 @@ export default function Home() {
 
               {/* Selected Visual Preview */}
               {selectedVisual && (
-                <div className="max-w-sm mx-auto">
-                  <VisualCard
-                    visual={selectedVisual}
-                    onRegenerate={handleRegenerate}
-                    onDownload={() => handleDownload(selectedVisual)}
-                    onVariation={handleVariation}
-                    onToggleFavorite={handleToggleFavorite}
-                    isRegenerating={isGenerating}
-                    canDownload={isAuthenticated && getTotalCredits() > 0}
-                    hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
-                  />
+                <div className="flex items-start justify-center gap-3">
+                  <div className="max-w-sm">
+                    <VisualCard
+                      visual={selectedVisual}
+                      onRegenerate={handleRegenerate}
+                      onDownload={() => handleDownload(selectedVisual)}
+                      onVariation={handleVariation}
+                      onToggleFavorite={handleToggleFavorite}
+                      isRegenerating={isGenerating}
+                      canDownload={isAuthenticated && getTotalCredits() > 0}
+                      hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
+                    />
+                  </div>
+                  {isAuthenticated && (
+                    <a
+                      href={createPageUrl('MyVisuals') + '?filter=favorites'}
+                      className="flex items-center gap-2 px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-lg text-amber-300 text-sm transition-colors whitespace-nowrap"
+                    >
+                      <Heart className="h-4 w-4" />
+                      {language === 'fr' ? 'Mes favoris' : 'My favorites'}
+                    </a>
+                  )}
                 </div>
               )}
 

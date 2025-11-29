@@ -14,7 +14,10 @@ export default function MyVisuals() {
   const { language } = useLanguage();
   const [visuals, setVisuals] = useState([]);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('filter') || 'all';
+  });
   const [typeFilter, setTypeFilter] = useState('all');
   const [gridSize, setGridSize] = useState('medium');
   const [selectedVisual, setSelectedVisual] = useState(null);
