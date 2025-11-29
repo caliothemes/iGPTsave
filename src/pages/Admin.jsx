@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp } from 'lucide-react';
+import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StatCard from '@/components/admin/StatCard';
 import { 
@@ -27,6 +27,13 @@ export default function Admin() {
     totalConversations: 0,
     activeSubscriptions: 0,
     totalUsers: 0
+  });
+  const [visitStats, setVisitStats] = useState({
+    currentVisitors: 0,
+    today: 0,
+    thisWeek: 0,
+    thisMonth: 0,
+    thisYear: 0
   });
   const [activityData, setActivityData] = useState([]);
   const [visualTypesData, setVisualTypesData] = useState([]);
@@ -88,6 +95,44 @@ export default function Admin() {
         });
         setVisualTypesData(Object.entries(typeCounts).map(([name, value]) => ({ name, value })));
 
+        // Calculate visit stats based on conversations/visuals activity
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const weekAgo = new Date(now);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const monthAgo = new Date(now);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        const yearAgo = new Date(now);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+
+        // Simulate current visitors based on recent activity (last 5 minutes)
+        const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
+        const recentActivity = [...allVisuals, ...allConversations].filter(item => 
+          new Date(item.created_date || item.updated_date) > fiveMinAgo
+        ).length;
+
+        // Count unique users by period
+        const getUniqueUsers = (items, afterDate) => {
+          const users = new Set();
+          items.forEach(item => {
+            if (new Date(item.created_date) > afterDate) {
+              users.add(item.user_email || item.created_by);
+            }
+          });
+          return users.size;
+        };
+
+        const allItems = [...allVisuals, ...allConversations];
+        const todayStart = new Date(todayStr);
+
+        setVisitStats({
+          currentVisitors: Math.max(1, recentActivity),
+          today: getUniqueUsers(allItems, todayStart),
+          thisWeek: getUniqueUsers(allItems, weekAgo),
+          thisMonth: getUniqueUsers(allItems, monthAgo),
+          thisYear: getUniqueUsers(allItems, yearAgo)
+        });
+
       } catch (e) {
         console.error(e);
         window.location.href = createPageUrl('Home');
@@ -114,6 +159,56 @@ export default function Admin() {
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
           <p className="text-white/60">Vue d'ensemble de votre application</p>
+        </div>
+
+        {/* Visit Stats Grid */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Eye className="h-5 w-5 text-violet-400" />
+            Statistiques de visites
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="p-4 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Activity className="h-4 w-4 text-green-400" />
+                <span className="text-green-300 text-xs">En ce moment</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{visitStats.currentVisitors}</p>
+              <p className="text-white/50 text-xs">visiteurs actifs</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="h-4 w-4 text-blue-400" />
+                <span className="text-blue-300 text-xs">Aujourd'hui</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{visitStats.today}</p>
+              <p className="text-white/50 text-xs">visiteurs</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarDays className="h-4 w-4 text-violet-400" />
+                <span className="text-violet-300 text-xs">Cette semaine</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{visitStats.thisWeek}</p>
+              <p className="text-white/50 text-xs">visiteurs</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarDays className="h-4 w-4 text-amber-400" />
+                <span className="text-amber-300 text-xs">Ce mois-ci</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{visitStats.thisMonth}</p>
+              <p className="text-white/50 text-xs">visiteurs</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarDays className="h-4 w-4 text-pink-400" />
+                <span className="text-pink-300 text-xs">Cette année</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{visitStats.thisYear}</p>
+              <p className="text-white/50 text-xs">visiteurs</p>
+            </div>
+          </div>
         </div>
 
         {/* Stats Grid */}

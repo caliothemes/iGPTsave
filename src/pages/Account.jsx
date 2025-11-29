@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Camera, User, Mail, Crown, Zap, Save } from 'lucide-react';
+import { Loader2, Camera, User, Mail, Crown, Zap, Save, Receipt, Download, FileText } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import { useLanguage } from '@/components/LanguageContext';
+import moment from 'moment';
 
 export default function Account() {
   const { language } = useLanguage();
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localData, setLocalData] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   const t = {
     fr: {
@@ -29,6 +32,21 @@ export default function Account() {
       paidCredits: "Crédits payants",
       save: "Sauvegarder",
       upgradeAccount: "Améliorer mon compte",
+      payments: "Historique des paiements",
+      noPayments: "Aucun paiement effectué",
+      invoice: "Facture",
+      downloadInvoice: "Télécharger",
+      printInvoice: "Imprimer",
+      date: "Date",
+      amount: "Montant",
+      type: "Type",
+      status: "Statut",
+      completed: "Complété",
+      pending: "En attente",
+      failed: "Échoué",
+      creditPack: "Pack de crédits",
+      subscriptionLimited: "Abonnement Pro",
+      subscriptionUnlimited: "Abonnement Unlimited",
     },
     en: {
       title: "My Account",
@@ -45,8 +63,135 @@ export default function Account() {
       paidCredits: "Paid credits",
       save: "Save",
       upgradeAccount: "Upgrade account",
+      payments: "Payment History",
+      noPayments: "No payments made",
+      invoice: "Invoice",
+      downloadInvoice: "Download",
+      printInvoice: "Print",
+      date: "Date",
+      amount: "Amount",
+      type: "Type",
+      status: "Status",
+      completed: "Completed",
+      pending: "Pending",
+      failed: "Failed",
+      creditPack: "Credit Pack",
+      subscriptionLimited: "Pro Subscription",
+      subscriptionUnlimited: "Unlimited Subscription",
     }
   }[language];
+
+  const loadTransactions = async (userEmail) => {
+    setLoadingTransactions(true);
+    const userTransactions = await base44.entities.Transaction.filter(
+      { user_email: userEmail }, 
+      '-created_date', 
+      50
+    );
+    setTransactions(userTransactions);
+    setLoadingTransactions(false);
+  };
+
+  const getTransactionTypeName = (type) => {
+    switch(type) {
+      case 'credit_pack': return t.creditPack;
+      case 'subscription_limited': return t.subscriptionLimited;
+      case 'subscription_unlimited': return t.subscriptionUnlimited;
+      default: return type;
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case 'completed': return <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-300 text-xs">{t.completed}</span>;
+      case 'pending': return <span className="px-2 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs">{t.pending}</span>;
+      case 'failed': return <span className="px-2 py-1 rounded-full bg-red-500/20 text-red-300 text-xs">{t.failed}</span>;
+      default: return null;
+    }
+  };
+
+  const generateInvoice = (transaction, user) => {
+    const invoiceContent = `
+      <html>
+      <head>
+        <title>Facture - iGPT</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+          .header { border-bottom: 2px solid #8b5cf6; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { font-size: 28px; font-weight: bold; color: #8b5cf6; }
+          .invoice-title { font-size: 24px; color: #333; margin-top: 10px; }
+          .info-section { display: flex; justify-content: space-between; margin-bottom: 30px; }
+          .info-block { }
+          .info-label { color: #666; font-size: 12px; text-transform: uppercase; }
+          .info-value { font-size: 14px; color: #333; margin-top: 5px; }
+          .table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+          .table th { background: #f5f5f5; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
+          .table td { padding: 12px; border-bottom: 1px solid #eee; }
+          .total { text-align: right; font-size: 20px; font-weight: bold; color: #8b5cf6; }
+          .footer { margin-top: 50px; text-align: center; color: #999; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">iGPT</div>
+          <div class="invoice-title">${t.invoice} #${transaction.id?.slice(-8).toUpperCase() || 'N/A'}</div>
+        </div>
+        <div class="info-section">
+          <div class="info-block">
+            <div class="info-label">${t.date}</div>
+            <div class="info-value">${moment(transaction.created_date).format('DD/MM/YYYY HH:mm')}</div>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Client</div>
+            <div class="info-value">${user?.full_name || user?.email}</div>
+            <div class="info-value">${user?.email}</div>
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>${t.amount}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${getTransactionTypeName(transaction.type)} - ${transaction.credits_added || 0} messages</td>
+              <td>${transaction.amount?.toFixed(2) || '0.00'}€</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="total">Total: ${transaction.amount?.toFixed(2) || '0.00'}€</div>
+        <div class="footer">
+          iGPT - Service de création de visuels par IA<br>
+          Merci pour votre confiance !
+        </div>
+      </body>
+      </html>
+    `;
+    return invoiceContent;
+  };
+
+  const handleDownloadInvoice = (transaction, user) => {
+    const invoiceContent = generateInvoice(transaction, user);
+    const blob = new Blob([invoiceContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `facture-${transaction.id?.slice(-8) || 'invoice'}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePrintInvoice = (transaction, user) => {
+    const invoiceContent = generateInvoice(transaction, user);
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(invoiceContent);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   const handleImageUpload = async (e, user) => {
     const file = e.target.files[0];
@@ -103,6 +248,7 @@ export default function Account() {
       {({ user, credits }) => {
         if (!localData && user) {
           setLocalData({ full_name: user.full_name || '', profile_image: user.profile_image || '' });
+          loadTransactions(user.email);
         }
         const formData = localData || { full_name: user?.full_name || '', profile_image: user?.profile_image || '' };
 
@@ -179,6 +325,67 @@ export default function Account() {
                   <p className="text-2xl font-bold text-white">{credits?.subscription_type === 'unlimited' ? '∞' : (credits?.paid_credits || 0)}</p>
                 </div>
               </div>
+            </div>
+
+            {/* Payments History Card */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+              <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                <Receipt className="h-5 w-5 text-violet-400" />
+                {t.payments}
+              </h2>
+              
+              {loadingTransactions ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 text-violet-400 animate-spin" />
+                </div>
+              ) : transactions.length === 0 ? (
+                <div className="text-center py-8 text-white/40">
+                  <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>{t.noPayments}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {transactions.map((transaction) => (
+                    <div 
+                      key={transaction.id} 
+                      className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-1">
+                          <p className="text-white font-medium">{getTransactionTypeName(transaction.type)}</p>
+                          {getStatusBadge(transaction.status)}
+                        </div>
+                        <p className="text-white/50 text-sm">
+                          {moment(transaction.created_date).format('DD/MM/YYYY HH:mm')} • {transaction.credits_added || 0} messages
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <p className="text-white font-bold text-lg">{transaction.amount?.toFixed(2) || '0.00'}€</p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownloadInvoice(transaction, user)}
+                            className="text-white/60 hover:text-white hover:bg-white/10"
+                            title={t.downloadInvoice}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePrintInvoice(transaction, user)}
+                            className="text-white/60 hover:text-white hover:bg-white/10"
+                            title={t.printInvoice}
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
