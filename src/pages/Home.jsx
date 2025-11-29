@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart } from 'lucide-react';
+import FavoritesModal from '@/components/FavoritesModal';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -37,6 +38,7 @@ export default function Home() {
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [showWatermarkNotice, setShowWatermarkNotice] = useState(false);
   const [showVisualsTooltip, setShowVisualsTooltip] = useState(false);
+  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -566,14 +568,14 @@ export default function Home() {
                       hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
                     />
                   </div>
-                  {isAuthenticated && (
-                    <a
-                      href={createPageUrl('MyVisuals') + '?filter=favorites'}
+                  {isAuthenticated && visuals.filter(v => v.is_favorite).length > 0 && (
+                    <button
+                      onClick={() => setShowFavoritesModal(true)}
                       className="flex items-center gap-2 px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-lg text-amber-300 text-sm transition-colors whitespace-nowrap"
                     >
-                      <Heart className="h-4 w-4" />
+                      <Heart className="h-4 w-4 fill-amber-400" />
                       {language === 'fr' ? 'Mes favoris' : 'My favorites'}
-                    </a>
+                    </button>
                   )}
                 </div>
               )}
@@ -706,6 +708,14 @@ export default function Home() {
           </div>
         </main>
       </div>
-    </div>
-  );
-}
+
+      {/* Favorites Modal */}
+      <FavoritesModal
+        isOpen={showFavoritesModal}
+        onClose={() => setShowFavoritesModal(false)}
+        favorites={visuals.filter(v => v.is_favorite)}
+        onSelectVisual={setSelectedVisual}
+      />
+      </div>
+      );
+      }
