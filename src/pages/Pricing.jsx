@@ -20,7 +20,7 @@ const subscriptions = [
     price: 0,
     messages: 50,
     pricePerMsg: 0,
-    features: ['50 messages', 'Génération de visuels', 'Sans filigrane'],
+    features: ['50 messages/mois', 'Génération de visuels', 'Éditeur magique', 'Sans filigrane'],
     icon: MessageSquare,
     gradient: 'from-gray-600 to-gray-700',
     isFree: true
@@ -31,7 +31,7 @@ const subscriptions = [
     price: 6.99,
     messages: 100,
     pricePerMsg: 0.07,
-    features: ['100 messages/mois', 'Sans filigrane', 'Support email'],
+    features: ['100 messages/mois', 'Sans filigrane', 'Éditeur magique', 'Support email'],
     icon: Zap,
     gradient: 'from-blue-600 to-cyan-600'
   },
@@ -49,9 +49,9 @@ const subscriptions = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 29.99,
+    price: 24.99,
     messages: 500,
-    pricePerMsg: 0.06,
+    pricePerMsg: 0.05,
     features: ['500 messages/mois', 'Sans filigrane', 'Éditeur magique', 'Formats HD & Print', 'Support VIP'],
     icon: Crown,
     gradient: 'from-amber-500 to-orange-600'
@@ -59,9 +59,9 @@ const subscriptions = [
   {
     id: 'ultra',
     name: 'Ultra',
-    price: 49.99,
+    price: 39.90,
     messages: 1000,
-    pricePerMsg: 0.05,
+    pricePerMsg: 0.04,
     features: ['1000 messages/mois', 'Sans filigrane', 'Éditeur magique', 'Formats HD & Print', 'API Access', 'Support VIP dédié'],
     icon: Gem,
     gradient: 'from-rose-500 to-pink-600'
