@@ -2,25 +2,27 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Monitor, Printer } from 'lucide-react';
 import { cn } from "@/lib/utils";
-
-const formats = {
-  digital: [
-    { id: 'post_instagram', name: 'Post Instagram', dimensions: '1080x1080', icon: '📱' },
-    { id: 'story_instagram', name: 'Story Instagram', dimensions: '1080x1920', icon: '📱' },
-    { id: 'post_facebook', name: 'Post Facebook', dimensions: '1200x630', icon: '👍' },
-    { id: 'post_linkedin', name: 'Post LinkedIn', dimensions: '1200x627', icon: '💼' },
-    { id: 'banner', name: 'Bannière Web', dimensions: '1920x600', icon: '🖥️' },
-  ],
-  print: [
-    { id: 'carte_visite', name: 'Carte de visite', dimensions: '85x55mm', icon: '💳' },
-    { id: 'flyer', name: 'Flyer A5', dimensions: '148x210mm', icon: '📄' },
-    { id: 'affiche', name: 'Affiche A3', dimensions: '297x420mm', icon: '🖼️' },
-    { id: 'logo', name: 'Logo HD', dimensions: '2000x2000', icon: '✨' },
-  ]
-};
+import { useLanguage } from '@/components/LanguageContext';
 
 export default function FormatSelector({ onSelect, selectedFormat }) {
+  const { t } = useLanguage();
   const [category, setCategory] = React.useState('digital');
+
+  const formats = {
+    digital: [
+      { id: 'post_instagram', name: t('postInstagram'), dimensions: '1080x1080', icon: '📱' },
+      { id: 'story_instagram', name: t('storyInstagram'), dimensions: '1080x1920', icon: '📱' },
+      { id: 'post_facebook', name: t('postFacebook'), dimensions: '1200x630', icon: '👍' },
+      { id: 'post_linkedin', name: t('postLinkedin'), dimensions: '1200x627', icon: '💼' },
+      { id: 'banner', name: t('webBanner'), dimensions: '1920x600', icon: '🖥️' },
+    ],
+    print: [
+      { id: 'carte_visite', name: t('businessCard'), dimensions: '85x55mm', icon: '💳' },
+      { id: 'flyer', name: t('flyerA5'), dimensions: '148x210mm', icon: '📄' },
+      { id: 'affiche', name: t('posterA3'), dimensions: '297x420mm', icon: '🖼️' },
+      { id: 'logo', name: t('logoHD'), dimensions: '2000x2000', icon: '✨' },
+    ]
+  };
 
   return (
     <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 space-y-4">
@@ -37,7 +39,7 @@ export default function FormatSelector({ onSelect, selectedFormat }) {
           )}
         >
           <Monitor className="h-4 w-4 mr-2" />
-          Digital
+          {t('digital')}
         </Button>
         <Button
           variant="ghost"
@@ -51,7 +53,7 @@ export default function FormatSelector({ onSelect, selectedFormat }) {
           )}
         >
           <Printer className="h-4 w-4 mr-2" />
-          Impression
+          {t('print')}
         </Button>
       </div>
 

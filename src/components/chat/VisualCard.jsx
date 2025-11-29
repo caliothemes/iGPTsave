@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Download, RefreshCw, Loader2, Check, Lock } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { useLanguage } from '@/components/LanguageContext';
 
 export default function VisualCard({ 
   visual, 
@@ -11,6 +12,7 @@ export default function VisualCard({
   canDownload,
   hasWatermark
 }) {
+  const { t } = useLanguage();
   const [downloading, setDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
@@ -81,7 +83,7 @@ export default function VisualCard({
             className="flex-1 border-white/20 text-white hover:bg-white/10"
           >
             <RefreshCw className={cn("h-4 w-4 mr-2", isRegenerating && "animate-spin")} />
-            Régénérer
+            {t('regenerate')}
           </Button>
           
           <Button
@@ -104,13 +106,13 @@ export default function VisualCard({
             ) : (
               <Download className="h-4 w-4 mr-2" />
             )}
-            {downloaded ? 'Téléchargé' : 'Télécharger'}
+            {downloaded ? t('downloaded') : t('download')}
           </Button>
         </div>
 
         {!canDownload && (
           <p className="text-xs text-amber-400/80 text-center">
-            Plus de crédits disponibles
+            {t('noCredits')}
           </p>
         )}
       </div>

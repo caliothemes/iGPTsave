@@ -10,9 +10,12 @@ import Sidebar from '@/components/Sidebar';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
 import FormatSelector from '@/components/chat/FormatSelector';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
 export default function Home() {
+  const { t, language } = useLanguage();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -30,9 +33,6 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
   const messagesEndRef = useRef(null);
-
-  const defaultTitle = "Votre assistant IA pour créer des visuels professionnels";
-  const defaultSubtitle = "Logos, cartes de visite, flyers, posts pour réseaux sociaux... Décrivez votre besoin et laissez l'IA créer pour vous.";
 
   useEffect(() => {
     const init = async () => {
@@ -73,18 +73,18 @@ export default function Home() {
 
           setMessages([{
             role: 'assistant',
-            content: `Bonjour ${currentUser.full_name || ''} ! 👋\n\nJe suis **VisualGPT**. Décrivez-moi le visuel que vous souhaitez créer et je m'en occupe !`
+            content: `${t('welcomeUser', { name: currentUser.full_name || '' })}\n\n${t('assistantIntro')}`
           }]);
         } else {
           setMessages([{
             role: 'assistant',
-            content: `Bienvenue sur **VisualGPT** ! 👋\n\nDécrivez-moi ce que vous souhaitez créer.\n\n*Connectez-vous pour sauvegarder vos créations et bénéficier de 5 téléchargements gratuits.*`
+            content: `${t('welcome')}\n\n${t('guestIntro')}`
           }]);
         }
       } catch (e) {
         setMessages([{
           role: 'assistant',
-          content: `Bienvenue sur **VisualGPT** ! 👋\n\nDécrivez-moi ce que vous souhaitez créer !`
+          content: `${t('welcome')}\n\n${t('guestIntro')}`
         }]);
       }
       setLoading(false);
@@ -106,7 +106,7 @@ export default function Home() {
     setCurrentConversation(null);
     setMessages([{
       role: 'assistant',
-      content: `Nouvelle conversation ! Que souhaitez-vous créer ?`
+      content: t('newConversation')
     }]);
     setSelectedVisual(null);
   };
@@ -193,7 +193,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
 
       if (analysis.needs_image && analysis.image_prompt) {
         setIsGenerating(true);
-        updatedMessages = [...updatedMessages, { role: 'assistant', content: '🎨 Génération en cours...' }];
+        updatedMessages = [...updatedMessages, { role: 'assistant', content: t('generating') }];
         setMessages(updatedMessages);
 
         const imageResult = await base44.integrations.Core.GenerateImage({
@@ -221,7 +221,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
         updatedMessages = updatedMessages.slice(0, -1);
         updatedMessages.push({
           role: 'assistant',
-          content: `✨ **${analysis.title}** est prêt !${!isAuthenticated ? '\n\n*Connectez-vous pour télécharger.*' : ''}`
+          content: `✨ **${analysis.title}** ${t('ready')}${!isAuthenticated ? `\n\n*${t('connectToDownload')}*` : ''}`
         });
         setMessages(updatedMessages);
         setIsGenerating(false);
@@ -229,7 +229,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
 
       await saveConversation(updatedMessages);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: '❌ Erreur. Réessayez.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: t('error') }]);
     }
 
     setIsLoading(false);
@@ -257,6 +257,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
 
       setVisuals(prev => [newVisual, ...prev]);
       setSelectedVisual(newVisual);
+      setMessages(prev => [...prev, { role: 'assistant', content: t('newVersion') }]);
     } catch (e) {
       console.error(e);
     }
@@ -342,17 +343,17 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                 <div className="flex flex-col items-center justify-center py-8 md:py-12 text-center">
                   <Logo size="large" />
                   <h1 className="text-xl md:text-2xl text-white/80 font-light mt-6 max-w-xl leading-relaxed">
-                    {settings.home_title || defaultTitle}
+                    {settings.home_title || t('heroTitle')}
                   </h1>
                   <p className="text-white/50 mt-3 max-w-md text-sm">
-                    {settings.home_subtitle || defaultSubtitle}
+                    {settings.home_subtitle || t('heroSubtitle')}
                   </p>
                 </div>
               )}
               
               {/* Chat Messages */}
               {messages.map((message, idx) => (
-                <MessageBubble key={idx} message={message} isStreaming={isLoading && idx === messages.length - 1} />
+                <MessageBubble key={idx} message={message} isStreaming={isLoading && idx === messages.length - 1} thinkingText={t('thinking')} />
               ))}
 
               {/* Selected Visual Preview */}
@@ -408,7 +409,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                  placeholder="Décrivez votre visuel..."
+                  placeholder={t('inputPlaceholder')}
                   className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 resize-none min-h-[44px] max-h-32 focus-visible:ring-0"
                   disabled={isLoading}
                   rows={1}
@@ -424,11 +425,11 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
               </div>
               
               {/* Footer */}
-              <div className="mt-3 text-center">
+              <div className="mt-3 flex items-center justify-center gap-4">
                 <p className="text-white/25 text-xs">
-                  <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">Tarifs</a>
+                  <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                   {' • '}
-                  <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">Mentions légales</a>
+                  <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
                   {user?.role === 'admin' && (
                     <>
                       {' • '}
@@ -436,6 +437,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                     </>
                   )}
                 </p>
+                <LanguageSwitcher />
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import Home from './pages/Home';
 import Pricing from './pages/Pricing';
 import Admin from './pages/Admin';
 import Legal from './pages/Legal';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -14,4 +15,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Home",
     Pages: PAGES,
+    Layout: __Layout,
 };

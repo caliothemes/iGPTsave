@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { createPageUrl } from '@/utils';
+import { useLanguage } from './LanguageContext';
 import {
   Collapsible,
   CollapsibleContent,
@@ -28,6 +29,7 @@ export default function Sidebar({
   onLogin,
   onLogout
 }) {
+  const { t } = useLanguage();
   const [visualsOpen, setVisualsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(true);
 
@@ -41,7 +43,7 @@ export default function Sidebar({
     if (!credits) return null;
     if (credits.subscription_type === 'unlimited') return { label: 'Unlimited', color: 'bg-purple-500/20 text-purple-300' };
     if (credits.subscription_type === 'limited') return { label: 'Pro', color: 'bg-blue-500/20 text-blue-300' };
-    return { label: 'Gratuit', color: 'bg-white/10 text-white/60' };
+    return { label: t('free'), color: 'bg-white/10 text-white/60' };
   };
 
   const badge = getSubscriptionBadge();
@@ -73,7 +75,7 @@ export default function Sidebar({
             className="w-full bg-gradient-to-r from-violet-600/80 to-blue-600/80 hover:from-violet-600 hover:to-blue-600 text-white border-0"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Nouvelle création
+            {t('newCreation')}
           </Button>
         </div>
 
@@ -84,13 +86,13 @@ export default function Sidebar({
             <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors">
               <span className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
-                Historique
+                {t('history')}
               </span>
               <ChevronDown className={cn("h-4 w-4 transition-transform", historyOpen && "rotate-180")} />
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-1">
               {conversations.length === 0 ? (
-                <p className="text-white/40 text-xs px-2 py-2">Aucune conversation</p>
+                <p className="text-white/40 text-xs px-2 py-2">{t('noConversation')}</p>
               ) : (
                 conversations.map((conv) => (
                   <div
@@ -123,7 +125,7 @@ export default function Sidebar({
               <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors">
                 <span className="flex items-center gap-2">
                   <Image className="h-4 w-4" />
-                  Mes visuels ({visuals.length})
+                  {t('myVisuals')} ({visuals.length})
                 </span>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", visualsOpen && "rotate-180")} />
               </CollapsibleTrigger>
@@ -140,7 +142,7 @@ export default function Sidebar({
                   ))}
                 </div>
                 {visuals.length > 8 && (
-                  <p className="text-white/40 text-xs text-center py-2">+{visuals.length - 8} autres</p>
+                  <p className="text-white/40 text-xs text-center py-2">+{visuals.length - 8} {t('others')}</p>
                 )}
               </CollapsibleContent>
             </Collapsible>
@@ -158,7 +160,7 @@ export default function Sidebar({
               >
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-violet-400" />
-                  <span className="text-white/80 text-sm">{getTotalCredits()} crédits</span>
+                  <span className="text-white/80 text-sm">{getTotalCredits()} {t('credits')}</span>
                 </div>
                 {badge && (
                   <span className={cn("text-xs px-2 py-0.5 rounded-full", badge.color)}>
@@ -175,7 +177,7 @@ export default function Sidebar({
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm truncate">{user.full_name || 'Utilisateur'}</p>
+                  <p className="text-white text-sm truncate">{user.full_name || 'User'}</p>
                   <p className="text-white/50 text-xs truncate">{user.email}</p>
                 </div>
               </div>
@@ -188,7 +190,7 @@ export default function Sidebar({
                 className="w-full justify-start text-white/60 hover:text-white hover:bg-white/10"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Déconnexion
+                {t('logout')}
               </Button>
             </>
           ) : (
@@ -197,7 +199,7 @@ export default function Sidebar({
               className="w-full bg-white/10 hover:bg-white/20 text-white"
             >
               <LogIn className="h-4 w-4 mr-2" />
-              Connexion
+              {t('login')}
             </Button>
           )}
         </div>
