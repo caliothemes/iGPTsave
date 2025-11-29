@@ -98,7 +98,7 @@ export default function Sidebar({
         <ScrollArea className="flex-1 px-3">
           {/* Current Session Visuals */}
           {visuals.length > 0 && (
-            <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4">
+            <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4 mt-4">
               <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg bg-violet-500/10 hover:bg-violet-500/20">
                 <span className="flex items-center gap-2">
                   <Image className="h-4 w-4 text-violet-400" />
