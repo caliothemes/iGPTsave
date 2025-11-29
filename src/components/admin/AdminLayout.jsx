@@ -7,7 +7,8 @@ import {
   Image, 
   Settings, 
   ArrowLeft,
-  BarChart3
+  BarChart3,
+  Scale
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -16,6 +17,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, page: 'Admin' },
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
+  { id: 'legal', label: 'Mentions légales', icon: Scale, page: 'AdminLegal' },
   { id: 'settings', label: 'Paramètres', icon: Settings, page: 'AdminSettings' },
 ];
 
