@@ -176,40 +176,76 @@ export default function VisualCard({
           {/* Download Button (when not in validation mode) */}
           {!showValidation && (
             <>
-              {/* Edit Button */}
-              {onEdit && (
-                <Button
-                  size="sm"
-                  onClick={() => onEdit(visual)}
-                  className="w-full bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600 mb-2"
-                >
-                  <Pencil className="h-4 w-4 mr-2" />
-                  {language === 'fr' ? 'Personnaliser' : 'Customize'}
-                </Button>
+              {/* Edit Button - compact mode shows icon only in a row */}
+              {onEdit && compact ? (
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => onEdit(visual)}
+                    className="flex-1 bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600"
+                  >
+                    <Pencil className="h-4 w-4 mr-1" />
+                    <span className="text-xs">{language === 'fr' ? 'Éditer' : 'Edit'}</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleDownload}
+                    disabled={!canDownload || downloading}
+                    className={cn(
+                      "flex-1 transition-all",
+                      canDownload 
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                        : "bg-white/10 cursor-not-allowed"
+                    )}
+                  >
+                    {downloading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : downloaded ? (
+                      <Check className="h-4 w-4" />
+                    ) : !canDownload ? (
+                      <Lock className="h-4 w-4" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {onEdit && (
+                    <Button
+                      size="sm"
+                      onClick={() => onEdit(visual)}
+                      className="w-full bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600 mb-2"
+                    >
+                      <Pencil className="h-4 w-4 mr-2" />
+                      {language === 'fr' ? 'Personnaliser' : 'Customize'}
+                    </Button>
+                  )}
+                  
+                  <Button
+                    size="sm"
+                    onClick={handleDownload}
+                    disabled={!canDownload || downloading}
+                    className={cn(
+                      "w-full transition-all",
+                      canDownload 
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                        : "bg-white/10 cursor-not-allowed"
+                    )}
+                  >
+                    {downloading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : downloaded ? (
+                      <Check className="h-4 w-4 mr-2" />
+                    ) : !canDownload ? (
+                      <Lock className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Download className="h-4 w-4 mr-2" />
+                    )}
+                    {downloaded ? t('downloaded') : t('download')}
+                  </Button>
+                </>
               )}
-              
-              <Button
-                size="sm"
-                onClick={handleDownload}
-                disabled={!canDownload || downloading}
-                className={cn(
-                  "w-full transition-all",
-                  canDownload 
-                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
-                    : "bg-white/10 cursor-not-allowed"
-                )}
-              >
-                {downloading ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : downloaded ? (
-                  <Check className="h-4 w-4 mr-2" />
-                ) : !canDownload ? (
-                  <Lock className="h-4 w-4 mr-2" />
-                ) : (
-                  <Download className="h-4 w-4 mr-2" />
-                )}
-                {downloaded ? t('downloaded') : t('download')}
-              </Button>
 
               {!canDownload && (
                 <p className="text-xs text-amber-400/80 text-center">
