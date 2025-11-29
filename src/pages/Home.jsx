@@ -43,7 +43,11 @@ export default function Home() {
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -110,6 +114,63 @@ export default function Home() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Voice recognition setup
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = language === 'fr' ? 'fr-FR' : 'en-US';
+      
+      recognitionRef.current.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        setInput(transcript);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.onerror = () => {
+        setIsListening(false);
+      };
+    }
+  }, [language]);
+
+  const toggleVoice = () => {
+    if (!recognitionRef.current) return;
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setMessages(prev => [...prev, { 
+        role: 'user', 
+        content: `[Image uploadée]`,
+        image_url: file_url 
+      }]);
+      // Trigger analysis of the image
+      setInput(language === 'fr' ? 'Analyse cette image et propose des améliorations visuelles' : 'Analyze this image and suggest visual improvements');
+    } catch (err) {
+      console.error(err);
+    }
+    setUploadingImage(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const getTotalCredits = () => {
     if (!credits) return 0;
