@@ -76,11 +76,10 @@ export default function VisualCard({
 
         <div className="flex gap-2">
           <Button
-            variant="outline"
             size="sm"
             onClick={onRegenerate}
             disabled={isRegenerating}
-            className="flex-1 border-white/20 text-white hover:bg-white/10"
+            className="flex-1 bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600 text-white border-0"
           >
             <RefreshCw className={cn("h-4 w-4 mr-2", isRegenerating && "animate-spin")} />
             {t('regenerate')}

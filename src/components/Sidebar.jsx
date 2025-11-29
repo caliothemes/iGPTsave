@@ -70,9 +70,9 @@ export default function Sidebar({
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Header with Logo */}
-        <div className="p-4 pt-14 flex flex-col items-center border-b border-white/10">
-          <div className="mb-4">
-            <Logo size="default" showText={false} />
+        <div className="p-4 pt-4 flex flex-col items-center border-b border-white/10">
+          <div className="mb-3">
+            <Logo size="large" showText={false} />
           </div>
           <Button
             onClick={onNewChat}
