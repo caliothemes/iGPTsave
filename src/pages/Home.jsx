@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Sparkles, Image } from 'lucide-react';
+import { Send, Loader2, Sparkles, Image, Palette } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
 import FormatSelector from '@/components/chat/FormatSelector';
+import StyleSelector, { STYLES, COLOR_PALETTES } from '@/components/chat/StyleSelector';
 import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
@@ -29,6 +30,9 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState(null);
   const [showFormatSelector, setShowFormatSelector] = useState(false);
+  const [showStyleSelector, setShowStyleSelector] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState(null);
+  const [selectedPalette, setSelectedPalette] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
   const messagesEndRef = useRef(null);
@@ -143,37 +147,67 @@ export default function Home() {
     }
   };
 
+  const buildDetailedPrompt = (basePrompt, style, palette, format) => {
+    let prompt = basePrompt;
+
+    if (style) {
+      prompt += `. Style: ${style.prompt}`;
+    }
+
+    if (palette) {
+      const colorNames = palette.colors.join(', ');
+      prompt += `. Color palette: use these exact colors: ${colorNames}`;
+    }
+
+    if (format) {
+      prompt += `. Format optimized for ${format.name} (${format.dimensions})`;
+    }
+
+    // Add quality enhancers
+    prompt += `. High quality, professional design, sharp details, balanced composition, visually striking, award-winning design`;
+
+    return prompt;
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
-    let fullPrompt = userMessage;
-    
-    if (selectedFormat) {
-      fullPrompt += `\n\nFormat demandé: ${selectedFormat.name} (${selectedFormat.dimensions})`;
-    }
-
     setInput('');
     const newMessages = [...messages, { role: 'user', content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
     setShowFormatSelector(false);
+    setShowStyleSelector(false);
 
     try {
+      // Build context for analysis
+      let contextInfo = '';
+      if (selectedFormat) contextInfo += `Format: ${selectedFormat.name} (${selectedFormat.dimensions}). `;
+      if (selectedStyle) contextInfo += `Style: ${selectedStyle.name.fr}. `;
+      if (selectedPalette) contextInfo += `Palette: ${selectedPalette.name.fr} (${selectedPalette.colors.join(', ')}). `;
+
       const analysis = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es iGPT, un assistant expert en création de visuels.
-        
-L'utilisateur demande: "${fullPrompt}"
+        prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels.
 
-Analyse cette demande et réponds en JSON avec:
-- needs_image: boolean (true si l'utilisateur veut qu'on génère une image)
-- response: string (ta réponse à l'utilisateur, en français, amicale et professionnelle, courte)
-- image_prompt: string (si needs_image=true, le prompt détaillé en anglais pour générer l'image, très descriptif avec style, couleurs, composition)
-- visual_type: string (logo, carte_visite, flyer, post_instagram, story_instagram, post_facebook, post_linkedin, affiche, banner, autre)
-- dimensions: string (dimensions suggérées)
-- title: string (titre court pour le visuel)
+  L'utilisateur demande: "${userMessage}"
+  ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
 
-Si l'utilisateur pose une question ou demande des précisions, réponds sans générer d'image.`,
+  RÈGLES IMPORTANTES:
+  - Tu dois créer des visuels de qualité PROFESSIONNELLE
+  - Sois très descriptif dans le prompt image (min 100 mots)
+  - Inclus des détails sur: composition, éclairage, textures, profondeur, style artistique
+  - Pour les logos: précise le type (wordmark, emblem, abstract, mascot, etc.)
+  - Mentionne toujours "vector style, scalable, clean edges" pour les logos
+
+  Réponds en JSON:
+  - needs_image: boolean (true si création visuelle demandée)
+  - response: string (réponse courte, professionnelle, en français)
+  - image_prompt: string (prompt TRÈS détaillé en anglais, 100+ mots, incluant style, couleurs, composition, éclairage, textures)
+  - visual_type: string (logo, carte_visite, flyer, post_instagram, story_instagram, post_facebook, post_linkedin, affiche, banner, autre)
+  - dimensions: string (ex: 1080x1080)
+  - title: string (titre court et accrocheur)
+  - suggested_colors: array de 5 codes hex couleurs recommandées`,
         response_json_schema: {
           type: 'object',
           properties: {
@@ -182,7 +216,8 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
             image_prompt: { type: 'string' },
             visual_type: { type: 'string' },
             dimensions: { type: 'string' },
-            title: { type: 'string' }
+            title: { type: 'string' },
+            suggested_colors: { type: 'array', items: { type: 'string' } }
           }
         }
       });
@@ -195,16 +230,32 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
         updatedMessages = [...updatedMessages, { role: 'assistant', content: t('generating') }];
         setMessages(updatedMessages);
 
+        // Build the final detailed prompt
+        const finalPrompt = buildDetailedPrompt(
+          analysis.image_prompt,
+          selectedStyle,
+          selectedPalette,
+          selectedFormat
+        );
+
         const imageResult = await base44.integrations.Core.GenerateImage({
-          prompt: analysis.image_prompt
+          prompt: finalPrompt
         });
+
+        // Use selected palette or AI suggested colors
+        const finalPalette = selectedPalette?.colors || analysis.suggested_colors || [];
 
         let newVisual = {
           title: analysis.title || 'Visuel',
           image_url: imageResult.url,
           visual_type: analysis.visual_type || 'autre',
           dimensions: analysis.dimensions || selectedFormat?.dimensions || '1080x1080',
-          format: selectedFormat?.id?.includes('post') || selectedFormat?.id?.includes('story') || selectedFormat?.id?.includes('banner') ? 'digital' : 'print'
+          format: selectedFormat?.id?.includes('post') || selectedFormat?.id?.includes('story') || selectedFormat?.id?.includes('banner') ? 'digital' : 'print',
+          original_prompt: userMessage,
+          image_prompt: finalPrompt,
+          style: selectedStyle?.name?.fr || '',
+          color_palette: finalPalette,
+          version: 1
         };
 
         if (user) {
@@ -216,7 +267,7 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
 
         setVisuals(prev => [newVisual, ...prev]);
         setSelectedVisual(newVisual);
-        
+
         updatedMessages = updatedMessages.slice(0, -1);
         updatedMessages.push({
           role: 'assistant',
@@ -233,21 +284,41 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
 
     setIsLoading(false);
     setSelectedFormat(null);
+    setSelectedStyle(null);
+    setSelectedPalette(null);
   };
 
   const handleRegenerate = async (visual) => {
     setIsGenerating(true);
     try {
+      // Use the original prompt if available, otherwise create a detailed one
+      let regeneratePrompt = visual.image_prompt;
+
+      if (!regeneratePrompt) {
+        regeneratePrompt = `Professional ${visual.visual_type}, high quality, ${visual.style || 'modern clean design'}`;
+        if (visual.color_palette?.length) {
+          regeneratePrompt += `, using colors: ${visual.color_palette.join(', ')}`;
+        }
+        regeneratePrompt += `, sharp details, balanced composition, award-winning design`;
+      }
+
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: `Regenerate a ${visual.visual_type} with similar style but variations. High quality, professional.`
+        prompt: regeneratePrompt
       });
 
+      const newVersion = (visual.version || 1) + 1;
       let newVisual = {
-        title: visual.title + ' (v2)',
+        title: visual.title?.replace(/ \(v\d+\)$/, '') + ` (v${newVersion})`,
         image_url: result.url,
         visual_type: visual.visual_type,
         dimensions: visual.dimensions,
-        format: visual.format
+        format: visual.format,
+        original_prompt: visual.original_prompt,
+        image_prompt: regeneratePrompt,
+        style: visual.style,
+        color_palette: visual.color_palette,
+        version: newVersion,
+        parent_visual_id: visual.id
       };
 
       if (user) {
@@ -261,6 +332,57 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
       console.error(e);
     }
     setIsGenerating(false);
+  };
+
+  const handleVariation = async (visual) => {
+    setIsGenerating(true);
+    try {
+      // Create a variation by slightly modifying the prompt
+      let variationPrompt = visual.image_prompt || `Professional ${visual.visual_type}`;
+      variationPrompt += `. Create a VARIATION with different composition, slightly different style interpretation, maintain the same quality and color scheme. Fresh perspective, alternative design approach.`;
+
+      const result = await base44.integrations.Core.GenerateImage({
+        prompt: variationPrompt
+      });
+
+      const newVersion = (visual.version || 1) + 1;
+      let newVisual = {
+        title: visual.title?.replace(/ \(v\d+\)$/, '') + ` (var${newVersion})`,
+        image_url: result.url,
+        visual_type: visual.visual_type,
+        dimensions: visual.dimensions,
+        format: visual.format,
+        original_prompt: visual.original_prompt,
+        image_prompt: variationPrompt,
+        style: visual.style,
+        color_palette: visual.color_palette,
+        version: newVersion,
+        parent_visual_id: visual.id
+      };
+
+      if (user) {
+        newVisual = await base44.entities.Visual.create({ user_email: user.email, ...newVisual });
+      }
+
+      setVisuals(prev => [newVisual, ...prev]);
+      setSelectedVisual(newVisual);
+      setMessages(prev => [...prev, { role: 'assistant', content: language === 'fr' ? '🎨 Nouvelle variation créée !' : '🎨 New variation created!' }]);
+    } catch (e) {
+      console.error(e);
+    }
+    setIsGenerating(false);
+  };
+
+  const handleToggleFavorite = async (visual) => {
+    if (!user || !visual.id) return;
+
+    const newFavoriteState = !visual.is_favorite;
+    await base44.entities.Visual.update(visual.id, { is_favorite: newFavoriteState });
+
+    setVisuals(prev => prev.map(v => v.id === visual.id ? { ...v, is_favorite: newFavoriteState } : v));
+    if (selectedVisual?.id === visual.id) {
+      setSelectedVisual(prev => ({ ...prev, is_favorite: newFavoriteState }));
+    }
   };
 
   const handleDownload = async (visual) => {
@@ -361,8 +483,10 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                 <div className="max-w-sm mx-auto">
                   <VisualCard
                     visual={selectedVisual}
-                    onRegenerate={() => handleRegenerate(selectedVisual)}
+                    onRegenerate={handleRegenerate}
                     onDownload={() => handleDownload(selectedVisual)}
+                    onVariation={handleVariation}
+                    onToggleFavorite={handleToggleFavorite}
                     isRegenerating={isGenerating}
                     canDownload={isAuthenticated && getTotalCredits() > 0}
                     hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
@@ -384,26 +508,73 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
             </div>
           )}
 
+          {/* Style & Palette Selector */}
+          {showStyleSelector && (
+            <div className="px-4 pb-2 max-w-3xl mx-auto w-full">
+              <StyleSelector
+                selectedStyle={selectedStyle}
+                selectedPalette={selectedPalette}
+                onStyleChange={setSelectedStyle}
+                onPaletteChange={setSelectedPalette}
+              />
+            </div>
+          )}
+
           {/* Input Area */}
           <div className="p-4 bg-transparent">
             <div className="max-w-3xl mx-auto">
-              {selectedFormat && (
-                <div className="mb-2 flex items-center gap-2 text-sm text-violet-300">
-                  <span>{selectedFormat.name} ({selectedFormat.dimensions})</span>
-                  <button onClick={() => setSelectedFormat(null)} className="text-white/50 hover:text-white">✕</button>
+              {/* Selected Options Display */}
+              {(selectedFormat || selectedStyle || selectedPalette) && (
+                <div className="mb-2 flex items-center gap-2 text-xs flex-wrap">
+                  {selectedFormat && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
+                      {selectedFormat.name}
+                      <button onClick={() => setSelectedFormat(null)} className="hover:text-white">✕</button>
+                    </span>
+                  )}
+                  {selectedStyle && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-violet-500/20 text-violet-300">
+                      {selectedStyle.icon} {selectedStyle.name[language]}
+                      <button onClick={() => setSelectedStyle(null)} className="hover:text-white">✕</button>
+                    </span>
+                  )}
+                  {selectedPalette && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/20 text-amber-300">
+                      <span className="flex gap-0.5">
+                        {selectedPalette.colors.slice(0, 3).map((c, i) => (
+                          <span key={i} className="w-2 h-2 rounded-full" style={{ backgroundColor: c }} />
+                        ))}
+                      </span>
+                      {selectedPalette.name[language]}
+                      <button onClick={() => setSelectedPalette(null)} className="hover:text-white">✕</button>
+                    </span>
+                  )}
                 </div>
               )}
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-3 py-2 h-12">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setShowFormatSelector(!showFormatSelector)}
+                  onClick={() => { setShowFormatSelector(!showFormatSelector); setShowStyleSelector(false); }}
                   className={cn(
                     "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
-                    showFormatSelector && "bg-violet-500/20 text-violet-300"
+                    showFormatSelector && "bg-blue-500/20 text-blue-300"
                   )}
+                  title={language === 'fr' ? 'Format' : 'Format'}
                 >
                   <Image className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => { setShowStyleSelector(!showStyleSelector); setShowFormatSelector(false); }}
+                  className={cn(
+                    "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
+                    showStyleSelector && "bg-violet-500/20 text-violet-300"
+                  )}
+                  title={language === 'fr' ? 'Style & Couleurs' : 'Style & Colors'}
+                >
+                  <Palette className="h-4 w-4" />
                 </Button>
                 <input
                   type="text"
