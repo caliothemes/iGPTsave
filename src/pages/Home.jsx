@@ -282,10 +282,12 @@ export default function Home() {
           setTimeout(() => setShowWatermarkNotice(false), 4000);
         }
 
-        // Show visuals tooltip after a short delay
-        setTimeout(() => {
-          setShowVisualsTooltip(true);
-        }, 1500);
+        // Show visuals tooltip after a short delay (if not dismissed)
+        if (!localStorage.getItem('hideVisualsTooltip')) {
+          setTimeout(() => {
+            setShowVisualsTooltip(true);
+          }, 1500);
+        }
 
         updatedMessages = updatedMessages.slice(0, -1);
         updatedMessages.push({
@@ -484,7 +486,7 @@ export default function Home() {
           <div className="relative bg-gradient-to-r from-violet-900/95 to-blue-900/95 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg p-4 max-w-xs">
             {/* Arrow pointing left */}
             <div className="absolute -left-2 top-6 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-violet-900/95" />
-            
+
             <div className="flex items-start gap-2">
               <Sparkles className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
@@ -496,6 +498,15 @@ export default function Home() {
                     ? "Retrouvez toutes vos créations ici ! Vous pouvez les régénérer, créer des variations ou les télécharger à tout moment." 
                     : "Find all your creations here! You can regenerate them, create variations, or download them anytime."}
                 </p>
+                <button 
+                  onClick={() => {
+                    setShowVisualsTooltip(false);
+                    localStorage.setItem('hideVisualsTooltip', 'true');
+                  }}
+                  className="text-white/40 hover:text-white/70 text-xs mt-2 transition-colors"
+                >
+                  {language === 'fr' ? "Ne plus afficher" : "Don't show again"}
+                </button>
               </div>
               <button 
                 onClick={() => setShowVisualsTooltip(false)}
