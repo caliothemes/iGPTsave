@@ -7,6 +7,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminVisuals from './pages/AdminVisuals';
 import AdminSettings from './pages/AdminSettings';
 import Account from './pages/Account';
+import AdminLegal from './pages/AdminLegal';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "AdminVisuals": AdminVisuals,
     "AdminSettings": AdminSettings,
     "Account": Account,
+    "AdminLegal": AdminLegal,
 }
 
 export const pagesConfig = {
