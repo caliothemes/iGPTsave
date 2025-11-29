@@ -6,7 +6,7 @@ export default function Logo({ size = 'default', showText = true, animate = fals
   const sizes = {
     small: { img: 32, text: 'text-xl' },
     default: { img: 48, text: 'text-2xl' },
-    large: { img: 120, text: 'text-4xl' }
+    large: { img: 240, text: 'text-4xl' }
   };
 
   const { img, text } = sizes[size];
