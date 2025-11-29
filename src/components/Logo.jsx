@@ -48,10 +48,11 @@ export default function Logo({ size = 'default', showText = true, animate = fals
         }
         @keyframes ping-slow {
           0% { transform: scale(1); opacity: 0; }
-          45% { transform: scale(1); opacity: 0; }
-          48% { transform: scale(1.05); opacity: 0.5; }
-          50% { transform: scale(1.1); opacity: 0.4; }
-          52% { transform: scale(1.05); opacity: 0; }
+          40% { transform: scale(1); opacity: 0; }
+          45% { transform: scale(1.02); opacity: 0.25; }
+          50% { transform: scale(1.06); opacity: 0.2; }
+          55% { transform: scale(1.02); opacity: 0.1; }
+          60% { transform: scale(1); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slow {
@@ -59,10 +60,11 @@ export default function Logo({ size = 'default', showText = true, animate = fals
         }
         @keyframes ping-slower {
           0% { transform: scale(1); opacity: 0; }
-          45% { transform: scale(1); opacity: 0; }
-          48% { transform: scale(1.1); opacity: 0.4; }
-          50% { transform: scale(1.15); opacity: 0.35; }
-          52% { transform: scale(1.1); opacity: 0; }
+          40% { transform: scale(1); opacity: 0; }
+          45% { transform: scale(1.04); opacity: 0.2; }
+          50% { transform: scale(1.08); opacity: 0.15; }
+          55% { transform: scale(1.04); opacity: 0.08; }
+          60% { transform: scale(1); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slower {
