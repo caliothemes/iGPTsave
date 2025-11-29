@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2, Sparkles, Image } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
@@ -10,7 +9,6 @@ import Sidebar from '@/components/Sidebar';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
 import FormatSelector from '@/components/chat/FormatSelector';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
@@ -162,7 +160,7 @@ export default function Home() {
 
     try {
       const analysis = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es VisualGPT, un assistant expert en création de visuels.
+        prompt: `Tu es iGPT, un assistant expert en création de visuels.
         
 L'utilisateur demande: "${fullPrompt}"
 
@@ -393,39 +391,39 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                   <button onClick={() => setSelectedFormat(null)} className="text-white/50 hover:text-white">✕</button>
                 </div>
               )}
-              <div className="flex items-end gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-2">
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-3 py-2 h-12">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowFormatSelector(!showFormatSelector)}
                   className={cn(
-                    "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0",
+                    "text-white/50 hover:text-white hover:bg-white/10 flex-shrink-0 h-8 w-8",
                     showFormatSelector && "bg-violet-500/20 text-violet-300"
                   )}
                 >
-                  <Image className="h-5 w-5" />
+                  <Image className="h-4 w-4" />
                 </Button>
-                <Textarea
+                <input
+                  type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
                   placeholder={t('inputPlaceholder')}
-                  className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 resize-none min-h-[44px] max-h-32 focus-visible:ring-0"
+                  className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm"
                   disabled={isLoading}
-                  rows={1}
                 />
                 <Button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   size="icon"
-                  className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 flex-shrink-0"
+                  className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 flex-shrink-0 h-8 w-8"
                 >
-                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </div>
               
               {/* Footer */}
-              <div className="mt-3 flex items-center justify-center gap-4">
+              <div className="mt-3 flex items-center justify-center">
                 <p className="text-white/25 text-xs">
                   <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                   {' • '}
@@ -437,7 +435,6 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                     </>
                   )}
                 </p>
-                <LanguageSwitcher />
               </div>
             </div>
           </div>

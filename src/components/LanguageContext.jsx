@@ -3,9 +3,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const translations = {
   fr: {
     // Home
-    welcome: "Bienvenue sur **VisualGPT** ! 👋",
+    welcome: "Bienvenue sur **iGPT** ! 👋",
     welcomeUser: "Bonjour {name} ! 👋",
-    assistantIntro: "Je suis **VisualGPT**. Décrivez-moi le visuel que vous souhaitez créer et je m'en occupe !",
+    assistantIntro: "Je suis **iGPT**. Décrivez-moi le visuel que vous souhaitez créer et je m'en occupe !",
     guestIntro: "Décrivez-moi ce que vous souhaitez créer.\n\n*Connectez-vous pour sauvegarder vos créations et bénéficier de 5 téléchargements gratuits.*",
     newConversation: "Nouvelle conversation ! Que souhaitez-vous créer ?",
     heroTitle: "Votre assistant IA pour créer des visuels professionnels",
@@ -51,7 +51,7 @@ const translations = {
     // Pricing
     back: "Retour",
     chooseFormula: "Choisissez votre formule",
-    unlockPotential: "Débloquez tout le potentiel de VisualGPT avec nos offres flexibles",
+    unlockPotential: "Débloquez tout le potentiel de iGPT avec nos offres flexibles",
     currentCredits: "Crédits actuels",
     creditPacks: "Packs de crédits",
     popular: "Populaire",
@@ -124,9 +124,9 @@ const translations = {
   },
   en: {
     // Home
-    welcome: "Welcome to **VisualGPT**! 👋",
+    welcome: "Welcome to **iGPT**! 👋",
     welcomeUser: "Hello {name}! 👋",
-    assistantIntro: "I'm **VisualGPT**. Describe the visual you want to create and I'll handle it!",
+    assistantIntro: "I'm **iGPT**. Describe the visual you want to create and I'll handle it!",
     guestIntro: "Describe what you want to create.\n\n*Sign in to save your creations and get 5 free downloads.*",
     newConversation: "New conversation! What would you like to create?",
     heroTitle: "Your AI assistant for creating professional visuals",
@@ -172,7 +172,7 @@ const translations = {
     // Pricing
     back: "Back",
     chooseFormula: "Choose your plan",
-    unlockPotential: "Unlock the full potential of VisualGPT with our flexible offers",
+    unlockPotential: "Unlock the full potential of iGPT with our flexible offers",
     currentCredits: "Current credits",
     creditPacks: "Credit packs",
     popular: "Popular",

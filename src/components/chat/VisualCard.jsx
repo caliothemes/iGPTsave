@@ -39,7 +39,7 @@ export default function VisualCard({
         {hasWatermark && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-white/30 text-2xl font-bold rotate-[-30deg] select-none">
-              VisualGPT
+              iGPT
             </div>
           </div>
         )}

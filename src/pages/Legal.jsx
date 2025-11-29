@@ -32,9 +32,9 @@ export default function Legal() {
             <section className="space-y-4">
               <h2 className="text-xl font-semibold text-white">1. {t('editor')}</h2>
               <div className="text-white/70 space-y-2">
-                <p><strong className="text-white">VisualGPT</strong></p>
+                <p><strong className="text-white">iGPT</strong></p>
                 <p>{t('editorDesc')}</p>
-                <p>Email : contact@visualgpt.ai</p>
+                <p>Email : contact@igpt.app</p>
               </div>
             </section>
 
@@ -95,7 +95,7 @@ export default function Legal() {
             <section className="space-y-4">
               <h2 className="text-xl font-semibold text-white">8. {t('contact')}</h2>
               <div className="text-white/70 space-y-2">
-                <p>Email : contact@visualgpt.ai</p>
+                <p>Email : contact@igpt.app</p>
               </div>
             </section>
 
