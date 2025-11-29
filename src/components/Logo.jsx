@@ -48,24 +48,25 @@ export default function Logo({ size = 'default', showText = true, animate = fals
         }
         @keyframes ping-slow {
           0% { transform: scale(1); opacity: 0; }
-          40% { transform: scale(1.1); opacity: 0.6; }
-          50% { transform: scale(1.15); opacity: 0.5; }
-          60% { transform: scale(1.1); opacity: 0; }
+          45% { transform: scale(1); opacity: 0; }
+          48% { transform: scale(1.05); opacity: 0.5; }
+          50% { transform: scale(1.1); opacity: 0.4; }
+          52% { transform: scale(1.05); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slow {
-          animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+          animation: ping-slow 3s ease-in-out infinite;
         }
         @keyframes ping-slower {
           0% { transform: scale(1); opacity: 0; }
-          40% { transform: scale(1.15); opacity: 0.5; }
-          50% { transform: scale(1.2); opacity: 0.4; }
-          60% { transform: scale(1.15); opacity: 0; }
+          45% { transform: scale(1); opacity: 0; }
+          48% { transform: scale(1.1); opacity: 0.4; }
+          50% { transform: scale(1.15); opacity: 0.35; }
+          52% { transform: scale(1.1); opacity: 0; }
           100% { transform: scale(1); opacity: 0; }
         }
         .animate-ping-slower {
-          animation: ping-slower 4s cubic-bezier(0, 0, 0.2, 1) infinite;
-          animation-delay: 0.5s;
+          animation: ping-slower 3s ease-in-out infinite;
         }
         @keyframes pulse-glow {
           0%, 100% { opacity: 0.3; transform: scale(1); }
