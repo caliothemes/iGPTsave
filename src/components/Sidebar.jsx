@@ -96,6 +96,40 @@ export default function Sidebar({
 
         {/* Content */}
         <ScrollArea className="flex-1 px-3">
+          {/* Current Session Visuals */}
+          {visuals.length > 0 && (
+            <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4">
+              <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg bg-violet-500/10 hover:bg-violet-500/20">
+                <span className="flex items-center gap-2">
+                  <Image className="h-4 w-4 text-violet-400" />
+                  {t('visualsInProgress')} ({visuals.length > 4 ? '4+' : visuals.length})
+                </span>
+                <ChevronDown className={cn("h-4 w-4 transition-transform", visualsOpen && "rotate-180")} />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="grid grid-cols-2 gap-2 p-2">
+                  {visuals.slice(0, 4).map((visual, idx) => (
+                    <div
+                      key={visual.id || idx}
+                      onClick={() => onSelectVisual(visual)}
+                      className="aspect-square rounded-lg overflow-hidden cursor-pointer border border-white/10 hover:border-violet-500/50 transition-colors"
+                    >
+                      <img src={visual.image_url} alt={visual.title} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+                {visuals.length > 4 && (
+                  <a 
+                    href={createPageUrl('MyVisuals')}
+                    className="block text-violet-400 text-xs text-center py-2 hover:text-violet-300 transition-colors"
+                  >
+                    {t('seeAll')} ({visuals.length})
+                  </a>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+
           {/* Conversation History */}
           <Collapsible open={historyOpen} onOpenChange={setHistoryOpen} className="mb-4">
             <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors">
@@ -133,40 +167,6 @@ export default function Sidebar({
               )}
             </CollapsibleContent>
           </Collapsible>
-
-          {/* Current Session Visuals */}
-          {visuals.length > 0 && (
-            <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4">
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors">
-                <span className="flex items-center gap-2">
-                  <Image className="h-4 w-4" />
-                  {t('visualsInProgress')} ({visuals.length > 4 ? '4+' : visuals.length})
-                </span>
-                <ChevronDown className={cn("h-4 w-4 transition-transform", visualsOpen && "rotate-180")} />
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="grid grid-cols-2 gap-2 p-2">
-                  {visuals.slice(0, 4).map((visual, idx) => (
-                    <div
-                      key={visual.id || idx}
-                      onClick={() => onSelectVisual(visual)}
-                      className="aspect-square rounded-lg overflow-hidden cursor-pointer border border-white/10 hover:border-violet-500/50 transition-colors"
-                    >
-                      <img src={visual.image_url} alt={visual.title} className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-                {visuals.length > 4 && (
-                  <a 
-                    href={createPageUrl('MyVisuals')}
-                    className="block text-violet-400 text-xs text-center py-2 hover:text-violet-300 transition-colors"
-                  >
-                    {t('seeAll')} ({visuals.length})
-                  </a>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
-          )}
         </ScrollArea>
 
         {/* Footer - Account Section */}
