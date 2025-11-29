@@ -513,42 +513,44 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
   const currentLayer = selectedLayer !== null ? layers[selectedLayer] : null;
 
   return (
-    <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 border border-white/10 rounded-2xl p-4 max-w-5xl mx-auto">
+    <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 border border-white/10 rounded-2xl p-3 md:p-4 w-full">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Wand2 className="h-5 w-5 text-violet-400" />
-          <h3 className="text-white font-semibold">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</h3>
+          <h3 className="text-white font-semibold text-sm md:text-base">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</h3>
         </div>
         <div className="flex items-center gap-2">
           {savedTexts.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(true)} className="text-amber-400 hover:text-amber-300">
+            <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(true)} className="text-amber-400 hover:text-amber-300 text-xs px-2">
               <Bookmark className="h-4 w-4 mr-1" />
-              {language === 'fr' ? 'Mes textes' : 'My texts'} ({savedTexts.length})
+              <span className="hidden sm:inline">{language === 'fr' ? 'Mes textes' : 'My texts'}</span> ({savedTexts.length})
             </Button>
           )}
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white">
-            <X className="h-4 w-4 mr-1" />{language === 'fr' ? 'Annuler' : 'Cancel'}
+          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white text-xs px-2">
+            <X className="h-4 w-4" />
           </Button>
-          <Button size="sm" onClick={handleDownload} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+          <Button size="sm" onClick={handleDownload} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
             <Save className="h-4 w-4 mr-1" />{language === 'fr' ? 'Sauvegarder' : 'Save'}
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4">
-        {/* Left Panel */}
-        <div className="w-80 flex-shrink-0 space-y-3">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="flex w-full bg-white/10 rounded-lg p-1 h-12 gap-1">
-              <TabsTrigger value="text" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Type className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-5 w-5" /></TabsTrigger>
-              <TabsTrigger value="ai" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Sparkles className="h-5 w-5" /></TabsTrigger>
-            </TabsList>
+      {/* Tools Tabs - Horizontal on top */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-3">
+        <TabsList className="flex w-full bg-white/10 rounded-lg p-1 h-10 gap-1">
+          <TabsTrigger value="text" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Type className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="ai" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Sparkles className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Layers className="h-4 w-4" /></TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-            <ScrollArea className="h-[350px] mt-3">
+      {/* Tool Content Panel */}
+      <div className="mb-3">
+        <ScrollArea className="max-h-32 md:max-h-40">
               <TabsContent value="text" className="mt-0 space-y-2">
                 <Button onClick={() => addTextLayer()} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
                   <Plus className="h-4 w-4 mr-2" />{language === 'fr' ? 'Ajouter texte' : 'Add text'}
