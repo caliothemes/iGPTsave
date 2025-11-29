@@ -16,7 +16,8 @@ export default function VisualCard({
   hasWatermark,
   showActions = true,
   showValidation = false,
-  onValidate
+  onValidate,
+  compact = false
 }) {
   const { t, language } = useLanguage();
   const [downloading, setDownloading] = useState(false);
