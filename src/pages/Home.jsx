@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart } from 'lucide-react';
+import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart, Plus, Mic, MicOff, Upload } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import FavoritesModal from '@/components/FavoritesModal';
 import VisualEditor from '@/components/chat/VisualEditor';
 import { base44 } from '@/api/base44Client';

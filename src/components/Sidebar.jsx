@@ -72,36 +72,29 @@ export default function Sidebar({
         {/* Header */}
         <div className="p-3 pt-4 flex flex-col border-b border-white/10">
           <p className="text-white/50 text-xs font-medium mb-3 ml-1">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
-          {user?.role === 'admin' && (
-            <a
-              href={createPageUrl('Admin')}
-              className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-colors"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              Admin
-            </a>
-          )}
-          <a
-            href={createPageUrl('Home')}
-            className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
-          >
-            <Home className="h-4 w-4 mr-2" />
-            {t('home')}
-          </a>
-          <a
-            href={createPageUrl('MyVisuals')}
-            className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
-          >
-            <Image className="h-4 w-4 mr-2" />
-            {t('myVisuals')}
-          </a>
-          <Button
-            onClick={onNewChat}
-            className="w-full bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white border-0"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t('newCreation')}
-          </Button>
+          <div className="flex items-center gap-2 mb-3">
+                            {user?.role === 'admin' && (
+                              <a href={createPageUrl('Admin')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-colors" title="Admin">
+                                <Crown className="h-4 w-4" />
+                              </a>
+                            )}
+                            <a href={createPageUrl('Home')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors" title={t('home')}>
+                              <Home className="h-4 w-4" />
+                            </a>
+                            <a href={createPageUrl('MyVisuals')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors" title={t('myVisuals')}>
+                              <Image className="h-4 w-4" />
+                            </a>
+                            <a href={createPageUrl('Account')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors" title={t('login')}>
+                              <User className="h-4 w-4" />
+                            </a>
+                          </div>
+                          <Button
+                            onClick={onNewChat}
+                            className="w-full bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white border-0"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t('newCreation')}
+                          </Button>
         </div>
 
         {/* Content */}
