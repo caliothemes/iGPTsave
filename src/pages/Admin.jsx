@@ -199,19 +199,19 @@ export default function Admin() {
           {/* Tabs */}
           <Tabs defaultValue="analytics" className="space-y-6">
             <TabsList className="bg-white/5 border border-white/10 p-1">
-              <TabsTrigger value="analytics" className="data-[state=active]:bg-violet-600 text-white/70 data-[state=active]:text-white">
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-violet-800 text-white/70 data-[state=active]:text-white">
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Statistiques
               </TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:bg-violet-600 text-white/70 data-[state=active]:text-white">
+              <TabsTrigger value="users" className="data-[state=active]:bg-violet-800 text-white/70 data-[state=active]:text-white">
                 <Users className="h-4 w-4 mr-2" />
                 Utilisateurs
               </TabsTrigger>
-              <TabsTrigger value="visuals" className="data-[state=active]:bg-violet-600 text-white/70 data-[state=active]:text-white">
+              <TabsTrigger value="visuals" className="data-[state=active]:bg-violet-800 text-white/70 data-[state=active]:text-white">
                 <Image className="h-4 w-4 mr-2" />
                 Visuels
               </TabsTrigger>
-              <TabsTrigger value="settings" className="data-[state=active]:bg-violet-600 text-white/70 data-[state=active]:text-white">
+              <TabsTrigger value="settings" className="data-[state=active]:bg-violet-800 text-white/70 data-[state=active]:text-white">
                 <Settings className="h-4 w-4 mr-2" />
                 Paramètres
               </TabsTrigger>
@@ -527,7 +527,7 @@ export default function Admin() {
                       await handleSaveSetting('home_subtitle_fr', settings.home_subtitle_fr?.value || '');
                     }}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700"
+                    className="bg-violet-800 hover:bg-violet-900"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                     Sauvegarder FR
@@ -569,7 +569,7 @@ export default function Admin() {
                       await handleSaveSetting('home_subtitle_en', settings.home_subtitle_en?.value || '');
                     }}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700"
+                    className="bg-violet-800 hover:bg-violet-900"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                     Save EN
@@ -596,7 +596,7 @@ export default function Admin() {
                   <Button 
                     onClick={() => handleSaveSetting('legal_content_fr', settings.legal_content_fr?.value || '')}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700"
+                    className="bg-violet-800 hover:bg-violet-900"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                     Sauvegarder FR
@@ -623,7 +623,7 @@ export default function Admin() {
                   <Button 
                     onClick={() => handleSaveSetting('legal_content_en', settings.legal_content_en?.value || '')}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700"
+                    className="bg-violet-800 hover:bg-violet-900"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                     Save EN
@@ -653,7 +653,7 @@ export default function Admin() {
                   <Button 
                     onClick={() => handleSaveSetting('sidebar_title', settings.sidebar_title?.value || '')}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700"
+                    className="bg-violet-800 hover:bg-violet-900"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                     Sauvegarder

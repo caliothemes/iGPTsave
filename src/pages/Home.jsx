@@ -590,7 +590,7 @@ export default function Home() {
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   size="icon"
-                  className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 flex-shrink-0 h-8 w-8"
+                  className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8"
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>

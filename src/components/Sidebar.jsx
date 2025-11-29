@@ -70,8 +70,8 @@ export default function Sidebar({
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Header */}
-        <div className="p-4 pt-14 flex flex-col border-b border-white/10">
-          <p className="text-white/50 text-xs mb-3">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
+        <div className="p-2 pt-4 flex flex-col border-b border-white/10">
+          <p className="text-white/60 text-sm font-medium mb-3">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
           <a
             href={createPageUrl('MyVisuals')}
             className="w-full mb-2 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition-colors"
@@ -81,7 +81,7 @@ export default function Sidebar({
           </a>
           <Button
             onClick={onNewChat}
-            className="w-full bg-gradient-to-r from-violet-600/80 to-blue-600/80 hover:from-violet-600 hover:to-blue-600 text-white border-0"
+            className="w-full bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white border-0"
           >
             <Plus className="h-4 w-4 mr-2" />
             {t('newCreation')}
