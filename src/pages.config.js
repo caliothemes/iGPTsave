@@ -6,6 +6,7 @@ import MyVisuals from './pages/MyVisuals';
 import AdminUsers from './pages/AdminUsers';
 import AdminVisuals from './pages/AdminVisuals';
 import AdminSettings from './pages/AdminSettings';
+import Account from './pages/Account';
 import __Layout from './Layout.jsx';
 
 
@@ -18,6 +19,7 @@ export const PAGES = {
     "AdminUsers": AdminUsers,
     "AdminVisuals": AdminVisuals,
     "AdminSettings": AdminSettings,
+    "Account": Account,
 }
 
 export const pagesConfig = {
