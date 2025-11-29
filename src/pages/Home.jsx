@@ -830,14 +830,14 @@ export default function Home() {
                                                             </a>
                                                           ) : (
                                                             <input
-                                                              type="text"
-                                                              value={input}
-                                                              onChange={(e) => setInput(e.target.value)}
-                                                              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                                                              placeholder={t('inputPlaceholder')}
-                                                              className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none text-sm"
-                                                              disabled={isLoading}
-                                                            />
+                                                                                                                                type="text"
+                                                                                                                                value={input}
+                                                                                                                                onChange={(e) => setInput(e.target.value)}
+                                                                                                                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                                                                                                                                placeholder={t('inputPlaceholder')}
+                                                                                                                                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none focus:placeholder:text-transparent text-sm"
+                                                                                                                                disabled={isLoading}
+                                                                                                                              />
                                                           )}
                                                           <Button
                                                             variant="ghost"
