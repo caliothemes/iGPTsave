@@ -75,8 +75,8 @@ export default function MyVisuals() {
   };
 
   const handleEdit = (visual) => {
-    setEditingVisual(visual);
-    setShowEditor(true);
+    // Redirect to Home with visual ID to open in chat
+    window.location.href = createPageUrl('Home') + `?editVisual=${visual.id}`;
   };
 
   const handleEditorSave = async (credits) => {
