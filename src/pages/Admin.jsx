@@ -39,7 +39,6 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCredit, setEditingCredit] = useState(null);
   const [editValues, setEditValues] = useState({});
-  const [legalContent, setLegalContent] = useState('');
 
   useEffect(() => {
     const init = async () => {
@@ -69,7 +68,6 @@ export default function Admin() {
         const settingsMap = {};
         settingsData.forEach(s => { settingsMap[s.key] = { id: s.id, value: s.value }; });
         setSettings(settingsMap);
-        setLegalContent(settingsMap.legal_content?.value || '');
       } catch (e) {
         window.location.href = createPageUrl('Home');
       }
@@ -495,71 +493,140 @@ export default function Admin() {
 
             {/* Settings Tab */}
             <TabsContent value="settings" className="space-y-6">
-              {/* Home Settings */}
+              {/* Home Settings FR */}
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Settings className="h-5 w-5" />
-                    Page d'accueil
+                    Page d'accueil - Français 🇫🇷
                   </CardTitle>
-                  <CardDescription className="text-white/50">Personnalisez le titre et sous-titre de l'accueil</CardDescription>
+                  <CardDescription className="text-white/50">Personnalisez le titre et sous-titre de l'accueil (FR)</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Titre principal</Label>
+                    <Label className="text-white/70">Titre principal (FR)</Label>
                     <Input
-                      value={settings.home_title?.value || ''}
-                      onChange={(e) => setSettings(prev => ({ ...prev, home_title: { ...prev.home_title, value: e.target.value } }))}
+                      value={settings.home_title_fr?.value || ''}
+                      onChange={(e) => setSettings(prev => ({ ...prev, home_title_fr: { ...prev.home_title_fr, value: e.target.value } }))}
                       placeholder="Votre assistant IA pour créer des visuels professionnels"
                       className="bg-white/5 border-white/20 text-white placeholder:text-white/30"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Sous-titre</Label>
+                    <Label className="text-white/70">Sous-titre (FR)</Label>
                     <Input
-                      value={settings.home_subtitle?.value || ''}
-                      onChange={(e) => setSettings(prev => ({ ...prev, home_subtitle: { ...prev.home_subtitle, value: e.target.value } }))}
+                      value={settings.home_subtitle_fr?.value || ''}
+                      onChange={(e) => setSettings(prev => ({ ...prev, home_subtitle_fr: { ...prev.home_subtitle_fr, value: e.target.value } }))}
                       placeholder="Logos, cartes de visite, flyers..."
                       className="bg-white/5 border-white/20 text-white placeholder:text-white/30"
                     />
                   </div>
                   <Button 
                     onClick={async () => {
-                      await handleSaveSetting('home_title', settings.home_title?.value || '');
-                      await handleSaveSetting('home_subtitle', settings.home_subtitle?.value || '');
+                      await handleSaveSetting('home_title_fr', settings.home_title_fr?.value || '');
+                      await handleSaveSetting('home_subtitle_fr', settings.home_subtitle_fr?.value || '');
                     }}
                     disabled={saving}
                     className="bg-violet-600 hover:bg-violet-700"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                    Sauvegarder
+                    Sauvegarder FR
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* Legal Settings */}
+              {/* Home Settings EN */}
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Mentions légales
+                    <Settings className="h-5 w-5" />
+                    Home Page - English 🇬🇧
                   </CardTitle>
-                  <CardDescription className="text-white/50">Modifiez le contenu des mentions légales</CardDescription>
+                  <CardDescription className="text-white/50">Customize home title and subtitle (EN)</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Textarea
-                    value={legalContent}
-                    onChange={(e) => setLegalContent(e.target.value)}
-                    placeholder="Contenu des mentions légales..."
-                    className="bg-white/5 border-white/20 text-white placeholder:text-white/30 min-h-[300px]"
-                  />
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Main Title (EN)</Label>
+                    <Input
+                      value={settings.home_title_en?.value || ''}
+                      onChange={(e) => setSettings(prev => ({ ...prev, home_title_en: { ...prev.home_title_en, value: e.target.value } }))}
+                      placeholder="Your AI assistant for creating professional visuals"
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/30"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Subtitle (EN)</Label>
+                    <Input
+                      value={settings.home_subtitle_en?.value || ''}
+                      onChange={(e) => setSettings(prev => ({ ...prev, home_subtitle_en: { ...prev.home_subtitle_en, value: e.target.value } }))}
+                      placeholder="Logos, business cards, flyers..."
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/30"
+                    />
+                  </div>
                   <Button 
-                    onClick={() => handleSaveSetting('legal_content', legalContent)}
+                    onClick={async () => {
+                      await handleSaveSetting('home_title_en', settings.home_title_en?.value || '');
+                      await handleSaveSetting('home_subtitle_en', settings.home_subtitle_en?.value || '');
+                    }}
                     disabled={saving}
                     className="bg-violet-600 hover:bg-violet-700"
                   >
                     {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                    Sauvegarder
+                    Save EN
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Legal Settings FR */}
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Mentions légales - Français 🇫🇷
+                  </CardTitle>
+                  <CardDescription className="text-white/50">Modifiez le contenu des mentions légales (FR)</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    value={settings.legal_content_fr?.value || ''}
+                    onChange={(e) => setSettings(prev => ({ ...prev, legal_content_fr: { ...prev.legal_content_fr, value: e.target.value } }))}
+                    placeholder="Contenu des mentions légales..."
+                    className="bg-white/5 border-white/20 text-white placeholder:text-white/30 min-h-[200px]"
+                  />
+                  <Button 
+                    onClick={() => handleSaveSetting('legal_content_fr', settings.legal_content_fr?.value || '')}
+                    disabled={saving}
+                    className="bg-violet-600 hover:bg-violet-700"
+                  >
+                    {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                    Sauvegarder FR
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Legal Settings EN */}
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Legal Notice - English 🇬🇧
+                  </CardTitle>
+                  <CardDescription className="text-white/50">Edit legal notice content (EN)</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    value={settings.legal_content_en?.value || ''}
+                    onChange={(e) => setSettings(prev => ({ ...prev, legal_content_en: { ...prev.legal_content_en, value: e.target.value } }))}
+                    placeholder="Legal notice content..."
+                    className="bg-white/5 border-white/20 text-white placeholder:text-white/30 min-h-[200px]"
+                  />
+                  <Button 
+                    onClick={() => handleSaveSetting('legal_content_en', settings.legal_content_en?.value || '')}
+                    disabled={saving}
+                    className="bg-violet-600 hover:bg-violet-700"
+                  >
+                    {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                    Save EN
                   </Button>
                 </CardContent>
               </Card>

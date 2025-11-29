@@ -341,10 +341,10 @@ Si l'utilisateur pose une question ou demande des précisions, réponds sans gé
                 <div className="flex flex-col items-center justify-center py-8 md:py-12 text-center">
                   <Logo size="large" />
                   <h1 className="text-xl md:text-2xl text-white/80 font-light mt-6 max-w-xl leading-relaxed">
-                    {settings.home_title || t('heroTitle')}
+                    {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
                   </h1>
                   <p className="text-white/50 mt-3 max-w-md text-sm">
-                    {settings.home_subtitle || t('heroSubtitle')}
+                    {(language === 'fr' ? settings.home_subtitle_fr : settings.home_subtitle_en) || t('heroSubtitle')}
                   </p>
                 </div>
               )}
