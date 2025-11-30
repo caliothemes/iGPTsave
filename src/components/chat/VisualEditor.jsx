@@ -145,6 +145,16 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         // Load saved layers from visual
         if (visual.editor_layers && Array.isArray(visual.editor_layers)) {
           setLayers(visual.editor_layers);
+          // Restore background state if there's a background layer
+          const bgLayer = visual.editor_layers.find(l => l.type === 'background');
+          if (bgLayer) {
+            setBgType(bgLayer.bgType);
+            if (bgLayer.bgType === 'solid') {
+              setBgColor(bgLayer.bgValue);
+            } else if (bgLayer.bgType === 'gradient') {
+              setBgGradient(bgLayer.bgValue);
+            }
+          }
         }
       } catch (e) {
         console.error(e);
