@@ -9,6 +9,7 @@ import AdminSettings from './pages/AdminSettings';
 import Account from './pages/Account';
 import AdminLegal from './pages/AdminLegal';
 import AdminAssets from './pages/AdminAssets';
+import AdminPricing from './pages/AdminPricing';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +25,7 @@ export const PAGES = {
     "Account": Account,
     "AdminLegal": AdminLegal,
     "AdminAssets": AdminAssets,
+    "AdminPricing": AdminPricing,
 }
 
 export const pagesConfig = {
