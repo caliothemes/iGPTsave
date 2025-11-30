@@ -340,25 +340,28 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               - TERMINE chaque prompt par: "completely text-free, no visible text or letters anywhere"
               - EXCEPTION UNIQUE: si l'utilisateur écrit explicitement "avec le texte [xxx]"
 
-              🎴 CARTE DE VISITE / BUSINESS CARD:
-              - Design abstrait et graphique UNIQUEMENT - jamais de représentation réaliste
-              - JAMAIS: bâtiments, maisons, photos, personnes, objets réalistes
-              - Le design doit être PARFAITEMENT CADRÉ aux dimensions de la carte (85x55mm ou 1050x600px)
-              - Style: minimaliste luxueux, formes géométriques abstraites, dégradés élégants
-              - Prompt type: "absolutely no text, abstract minimalist business card design, perfectly framed within card boundaries, elegant geometric shapes, subtle luxury gradient, clean lines, premium feel, white space balance, sophisticated abstract pattern, completely text-free, no visible text or letters anywhere, print-ready 300dpi"
-              - Pour agence immobilière: "abstract geometric shapes suggesting elegance and trust, gold and navy gradient, clean minimal lines" - PAS de maisons ou bâtiments!
+              🖨️ RÈGLE POUR TOUS LES VISUELS IMPRESSION (carte visite, flyer, sticker, affiche):
+                  - Le design doit REMPLIR ENTIÈREMENT le cadre, bord à bord, sans marges internes
+                  - AJOUTER OBLIGATOIREMENT: "full bleed design, edge-to-edge graphics filling the entire frame, no margins, no borders, design extends to all edges"
+                  - Le visuel doit être PRÊT À IMPRIMER sans recadrage nécessaire
 
-              🎨 LOGO:
-              - Symbole/icône abstrait UNIQUEMENT - jamais de lettres
-              - "absolutely no text, abstract symbol logo, icon only, vector clean style, centered, minimal, completely text-free"
+                  🎴 CARTE DE VISITE / BUSINESS CARD:
+                  - Design abstrait et graphique UNIQUEMENT - jamais de représentation réaliste
+                  - JAMAIS: bâtiments, maisons, photos, personnes, objets réalistes
+                  - Prompt type: "absolutely no text, abstract minimalist business card design, FULL BLEED edge-to-edge design filling entire frame, no margins, elegant geometric shapes extending to all edges, subtle luxury gradient, clean lines, premium feel, sophisticated abstract pattern, completely text-free, print-ready 300dpi"
+                  - Pour agence immobilière: "abstract geometric shapes suggesting elegance and trust, gold and navy gradient" - PAS de maisons!
 
-              📱 POSTS RÉSEAUX SOCIAUX:
-              - Design graphique moderne, couleurs tendance
-              - "absolutely no text, modern graphic design, vibrant colors, completely text-free"
+                  🎨 LOGO:
+                  - Symbole/icône abstrait UNIQUEMENT - jamais de lettres
+                  - "absolutely no text, abstract symbol logo, icon only, vector clean style, centered, minimal, completely text-free"
 
-              📄 FLYERS/AFFICHES:
-              - Fond graphique pur pour ajout texte ultérieur par l'utilisateur
-              - "absolutely no text, background design only, completely text-free"
+                  📱 POSTS RÉSEAUX SOCIAUX:
+                  - Design graphique moderne, couleurs tendance, FULL BLEED
+                  - "absolutely no text, modern graphic design filling entire frame, edge-to-edge, vibrant colors, completely text-free"
+
+                  📄 FLYERS/AFFICHES/STICKERS:
+                  - Design FULL BLEED, bord à bord
+                  - "absolutely no text, FULL BLEED background design filling entire frame edge-to-edge, no margins, completely text-free"
 
           RÈGLES GÉNÉRALES:
           - Sois TRÈS créatif et original - évite les clichés
