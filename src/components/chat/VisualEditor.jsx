@@ -275,18 +275,32 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   };
 
   // Render canvas
-  useEffect(() => {
-    if (!imageLoaded || !canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw the main image
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      layers.forEach((layer, idx) => {
+      useEffect(() => {
+        if (!imageLoaded || !canvasRef.current) return;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+
+        // Load all image layers first
+        const imageLayersToLoad = layers.filter(l => l.type === 'image' && l.imageUrl && !loadedImages[l.imageUrl]);
+        if (imageLayersToLoad.length > 0) {
+          imageLayersToLoad.forEach(layer => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              setLoadedImages(prev => ({ ...prev, [layer.imageUrl]: img }));
+            };
+            img.src = layer.imageUrl;
+          });
+        }
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw the main image
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          layers.forEach((layer, idx) => {
         ctx.save();
         ctx.globalAlpha = layer.opacity / 100;
         if (layer.type === 'text') {
@@ -863,10 +877,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           {adminTexturesWithImage.length > 0 && (
                             <>
                               <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Textures disponibles:' : 'Available textures:'}</p>
-                              <div className="grid grid-cols-3 gap-2">
-                                {adminTexturesWithImage.map(texture => (
-                                  <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
-                                    className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
+                              <div className="grid grid-cols-4 gap-1.5">
+                                                    {adminTexturesWithImage.map(texture => (
+                                                      <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
+                                                        className="relative group rounded-md overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors w-12 h-12">
                                     <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                       <span className="text-white text-xs text-center px-1">{texture.name[language]}</span>
@@ -888,11 +902,11 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           {userLibrary.filter(item => item.type === 'texture').length > 0 && (
                             <div className="pt-2 border-t border-white/10">
                               <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes textures:' : 'My textures:'}</p>
-                              <div className="grid grid-cols-3 gap-2">
-                                {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
-                                  <div key={idx} className="relative group">
-                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
-                                      className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                              <div className="grid grid-cols-4 gap-1.5">
+                                                    {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
+                                                      <div key={idx} className="relative group">
+                                                        <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
+                                                          className="w-12 h-12 rounded-md overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
                                       <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                                     </button>
                                     <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
