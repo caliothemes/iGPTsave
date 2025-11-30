@@ -407,15 +407,26 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           ctx.fill();
           if (layer.stroke) { ctx.strokeStyle = layer.strokeColor || '#000000'; ctx.lineWidth = layer.strokeWidth || 2; ctx.stroke(); }
         } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-          ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-          // Apply color tint
+          // Apply color tint using a temporary canvas
           if (layer.tintColor && layer.tintOpacity) {
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.globalAlpha = layer.tintOpacity / 100;
-            ctx.fillStyle = layer.tintColor;
-            ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.globalAlpha = layer.opacity / 100;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = layer.width;
+            tempCanvas.height = layer.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Draw the image
+            tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
+            
+            // Apply tint with color blend
+            tempCtx.globalCompositeOperation = 'overlay';
+            tempCtx.globalAlpha = layer.tintOpacity / 100;
+            tempCtx.fillStyle = layer.tintColor;
+            tempCtx.fillRect(0, 0, layer.width, layer.height);
+            
+            // Draw the tinted result
+            ctx.drawImage(tempCanvas, layer.x, layer.y);
+          } else {
+            ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
           }
         } else if (layer.type === 'background') {
           if (layer.bgType === 'solid') {
@@ -746,13 +757,21 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               img.onload = () => resolve(img);
               img.src = layer.imageUrl;
             });
-            exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+            
             if (layer.tintColor && layer.tintOpacity) {
-              exportCtx.globalCompositeOperation = 'multiply';
-              exportCtx.globalAlpha = layer.tintOpacity / 100;
-              exportCtx.fillStyle = layer.tintColor;
-              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
-              exportCtx.globalCompositeOperation = 'source-over';
+              // Apply tint using temporary canvas
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = layer.width;
+              tempCanvas.height = layer.height;
+              const tempCtx = tempCanvas.getContext('2d');
+              tempCtx.drawImage(layerImg, 0, 0, layer.width, layer.height);
+              tempCtx.globalCompositeOperation = 'overlay';
+              tempCtx.globalAlpha = layer.tintOpacity / 100;
+              tempCtx.fillStyle = layer.tintColor;
+              tempCtx.fillRect(0, 0, layer.width, layer.height);
+              exportCtx.drawImage(tempCanvas, layer.x, layer.y);
+            } else {
+              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
             }
           } else if (layer.type === 'text') {
             const fontStyle = `${layer.italic ? 'italic ' : ''}${layer.bold ? 'bold ' : ''}${layer.fontSize}px ${layer.fontFamily}`;
@@ -814,7 +833,8 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
       }
       
       setSaving(false);
-      onSave?.(file_url);
+      // Pass the new URL back so the parent can update immediately
+      onSave?.(file_url, layers);
     } catch (e) {
       console.error(e);
       setSaving(false);
