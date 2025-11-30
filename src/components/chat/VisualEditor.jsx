@@ -849,8 +849,15 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         </div>
       </Tabs>
 
-      {/* Canvas - Responsive */}
-      <div className="flex items-center justify-center bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
+      {/* Help Message */}
+              {helpMessage && (
+                <div className="mb-3 px-3 py-2 bg-violet-500/20 border border-violet-500/30 rounded-lg text-violet-300 text-xs text-center animate-in fade-in slide-in-from-top-2 duration-300">
+                  {helpMessage}
+                </div>
+              )}
+
+              {/* Canvas - Responsive */}
+              <div className="flex items-center justify-center bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
         <canvas 
           ref={canvasRef} 
           width={canvasSize.width} 
