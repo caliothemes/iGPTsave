@@ -18,12 +18,13 @@ Deno.serve(async (req) => {
     }
 
     // Build request body for Runway API
+    // gen3a_turbo valid ratios: 1280:768, 768:1280
     const requestBody = {
       model: 'gen3a_turbo',
       promptImage: image_url,
       promptText: prompt || 'Subtle elegant motion, cinematic quality',
       duration: duration || 5,
-      ratio: '1280:720'
+      ratio: '1280:768'
     };
     
     console.log('Sending to Runway:', JSON.stringify(requestBody));
