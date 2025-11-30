@@ -724,7 +724,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                       isRegenerating={isGenerating}
                       canDownload={isAuthenticated && getTotalCredits() > 0}
                       hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
-                      showValidation={showValidation}
+                      showValidation={true}
                       onValidate={(action) => {
                         setShowValidation(false);
                         if (action === 'download') {

@@ -34,13 +34,15 @@ Deno.serve(async (req) => {
       })
     });
 
+    const responseText = await createResponse.text();
+    console.log('Runway API response:', createResponse.status, responseText);
+    
     if (!createResponse.ok) {
-      const error = await createResponse.text();
-      console.error('Runway API error:', error);
-      return Response.json({ error: 'Failed to start video generation', details: error }, { status: 500 });
+      console.error('Runway API error:', responseText);
+      return Response.json({ error: 'Failed to start video generation', details: responseText }, { status: 500 });
     }
 
-    const taskData = await createResponse.json();
+    const taskData = JSON.parse(responseText);
     
     return Response.json({ 
       success: true, 
