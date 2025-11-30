@@ -37,12 +37,12 @@ Deno.serve(async (req) => {
     console.log('Image converted to base64, length:', base64Image.length);
 
     // Build request body for Runway API
+    // Valid ratios for gen3a_turbo: 1280:768, 768:1280
     const requestBody = {
       model: 'gen3a_turbo',
       promptImage: base64Image,
       promptText: prompt || 'Subtle elegant motion, cinematic quality',
-      duration: duration || 5,
-      ratio: '1280:768'
+      duration: duration || 5
     };
     
     console.log('API Key present:', !!RUNWAY_API_KEY);
