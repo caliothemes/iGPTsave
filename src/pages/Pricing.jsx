@@ -7,13 +7,13 @@ import PageWrapper from '@/components/PageWrapper';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
-// Produits Stripe
+// Produits Stripe - IDs réels
 const STRIPE_PRODUCTS = {
   subscriptions: {
     monthly: [
       { 
         id: 'starter_monthly',
-        priceId: 'price_1SZIx2HfyAhC7kY5qlFmFIP8',
+        priceId: 'price_1SZIx2HfyAhC7kY5qlFmFIP8', // prod_TWLeCLUbXfQ4KF
         name: { fr: 'STARTER', en: 'STARTER' },
         price: 8.90,
         credits: 100,
@@ -26,7 +26,7 @@ const STRIPE_PRODUCTS = {
       },
       { 
         id: 'pro_monthly',
-        priceId: 'price_1SZIzfHfyAhC7kY506OILTq9',
+        priceId: 'price_1SZIzfHfyAhC7kY506OILTq9', // prod_TWLhV1pSXRSz3Q
         name: { fr: 'PRO', en: 'PRO' },
         price: 14.90,
         credits: 250,
@@ -40,7 +40,7 @@ const STRIPE_PRODUCTS = {
       },
       { 
         id: 'elite_monthly',
-        priceId: 'price_1SZJ2HHfyAhC7kY5I0sUBlJq',
+        priceId: 'price_1SZJ2HHfyAhC7kY5I0sUBlJq', // prod_TWLjEEHP8GyXTV
         name: { fr: 'ELITE', en: 'ELITE' },
         price: 24.90,
         credits: 500,
@@ -53,7 +53,7 @@ const STRIPE_PRODUCTS = {
       },
       { 
         id: 'elite_plus_monthly',
-        priceId: 'price_1SZJ3tHfyAhC7kY520ohEG7x',
+        priceId: 'price_1SZJ3tHfyAhC7kY520ohEG7x', // prod_TWLlhvQGwnrOHX
         name: { fr: 'ELITE PLUS', en: 'ELITE PLUS' },
         price: 39.90,
         credits: 1000,
@@ -68,7 +68,7 @@ const STRIPE_PRODUCTS = {
     yearly: [
       { 
         id: 'starter_yearly',
-        priceId: 'price_1SZIyTHfyAhC7kY5BAIvAIyy',
+        priceId: 'price_1SZIyTHfyAhC7kY5BAIvAIyy', // prod_TWLfJW2UaDTeo5
         name: { fr: 'STARTER', en: 'STARTER' },
         price: 89,
         priceMonthly: 8.90,
@@ -83,7 +83,7 @@ const STRIPE_PRODUCTS = {
       },
       { 
         id: 'pro_yearly',
-        priceId: 'price_1SZJ1IHfyAhC7kY5pcJVZdxv',
+        priceId: 'price_1SZJ1IHfyAhC7kY5pcJVZdxv', // prod_TWLirA98VTt6kD
         name: { fr: 'PRO', en: 'PRO' },
         price: 149,
         priceMonthly: 14.90,
@@ -99,7 +99,7 @@ const STRIPE_PRODUCTS = {
       },
       { 
         id: 'elite_yearly',
-        priceId: 'price_1SZJ33HfyAhC7kY5fdZqeGdC',
+        priceId: 'price_1SZJ33HfyAhC7kY5fdZqeGdC', // prod_TWLkczcFEQ2ebe
         name: { fr: 'ELITE', en: 'ELITE' },
         price: 249,
         priceMonthly: 24.90,
@@ -114,7 +114,7 @@ const STRIPE_PRODUCTS = {
       },
       { 
         id: 'elite_plus_yearly',
-        priceId: 'price_1SZJ4hHfyAhC7kY54We57RJk',
+        priceId: 'price_1SZJ4hHfyAhC7kY54We57RJk', // prod_TWLm7SIvUgDBGh
         name: { fr: 'ELITE PLUS', en: 'ELITE PLUS' },
         price: 399,
         priceMonthly: 39.90,
@@ -132,13 +132,13 @@ const STRIPE_PRODUCTS = {
   packs: [
     { 
       id: 'pack_250',
-      priceId: 'price_1SZIvEHfyAhC7kY5PJgk7nME',
+      priceId: 'price_1SZIvEHfyAhC7kY5PJgk7nME', // prod_TWLcf4UtzqMQe4
       credits: 250,
       price: 19.90
     },
     { 
       id: 'pack_500',
-      priceId: 'price_1SZIvjHfyAhC7kY5irsRoqBB',
+      priceId: 'price_1SZIvjHfyAhC7kY5irsRoqBB', // prod_TWLc6dyHxZtKJS
       credits: 500,
       price: 29.90,
       is_popular: true
