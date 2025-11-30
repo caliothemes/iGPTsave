@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Trash2, Brush, ImagePlus, Save, Eye } from 'lucide-react';
+import { Loader2, Plus, Trash2, Brush, ImagePlus, Save, Eye, Upload, Sparkles } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ export default function AdminAssets() {
   const [editingAsset, setEditingAsset] = useState(null);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const [newAsset, setNewAsset] = useState({
     type: 'texture',
@@ -101,6 +102,20 @@ export default function AdminAssets() {
     setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, is_active: !a.is_active } : a));
   };
 
+  const handleUploadImage = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setNewAsset(prev => ({ ...prev, preview_url: file_url }));
+    } catch (err) {
+      console.error(err);
+    }
+    setUploading(false);
+    e.target.value = '';
+  };
+
   const filteredAssets = assets.filter(a => filter === 'all' || a.type === filter);
 
   if (loading) {
@@ -169,7 +184,10 @@ export default function AdminAssets() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-white/60 text-sm mb-1 block">Prompt IA</label>
+              <label className="text-white/60 text-sm mb-1 block flex items-center gap-2">
+                <Sparkles className="h-3 w-3" />
+                Prompt IA <span className="text-white/40 font-normal">(utilisé pour générer l'asset à la demande dans l'éditeur)</span>
+              </label>
               <Textarea
                 value={newAsset.prompt}
                 onChange={(e) => setNewAsset(prev => ({ ...prev, prompt: e.target.value }))}
@@ -177,28 +195,37 @@ export default function AdminAssets() {
                 placeholder="seamless marble texture, elegant white and gray veins..."
                 rows={3}
               />
+              <p className="text-white/30 text-xs mt-1">Ce prompt sera utilisé quand un utilisateur clique sur cet asset dans l'éditeur pour générer l'image via l'IA.</p>
             </div>
             <div className="md:col-span-2">
-              <label className="text-white/60 text-sm mb-1 block">Prévisualisation</label>
-              <div className="flex gap-3">
-                <Input
-                  value={newAsset.preview_url}
-                  onChange={(e) => setNewAsset(prev => ({ ...prev, preview_url: e.target.value }))}
-                  className="bg-white/5 border-white/10 text-white flex-1"
-                  placeholder="URL de l'image de prévisualisation"
-                />
+              <label className="text-white/60 text-sm mb-1 block">Image (upload ou génération IA)</label>
+              <div className="flex gap-3 flex-wrap">
+                <label className="cursor-pointer">
+                  <input type="file" accept="image/*" onChange={handleUploadImage} className="hidden" />
+                  <div className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white text-sm transition-colors">
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    Uploader une image
+                  </div>
+                </label>
+                <span className="text-white/40 self-center">ou</span>
                 <Button
                   onClick={handleGeneratePreview}
                   disabled={generating || !newAsset.prompt}
                   className="bg-violet-600 hover:bg-violet-700"
                 >
-                  {generating === 'preview' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-                  <span className="ml-2">Générer</span>
+                  {generating === 'preview' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  <span className="ml-2">Générer via IA</span>
                 </Button>
               </div>
               {newAsset.preview_url && (
                 <div className="mt-3">
                   <img src={newAsset.preview_url} alt="Preview" className="w-24 h-24 object-cover rounded-lg" />
+                  <Input
+                    value={newAsset.preview_url}
+                    onChange={(e) => setNewAsset(prev => ({ ...prev, preview_url: e.target.value }))}
+                    className="bg-white/5 border-white/10 text-white mt-2 text-xs"
+                    placeholder="URL de l'image"
+                  />
                 </div>
               )}
             </div>
@@ -209,7 +236,7 @@ export default function AdminAssets() {
                 Annuler
               </Button>
             )}
-            <Button onClick={handleSave} disabled={saving || !newAsset.name_fr || !newAsset.prompt} className="bg-gradient-to-r from-violet-600 to-blue-600">
+            <Button onClick={handleSave} disabled={saving || !newAsset.name_fr || (!newAsset.prompt && !newAsset.preview_url)} className="bg-gradient-to-r from-violet-600 to-blue-600">
               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               {editingAsset ? 'Mettre à jour' : 'Ajouter'}
             </Button>
