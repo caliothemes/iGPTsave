@@ -13,15 +13,27 @@ function TypingIndicator() {
   );
 }
 
-export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion..." }) {
+export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion...", user }) {
   const isUser = message.role === 'user';
 
   return (
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
-      {/* Avatar - only for assistant */}
+      {/* Avatar - for assistant */}
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600/60 to-purple-600/60 backdrop-blur-sm border border-violet-500/20 flex items-center justify-center shadow-lg shadow-violet-500/10">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-600/60 to-purple-600/60 backdrop-blur-sm border border-violet-500/20 flex items-center justify-center shadow-lg shadow-violet-500/10">
           <Sparkles className="h-4 w-4 text-violet-300" />
+        </div>
+      )}
+      {/* Avatar - for user */}
+      {isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center overflow-hidden order-last">
+          {user?.profile_image ? (
+            <img src={user.profile_image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-white text-xs font-medium">
+              {user?.full_name?.[0] || user?.email?.[0] || 'U'}
+            </span>
+          )}
         </div>
       )}
 
