@@ -256,24 +256,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     img.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw background first (behind the image)
-      if (bgType === 'solid') {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      } else if (bgType === 'gradient') {
-        const angle = (bgGradient.angle * Math.PI) / 180;
-        const x1 = canvas.width / 2 - Math.cos(angle) * canvas.width;
-        const y1 = canvas.height / 2 - Math.sin(angle) * canvas.height;
-        const x2 = canvas.width / 2 + Math.cos(angle) * canvas.width;
-        const y2 = canvas.height / 2 + Math.sin(angle) * canvas.height;
-        const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-        gradient.addColorStop(0, bgGradient.color1);
-        gradient.addColorStop(1, bgGradient.color2);
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
-      
-      // Draw the main image on top of the background
+      // Draw the main image
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       layers.forEach((layer, idx) => {
         ctx.save();
@@ -360,6 +343,17 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           if (layer.stroke) { ctx.strokeStyle = layer.strokeColor || '#000000'; ctx.lineWidth = layer.strokeWidth || 2; ctx.stroke(); }
         } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
           ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+        } else if (layer.type === 'background') {
+          if (layer.bgType === 'solid') {
+            ctx.fillStyle = layer.bgValue;
+            ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
+          } else if (layer.bgType === 'gradient') {
+            const gradient = ctx.createLinearGradient(layer.x, layer.y, layer.x + layer.width, layer.y + layer.height);
+            gradient.addColorStop(0, layer.bgValue.color1);
+            gradient.addColorStop(1, layer.bgValue.color2);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
+          }
         }
         ctx.restore();
         if (selectedLayer === idx) {
@@ -429,6 +423,23 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       setLayers([...layers, newLayer]);
       setSelectedLayer(layers.length);
     }
+    setActiveTab('layers');
+  };
+
+  const addBackgroundLayer = (type, value) => {
+    const newLayer = {
+      type: 'background',
+      bgType: type,
+      bgValue: value,
+      x: 0,
+      y: 0,
+      width: canvasSize.width,
+      height: canvasSize.height,
+      opacity: 100
+    };
+    // Insert backgrounds at the very beginning
+    setLayers([newLayer, ...layers]);
+    setSelectedLayer(0);
     setActiveTab('layers');
   };
 
@@ -700,65 +711,50 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           </TabsContent>
 
           <TabsContent value="background" className="mt-0 space-y-3">
-            <div className="flex gap-2">
-              <button onClick={() => setBgType('none')} className={cn("flex-1 p-2 rounded-lg text-xs transition-colors", bgType === 'none' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}>
-                {language === 'fr' ? 'Aucun' : 'None'}
-              </button>
-              <button onClick={() => setBgType('solid')} className={cn("flex-1 p-2 rounded-lg text-xs transition-colors", bgType === 'solid' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}>
-                {language === 'fr' ? 'Couleur' : 'Solid'}
-              </button>
-              <button onClick={() => setBgType('gradient')} className={cn("flex-1 p-2 rounded-lg text-xs transition-colors", bgType === 'gradient' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}>
-                {language === 'fr' ? 'Dégradé' : 'Gradient'}
+            <p className="text-white/40 text-xs">{language === 'fr' ? 'Couleurs unies:' : 'Solid colors:'}</p>
+            <div className="flex gap-1 flex-wrap">
+              {PRESET_COLORS.map(color => (
+                <button key={color} onClick={() => addBackgroundLayer('solid', color)} className="w-7 h-7 rounded-lg border-2 border-transparent hover:border-violet-400 transition-all hover:scale-110" style={{ backgroundColor: color }} />
+              ))}
+              <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer" />
+              <button onClick={() => addBackgroundLayer('solid', bgColor)} className="px-2 h-7 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs">
+                +
               </button>
             </div>
 
-            {bgType === 'solid' && (
-              <div className="space-y-2">
-                <p className="text-white/40 text-xs">{language === 'fr' ? 'Couleur de fond:' : 'Background color:'}</p>
-                <div className="flex gap-1 flex-wrap">
-                  {PRESET_COLORS.map(color => (
-                    <button key={color} onClick={() => setBgColor(color)} className={cn("w-6 h-6 rounded-full border-2 transition-transform hover:scale-110", bgColor === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
-                  ))}
-                  <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
-                </div>
+            <p className="text-white/40 text-xs mt-3">{language === 'fr' ? 'Dégradés:' : 'Gradients:'}</p>
+            <div className="grid grid-cols-4 gap-1">
+              {[
+                { color1: '#667eea', color2: '#764ba2' },
+                { color1: '#f093fb', color2: '#f5576c' },
+                { color1: '#4facfe', color2: '#00f2fe' },
+                { color1: '#43e97b', color2: '#38f9d7' },
+                { color1: '#fa709a', color2: '#fee140' },
+                { color1: '#a18cd1', color2: '#fbc2eb' },
+                { color1: '#ff0844', color2: '#ffb199' },
+                { color1: '#30cfd0', color2: '#330867' },
+                { color1: '#000000', color2: '#434343' },
+                { color1: '#200122', color2: '#6f0000' },
+                { color1: '#0f0c29', color2: '#302b63' },
+                { color1: '#ffe259', color2: '#ffa751' },
+              ].map((preset, idx) => (
+                <button key={idx} onClick={() => addBackgroundLayer('gradient', preset)} 
+                  className="h-10 rounded-lg border border-white/10 hover:border-violet-400 transition-colors hover:scale-105"
+                  style={{ background: `linear-gradient(135deg, ${preset.color1}, ${preset.color2})` }} />
+              ))}
+            </div>
+            
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-white/40 text-xs mb-2">{language === 'fr' ? 'Dégradé personnalisé:' : 'Custom gradient:'}</p>
+              <div className="flex gap-2 items-center">
+                <input type="color" value={bgGradient.color1} onChange={(e) => setBgGradient({...bgGradient, color1: e.target.value})} className="w-8 h-8 rounded cursor-pointer" />
+                <input type="color" value={bgGradient.color2} onChange={(e) => setBgGradient({...bgGradient, color2: e.target.value})} className="w-8 h-8 rounded cursor-pointer" />
+                <div className="flex-1 h-8 rounded-lg" style={{ background: `linear-gradient(135deg, ${bgGradient.color1}, ${bgGradient.color2})` }} />
+                <button onClick={() => addBackgroundLayer('gradient', bgGradient)} className="px-3 h-8 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs">
+                  {language === 'fr' ? 'Ajouter' : 'Add'}
+                </button>
               </div>
-            )}
-
-            {bgType === 'gradient' && (
-              <div className="space-y-2">
-                <p className="text-white/40 text-xs">{language === 'fr' ? 'Dégradé:' : 'Gradient:'}</p>
-                <div className="flex gap-2 items-center">
-                  <div className="flex-1">
-                    <p className="text-white/30 text-[10px] mb-1">{language === 'fr' ? 'Couleur 1' : 'Color 1'}</p>
-                    <input type="color" value={bgGradient.color1} onChange={(e) => setBgGradient({...bgGradient, color1: e.target.value})} className="w-full h-8 rounded cursor-pointer" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white/30 text-[10px] mb-1">{language === 'fr' ? 'Couleur 2' : 'Color 2'}</p>
-                    <input type="color" value={bgGradient.color2} onChange={(e) => setBgGradient({...bgGradient, color2: e.target.value})} className="w-full h-8 rounded cursor-pointer" />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-white/30 text-[10px] mb-1">{language === 'fr' ? 'Angle' : 'Angle'}: {bgGradient.angle}°</p>
-                  <Slider value={[bgGradient.angle]} onValueChange={([v]) => setBgGradient({...bgGradient, angle: v})} min={0} max={360} step={15} />
-                </div>
-                <div className="grid grid-cols-4 gap-1">
-                  {[
-                    { color1: '#667eea', color2: '#764ba2' },
-                    { color1: '#f093fb', color2: '#f5576c' },
-                    { color1: '#4facfe', color2: '#00f2fe' },
-                    { color1: '#43e97b', color2: '#38f9d7' },
-                    { color1: '#fa709a', color2: '#fee140' },
-                    { color1: '#a18cd1', color2: '#fbc2eb' },
-                    { color1: '#ff0844', color2: '#ffb199' },
-                    { color1: '#30cfd0', color2: '#330867' },
-                  ].map((preset, idx) => (
-                    <button key={idx} onClick={() => setBgGradient({...bgGradient, ...preset})} 
-                      className="h-8 rounded-lg border border-white/10 hover:border-white/30 transition-colors"
-                      style={{ background: `linear-gradient(${bgGradient.angle}deg, ${preset.color1}, ${preset.color2})` }} />
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </TabsContent>
 
           <TabsContent value="shapes" className="mt-0 space-y-2">
@@ -812,8 +808,8 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               ) : layers.map((layer, idx) => (
                 <button key={idx} onClick={() => setSelectedLayer(idx)}
                   className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
-                  {layer.type === 'text' ? <Type className="h-3 w-3" /> : layer.type === 'image' ? <ImagePlus className="h-3 w-3" /> : <Square className="h-3 w-3" />}
-                  <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 15) : layer.type === 'image' ? 'Image' : layer.shape}</span>
+                  {layer.type === 'text' ? <Type className="h-3 w-3" /> : layer.type === 'image' ? <ImagePlus className="h-3 w-3" /> : layer.type === 'background' ? <PaintBucket className="h-3 w-3" /> : <Square className="h-3 w-3" />}
+                  <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 15) : layer.type === 'image' ? 'Image' : layer.type === 'background' ? (language === 'fr' ? 'Fond' : 'Background') : layer.shape}</span>
                   <button onClick={(e) => { e.stopPropagation(); deleteLayer(idx); }} className="p-1 text-red-400/60 hover:text-red-400"><Trash2 className="h-3 w-3" /></button>
                 </button>
               ))}
