@@ -13,7 +13,8 @@ import {
   Layers, Sparkles, Triangle, Star, Heart, Hexagon,
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   Brush, Library, Plus, Save, Palette, Eraser,
-  MessageSquare, FileText, Bookmark, Check, Copy
+  MessageSquare, FileText, Bookmark, Check, Copy,
+  PaintBucket
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import { cn } from "@/lib/utils";
@@ -98,6 +99,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [adminTextures, setAdminTextures] = useState([]);
   const [adminIllustrations, setAdminIllustrations] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [bgType, setBgType] = useState('none'); // none, solid, gradient
+  const [bgColor, setBgColor] = useState('#000000');
+  const [bgGradient, setBgGradient] = useState({ color1: '#667eea', color2: '#764ba2', angle: 135 });
   
   // Custom illustration generator
   const [showIllustGenerator, setShowIllustGenerator] = useState(false);
@@ -251,6 +255,24 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw background first
+      if (bgType === 'solid') {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else if (bgType === 'gradient') {
+        const angle = (bgGradient.angle * Math.PI) / 180;
+        const x1 = canvas.width / 2 - Math.cos(angle) * canvas.width;
+        const y1 = canvas.height / 2 - Math.sin(angle) * canvas.height;
+        const x2 = canvas.width / 2 + Math.cos(angle) * canvas.width;
+        const y2 = canvas.height / 2 + Math.sin(angle) * canvas.height;
+        const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+        gradient.addColorStop(0, bgGradient.color1);
+        gradient.addColorStop(1, bgGradient.color2);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       layers.forEach((layer, idx) => {
         ctx.save();
@@ -354,7 +376,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       });
     };
     img.src = visual.image_url;
-  }, [imageLoaded, layers, selectedLayer, visual.image_url, loadedImages]);
+  }, [imageLoaded, layers, selectedLayer, visual.image_url, loadedImages, bgType, bgColor, bgGradient]);
 
   const addTextLayer = (text = null) => {
     const newLayer = {
@@ -580,7 +602,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
   const handleCanvasMouseUp = () => setDragging(null);
 
-  const handleDownload = async () => {
+  const handleSave = async () => {
     setSaving(true);
     const canvas = canvasRef.current;
     const dataUrl = canvas.toDataURL('image/png');
@@ -601,26 +623,11 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         });
       }
       
-      // Download the file
-      const link = document.createElement('a');
-      link.download = `${visual.title || 'visual'}-edited.png`;
-      link.href = file_url;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
       setSaving(false);
       onSave?.(file_url);
     } catch (e) {
       console.error(e);
       setSaving(false);
-      // Fallback to direct download
-      const link = document.createElement('a');
-      link.download = `${visual.title || 'visual'}-edited.png`;
-      link.href = dataUrl;
-      link.click();
-      onSave?.();
     }
   };
 
@@ -647,7 +654,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white text-xs px-2">
             <X className="h-4 w-4" />
           </Button>
-          <Button size="sm" onClick={handleDownload} disabled={saving} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
+          <Button size="sm" onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
             {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
             {language === 'fr' ? 'Sauvegarder' : 'Save'}
           </Button>
@@ -658,6 +665,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-3">
         <TabsList className="flex w-full bg-white/10 rounded-lg p-1 h-10 gap-1">
           <TabsTrigger value="text" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Type className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="background" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><PaintBucket className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-4 w-4" /></TabsTrigger>
@@ -688,6 +696,68 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   style={{ fontFamily: font.family }}>{font.name}</button>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="background" className="mt-0 space-y-3">
+            <div className="flex gap-2">
+              <button onClick={() => setBgType('none')} className={cn("flex-1 p-2 rounded-lg text-xs transition-colors", bgType === 'none' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}>
+                {language === 'fr' ? 'Aucun' : 'None'}
+              </button>
+              <button onClick={() => setBgType('solid')} className={cn("flex-1 p-2 rounded-lg text-xs transition-colors", bgType === 'solid' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}>
+                {language === 'fr' ? 'Couleur' : 'Solid'}
+              </button>
+              <button onClick={() => setBgType('gradient')} className={cn("flex-1 p-2 rounded-lg text-xs transition-colors", bgType === 'gradient' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}>
+                {language === 'fr' ? 'Dégradé' : 'Gradient'}
+              </button>
+            </div>
+
+            {bgType === 'solid' && (
+              <div className="space-y-2">
+                <p className="text-white/40 text-xs">{language === 'fr' ? 'Couleur de fond:' : 'Background color:'}</p>
+                <div className="flex gap-1 flex-wrap">
+                  {PRESET_COLORS.map(color => (
+                    <button key={color} onClick={() => setBgColor(color)} className={cn("w-6 h-6 rounded-full border-2 transition-transform hover:scale-110", bgColor === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                  ))}
+                  <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                </div>
+              </div>
+            )}
+
+            {bgType === 'gradient' && (
+              <div className="space-y-2">
+                <p className="text-white/40 text-xs">{language === 'fr' ? 'Dégradé:' : 'Gradient:'}</p>
+                <div className="flex gap-2 items-center">
+                  <div className="flex-1">
+                    <p className="text-white/30 text-[10px] mb-1">{language === 'fr' ? 'Couleur 1' : 'Color 1'}</p>
+                    <input type="color" value={bgGradient.color1} onChange={(e) => setBgGradient({...bgGradient, color1: e.target.value})} className="w-full h-8 rounded cursor-pointer" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white/30 text-[10px] mb-1">{language === 'fr' ? 'Couleur 2' : 'Color 2'}</p>
+                    <input type="color" value={bgGradient.color2} onChange={(e) => setBgGradient({...bgGradient, color2: e.target.value})} className="w-full h-8 rounded cursor-pointer" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white/30 text-[10px] mb-1">{language === 'fr' ? 'Angle' : 'Angle'}: {bgGradient.angle}°</p>
+                  <Slider value={[bgGradient.angle]} onValueChange={([v]) => setBgGradient({...bgGradient, angle: v})} min={0} max={360} step={15} />
+                </div>
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { color1: '#667eea', color2: '#764ba2' },
+                    { color1: '#f093fb', color2: '#f5576c' },
+                    { color1: '#4facfe', color2: '#00f2fe' },
+                    { color1: '#43e97b', color2: '#38f9d7' },
+                    { color1: '#fa709a', color2: '#fee140' },
+                    { color1: '#a18cd1', color2: '#fbc2eb' },
+                    { color1: '#ff0844', color2: '#ffb199' },
+                    { color1: '#30cfd0', color2: '#330867' },
+                  ].map((preset, idx) => (
+                    <button key={idx} onClick={() => setBgGradient({...bgGradient, ...preset})} 
+                      className="h-8 rounded-lg border border-white/10 hover:border-white/30 transition-colors"
+                      style={{ background: `linear-gradient(${bgGradient.angle}deg, ${preset.color1}, ${preset.color2})` }} />
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="shapes" className="mt-0 space-y-2">
