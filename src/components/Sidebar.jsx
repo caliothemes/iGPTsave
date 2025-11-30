@@ -165,7 +165,15 @@ export default function Sidebar({
                     )}
                     onClick={() => onSelectConversation(conv)}
                   >
-                    <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {user?.profile_image ? (
+                        <img src={user.profile_image} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-white text-[10px] font-medium">
+                          {user?.full_name?.[0] || user?.email?.[0] || 'U'}
+                        </span>
+                      )}
+                    </div>
                     <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
                     <button
                       onClick={(e) => { e.stopPropagation(); onDeleteConversation(conv.id); }}
