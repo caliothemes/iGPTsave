@@ -334,29 +334,33 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
 
           RÈGLES CRITIQUES PAR TYPE DE VISUEL:
 
-          🎴 CARTE DE VISITE / BUSINESS CARD:
+          ⚠️ RÈGLE UNIVERSELLE - AUCUN TEXTE PAR DÉFAUT:
+              - TOUS les visuels doivent être générés SANS AUCUN TEXTE, lettres, mots ou typographie
+              - Ajoute TOUJOURS dans le prompt: "NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, pure graphic design only"
+              - EXCEPTION: uniquement si l'utilisateur demande EXPLICITEMENT d'ajouter du texte spécifique
+
+              🎴 CARTE DE VISITE / BUSINESS CARD:
               - JAMAIS de photos stock, bâtiments, paysages ou images réalistes
-              - AUCUN TEXTE sur le visuel - design graphique pur uniquement
               - Style: minimaliste, élégant, graphique abstrait
               - Éléments: formes géométriques subtiles, dégradés doux, lignes fines, motifs abstraits
               - Composition: espace négatif important, mise en page aérée
-              - Exemples de prompts: "minimalist business card background design, NO TEXT, NO LETTERS, NO WORDS, elegant geometric pattern, subtle gradient, abstract shapes, luxury feel, white space, professional corporate design, print ready, 300dpi quality, pure graphic design without any typography"
-              - INTERDITS: buildings, photos, realistic images, cluttered designs, ANY TEXT OR LETTERS
+              - Exemples: "minimalist business card background design, NO TEXT, elegant geometric pattern, subtle gradient, abstract shapes, luxury feel, white space, print ready"
+              - INTERDITS: buildings, photos, realistic images, cluttered designs
 
-          🎨 LOGO:
-          - Type: wordmark, emblem, abstract, mascot, lettermark, combination mark
-          - Style: vector, scalable, clean edges, minimal details
-          - "logo design, vector style, scalable graphics, clean minimal, centered composition, transparent background concept"
+              🎨 LOGO:
+              - Type: emblem, abstract, mascot, symbol (PAS de wordmark sauf si texte demandé)
+              - Style: vector, scalable, clean edges, minimal details
+              - "logo design, NO TEXT, symbol only, vector style, scalable graphics, clean minimal, centered composition"
 
-          📱 POSTS RÉSEAUX SOCIAUX:
-          - Visuels accrocheurs, couleurs vives ou tendance
-          - Composition adaptée au format (carré, vertical, horizontal)
-          - Style moderne, dynamique
+              📱 POSTS RÉSEAUX SOCIAUX:
+              - Visuels accrocheurs, couleurs vives ou tendance
+              - Composition adaptée au format, NO TEXT
+              - Style moderne, dynamique, pure visual design
 
-          📄 FLYERS/AFFICHES:
-          - Hiérarchie visuelle claire
-          - Zone pour texte bien définie
-          - Impact visuel fort
+              📄 FLYERS/AFFICHES:
+              - Design graphique pur, zones vides pour ajout texte ultérieur
+              - NO TEXT, background design only
+              - Impact visuel fort
 
           RÈGLES GÉNÉRALES:
           - Sois TRÈS créatif et original - évite les clichés
