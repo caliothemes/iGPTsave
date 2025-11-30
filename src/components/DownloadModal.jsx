@@ -26,26 +26,18 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
     try {
       let imageUrl = visual.image_url;
       
-      // If transparent format selected, call remove.bg API via LLM
+      // If transparent format selected, call remove.bg API
       if (format.removeBg) {
         try {
-          // Use InvokeLLM with internet context to call remove.bg API
-          const response = await fetch(visual.image_url);
-          const blob = await response.blob();
-          const file = new File([blob], 'image.png', { type: 'image/png' });
-          
-          // Upload to get URL then use remove bg service
-          const { file_url } = await base44.integrations.Core.UploadFile({ file });
-          
-          // Call remove.bg via fetch
+          // Call remove.bg via fetch with the image URL
           const formData = new FormData();
-          formData.append('image_url', file_url);
+          formData.append('image_url', visual.image_url);
           formData.append('size', 'auto');
           
           const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
             method: 'POST',
             headers: {
-              'X-Api-Key': 'YOUR_REMOVE_BG_API_KEY' // Will be replaced by secret
+              'X-Api-Key': import.meta.env.VITE_REMOVE_BG_API_KEY
             },
             body: formData
           });
