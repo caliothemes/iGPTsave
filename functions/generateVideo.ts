@@ -2,6 +2,19 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
 const RUNWAY_API_KEY = Deno.env.get("RUNWAY_API_KEY");
 
+async function fetchImageAsBase64(imageUrl) {
+  const response = await fetch(imageUrl);
+  const arrayBuffer = await response.arrayBuffer();
+  const uint8Array = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < uint8Array.length; i++) {
+    binary += String.fromCharCode(uint8Array[i]);
+  }
+  const base64 = btoa(binary);
+  const contentType = response.headers.get('content-type') || 'image/png';
+  return `data:${contentType};base64,${base64}`;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -17,17 +30,21 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Image URL is required' }, { status: 400 });
     }
 
+    console.log('Fetching image from:', image_url);
+    
+    // Convert image URL to base64 data URI
+    const base64Image = await fetchImageAsBase64(image_url);
+    console.log('Image converted to base64, length:', base64Image.length);
+
     // Build request body for Runway API
-    // gen3a_turbo valid ratios: 1280:768, 768:1280
     const requestBody = {
       model: 'gen3a_turbo',
-      promptImage: image_url,
+      promptImage: base64Image,
       promptText: prompt || 'Subtle elegant motion, cinematic quality',
       duration: duration || 5,
       ratio: '1280:768'
     };
     
-    console.log('Sending to Runway:', JSON.stringify(requestBody));
     console.log('API Key present:', !!RUNWAY_API_KEY);
 
     // Start the video generation task
@@ -47,7 +64,6 @@ Deno.serve(async (req) => {
     
     if (!createResponse.ok) {
       console.error('Runway API error:', responseText);
-      // Return the actual error message from Runway
       let errorDetails = responseText;
       try {
         const errorJson = JSON.parse(responseText);
