@@ -12,7 +12,7 @@ export default function Logo({ size = 'default', showText = true, animate = fals
   const { img, text } = sizes[size];
 
   return (
-    <div className={`flex flex-col items-center gap-2 relative ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}
+    <div className={`flex flex-col items-center gap-2 relative ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
       {/* Animated glow rings - only on large size with animate */}
       {animate && size === 'large' && (
         <>
