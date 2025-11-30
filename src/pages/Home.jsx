@@ -77,12 +77,12 @@ export default function Home() {
           ]);
 
           if (userCredits.length === 0) {
-            const newCredits = await base44.entities.UserCredits.create({
-              user_email: currentUser.email,
-              free_downloads: 5,
-              paid_credits: 0,
-              subscription_type: 'free'
-            });
+                            const newCredits = await base44.entities.UserCredits.create({
+                              user_email: currentUser.email,
+                              free_downloads: 25,
+                              paid_credits: 0,
+                              subscription_type: 'free'
+                            });
             setCredits(newCredits);
           } else {
             setCredits(userCredits[0]);
