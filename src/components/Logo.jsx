@@ -2,7 +2,7 @@ import React from 'react';
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/f227f1937_iGPT.png";
 
-export default function Logo({ size = 'default', showText = true, animate = false }) {
+export default function Logo({ size = 'default', showText = true, animate = false, onClick }) {
   const sizes = {
     small: { img: 32, text: 'text-xl' },
     default: { img: 48, text: 'text-2xl' },
@@ -12,7 +12,7 @@ export default function Logo({ size = 'default', showText = true, animate = fals
   const { img, text } = sizes[size];
 
   return (
-    <div className="flex flex-col items-center gap-2 relative">
+    <div className={`flex flex-col items-center gap-2 relative ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}
       {/* Animated glow rings - only on large size with animate */}
       {animate && size === 'large' && (
         <>

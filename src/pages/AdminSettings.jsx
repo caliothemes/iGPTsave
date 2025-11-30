@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Globe, FileText, Layout, MessageSquare, Building2 } from 'lucide-react';
+import { Loader2, Save, Globe, FileText, Layout, MessageSquare, Building2, MousePointerClick } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,9 @@ export default function AdminSettings() {
     guest_message_en: '',
     new_conversation_fr: '',
     new_conversation_en: '',
+    // Logo modal
+    logo_modal_fr: '',
+    logo_modal_en: '',
     // Company settings
     company_name: '',
     company_address: '',
@@ -209,6 +212,41 @@ export default function AdminSettings() {
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Logo Modal Settings */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-pink-600/20">
+              <MousePointerClick className="h-5 w-5 text-pink-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Modal du logo</h2>
+              <p className="text-sm text-white/50">Texte affiché quand on clique sur le logo</p>
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-white/60 mb-2">Contenu (Français)</label>
+              <Textarea
+                value={settings.logo_modal_fr}
+                onChange={(e) => setSettings(prev => ({ ...prev, logo_modal_fr: e.target.value }))}
+                placeholder="# Bienvenue sur iGPT&#10;&#10;Votre assistant IA pour créer des visuels..."
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-32"
+              />
+              <p className="text-xs text-white/40 mt-1">Supporte le Markdown (# titre, **gras**, etc.)</p>
+            </div>
+            <div>
+              <label className="block text-sm text-white/60 mb-2">Content (English)</label>
+              <Textarea
+                value={settings.logo_modal_en}
+                onChange={(e) => setSettings(prev => ({ ...prev, logo_modal_en: e.target.value }))}
+                placeholder="# Welcome to iGPT&#10;&#10;Your AI assistant to create visuals..."
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-32"
+              />
+              <p className="text-xs text-white/40 mt-1">Supports Markdown (# title, **bold**, etc.)</p>
             </div>
           </div>
         </div>
