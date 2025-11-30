@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
     }
 
     // Start the video generation task
-    const createResponse = await fetch('https://api.runwayml.com/v1/image_to_video', {
+    const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${RUNWAY_API_KEY}`,
@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
         promptImage: image_url,
         promptText: prompt || 'Subtle elegant motion, cinematic quality',
         duration: duration || 5,
-        ratio: '1280:768'
+        ratio: '1280:720'
       })
     });
 
