@@ -771,26 +771,28 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         <div className="bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/98 to-transparent pt-8 pb-4 px-4">
           <div className="max-w-3xl mx-auto">
             {/* Format Selector */}
-            {showFormatSelector && (
-              <div className="mb-3">
-                <FormatSelector 
-                  onSelect={(format) => { setSelectedFormat(format); setShowFormatSelector(false); }}
-                  selectedFormat={selectedFormat}
-                />
-              </div>
-            )}
+                            {showFormatSelector && (
+                              <div className="mb-3">
+                                <FormatSelector 
+                                  onSelect={(format) => { setSelectedFormat(format); setShowFormatSelector(false); }}
+                                  selectedFormat={selectedFormat}
+                                  onClose={() => setShowFormatSelector(false)}
+                                />
+                              </div>
+                            )}
 
-            {/* Style & Palette Selector */}
-            {showStyleSelector && (
-              <div className="mb-3">
-                <StyleSelector
-                  selectedStyle={selectedStyle}
-                  selectedPalette={selectedPalette}
-                  onStyleChange={setSelectedStyle}
-                  onPaletteChange={setSelectedPalette}
-                />
-              </div>
-            )}
+                            {/* Style & Palette Selector */}
+                            {showStyleSelector && (
+                              <div className="mb-3">
+                                <StyleSelector
+                                  selectedStyle={selectedStyle}
+                                  selectedPalette={selectedPalette}
+                                  onStyleChange={setSelectedStyle}
+                                  onPaletteChange={setSelectedPalette}
+                                  onClose={() => setShowStyleSelector(false)}
+                                />
+                              </div>
+                            )}
               {/* Apply format to existing visual */}
               {selectedFormat && selectedVisual && (
                 <div className="mb-2 flex items-center gap-2">

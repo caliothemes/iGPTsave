@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Monitor, Printer, Ruler } from 'lucide-react';
+import { Monitor, Printer, Ruler, X } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 
@@ -26,7 +26,7 @@ const FormatShape = ({ w, h, selected, isCircle }) => {
   );
 };
 
-export default function FormatSelector({ onSelect, selectedFormat }) {
+export default function FormatSelector({ onSelect, selectedFormat, onClose }) {
   const { language } = useLanguage();
   const [category, setCategory] = useState('digital');
   const [customWidth, setCustomWidth] = useState('1080');
@@ -71,7 +71,16 @@ export default function FormatSelector({ onSelect, selectedFormat }) {
   };
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 space-y-4">
+    <div className="relative bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-2xl p-4 space-y-4">
+      {/* Close button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors z-10"
+        >
+          <X className="h-3.5 w-3.5 text-white" />
+        </button>
+      )}
       {/* Category Tabs */}
       <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl">
         <Button

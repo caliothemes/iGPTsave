@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
-import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf } from 'lucide-react';
+import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf, X } from 'lucide-react';
 
 const STYLES = [
   { id: 'modern', name: { fr: 'Moderne', en: 'Modern' }, icon: Sparkles, prompt: 'modern, clean, minimalist, contemporary design', color: 'from-violet-500 to-purple-500' },
@@ -27,11 +27,20 @@ const COLOR_PALETTES = [
   { id: 'earth', name: { fr: 'Terre', en: 'Earth' }, colors: ['#8B4513', '#A0522D', '#CD853F', '#DEB887', '#D2691E'] },
 ];
 
-export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange }) {
+export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose }) {
   const { language } = useLanguage();
 
   return (
-    <div className="space-y-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
+    <div className="relative space-y-4 p-4 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-2xl">
+      {/* Close button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors z-10"
+        >
+          <X className="h-3.5 w-3.5 text-white" />
+        </button>
+      )}
       {/* Styles */}
       <div>
         <p className="text-white/50 text-xs mb-3 font-medium">
