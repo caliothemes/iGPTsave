@@ -6,6 +6,7 @@ import FavoritesModal from '@/components/FavoritesModal';
 import LogoModal from '@/components/LogoModal';
 import GDPRBanner from '@/components/GDPRBanner';
 import VisualEditor from '@/components/chat/VisualEditor';
+import VideoGenerator from '@/components/VideoGenerator';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -48,6 +49,7 @@ export default function Home() {
   const [isListening, setIsListening] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showLogoModal, setShowLogoModal] = useState(false);
+  const [showVideoGenerator, setShowVideoGenerator] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -718,6 +720,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                       onVariation={handleVariation}
                       onToggleFavorite={handleToggleFavorite}
                       onEdit={() => setShowEditor(true)}
+                      onAnimate={() => setShowVideoGenerator(true)}
                       isRegenerating={isGenerating}
                       canDownload={isAuthenticated && getTotalCredits() > 0}
                       hasWatermark={!isAuthenticated || credits?.subscription_type === 'free'}
@@ -1003,6 +1006,13 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
 
               {/* GDPR Banner */}
               <GDPRBanner />
+
+              {/* Video Generator */}
+              <VideoGenerator
+                isOpen={showVideoGenerator}
+                onClose={() => setShowVideoGenerator(false)}
+                visual={selectedVisual}
+              />
               </div>
               );
       }

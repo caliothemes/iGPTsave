@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
@@ -19,6 +19,7 @@ export default function VisualCard({
   onToggleFavorite,
   onVariation,
   onEdit,
+  onAnimate,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -163,23 +164,35 @@ export default function VisualCard({
 
           {/* Validation Buttons */}
           {showValidation && (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={handleDownloadClick}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-              >
-                <Download className="h-4 w-4 mr-1.5" />
-                <span className="text-xs">{language === 'fr' ? 'Télécharger' : 'Download'}</span>
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => onValidate?.('edit')}
-                className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-              >
-                <Pencil className="h-4 w-4 mr-1.5" />
-                <span className="text-xs">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
-              </Button>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={handleDownloadClick}
+                  className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                >
+                  <Download className="h-4 w-4 mr-1.5" />
+                  <span className="text-xs">{language === 'fr' ? 'Télécharger' : 'Download'}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => onValidate?.('edit')}
+                  className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                >
+                  <Pencil className="h-4 w-4 mr-1.5" />
+                  <span className="text-xs">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
+                </Button>
+              </div>
+              {onAnimate && (
+                <Button
+                  size="sm"
+                  onClick={() => onAnimate(visual)}
+                  className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700"
+                >
+                  <Video className="h-4 w-4 mr-1.5" />
+                  <span className="text-xs">{language === 'fr' ? '✨ Animer ce visuel' : '✨ Animate this visual'}</span>
+                </Button>
+              )}
             </div>
           )}
 
