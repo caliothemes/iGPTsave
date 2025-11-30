@@ -12,6 +12,7 @@ Deno.serve(async (req) => {
 
     console.log('Image URL:', image_url);
     console.log('API Key present:', !!RUNWAY_API_KEY);
+    console.log('API Key first 10 chars:', RUNWAY_API_KEY ? RUNWAY_API_KEY.substring(0, 10) : 'MISSING');
 
     // Build request body for Runway API - use direct URL
     const requestBody = {
