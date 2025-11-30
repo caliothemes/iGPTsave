@@ -303,13 +303,14 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     };
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
-    setActiveTab('text');
+    setActiveTab('layers');
   };
 
   const addShapeLayer = (shape) => {
     const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2 };
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
+    setActiveTab('layers');
   };
 
   const addImageLayer = (imageUrl, width = 100, height = 100) => {
@@ -332,6 +333,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       setLayers([...layers, newLayer]);
       setSelectedLayer(layers.length);
     }
+    setActiveTab('layers');
   };
 
   const generateTexture = async (texturePrompt) => {
@@ -472,7 +474,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
   const handleCanvasMouseDown = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const scaleX = canvasSize.width / rect.width;
+    const scaleY = canvasSize.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
     for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
       let hit = false;
@@ -493,7 +498,11 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
   const handleCanvasMouseMove = (e) => {
     if (dragging === null) return;
     const rect = canvasRef.current.getBoundingClientRect();
-    updateLayer(dragging, { x: e.clientX - rect.left - dragOffset.x, y: e.clientY - rect.top - dragOffset.y });
+    const scaleX = canvasSize.width / rect.width;
+    const scaleY = canvasSize.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    updateLayer(dragging, { x: x - dragOffset.x, y: y - dragOffset.y });
   };
 
   const handleCanvasMouseUp = () => setDragging(null);
@@ -543,7 +552,14 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-4 w-4" /></TabsTrigger>
-          <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Layers className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors relative">
+            <Layers className="h-4 w-4" />
+            {layers.length > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-emerald-500 rounded-full text-[10px] text-white font-medium flex items-center justify-center">
+                {layers.length}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         {/* Tool Content Panel */}
@@ -605,6 +621,11 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           </TabsContent>
 
           <TabsContent value="layers" className="mt-0 space-y-2">
+            {layers.length > 0 && (
+              <p className="text-amber-400/80 text-xs px-2 py-1 bg-amber-500/10 rounded-lg flex items-center gap-1">
+                💡 {language === 'fr' ? 'Glissez les éléments sur l\'image. Supprimez-les ici.' : 'Drag elements on image. Delete them here.'}
+              </p>
+            )}
             <div className="space-y-1">
               {layers.length === 0 ? (
                 <p className="text-white/40 text-xs text-center py-4">{language === 'fr' ? 'Aucun calque' : 'No layers'}</p>
