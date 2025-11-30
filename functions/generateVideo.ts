@@ -17,6 +17,18 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Image URL is required' }, { status: 400 });
     }
 
+    // Build request body for Runway API
+    const requestBody = {
+      model: 'gen3a_turbo',
+      promptImage: image_url,
+      promptText: prompt || 'Subtle elegant motion, cinematic quality',
+      duration: duration || 5,
+      ratio: '1280:720'
+    };
+    
+    console.log('Sending to Runway:', JSON.stringify(requestBody));
+    console.log('API Key present:', !!RUNWAY_API_KEY);
+
     // Start the video generation task
     const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
       method: 'POST',
@@ -25,21 +37,22 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
         'X-Runway-Version': '2024-11-06'
       },
-      body: JSON.stringify({
-        model: 'gen3a_turbo',
-        promptImage: image_url,
-        promptText: prompt || 'Subtle elegant motion, cinematic quality',
-        duration: duration || 5,
-        ratio: '1280:720'
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const responseText = await createResponse.text();
-    console.log('Runway API response:', createResponse.status, responseText);
+    console.log('Runway API response status:', createResponse.status);
+    console.log('Runway API response body:', responseText);
     
     if (!createResponse.ok) {
       console.error('Runway API error:', responseText);
-      return Response.json({ error: 'Failed to start video generation', details: responseText }, { status: 500 });
+      // Return the actual error message from Runway
+      let errorDetails = responseText;
+      try {
+        const errorJson = JSON.parse(responseText);
+        errorDetails = errorJson.error || errorJson.message || responseText;
+      } catch (e) {}
+      return Response.json({ error: 'Failed to start video generation', details: errorDetails }, { status: 500 });
     }
 
     const taskData = JSON.parse(responseText);
