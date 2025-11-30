@@ -335,12 +335,13 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
           RÈGLES CRITIQUES PAR TYPE DE VISUEL:
 
           🎴 CARTE DE VISITE / BUSINESS CARD:
-          - JAMAIS de photos stock, bâtiments, paysages ou images réalistes
-          - Style: minimaliste, élégant, graphique abstrait
-          - Éléments: formes géométriques subtiles, dégradés doux, lignes fines, motifs abstraits
-          - Composition: espace négatif important, mise en page aérée
-          - Exemples de prompts: "minimalist business card design, elegant geometric pattern, subtle gradient background, clean typography layout, luxury feel, white space, abstract shapes, professional corporate design, print ready, 300dpi quality"
-          - INTERDITS: buildings, photos, realistic images, cluttered designs
+              - JAMAIS de photos stock, bâtiments, paysages ou images réalistes
+              - AUCUN TEXTE sur le visuel - design graphique pur uniquement
+              - Style: minimaliste, élégant, graphique abstrait
+              - Éléments: formes géométriques subtiles, dégradés doux, lignes fines, motifs abstraits
+              - Composition: espace négatif important, mise en page aérée
+              - Exemples de prompts: "minimalist business card background design, NO TEXT, NO LETTERS, NO WORDS, elegant geometric pattern, subtle gradient, abstract shapes, luxury feel, white space, professional corporate design, print ready, 300dpi quality, pure graphic design without any typography"
+              - INTERDITS: buildings, photos, realistic images, cluttered designs, ANY TEXT OR LETTERS
 
           🎨 LOGO:
           - Type: wordmark, emblem, abstract, mascot, lettermark, combination mark
