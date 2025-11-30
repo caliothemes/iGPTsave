@@ -119,7 +119,7 @@ export default function AnimatedBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
+      className="fixed inset-0 -z-10"
       style={{ background: 'linear-gradient(135deg, #0F0F1A 0%, #1a1a2e 50%, #16213e 100%)' }}
     />
   );
