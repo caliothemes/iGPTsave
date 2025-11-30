@@ -580,7 +580,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
       {/* Watermark Notice Toast */}
       {showWatermarkNotice && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex flex-col gap-2 px-4 py-3 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-xl shadow-lg">
+          <div className="flex flex-col gap-2 px-4 py-3 bg-blue-900/95 border border-blue-400/30 rounded-xl shadow-lg">
             <div className="flex items-center gap-3">
               <Info className="h-4 w-4 text-blue-300 flex-shrink-0" />
               <p className="text-blue-100 text-sm">
