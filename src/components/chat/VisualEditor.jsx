@@ -103,6 +103,12 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [bgColor, setBgColor] = useState('#000000');
   const [bgGradient, setBgGradient] = useState({ color1: '#667eea', color2: '#764ba2', angle: 135 });
   
+  // Custom texture generator
+  const [showTextureGenerator, setShowTextureGenerator] = useState(false);
+  const [texturePrompt, setTexturePrompt] = useState('');
+  const [generatingCustomTexture, setGeneratingCustomTexture] = useState(false);
+  const [generatedTexture, setGeneratedTexture] = useState(null);
+  
   // Custom illustration generator
   const [showIllustGenerator, setShowIllustGenerator] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
@@ -498,23 +504,31 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
   };
 
-  const generateTexture = async (texturePrompt) => {
-    setGeneratingTexture(texturePrompt.id || texturePrompt.name_fr);
-    try {
-      const prompt = texturePrompt.prompt + ', high quality, seamless, 1024x1024';
-      const result = await base44.integrations.Core.GenerateImage({ prompt });
-      // Add as full-size texture layer
-      addImageLayer(result.url, canvasSize.width, canvasSize.height);
-                showHelp(language === 'fr' ? '💡 Texture ajoutée. Réglez l\'opacité en bas.' : '💡 Texture added. Adjust opacity below.');
-                if (user) {
-        const newItem = { type: 'texture', url: result.url, name: texturePrompt.name?.[language] || texturePrompt.name_fr };
-        const updatedLibrary = [...userLibrary, newItem];
-        setUserLibrary(updatedLibrary);
-        await base44.auth.updateMe({ editor_library: updatedLibrary });
-      }
-    } catch (e) { console.error(e); }
-    setGeneratingTexture(null);
-  };
+  const generateCustomTexture = async () => {
+        if (!texturePrompt.trim()) return;
+        setGeneratingCustomTexture(true);
+        try {
+          const prompt = texturePrompt + ', seamless texture, high quality, tileable pattern, 1024x1024';
+          const result = await base44.integrations.Core.GenerateImage({ prompt });
+          setGeneratedTexture(result.url);
+        } catch (e) { console.error(e); }
+        setGeneratingCustomTexture(false);
+      };
+
+      const addTextureToCanvas = (saveToLibrary = false) => {
+        if (!generatedTexture) return;
+        addImageLayer(generatedTexture, canvasSize.width, canvasSize.height);
+        if (saveToLibrary && user) {
+          const newItem = { type: 'texture', url: generatedTexture, name: texturePrompt.slice(0, 30) };
+          const updatedLibrary = [...userLibrary, newItem];
+          setUserLibrary(updatedLibrary);
+          base44.auth.updateMe({ editor_library: updatedLibrary });
+        }
+        setShowTextureGenerator(false);
+        setGeneratedTexture(null);
+        setTexturePrompt('');
+        showHelp(language === 'fr' ? '💡 Texture ajoutée. Réglez l\'opacité en bas.' : '💡 Texture added. Adjust opacity below.');
+      };
 
   const generateIllustration = async (illustPrompt) => {
     setGeneratingIllustration(illustPrompt.id || illustPrompt.name_fr);
@@ -712,8 +726,16 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
     }
   };
 
-  const allTextures = [...DEFAULT_TEXTURES, ...adminTextures.map(a => ({ id: a.id, name: { fr: a.name_fr, en: a.name_en || a.name_fr }, prompt: a.prompt }))];
-  const allIllustrations = [...DEFAULT_ILLUSTRATIONS, ...adminIllustrations.map(a => ({ id: a.id, name: { fr: a.name_fr, en: a.name_en || a.name_fr }, prompt: a.prompt }))];
+  // Textures admin avec image uploadée (pas de génération)
+  const adminTexturesWithImage = adminTextures.filter(a => a.preview_url).map(a => ({ 
+    id: a.id, 
+    name: { fr: a.name_fr, en: a.name_en || a.name_fr }, 
+    preview_url: a.preview_url,
+    isStatic: true 
+  }));
+  // Textures par défaut qui nécessitent génération IA
+  const generativeTextures = [...DEFAULT_TEXTURES, ...adminTextures.filter(a => !a.preview_url && a.prompt).map(a => ({ id: a.id, name: { fr: a.name_fr, en: a.name_en || a.name_fr }, prompt: a.prompt }))];
+  const allIllustrations = [...DEFAULT_ILLUSTRATIONS, ...adminIllustrations.map(a => ({ id: a.id, name: { fr: a.name_fr, en: a.name_en || a.name_fr }, prompt: a.prompt, preview_url: a.preview_url }))];
 
   const currentLayer = selectedLayer !== null ? layers[selectedLayer] : null;
 
@@ -836,18 +858,52 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </div>
           </TabsContent>
 
-          <TabsContent value="textures" className="mt-0 space-y-2">
-            <p className="text-white/40 text-xs px-1 flex items-center gap-1"><Sparkles className="h-3 w-3" />{language === 'fr' ? 'Textures IA (plein écran):' : 'AI Textures (full screen):'}</p>
-            <div className="grid grid-cols-2 gap-2">
-              {allTextures.map(texture => (
-                <button key={texture.id} onClick={() => generateTexture(texture)} disabled={generatingTexture !== null}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xs flex items-center gap-2">
-                  {generatingTexture === (texture.id || texture.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <Palette className="h-3 w-3" />}
-                  {texture.name[language] || texture.name.fr}
-                </button>
-              ))}
-            </div>
-          </TabsContent>
+          <TabsContent value="textures" className="mt-0 space-y-3">
+                          {/* Textures statiques (admin) */}
+                          {adminTexturesWithImage.length > 0 && (
+                            <>
+                              <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Textures disponibles:' : 'Available textures:'}</p>
+                              <div className="grid grid-cols-3 gap-2">
+                                {adminTexturesWithImage.map(texture => (
+                                  <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
+                                    className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
+                                    <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                      <span className="text-white text-xs text-center px-1">{texture.name[language]}</span>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+
+                          {/* Générateur de texture IA */}
+                          <div className="pt-2 border-t border-white/10">
+                            <Button onClick={() => setShowTextureGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30 text-violet-300">
+                              <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer texture IA' : 'Generate AI texture'}
+                            </Button>
+                          </div>
+
+                          {/* Bibliothèque personnelle de textures */}
+                          {userLibrary.filter(item => item.type === 'texture').length > 0 && (
+                            <div className="pt-2 border-t border-white/10">
+                              <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes textures:' : 'My textures:'}</p>
+                              <div className="grid grid-cols-3 gap-2">
+                                {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
+                                  <div key={idx} className="relative group">
+                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
+                                      className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                    </button>
+                                    <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <X className="h-2 w-2 text-white" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </TabsContent>
 
           <TabsContent value="illustrations" className="mt-0 space-y-2">
             <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 text-pink-300">
@@ -1108,8 +1164,40 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         </div>
       )}
 
-      {/* Custom Illustration Generator Modal */}
-      <Dialog open={showIllustGenerator} onOpenChange={setShowIllustGenerator}>
+      {/* Custom Texture Generator Modal */}
+              <Dialog open={showTextureGenerator} onOpenChange={setShowTextureGenerator}>
+                <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2"><Brush className="h-5 w-5 text-violet-400" />{language === 'fr' ? 'Générer une texture IA' : 'Generate AI texture'}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <Textarea value={texturePrompt} onChange={(e) => setTexturePrompt(e.target.value)} placeholder={language === 'fr' ? 'Décrivez la texture souhaitée (ex: marbre blanc veiné, bois de chêne, métal brossé...)' : 'Describe the texture you want (ex: veined white marble, oak wood, brushed metal...)'}
+                      className="bg-white/5 border-white/10 text-white min-h-[100px]" />
+                    <Button onClick={generateCustomTexture} disabled={generatingCustomTexture || !texturePrompt.trim()} className="w-full bg-gradient-to-r from-violet-600 to-purple-600">
+                      {generatingCustomTexture ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                      {language === 'fr' ? 'Générer' : 'Generate'}
+                    </Button>
+                    {generatedTexture && (
+                      <div className="space-y-3">
+                        <img src={generatedTexture} alt="Generated texture" className="w-full rounded-lg" />
+                        <div className="flex gap-2">
+                          <Button onClick={() => addTextureToCanvas(false)} className="flex-1 bg-violet-600 hover:bg-violet-700">
+                            <Plus className="h-4 w-4 mr-1" />{language === 'fr' ? 'Utiliser' : 'Use'}
+                          </Button>
+                          {user && (
+                            <Button onClick={() => addTextureToCanvas(true)} className="flex-1 bg-amber-600 hover:bg-amber-700">
+                              <Bookmark className="h-4 w-4 mr-1" />{language === 'fr' ? 'Sauvegarder' : 'Save'}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Custom Illustration Generator Modal */}
+              <Dialog open={showIllustGenerator} onOpenChange={setShowIllustGenerator}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Wand2 className="h-5 w-5 text-pink-400" />{language === 'fr' ? 'Créer une illustration' : 'Create an illustration'}</DialogTitle>
