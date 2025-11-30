@@ -97,6 +97,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [user, setUser] = useState(null);
   const [adminTextures, setAdminTextures] = useState([]);
   const [adminIllustrations, setAdminIllustrations] = useState([]);
+  const [saving, setSaving] = useState(false);
   
   // Custom illustration generator
   const [showIllustGenerator, setShowIllustGenerator] = useState(false);
@@ -136,6 +137,11 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const assets = await base44.entities.EditorAsset.filter({ is_active: true });
         setAdminTextures(assets.filter(a => a.type === 'texture'));
         setAdminIllustrations(assets.filter(a => a.type === 'illustration'));
+        
+        // Load saved layers from visual
+        if (visual.editor_layers && Array.isArray(visual.editor_layers)) {
+          setLayers(visual.editor_layers);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -574,13 +580,48 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
   const handleCanvasMouseUp = () => setDragging(null);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    setSaving(true);
     const canvas = canvasRef.current;
-    const link = document.createElement('a');
-    link.download = `${visual.title || 'visual'}-edited.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    onSave?.();
+    const dataUrl = canvas.toDataURL('image/png');
+    
+    // Convert dataUrl to blob and upload
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], `${visual.title || 'visual'}-edited.png`, { type: 'image/png' });
+    
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      
+      // Update the visual with new image and layers
+      if (visual.id) {
+        await base44.entities.Visual.update(visual.id, {
+          image_url: file_url,
+          editor_layers: layers
+        });
+      }
+      
+      // Download the file
+      const link = document.createElement('a');
+      link.download = `${visual.title || 'visual'}-edited.png`;
+      link.href = file_url;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setSaving(false);
+      onSave?.(file_url);
+    } catch (e) {
+      console.error(e);
+      setSaving(false);
+      // Fallback to direct download
+      const link = document.createElement('a');
+      link.download = `${visual.title || 'visual'}-edited.png`;
+      link.href = dataUrl;
+      link.click();
+      onSave?.();
+    }
   };
 
   const allTextures = [...DEFAULT_TEXTURES, ...adminTextures.map(a => ({ id: a.id, name: { fr: a.name_fr, en: a.name_en || a.name_fr }, prompt: a.prompt }))];
@@ -606,8 +647,9 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white text-xs px-2">
             <X className="h-4 w-4" />
           </Button>
-          <Button size="sm" onClick={handleDownload} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
-            <Save className="h-4 w-4 mr-1" />{language === 'fr' ? 'Sauvegarder' : 'Save'}
+          <Button size="sm" onClick={handleDownload} disabled={saving} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
+            {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
+            {language === 'fr' ? 'Sauvegarder' : 'Save'}
           </Button>
         </div>
       </div>
