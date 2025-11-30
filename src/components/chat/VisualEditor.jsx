@@ -1026,12 +1026,13 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
                 </div>
                 {currentLayer.type === 'shape' && (
-                  <div className="flex gap-1">
-                    {PRESET_COLORS.slice(0, 6).map(color => (
-                      <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
-                    ))}
-                  </div>
-                )}
+                                <div className="flex gap-1 flex-wrap">
+                                  {PRESET_COLORS.map(color => (
+                                    <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                                  ))}
+                                  <input type="color" value={currentLayer.color} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                                </div>
+                              )}
               </div>
               {currentLayer.type === 'shape' && (
                 <>
