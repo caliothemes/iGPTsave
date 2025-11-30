@@ -1197,42 +1197,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
                   </div>
                 </div>
-                
-                {/* Color tint for textures */}
-                <div className="pt-2 border-t border-white/10">
-                  <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
-                    <Palette className="h-3 w-3" />
-                    {language === 'fr' ? 'Teinte de couleur:' : 'Color tint:'}
-                  </p>
-                  <div className="flex gap-1 flex-wrap">
-                    <button 
-                      onClick={() => updateLayer(selectedLayer, { tintColor: null, tintOpacity: 0 })}
-                      className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs", !currentLayer.tintColor ? "border-violet-400 bg-white/10" : "border-transparent bg-white/5")}
-                    >
-                      ✕
-                    </button>
-                    {/* Colors from visual palette */}
-                    {visual.color_palette?.map((color, i) => (
-                      <button key={i} onClick={() => updateLayer(selectedLayer, { tintColor: color, tintOpacity: currentLayer.tintOpacity || 40 })}
-                        className={cn("w-6 h-6 rounded-full border-2 transition-transform hover:scale-110", currentLayer.tintColor === color ? "border-violet-400" : "border-transparent")}
-                        style={{ backgroundColor: color }} />
-                    ))}
-                    {/* Preset colors */}
-                    {PRESET_COLORS.slice(0, 8).map(color => (
-                      <button key={color} onClick={() => updateLayer(selectedLayer, { tintColor: color, tintOpacity: currentLayer.tintOpacity || 40 })}
-                        className={cn("w-6 h-6 rounded-full border-2 transition-transform hover:scale-110", currentLayer.tintColor === color ? "border-violet-400" : "border-transparent")}
-                        style={{ backgroundColor: color }} />
-                    ))}
-                    <input type="color" value={currentLayer.tintColor || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { tintColor: e.target.value, tintOpacity: currentLayer.tintOpacity || 40 })} className="w-6 h-6 rounded cursor-pointer" />
-                  </div>
-                  {currentLayer.tintColor && (
-                    <div className="flex gap-2 items-center mt-2">
-                      <span className="text-white/40 text-xs">{language === 'fr' ? 'Intensité:' : 'Intensity:'}</span>
-                      <Slider value={[currentLayer.tintOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { tintOpacity: v })} min={10} max={90} step={5} className="flex-1" />
-                      <span className="text-white/40 text-xs w-8">{currentLayer.tintOpacity || 40}%</span>
-                    </div>
-                  )}
-                </div>
               </div>
             )}
 
