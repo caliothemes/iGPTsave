@@ -326,34 +326,55 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
 ` : '';
 
       const analysis = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels.
+                prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels de niveau agence de design.
 
-  L'utilisateur demande: "${userMessage}"
-  ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
-  ${existingVisualContext}
+          L'utilisateur demande: "${userMessage}"
+          ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
+          ${existingVisualContext}
 
-  RÈGLES IMPORTANTES:
-  - Tu dois créer des visuels de qualité PROFESSIONNELLE
-  - Sois très descriptif dans le prompt image (min 100 mots)
-  - Inclus des détails sur: composition, éclairage, textures, profondeur, style artistique
-  - Pour les logos: précise le type (wordmark, emblem, abstract, mascot, etc.)
-  - Mentionne toujours "vector style, scalable, clean edges" pour les logos
-  
-  RÈGLE CRUCIALE POUR LES MODIFICATIONS:
-  - Si un visuel existe et que l'utilisateur demande une modification (texte, texture, forme, placement, etc.)
-  - Tu DOIS reprendre EXACTEMENT le prompt du visuel existant et AJOUTER les modifications demandées
-  - Exemple: si le logo est "blue phoenix logo" et l'utilisateur dit "mets-le dans un cercle doré", 
-    ton prompt doit être "blue phoenix logo INSIDE a golden textured circle frame..."
-  - NE CHANGE PAS le design principal, AJOUTE simplement ce que l'utilisateur demande
+          RÈGLES CRITIQUES PAR TYPE DE VISUEL:
 
-  Réponds en JSON:
-  - needs_image: boolean (true si création visuelle demandée)
-  - response: string (réponse courte, professionnelle, en français)
-  - image_prompt: string (prompt TRÈS détaillé en anglais, 100+ mots, incluant style, couleurs, composition, éclairage, textures)
-  - visual_type: string (logo, carte_visite, flyer, post_instagram, story_instagram, post_facebook, post_linkedin, affiche, banner, autre)
-  - dimensions: string (ex: 1080x1080)
-  - title: string (titre court et accrocheur)
-  - suggested_colors: array de 5 codes hex couleurs recommandées`,
+          🎴 CARTE DE VISITE / BUSINESS CARD:
+          - JAMAIS de photos stock, bâtiments, paysages ou images réalistes
+          - Style: minimaliste, élégant, graphique abstrait
+          - Éléments: formes géométriques subtiles, dégradés doux, lignes fines, motifs abstraits
+          - Composition: espace négatif important, mise en page aérée
+          - Exemples de prompts: "minimalist business card design, elegant geometric pattern, subtle gradient background, clean typography layout, luxury feel, white space, abstract shapes, professional corporate design, print ready, 300dpi quality"
+          - INTERDITS: buildings, photos, realistic images, cluttered designs
+
+          🎨 LOGO:
+          - Type: wordmark, emblem, abstract, mascot, lettermark, combination mark
+          - Style: vector, scalable, clean edges, minimal details
+          - "logo design, vector style, scalable graphics, clean minimal, centered composition, transparent background concept"
+
+          📱 POSTS RÉSEAUX SOCIAUX:
+          - Visuels accrocheurs, couleurs vives ou tendance
+          - Composition adaptée au format (carré, vertical, horizontal)
+          - Style moderne, dynamique
+
+          📄 FLYERS/AFFICHES:
+          - Hiérarchie visuelle claire
+          - Zone pour texte bien définie
+          - Impact visuel fort
+
+          RÈGLES GÉNÉRALES:
+          - Sois TRÈS créatif et original - évite les clichés
+          - Prompt de 100+ mots minimum en anglais
+          - Décris: style artistique, composition, couleurs, mood, textures, éclairage
+          - Qualité: "professional design, award-winning, high-end, premium quality"
+
+          RÈGLE POUR LES MODIFICATIONS:
+          - Si un visuel existe, reprends son prompt et AJOUTE les modifications demandées
+          - Ne change pas le design principal, enrichis-le
+
+          Réponds en JSON:
+          - needs_image: boolean (true si création visuelle demandée)
+          - response: string (réponse courte, professionnelle, en français)
+          - image_prompt: string (prompt TRÈS détaillé en anglais, 100+ mots, RESPECTE les règles du type de visuel)
+          - visual_type: string (logo, carte_visite, flyer, post_instagram, story_instagram, post_facebook, post_linkedin, affiche, banner, autre)
+          - dimensions: string (ex: 1080x1080)
+          - title: string (titre court et accrocheur)
+          - suggested_colors: array de 5 codes hex couleurs recommandées`,
         response_json_schema: {
           type: 'object',
           properties: {
