@@ -700,21 +700,93 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
   const handleCanvasMouseUp = () => setDragging(null);
 
   const handleSave = async () => {
-    setSaving(true);
-    
-    // Wait a frame to ensure canvas is fully rendered with all effects
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Create a new canvas to render everything properly for export
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = canvasSize.width;
-    exportCanvas.height = canvasSize.height;
-    const exportCtx = exportCanvas.getContext('2d');
-    
-    // Draw from the current canvas which has all layers rendered
-    exportCtx.drawImage(canvasRef.current, 0, 0);
-    
-    const dataUrl = exportCanvas.toDataURL('image/png');
+        setSaving(true);
+
+        // Wait a frame to ensure canvas is fully rendered with all effects
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Create a high-resolution canvas for export
+        const scale = 2; // Export at 2x resolution
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = canvasSize.width * scale;
+        exportCanvas.height = canvasSize.height * scale;
+        const exportCtx = exportCanvas.getContext('2d');
+        exportCtx.scale(scale, scale);
+
+        // Redraw everything on export canvas
+        const baseImg = new Image();
+        baseImg.crossOrigin = 'anonymous';
+
+        await new Promise((resolve) => {
+          baseImg.onload = resolve;
+          baseImg.src = visual.image_url;
+        });
+
+        // Draw base image
+        exportCtx.drawImage(baseImg, 0, 0, canvasSize.width, canvasSize.height);
+
+        // Draw all layers
+        for (const layer of layers) {
+          exportCtx.save();
+          exportCtx.globalAlpha = layer.opacity / 100;
+
+          if (layer.type === 'image' && layer.imageUrl) {
+            const layerImg = loadedImages[layer.imageUrl] || await new Promise((resolve) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => resolve(img);
+              img.src = layer.imageUrl;
+            });
+            exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+            if (layer.tintColor && layer.tintOpacity) {
+              exportCtx.globalCompositeOperation = 'multiply';
+              exportCtx.globalAlpha = layer.tintOpacity / 100;
+              exportCtx.fillStyle = layer.tintColor;
+              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
+              exportCtx.globalCompositeOperation = 'source-over';
+            }
+          } else if (layer.type === 'text') {
+            const fontStyle = `${layer.italic ? 'italic ' : ''}${layer.bold ? 'bold ' : ''}${layer.fontSize}px ${layer.fontFamily}`;
+            exportCtx.font = fontStyle;
+            exportCtx.fillStyle = layer.color;
+            exportCtx.textAlign = layer.align || 'left';
+            if (layer.stroke) {
+              exportCtx.strokeStyle = layer.strokeColor || '#000000';
+              exportCtx.lineWidth = layer.strokeWidth || 2;
+              exportCtx.strokeText(layer.text, layer.x, layer.y);
+            }
+            if (layer.shadow) {
+              exportCtx.shadowColor = 'rgba(0,0,0,0.6)';
+              exportCtx.shadowBlur = 6;
+              exportCtx.shadowOffsetX = 3;
+              exportCtx.shadowOffsetY = 3;
+            }
+            exportCtx.fillText(layer.text, layer.x, layer.y);
+          } else if (layer.type === 'shape') {
+            exportCtx.fillStyle = layer.color;
+            drawShape(exportCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
+            exportCtx.fill();
+            if (layer.stroke) {
+              exportCtx.strokeStyle = layer.strokeColor || '#000000';
+              exportCtx.lineWidth = layer.strokeWidth || 2;
+              exportCtx.stroke();
+            }
+          } else if (layer.type === 'background') {
+            if (layer.bgType === 'solid') {
+              exportCtx.fillStyle = layer.bgValue;
+              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
+            } else if (layer.bgType === 'gradient') {
+              const gradient = exportCtx.createLinearGradient(layer.x, layer.y, layer.x + layer.width, layer.y + layer.height);
+              gradient.addColorStop(0, layer.bgValue.color1);
+              gradient.addColorStop(1, layer.bgValue.color2);
+              exportCtx.fillStyle = gradient;
+              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
+            }
+          }
+          exportCtx.restore();
+        }
+
+        const dataUrl = exportCanvas.toDataURL('image/png');
     
     // Convert dataUrl to blob and upload
     const res = await fetch(dataUrl);
@@ -877,10 +949,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           {adminTexturesWithImage.length > 0 && (
                             <>
                               <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Textures disponibles:' : 'Available textures:'}</p>
-                              <div className="grid grid-cols-4 gap-2">
-                                                    {adminTexturesWithImage.map(texture => (
-                                                      <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
-                                                        className="relative group rounded-md overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors w-16 h-16">
+                              <div className="grid grid-cols-3 gap-2">
+                                {adminTexturesWithImage.map(texture => (
+                                  <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
+                                    className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
                                     <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                       <span className="text-white text-xs text-center px-1">{texture.name[language]}</span>
@@ -902,11 +974,11 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           {userLibrary.filter(item => item.type === 'texture').length > 0 && (
                             <div className="pt-2 border-t border-white/10">
                               <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes textures:' : 'My textures:'}</p>
-                              <div className="grid grid-cols-4 gap-2">
-                                                    {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
-                                                      <div key={idx} className="relative group">
-                                                        <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
-                                                          className="w-16 h-16 rounded-md overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                              <div className="grid grid-cols-3 gap-2">
+                                {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
+                                  <div key={idx} className="relative group">
+                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
+                                      className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
                                       <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                                     </button>
                                     <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1084,7 +1156,58 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </div>
           )}
 
-          {(currentLayer.type === 'shape' || currentLayer.type === 'image') && (
+          {currentLayer.type === 'image' && (
+              <div className="space-y-2">
+                <div className="flex gap-3 items-center flex-wrap">
+                  <div className="flex-1 min-w-[100px]">
+                    <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Largeur' : 'W'}</label>
+                    <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
+                  </div>
+                  <div className="flex-1 min-w-[100px]">
+                    <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Hauteur' : 'H'}</label>
+                    <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+                  </div>
+                </div>
+                
+                {/* Color tint for textures */}
+                <div className="pt-2 border-t border-white/10">
+                  <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
+                    <Palette className="h-3 w-3" />
+                    {language === 'fr' ? 'Teinte de couleur:' : 'Color tint:'}
+                  </p>
+                  <div className="flex gap-1 flex-wrap">
+                    <button 
+                      onClick={() => updateLayer(selectedLayer, { tintColor: null, tintOpacity: 0 })}
+                      className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs", !currentLayer.tintColor ? "border-violet-400 bg-white/10" : "border-transparent bg-white/5")}
+                    >
+                      ✕
+                    </button>
+                    {/* Colors from visual palette */}
+                    {visual.color_palette?.map((color, i) => (
+                      <button key={i} onClick={() => updateLayer(selectedLayer, { tintColor: color, tintOpacity: currentLayer.tintOpacity || 40 })}
+                        className={cn("w-6 h-6 rounded-full border-2 transition-transform hover:scale-110", currentLayer.tintColor === color ? "border-violet-400" : "border-transparent")}
+                        style={{ backgroundColor: color }} />
+                    ))}
+                    {/* Preset colors */}
+                    {PRESET_COLORS.slice(0, 8).map(color => (
+                      <button key={color} onClick={() => updateLayer(selectedLayer, { tintColor: color, tintOpacity: currentLayer.tintOpacity || 40 })}
+                        className={cn("w-6 h-6 rounded-full border-2 transition-transform hover:scale-110", currentLayer.tintColor === color ? "border-violet-400" : "border-transparent")}
+                        style={{ backgroundColor: color }} />
+                    ))}
+                    <input type="color" value={currentLayer.tintColor || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { tintColor: e.target.value, tintOpacity: currentLayer.tintOpacity || 40 })} className="w-6 h-6 rounded cursor-pointer" />
+                  </div>
+                  {currentLayer.tintColor && (
+                    <div className="flex gap-2 items-center mt-2">
+                      <span className="text-white/40 text-xs">{language === 'fr' ? 'Intensité:' : 'Intensity:'}</span>
+                      <Slider value={[currentLayer.tintOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { tintOpacity: v })} min={10} max={90} step={5} className="flex-1" />
+                      <span className="text-white/40 text-xs w-8">{currentLayer.tintOpacity || 40}%</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {currentLayer.type === 'shape' && (
             <div className="space-y-2">
               <div className="flex gap-3 items-center flex-wrap">
                 <div className="flex-1 min-w-[100px]">
