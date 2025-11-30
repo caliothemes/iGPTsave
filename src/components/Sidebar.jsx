@@ -52,17 +52,28 @@ export default function Sidebar({
   return (
     <>
       {/* Toggle Button - Always visible */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onToggle}
-        className={cn(
-          "fixed top-4 left-4 z-50 text-white/70 hover:text-white hover:bg-white/10 transition-all",
-          isOpen && "left-[268px]"
+      <div className={cn(
+        "fixed top-4 left-4 z-50 flex items-center gap-2 transition-all",
+        isOpen && "left-[268px]"
+      )}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggle}
+          className="text-white/70 hover:text-white hover:bg-white/10"
+        >
+          {isOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
+        </Button>
+        {!isOpen && (
+          <button 
+            onClick={onNewChat} 
+            className="h-10 w-10 flex items-center justify-center rounded-lg bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white transition-colors"
+            title={t('newCreation')}
+          >
+            <Plus className="h-5 w-5" />
+          </button>
         )}
-      >
-        {isOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
-      </Button>
+      </div>
 
       {/* Sidebar */}
       <aside className={cn(
