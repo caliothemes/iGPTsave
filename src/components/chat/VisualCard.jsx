@@ -19,7 +19,7 @@ export default function VisualCard({
   onToggleFavorite,
   onVariation,
   onEdit,
-  onAnimate,
+  // onAnimate, // Temporarily hidden
   isRegenerating,
   canDownload,
   hasWatermark,
