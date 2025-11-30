@@ -674,8 +674,10 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                   <h1 className="text-xl md:text-2xl text-white/80 font-light mt-10 max-w-xl leading-relaxed">
                     {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
                   </h1>
-                  <p className="text-white/50 mt-3 max-w-md text-sm">
-                    {(language === 'fr' ? settings.home_subtitle_fr : settings.home_subtitle_en) || t('heroSubtitle')}
+                  <p className="text-white/60 mt-4 max-w-lg text-base md:text-lg font-light tracking-wide leading-relaxed">
+                    <span className="bg-gradient-to-r from-violet-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+                      {(language === 'fr' ? settings.home_subtitle_fr : settings.home_subtitle_en) || t('heroSubtitle')}
+                    </span>
                   </p>
                 </div>
               )}
