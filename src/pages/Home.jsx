@@ -745,15 +745,21 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               {showEditor && selectedVisual && (
                 <VisualEditor
                   visual={selectedVisual}
-                  onSave={async () => {
+                  onSave={async (newImageUrl, newLayers) => {
                     // Deduct 1 credit for saving edited visual
                     await deductCredit();
+                    // Update the visual in state immediately with new image
+                    if (newImageUrl) {
+                      const updatedVisual = { ...selectedVisual, image_url: newImageUrl, editor_layers: newLayers };
+                      setSelectedVisual(updatedVisual);
+                      setVisuals(prev => prev.map(v => v.id === selectedVisual.id ? updatedVisual : v));
+                    }
                     setShowEditor(false);
                     setMessages(prev => [...prev, { 
                       role: 'assistant', 
                       content: language === 'fr' 
-                        ? '✨ Visuel personnalisé téléchargé avec succès !' 
-                        : '✨ Customized visual downloaded successfully!' 
+                        ? '✨ Visuel personnalisé sauvegardé avec succès !' 
+                        : '✨ Customized visual saved successfully!' 
                     }]);
                   }}
                   onCancel={() => setShowEditor(false)}
