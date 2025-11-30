@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
-import { Sparkles } from 'lucide-react';
+
 
 function TypingIndicator() {
   return (
@@ -20,13 +20,17 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
       {/* Avatar - for assistant */}
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-600/60 to-purple-600/60 backdrop-blur-sm border border-violet-500/20 flex items-center justify-center shadow-lg shadow-violet-500/10">
-          <Sparkles className="h-4 w-4 text-violet-300" />
+        <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden shadow-lg shadow-violet-500/10">
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
+            alt="iGPT" 
+            className="w-full h-full object-cover"
+          />
         </div>
       )}
       {/* Avatar - for user */}
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center overflow-hidden order-last">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center overflow-hidden order-last">
           {user?.profile_image ? (
             <img src={user.profile_image} alt="" className="w-full h-full object-cover" />
           ) : (
