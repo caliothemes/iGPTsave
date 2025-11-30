@@ -1012,6 +1012,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                 isOpen={showVideoGenerator}
                 onClose={() => setShowVideoGenerator(false)}
                 visual={selectedVisual}
+                onDeductCredits={deductCredit}
               />
               </div>
               );

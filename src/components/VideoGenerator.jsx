@@ -25,7 +25,7 @@ const ANIMATION_PRESETS = [
   { id: 'energy', icon: Zap, name: { fr: 'Énergie', en: 'Energy' }, prompt: 'Electric energy crackling, lightning effects, power surge, dynamic electricity' },
 ];
 
-export default function VideoGenerator({ isOpen, onClose, visual }) {
+export default function VideoGenerator({ isOpen, onClose, visual, onDeductCredits }) {
   const { language } = useLanguage();
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [customPrompt, setCustomPrompt] = useState('');
@@ -87,6 +87,12 @@ export default function VideoGenerator({ isOpen, onClose, visual }) {
 
       if (data.success && data.task_id) {
         setTaskId(data.task_id);
+        // Deduct 5 credits for video generation
+        if (onDeductCredits) {
+          for (let i = 0; i < 5; i++) {
+            await onDeductCredits();
+          }
+        }
         // Poll for status every 3 seconds
         pollInterval.current = setInterval(() => checkStatus(data.task_id), 3000);
       } else {
@@ -99,15 +105,24 @@ export default function VideoGenerator({ isOpen, onClose, visual }) {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!videoUrl) return;
-    const a = document.createElement('a');
-    a.href = videoUrl;
-    a.download = `${visual?.title || 'video'}-animated.mp4`;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    try {
+      // Fetch the video as blob to force download
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${visual?.title || 'video'}-animated.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e) {
+      // Fallback: open in new tab
+      window.open(videoUrl, '_blank');
+    }
   };
 
   const handleClose = () => {
@@ -266,8 +281,8 @@ export default function VideoGenerator({ isOpen, onClose, visual }) {
 
               <p className="text-white/40 text-xs text-center">
                 {language === 'fr' 
-                  ? '⚡ Powered by Runway ML • ~30-60 secondes de génération • 1 crédit par vidéo'
-                  : '⚡ Powered by Runway ML • ~30-60 seconds generation • 1 credit per video'}
+                  ? '⚡ Powered by Runway ML • ~30-60 secondes de génération • 5 crédits par vidéo'
+                  : '⚡ Powered by Runway ML • ~30-60 seconds generation • 5 credits per video'}
               </p>
             </>
           )}

@@ -104,6 +104,13 @@ export default function Pricing() {
                 ? 'Débloquez tout le potentiel de iGPT avec nos offres flexibles' 
                 : 'Unlock the full potential of iGPT with our flexible plans'}
             </p>
+            <div className="mt-4 px-4 py-3 bg-violet-500/10 border border-violet-500/20 rounded-xl max-w-xl mx-auto">
+              <p className="text-violet-300 text-sm">
+                {language === 'fr' 
+                  ? '💡 1 crédit = 1 message ou 1 génération d\'image. Les vidéos coûtent 5 crédits.' 
+                  : '💡 1 credit = 1 message or 1 image generation. Videos cost 5 credits.'}
+              </p>
+            </div>
             {credits && (
               <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80">
                 <MessageSquare className="h-4 w-4" />

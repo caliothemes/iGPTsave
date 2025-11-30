@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Task ID is required' }, { status: 400 });
     }
 
-    const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${task_id}`, {
+    const statusResponse = await fetch(`https://api.runwayml.com/v1/tasks/${task_id}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${RUNWAY_API_KEY}`,
