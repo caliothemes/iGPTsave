@@ -168,22 +168,15 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          // Use stored dimensions if available (for proper aspect ratio), otherwise use natural size
+          // Always use stored dimensions if available (user selected format)
           let targetWidth = img.width;
           let targetHeight = img.height;
 
           if (visual.dimensions) {
             const [w, h] = visual.dimensions.split('x').map(Number);
             if (w && h) {
-              // Calculate aspect ratios
-              const storedRatio = w / h;
-              const naturalRatio = img.width / img.height;
-
-              // If ratios are significantly different, use stored dimensions
-              if (Math.abs(storedRatio - naturalRatio) > 0.1) {
-                targetWidth = w;
-                targetHeight = h;
-              }
+              targetWidth = w;
+              targetHeight = h;
             }
           }
 
