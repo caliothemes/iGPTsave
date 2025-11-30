@@ -183,6 +183,7 @@ export default function VisualCard({
                   <span className="text-xs">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
                 </Button>
               </div>
+              {/* Animation button temporarily hidden
               {onAnimate && (
                 <Button
                   size="sm"
@@ -193,6 +194,7 @@ export default function VisualCard({
                   <span className="text-xs">{language === 'fr' ? '✨ Animer ce visuel' : '✨ Animate this visual'}</span>
                 </Button>
               )}
+              */}
             </div>
           )}
 
