@@ -24,6 +24,8 @@ export default function AdminSettings() {
     welcome_message_en: '',
     guest_message_fr: '',
     guest_message_en: '',
+    new_conversation_fr: '',
+    new_conversation_en: '',
     // Company settings
     company_name: '',
     company_address: '',
@@ -185,6 +187,26 @@ export default function AdminSettings() {
                   onChange={(e) => setSettings(prev => ({ ...prev, guest_message_en: e.target.value }))}
                   placeholder="Welcome to **iGPT**! 👋&#10;&#10;Describe what you want to create..."
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Nouvelle conversation (Français)</label>
+                <Input
+                  value={settings.new_conversation_fr}
+                  onChange={(e) => setSettings(prev => ({ ...prev, new_conversation_fr: e.target.value }))}
+                  placeholder="Nouvelle conversation ! Que souhaitez-vous créer ?"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">New conversation (English)</label>
+                <Input
+                  value={settings.new_conversation_en}
+                  onChange={(e) => setSettings(prev => ({ ...prev, new_conversation_en: e.target.value }))}
+                  placeholder="New conversation! What would you like to create?"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
             </div>

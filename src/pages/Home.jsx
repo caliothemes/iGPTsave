@@ -198,13 +198,16 @@ export default function Home() {
   };
 
   const handleNewChat = () => {
-    setCurrentConversation(null);
-    setMessages([{
-      role: 'assistant',
-      content: t('newConversation')
-    }]);
-    setSelectedVisual(null);
-  };
+        setCurrentConversation(null);
+        const newConvMsg = language === 'fr' 
+          ? (settings.new_conversation_fr || t('newConversation'))
+          : (settings.new_conversation_en || t('newConversation'));
+        setMessages([{
+          role: 'assistant',
+          content: newConvMsg
+        }]);
+        setSelectedVisual(null);
+      };
 
   const handleSelectConversation = (conv) => {
     setCurrentConversation(conv);

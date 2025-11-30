@@ -168,17 +168,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          // Use dimensions from visual if available, otherwise use image's natural size
-          let targetWidth = img.width;
-          let targetHeight = img.height;
-
-          if (visual.dimensions) {
-            const [w, h] = visual.dimensions.split('x').map(Number);
-            if (w && h) {
-              targetWidth = w;
-              targetHeight = h;
-            }
-          }
+          // Always use the image's natural size to avoid stretching
+          const targetWidth = img.width;
+          const targetHeight = img.height;
 
           const maxSize = 450;
           const ratio = Math.min(maxSize / targetWidth, maxSize / targetHeight);
@@ -189,7 +181,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           setImageLoaded(true);
         };
         img.src = visual.image_url;
-      }, [visual.image_url, visual.dimensions]);
+      }, [visual.image_url]);
 
   // Preload layer images
   useEffect(() => {
