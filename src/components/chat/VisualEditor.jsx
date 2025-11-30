@@ -824,17 +824,20 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
-      // Update the visual with new image and layers
+      // Update the visual with new image and CLEAR layers (they're now baked into the image)
       if (visual.id) {
         await base44.entities.Visual.update(visual.id, {
           image_url: file_url,
-          editor_layers: layers
+          editor_layers: []
         });
       }
       
       setSaving(false);
+      // Clear layers locally since they're baked into the new image
+      setLayers([]);
+      setSelectedLayer(null);
       // Pass the new URL back so the parent can update immediately
-      onSave?.(file_url, layers);
+      onSave?.(file_url, []);
     } catch (e) {
       console.error(e);
       setSaving(false);
