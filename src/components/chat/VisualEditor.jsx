@@ -383,6 +383,13 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     img.src = visual.image_url;
   }, [imageLoaded, layers, selectedLayer, visual.image_url, loadedImages, bgType, bgColor, bgGradient]);
 
+  const [helpMessage, setHelpMessage] = useState(null);
+
+  const showHelp = (msg) => {
+    setHelpMessage(msg);
+    setTimeout(() => setHelpMessage(null), 4000);
+  };
+
   const addTextLayer = (text = null) => {
     const newLayer = {
       type: 'text',
@@ -404,6 +411,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
     setActiveTab('layers');
+    showHelp(language === 'fr' ? '💡 Glissez le texte sur l\'image. Options de style en bas.' : '💡 Drag text on image. Style options below.');
   };
 
   const addShapeLayer = (shape) => {
@@ -411,6 +419,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
     setActiveTab('layers');
+    showHelp(language === 'fr' ? '💡 Glissez la forme. Taille et couleur en bas.' : '💡 Drag shape. Size and color below.');
   };
 
   const addImageLayer = (imageUrl, width = 100, height = 100) => {
@@ -451,6 +460,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     setLayers([newLayer, ...layers]);
     setSelectedLayer(0);
     setActiveTab('layers');
+    showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
   };
 
   const generateTexture = async (texturePrompt) => {
@@ -460,7 +470,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       const result = await base44.integrations.Core.GenerateImage({ prompt });
       // Add as full-size texture layer
       addImageLayer(result.url, canvasSize.width, canvasSize.height);
-      if (user) {
+                showHelp(language === 'fr' ? '💡 Texture ajoutée. Réglez l\'opacité en bas.' : '💡 Texture added. Adjust opacity below.');
+                if (user) {
         const newItem = { type: 'texture', url: result.url, name: texturePrompt.name?.[language] || texturePrompt.name_fr };
         const updatedLibrary = [...userLibrary, newItem];
         setUserLibrary(updatedLibrary);
@@ -476,7 +487,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       const prompt = illustPrompt.prompt + ', high quality illustration';
       const result = await base44.integrations.Core.GenerateImage({ prompt });
       addImageLayer(result.url, 150, 150);
-      if (user) {
+                showHelp(language === 'fr' ? '💡 Illustration ajoutée. Redimensionnez en bas.' : '💡 Illustration added. Resize below.');
+                if (user) {
         const newItem = { type: 'illustration', url: result.url, name: illustPrompt.name?.[language] || illustPrompt.name_fr };
         const updatedLibrary = [...userLibrary, newItem];
         setUserLibrary(updatedLibrary);
@@ -626,8 +638,17 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
   const handleSave = async () => {
     setSaving(true);
-    const canvas = canvasRef.current;
-    const dataUrl = canvas.toDataURL('image/png');
+    
+    // Create a new canvas to render everything properly for export
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = canvasSize.width;
+    exportCanvas.height = canvasSize.height;
+    const exportCtx = exportCanvas.getContext('2d');
+    
+    // Draw from the current canvas which has all layers rendered
+    exportCtx.drawImage(canvasRef.current, 0, 0);
+    
+    const dataUrl = exportCanvas.toDataURL('image/png');
     
     // Convert dataUrl to blob and upload
     const res = await fetch(dataUrl);
@@ -668,14 +689,14 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         </div>
         <div className="flex items-center gap-2">
           {savedTexts.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(true)} className="text-amber-400 hover:text-amber-300 text-xs px-2">
-              <Bookmark className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">{language === 'fr' ? 'Mes textes' : 'My texts'}</span> ({savedTexts.length})
-            </Button>
-          )}
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white text-xs px-2">
-            <X className="h-4 w-4" />
-          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setShowSavedTexts(true)} className="text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 text-xs px-2">
+                            <Bookmark className="h-4 w-4 mr-1" />
+                            <span className="hidden sm:inline">{language === 'fr' ? 'Mes textes' : 'My texts'}</span> ({savedTexts.length})
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white hover:bg-white/10 text-xs px-2">
+                          <X className="h-4 w-4" />
+                        </Button>
           <Button size="sm" onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
             {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
             {language === 'fr' ? 'Sauvegarder' : 'Save'}
