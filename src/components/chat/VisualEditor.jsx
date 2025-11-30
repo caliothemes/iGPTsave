@@ -14,7 +14,7 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   Brush, Library, Plus, Save, Palette, Eraser,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket
+  PaintBucket, RotateCw
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import { cn } from "@/lib/utils";
@@ -359,6 +359,13 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           
           ctx.fillText(layer.text, layer.x, layer.y);
         } else if (layer.type === 'shape') {
+          // Apply rotation
+          const centerX = layer.x + layer.width / 2;
+          const centerY = layer.y + layer.height / 2;
+          ctx.translate(centerX, centerY);
+          ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+          ctx.translate(-centerX, -centerY);
+          
           ctx.fillStyle = layer.color;
           drawShape(ctx, layer.shape, layer.x, layer.y, layer.width, layer.height);
           ctx.fill();
@@ -427,7 +434,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   };
 
   const addShapeLayer = (shape) => {
-    const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2 };
+    const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2, rotation: 0 };
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
     setActiveTab('layers');
@@ -989,20 +996,32 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           )}
 
           {(currentLayer.type === 'shape' || currentLayer.type === 'image') && (
-            <div className="flex gap-3 items-center flex-wrap">
-              <div className="flex-1 min-w-[100px]">
-                <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Largeur' : 'W'}</label>
-                <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
-              </div>
-              <div className="flex-1 min-w-[100px]">
-                <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Hauteur' : 'H'}</label>
-                <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+            <div className="space-y-2">
+              <div className="flex gap-3 items-center flex-wrap">
+                <div className="flex-1 min-w-[100px]">
+                  <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Largeur' : 'W'}</label>
+                  <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
+                </div>
+                <div className="flex-1 min-w-[100px]">
+                  <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Hauteur' : 'H'}</label>
+                  <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+                </div>
+                {currentLayer.type === 'shape' && (
+                  <div className="flex gap-1">
+                    {PRESET_COLORS.slice(0, 6).map(color => (
+                      <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                    ))}
+                  </div>
+                )}
               </div>
               {currentLayer.type === 'shape' && (
-                <div className="flex gap-1">
-                  {PRESET_COLORS.slice(0, 6).map(color => (
-                    <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
-                  ))}
+                <div className="flex gap-2 items-center">
+                  <RotateCw className="h-3 w-3 text-white/50" />
+                  <label className="text-white/50 text-xs">{language === 'fr' ? 'Rotation' : 'Rotation'}</label>
+                  <div className="flex-1">
+                    <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
+                  </div>
+                  <span className="text-white/50 text-xs w-10">{currentLayer.rotation || 0}°</span>
                 </div>
               )}
             </div>
