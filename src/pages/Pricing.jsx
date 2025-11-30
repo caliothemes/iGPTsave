@@ -300,8 +300,8 @@ export default function Pricing() {
                           )}
                           <p className="text-3xl font-bold text-white mb-2">{pack.price}€</p>
                           <p className="text-xs text-emerald-400 mb-4">
-                            {((pack.price / (pack.credits + (pack.bonus_credits || 0))) * 100).toFixed(1)}c/message
-                          </p>
+                                                            {(pack.price / (pack.credits + (pack.bonus_credits || 0))).toFixed(2)}€/message
+                                                          </p>
                           <Button 
                             onClick={() => handlePurchase('pack', pack, user, credits)} 
                             disabled={purchasing === (pack.id || pack.pack_id)} 
