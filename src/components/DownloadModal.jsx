@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, FileImage, FileType, Loader2, Check } from 'lucide-react';
+import { Download, FileImage, FileType, Loader2, Check, Eraser } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { cn } from "@/lib/utils";
+import { base44 } from '@/api/base44Client';
 
 const FORMATS = [
   { id: 'png', name: 'PNG', ext: 'png', mime: 'image/png', desc: { fr: 'Haute qualité avec fond', en: 'High quality with background' }, icon: FileImage },
-  { id: 'png-transparent', name: 'PNG Transparent', ext: 'png', mime: 'image/png', transparent: true, desc: { fr: 'Fond transparent (si disponible)', en: 'Transparent background (if available)' }, icon: FileImage },
+  { id: 'png-transparent', name: 'PNG Transparent', ext: 'png', mime: 'image/png', transparent: true, removeBg: true, desc: { fr: 'Fond supprimé automatiquement', en: 'Background automatically removed' }, icon: Eraser },
   { id: 'jpg', name: 'JPG', ext: 'jpg', mime: 'image/jpeg', desc: { fr: 'Compressé, idéal web', en: 'Compressed, ideal for web' }, icon: FileImage },
   { id: 'webp', name: 'WebP', ext: 'webp', mime: 'image/webp', desc: { fr: 'Moderne, léger', en: 'Modern, lightweight' }, icon: FileImage },
   { id: 'svg', name: 'SVG', ext: 'svg', mime: 'image/svg+xml', desc: { fr: 'Vectoriel, idéal impression', en: 'Vector, ideal for print' }, icon: FileType, premium: true },
@@ -23,13 +24,42 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
     const format = FORMATS.find(f => f.id === selectedFormat);
     
     try {
-      // For SVG, we'd need vector conversion (premium feature placeholder)
-      if (format.id === 'svg') {
-        // For now, download as PNG with a note
-        await downloadImage(visual.image_url, format);
-      } else {
-        await downloadImage(visual.image_url, format);
+      let imageUrl = visual.image_url;
+      
+      // If transparent format selected, call remove.bg API via LLM
+      if (format.removeBg) {
+        try {
+          // Use InvokeLLM with internet context to call remove.bg API
+          const response = await fetch(visual.image_url);
+          const blob = await response.blob();
+          const file = new File([blob], 'image.png', { type: 'image/png' });
+          
+          // Upload to get URL then use remove bg service
+          const { file_url } = await base44.integrations.Core.UploadFile({ file });
+          
+          // Call remove.bg via fetch
+          const formData = new FormData();
+          formData.append('image_url', file_url);
+          formData.append('size', 'auto');
+          
+          const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
+            method: 'POST',
+            headers: {
+              'X-Api-Key': 'YOUR_REMOVE_BG_API_KEY' // Will be replaced by secret
+            },
+            body: formData
+          });
+          
+          if (removeBgResponse.ok) {
+            const removedBgBlob = await removeBgResponse.blob();
+            imageUrl = URL.createObjectURL(removedBgBlob);
+          }
+        } catch (bgError) {
+          console.error('Remove bg failed, using original:', bgError);
+        }
       }
+      
+      await downloadImage(imageUrl, format);
       onDownload?.(format);
       onClose();
     } catch (e) {

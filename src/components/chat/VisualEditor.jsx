@@ -256,7 +256,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     img.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw background first
+      // Draw background first (behind the image)
       if (bgType === 'solid') {
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -273,6 +273,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
       
+      // Draw the main image on top of the background
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       layers.forEach((layer, idx) => {
         ctx.save();
