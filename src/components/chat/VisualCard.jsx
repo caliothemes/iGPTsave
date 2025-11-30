@@ -45,8 +45,8 @@ export default function VisualCard({
   return (
     <div className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
       {/* Image Container */}
-              <div className="relative overflow-hidden" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}
-        <img 
+        <div className="relative overflow-hidden" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}>
+          <img 
           src={visual.image_url} 
           alt={visual.title || 'Visuel généré'}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
