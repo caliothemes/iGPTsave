@@ -33,6 +33,7 @@ export default function AdminPricing() {
     price_monthly: 0,
     price_yearly: 0,
     messages_per_month: 0,
+    messages_per_year: 0,
     features_fr: [],
     features_en: [],
     icon: 'Sparkles',
@@ -117,7 +118,7 @@ export default function AdminPricing() {
 
   const resetPlanForm = () => {
     setEditingPlan(null);
-    setNewPlan({ plan_id: '', name_fr: '', name_en: '', price_monthly: 0, price_yearly: 0, messages_per_month: 0, features_fr: [], features_en: [], icon: 'Sparkles', gradient: 'from-violet-600 to-blue-600', is_popular: false, is_active: true, order: 0 });
+    setNewPlan({ plan_id: '', name_fr: '', name_en: '', price_monthly: 0, price_yearly: 0, messages_per_month: 0, messages_per_year: 0, features_fr: [], features_en: [], icon: 'Sparkles', gradient: 'from-violet-600 to-blue-600', is_popular: false, is_active: true, order: 0 });
     setFeaturesText({ fr: '', en: '' });
   };
 
@@ -135,6 +136,7 @@ export default function AdminPricing() {
       price_monthly: plan.price_monthly || 0,
       price_yearly: plan.price_yearly || 0,
       messages_per_month: plan.messages_per_month || 0,
+      messages_per_year: plan.messages_per_year || 0,
       icon: plan.icon || 'Sparkles',
       gradient: plan.gradient || 'from-violet-600 to-blue-600',
       is_popular: plan.is_popular || false,
@@ -239,6 +241,11 @@ export default function AdminPricing() {
                     className="bg-white/5 border-white/10 text-white" />
                 </div>
                 <div>
+                  <label className="text-white/60 text-sm mb-1 block">Messages/an <span className="text-white/40">(-1 = illimité)</span></label>
+                  <Input type="number" value={newPlan.messages_per_year} onChange={(e) => setNewPlan(prev => ({ ...prev, messages_per_year: parseInt(e.target.value) || 0 }))}
+                    className="bg-white/5 border-white/10 text-white" placeholder={`Ex: ${(newPlan.messages_per_month || 0) * 12}`} />
+                </div>
+                <div>
                   <label className="text-white/60 text-sm mb-1 block">Ordre</label>
                   <Input type="number" value={newPlan.order} onChange={(e) => setNewPlan(prev => ({ ...prev, order: parseInt(e.target.value) || 0 }))}
                     className="bg-white/5 border-white/10 text-white" />
@@ -304,7 +311,8 @@ export default function AdminPricing() {
                     <div className="space-y-1 text-sm text-white/60 mb-4">
                       <p>Mensuel: <span className="text-white">{plan.price_monthly}€</span></p>
                       <p>Annuel: <span className="text-white">{plan.price_yearly}€</span></p>
-                      <p>Messages: <span className="text-white">{plan.messages_per_month === -1 ? 'Illimité' : plan.messages_per_month}</span></p>
+                      <p>Messages/mois: <span className="text-white">{plan.messages_per_month === -1 ? 'Illimité' : plan.messages_per_month}</span></p>
+                      <p>Messages/an: <span className="text-white">{plan.messages_per_year === -1 ? 'Illimité' : (plan.messages_per_year || '-')}</span></p>
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="ghost" onClick={() => handleEditPlan(plan)} className="text-white/60 hover:text-white">Modifier</Button>

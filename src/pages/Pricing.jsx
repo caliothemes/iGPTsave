@@ -222,11 +222,16 @@ export default function Pricing() {
                           </div>
 
                           {/* Cost per message */}
-                          {!isFree && sub.messages_per_month > 0 && (
-                            <p className="text-xs text-emerald-400 mb-3 text-center">
-                              {(price / sub.messages_per_month).toFixed(2)}€/message
-                            </p>
-                          )}
+                                                          {!isFree && (
+                                                            <p className="text-xs text-emerald-400 mb-3 text-center">
+                                                              {billingCycle === 'yearly' && sub.messages_per_year > 0
+                                                                ? `${(price / sub.messages_per_year).toFixed(2)}€/message`
+                                                                : sub.messages_per_month > 0
+                                                                  ? `${(price / sub.messages_per_month).toFixed(2)}€/message`
+                                                                  : null
+                                                              }
+                                                            </p>
+                                                          )}
 
                           {/* Features */}
                           {features && features.length > 0 && (
