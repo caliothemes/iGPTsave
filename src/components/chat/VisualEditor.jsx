@@ -254,8 +254,75 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           ctx.font = fontStyle;
           ctx.fillStyle = layer.color;
           ctx.textAlign = layer.align || 'left';
-          if (layer.shadow) { ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2; }
-          if (layer.stroke) { ctx.strokeStyle = layer.strokeColor || '#000000'; ctx.lineWidth = layer.strokeWidth || 2; ctx.strokeText(layer.text, layer.x, layer.y); }
+          
+          // Reset shadows first
+          ctx.shadowColor = 'transparent';
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          
+          // 3D Effect (draw multiple offset layers)
+          if (layer.effect3d) {
+            const depth = 6;
+            for (let i = depth; i > 0; i--) {
+              ctx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
+              ctx.fillText(layer.text, layer.x + i, layer.y + i);
+            }
+            ctx.fillStyle = layer.color;
+          }
+          
+          // Halo effect (golden glow behind)
+          if (layer.halo) {
+            ctx.save();
+            ctx.shadowColor = layer.haloColor || '#FFD700';
+            ctx.shadowBlur = layer.haloSize || 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.fillStyle = layer.haloColor || '#FFD700';
+            ctx.fillText(layer.text, layer.x, layer.y);
+            ctx.fillText(layer.text, layer.x, layer.y);
+            ctx.restore();
+            ctx.fillStyle = layer.color;
+          }
+          
+          // Neon effect
+          if (layer.neon) {
+            ctx.save();
+            const neonColor = layer.neonColor || '#ff00ff';
+            const intensity = layer.neonIntensity || 15;
+            ctx.shadowColor = neonColor;
+            ctx.shadowBlur = intensity;
+            ctx.fillStyle = neonColor;
+            ctx.fillText(layer.text, layer.x, layer.y);
+            ctx.shadowBlur = intensity * 2;
+            ctx.fillText(layer.text, layer.x, layer.y);
+            ctx.restore();
+            ctx.fillStyle = '#ffffff';
+          }
+          
+          // Glow effect
+          if (layer.glow) {
+            ctx.shadowColor = layer.glowColor || '#ffffff';
+            ctx.shadowBlur = layer.glowSize || 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+          }
+          
+          // Shadow effect
+          if (layer.shadow && !layer.glow && !layer.neon) {
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+          }
+          
+          // Stroke
+          if (layer.stroke) {
+            ctx.strokeStyle = layer.strokeColor || '#000000';
+            ctx.lineWidth = layer.strokeWidth || 2;
+            ctx.strokeText(layer.text, layer.x, layer.y);
+          }
+          
           ctx.fillText(layer.text, layer.x, layer.y);
         } else if (layer.type === 'shape') {
           ctx.fillStyle = layer.color;
@@ -702,6 +769,62 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   ))}
                   <input type="color" value={currentLayer.color} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
                 </div>
+              </div>
+              {/* Text Effects */}
+              <div className="pt-2 border-t border-white/10 space-y-2">
+                <p className="text-white/40 text-xs">{language === 'fr' ? 'Effets:' : 'Effects:'}</p>
+                <div className="grid grid-cols-3 gap-1">
+                  <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    {language === 'fr' ? 'Contour' : 'Stroke'}
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    {language === 'fr' ? 'Ombre' : 'Shadow'}
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { glow: !currentLayer.glow })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    {language === 'fr' ? 'Lueur' : 'Glow'}
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { halo: !currentLayer.halo })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    Halo
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { effect3d: !currentLayer.effect3d })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.effect3d ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    3D
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { neon: !currentLayer.neon })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    Néon
+                  </button>
+                </div>
+                {currentLayer.stroke && (
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Contour:' : 'Stroke:'}</span>
+                    <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                    <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={10} step={1} className="flex-1" />
+                    <span className="text-white/40 text-xs w-6">{currentLayer.strokeWidth || 2}</span>
+                  </div>
+                )}
+                {currentLayer.glow && (
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Lueur:' : 'Glow:'}</span>
+                    <input type="color" value={currentLayer.glowColor || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { glowColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                    <Slider value={[currentLayer.glowSize || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { glowSize: v })} min={5} max={40} step={1} className="flex-1" />
+                    <span className="text-white/40 text-xs w-6">{currentLayer.glowSize || 10}</span>
+                  </div>
+                )}
+                {currentLayer.halo && (
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-16">Halo:</span>
+                    <input type="color" value={currentLayer.haloColor || '#FFD700'} onChange={(e) => updateLayer(selectedLayer, { haloColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                    <Slider value={[currentLayer.haloSize || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { haloSize: v })} min={5} max={50} step={1} className="flex-1" />
+                    <span className="text-white/40 text-xs w-6">{currentLayer.haloSize || 15}</span>
+                  </div>
+                )}
+                {currentLayer.neon && (
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-16">Néon:</span>
+                    <input type="color" value={currentLayer.neonColor || '#ff00ff'} onChange={(e) => updateLayer(selectedLayer, { neonColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                    <Slider value={[currentLayer.neonIntensity || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { neonIntensity: v })} min={5} max={30} step={1} className="flex-1" />
+                    <span className="text-white/40 text-xs w-6">{currentLayer.neonIntensity || 15}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
