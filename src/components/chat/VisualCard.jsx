@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
+import DownloadModal from '@/components/DownloadModal';
 
 export default function VisualCard({ 
   visual, 
@@ -20,14 +21,16 @@ export default function VisualCard({
   compact = false
 }) {
   const { t, language } = useLanguage();
-  const [downloading, setDownloading] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
-  const handleDownload = async () => {
+  const handleDownloadClick = () => {
     if (!canDownload) return;
-    setDownloading(true);
-    await onDownload();
-    setDownloading(false);
+    setShowDownloadModal(true);
+  };
+
+  const handleDownloadComplete = async (format) => {
+    await onDownload?.(format);
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 2000);
   };
@@ -156,7 +159,7 @@ export default function VisualCard({
             <div className="flex gap-2">
               <Button
                 size="sm"
-                onClick={() => onValidate?.('download')}
+                onClick={handleDownloadClick}
                 className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               >
                 <Download className="h-4 w-4 mr-1.5" />
@@ -189,8 +192,8 @@ export default function VisualCard({
                   </Button>
                   <Button
                     size="sm"
-                    onClick={handleDownload}
-                    disabled={!canDownload || downloading}
+                    onClick={handleDownloadClick}
+                    disabled={!canDownload}
                     className={cn(
                       "flex-1 transition-all",
                       canDownload 
@@ -198,9 +201,7 @@ export default function VisualCard({
                         : "bg-white/10 cursor-not-allowed"
                     )}
                   >
-                    {downloading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : downloaded ? (
+                    {downloaded ? (
                       <Check className="h-4 w-4" />
                     ) : !canDownload ? (
                       <Lock className="h-4 w-4" />
@@ -224,8 +225,8 @@ export default function VisualCard({
                   
                   <Button
                     size="sm"
-                    onClick={handleDownload}
-                    disabled={!canDownload || downloading}
+                    onClick={handleDownloadClick}
+                    disabled={!canDownload}
                     className={cn(
                       "w-full transition-all",
                       canDownload 
@@ -233,9 +234,7 @@ export default function VisualCard({
                         : "bg-white/10 cursor-not-allowed"
                     )}
                   >
-                    {downloading ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : downloaded ? (
+                    {downloaded ? (
                       <Check className="h-4 w-4 mr-2" />
                     ) : !canDownload ? (
                       <Lock className="h-4 w-4 mr-2" />
@@ -256,6 +255,14 @@ export default function VisualCard({
           )}
         </div>
       )}
+
+      {/* Download Modal */}
+      <DownloadModal
+        isOpen={showDownloadModal}
+        onClose={() => setShowDownloadModal(false)}
+        visual={visual}
+        onDownload={handleDownloadComplete}
+      />
     </div>
   );
 }
