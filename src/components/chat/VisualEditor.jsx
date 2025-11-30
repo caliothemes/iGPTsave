@@ -366,6 +366,22 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           ctx.rotate((layer.rotation || 0) * Math.PI / 180);
           ctx.translate(-centerX, -centerY);
           
+          // Shadow effect
+          if (layer.shadow) {
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 5;
+            ctx.shadowOffsetY = 5;
+          }
+          
+          // Glow effect
+          if (layer.glow) {
+            ctx.shadowColor = layer.glowColor || '#ffffff';
+            ctx.shadowBlur = layer.glowSize || 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+          }
+          
           ctx.fillStyle = layer.color;
           drawShape(ctx, layer.shape, layer.x, layer.y, layer.width, layer.height);
           ctx.fill();
@@ -434,7 +450,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   };
 
   const addShapeLayer = (shape) => {
-    const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2, rotation: 0 };
+    const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2, rotation: 0, shadow: false, glow: false, glowColor: '#ffffff', glowSize: 10 };
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
     setActiveTab('layers');
@@ -1015,14 +1031,46 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 )}
               </div>
               {currentLayer.type === 'shape' && (
-                <div className="flex gap-2 items-center">
-                  <RotateCw className="h-3 w-3 text-white/50" />
-                  <label className="text-white/50 text-xs">{language === 'fr' ? 'Rotation' : 'Rotation'}</label>
-                  <div className="flex-1">
-                    <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
+                <>
+                  <div className="flex gap-2 items-center">
+                    <RotateCw className="h-3 w-3 text-white/50" />
+                    <label className="text-white/50 text-xs">{language === 'fr' ? 'Rotation' : 'Rotation'}</label>
+                    <div className="flex-1">
+                      <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
+                    </div>
+                    <span className="text-white/50 text-xs w-10">{currentLayer.rotation || 0}°</span>
                   </div>
-                  <span className="text-white/50 text-xs w-10">{currentLayer.rotation || 0}°</span>
-                </div>
+                  <div className="pt-2 border-t border-white/10 space-y-2">
+                    <p className="text-white/40 text-xs">{language === 'fr' ? 'Effets:' : 'Effects:'}</p>
+                    <div className="grid grid-cols-3 gap-1">
+                      <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                        {language === 'fr' ? 'Bordure' : 'Border'}
+                      </button>
+                      <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                        {language === 'fr' ? 'Ombre' : 'Shadow'}
+                      </button>
+                      <button onClick={() => updateLayer(selectedLayer, { glow: !currentLayer.glow })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                        {language === 'fr' ? 'Lueur' : 'Glow'}
+                      </button>
+                    </div>
+                    {currentLayer.stroke && (
+                      <div className="flex gap-2 items-center">
+                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Bordure:' : 'Border:'}</span>
+                        <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                        <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
+                        <span className="text-white/40 text-xs w-6">{currentLayer.strokeWidth || 2}</span>
+                      </div>
+                    )}
+                    {currentLayer.glow && (
+                      <div className="flex gap-2 items-center">
+                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Lueur:' : 'Glow:'}</span>
+                        <input type="color" value={currentLayer.glowColor || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { glowColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                        <Slider value={[currentLayer.glowSize || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { glowSize: v })} min={5} max={40} step={1} className="flex-1" />
+                        <span className="text-white/40 text-xs w-6">{currentLayer.glowSize || 10}</span>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           )}
