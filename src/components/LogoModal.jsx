@@ -44,17 +44,17 @@ export default function LogoModal({ isOpen, onClose, content }) {
         </button>
         
         {/* Content */}
-        <div className="relative z-10 p-6 pt-5">
-          <div className="prose prose-invert prose-xs max-w-none">
+        <div className="relative z-10 p-8 pt-7">
+          <div className="prose prose-invert prose-sm max-w-none">
             <ReactMarkdown
               components={{
-                p: ({ children }) => <p className="text-white/70 leading-relaxed mb-2 text-xs">{children}</p>,
+                p: ({ children }) => <p className="text-white/75 leading-relaxed mb-3 text-sm">{children}</p>,
                 strong: ({ children }) => <strong className="text-violet-300 font-semibold">{children}</strong>,
-                h1: ({ children }) => <h1 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Sparkles className="h-4 w-4 text-violet-400" />{children}</h1>,
-                h2: ({ children }) => <h2 className="text-base font-semibold text-white mb-2">{children}</h2>,
-                h3: ({ children }) => <h3 className="text-sm font-medium text-white mb-1.5">{children}</h3>,
-                ul: ({ children }) => <ul className="list-disc list-inside text-white/70 space-y-0.5 mb-2 text-xs">{children}</ul>,
-                li: ({ children }) => <li className="text-xs">{children}</li>,
+                h1: ({ children }) => <h1 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Sparkles className="h-5 w-5 text-violet-400" />{children}</h1>,
+                h2: ({ children }) => <h2 className="text-lg font-semibold text-white mb-3">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-base font-medium text-white mb-2">{children}</h3>,
+                ul: ({ children }) => <ul className="list-disc list-inside text-white/75 space-y-1 mb-3 text-sm">{children}</ul>,
+                li: ({ children }) => <li className="text-sm">{children}</li>,
                 a: ({ children, href }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 underline">{children}</a>,
               }}
             >
