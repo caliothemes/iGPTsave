@@ -9,7 +9,8 @@ import {
   ArrowLeft,
   BarChart3,
   Scale,
-  Brush
+  Brush,
+  CreditCard
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -19,6 +20,7 @@ const navItems = [
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
+  { id: 'pricing', label: 'Tarification', icon: CreditCard, page: 'AdminPricing' },
   { id: 'legal', label: 'Mentions légales', icon: Scale, page: 'AdminLegal' },
   { id: 'settings', label: 'Paramètres', icon: Settings, page: 'AdminSettings' },
 ];
