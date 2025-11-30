@@ -701,7 +701,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               
               {/* Chat Messages */}
               {messages.map((message, idx) => (
-                <MessageBubble key={idx} message={message} isStreaming={isLoading && idx === messages.length - 1} thinkingText={t('thinking')} />
+                <MessageBubble key={idx} message={message} isStreaming={isLoading && idx === messages.length - 1} thinkingText={t('thinking')} user={user} />
               ))}
 
               {/* Selected Visual Preview */}
