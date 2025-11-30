@@ -382,17 +382,18 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         const finalPalette = selectedPalette?.colors || analysis.suggested_colors || [];
 
         let newVisual = {
-          title: analysis.title || 'Visuel',
-          image_url: imageResult.url,
-          visual_type: analysis.visual_type || 'autre',
-          dimensions: analysis.dimensions || selectedFormat?.dimensions || '1080x1080',
-          format: selectedFormat?.id?.includes('post') || selectedFormat?.id?.includes('story') || selectedFormat?.id?.includes('banner') ? 'digital' : 'print',
-          original_prompt: userMessage,
-          image_prompt: finalPrompt,
-          style: selectedStyle?.name?.fr || '',
-          color_palette: finalPalette,
-          version: 1
-        };
+                        title: analysis.title || 'Visuel',
+                        image_url: imageResult.url,
+                        visual_type: analysis.visual_type || 'autre',
+                        dimensions: selectedFormat?.dimensions || analysis.dimensions || '1080x1080',
+                        format: selectedFormat?.id?.includes('post') || selectedFormat?.id?.includes('story') || selectedFormat?.id?.includes('banner') ? 'digital' : 'print',
+                        format_name: selectedFormat?.name || null,
+                        original_prompt: userMessage,
+                        image_prompt: finalPrompt,
+                        style: selectedStyle?.name?.fr || '',
+                        color_palette: finalPalette,
+                        version: 1
+                      };
 
         if (user) {
           newVisual = await base44.entities.Visual.create({
