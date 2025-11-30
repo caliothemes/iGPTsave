@@ -408,6 +408,15 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           if (layer.stroke) { ctx.strokeStyle = layer.strokeColor || '#000000'; ctx.lineWidth = layer.strokeWidth || 2; ctx.stroke(); }
         } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
           ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+          // Apply color tint
+          if (layer.tintColor && layer.tintOpacity) {
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.globalAlpha = layer.tintOpacity / 100;
+            ctx.fillStyle = layer.tintColor;
+            ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = layer.opacity / 100;
+          }
         } else if (layer.type === 'background') {
           if (layer.bgType === 'solid') {
             ctx.fillStyle = layer.bgValue;
