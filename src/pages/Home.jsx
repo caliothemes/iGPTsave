@@ -47,6 +47,7 @@ export default function Home() {
   const [showValidation, setShowValidation] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showLogoModal, setShowLogoModal] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -676,7 +677,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               {/* Hero - only show if few messages */}
               {messages.length <= 1 && (
                 <div className="flex flex-col items-center justify-center py-4 md:py-6 text-center">
-                  <Logo size="large" showText={false} animate={true} />
+                  <Logo size="large" showText={false} animate={true} onClick={() => setShowLogoModal(true)} />
                   <h1 className="text-xl md:text-2xl text-white/80 font-light mt-10 max-w-xl leading-relaxed animate-fade-in-up">
                                             {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
                                           </h1>
@@ -986,12 +987,22 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
       </div>
 
       {/* Favorites Modal */}
-      <FavoritesModal
-        isOpen={showFavoritesModal}
-        onClose={() => setShowFavoritesModal(false)}
-        favorites={visuals.filter(v => v.is_favorite)}
-        onSelectVisual={setSelectedVisual}
-      />
-      </div>
-      );
+              <FavoritesModal
+                isOpen={showFavoritesModal}
+                onClose={() => setShowFavoritesModal(false)}
+                favorites={visuals.filter(v => v.is_favorite)}
+                onSelectVisual={setSelectedVisual}
+              />
+
+              {/* Logo Modal */}
+              <LogoModal
+                isOpen={showLogoModal}
+                onClose={() => setShowLogoModal(false)}
+                content={language === 'fr' ? settings.logo_modal_fr : settings.logo_modal_en}
+              />
+
+              {/* GDPR Banner */}
+              <GDPRBanner />
+              </div>
+              );
       }
