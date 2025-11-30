@@ -4,13 +4,6 @@ const RUNWAY_API_KEY = Deno.env.get("RUNWAY_API_KEY");
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
-    
-    const isAuth = await base44.auth.isAuthenticated();
-    if (!isAuth) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { task_id } = await req.json();
 
     if (!task_id) {
