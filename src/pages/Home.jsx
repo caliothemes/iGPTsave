@@ -334,33 +334,31 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
 
           RÈGLES CRITIQUES PAR TYPE DE VISUEL:
 
-          ⚠️ RÈGLE UNIVERSELLE - AUCUN TEXTE PAR DÉFAUT:
-              - TOUS les visuels doivent être générés SANS AUCUN TEXTE, lettres, mots ou typographie
-              - Ajoute TOUJOURS dans le prompt: "NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, pure graphic design only"
-              - EXCEPTION: uniquement si l'utilisateur demande EXPLICITEMENT d'ajouter du texte spécifique
+          ⚠️ RÈGLE UNIVERSELLE ABSOLUE - ZÉRO TEXTE:
+              - INTERDICTION TOTALE de texte, lettres, mots, chiffres, typographie sur TOUS les visuels
+              - Dans CHAQUE prompt image, COMMENCE par: "absolutely no text, no letters, no words, no numbers, no typography, no writing, text-free design"
+              - TERMINE chaque prompt par: "completely text-free, no visible text or letters anywhere"
+              - EXCEPTION UNIQUE: si l'utilisateur écrit explicitement "avec le texte [xxx]"
 
               🎴 CARTE DE VISITE / BUSINESS CARD:
-              - JAMAIS de photos stock, bâtiments, paysages ou images réalistes
-              - Style: minimaliste, élégant, graphique abstrait
-              - Éléments: formes géométriques subtiles, dégradés doux, lignes fines, motifs abstraits
-              - Composition: espace négatif important, mise en page aérée
-              - Exemples: "minimalist business card background design, NO TEXT, elegant geometric pattern, subtle gradient, abstract shapes, luxury feel, white space, print ready"
-              - INTERDITS: buildings, photos, realistic images, cluttered designs
+              - Design abstrait et graphique UNIQUEMENT - jamais de représentation réaliste
+              - JAMAIS: bâtiments, maisons, photos, personnes, objets réalistes
+              - Le design doit être PARFAITEMENT CADRÉ aux dimensions de la carte (85x55mm ou 1050x600px)
+              - Style: minimaliste luxueux, formes géométriques abstraites, dégradés élégants
+              - Prompt type: "absolutely no text, abstract minimalist business card design, perfectly framed within card boundaries, elegant geometric shapes, subtle luxury gradient, clean lines, premium feel, white space balance, sophisticated abstract pattern, completely text-free, no visible text or letters anywhere, print-ready 300dpi"
+              - Pour agence immobilière: "abstract geometric shapes suggesting elegance and trust, gold and navy gradient, clean minimal lines" - PAS de maisons ou bâtiments!
 
               🎨 LOGO:
-              - Type: emblem, abstract, mascot, symbol (PAS de wordmark sauf si texte demandé)
-              - Style: vector, scalable, clean edges, minimal details
-              - "logo design, NO TEXT, symbol only, vector style, scalable graphics, clean minimal, centered composition"
+              - Symbole/icône abstrait UNIQUEMENT - jamais de lettres
+              - "absolutely no text, abstract symbol logo, icon only, vector clean style, centered, minimal, completely text-free"
 
               📱 POSTS RÉSEAUX SOCIAUX:
-              - Visuels accrocheurs, couleurs vives ou tendance
-              - Composition adaptée au format, NO TEXT
-              - Style moderne, dynamique, pure visual design
+              - Design graphique moderne, couleurs tendance
+              - "absolutely no text, modern graphic design, vibrant colors, completely text-free"
 
               📄 FLYERS/AFFICHES:
-              - Design graphique pur, zones vides pour ajout texte ultérieur
-              - NO TEXT, background design only
-              - Impact visuel fort
+              - Fond graphique pur pour ajout texte ultérieur par l'utilisateur
+              - "absolutely no text, background design only, completely text-free"
 
           RÈGLES GÉNÉRALES:
           - Sois TRÈS créatif et original - évite les clichés
