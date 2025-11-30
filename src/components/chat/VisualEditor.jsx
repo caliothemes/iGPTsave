@@ -543,12 +543,11 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-4 w-4" /></TabsTrigger>
-          <TabsTrigger value="ai" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Sparkles className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Layers className="h-4 w-4" /></TabsTrigger>
         </TabsList>
 
         {/* Tool Content Panel */}
-        <ScrollArea className="max-h-32 md:max-h-40 mt-3">
+        <div className="h-32 md:h-40 overflow-y-auto mt-3">
           <TabsContent value="text" className="mt-0 space-y-2">
             <Button onClick={() => addTextLayer()} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
               <Plus className="h-4 w-4 mr-2" />{language === 'fr' ? 'Ajouter texte' : 'Add text'}
@@ -605,23 +604,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </div>
           </TabsContent>
 
-          <TabsContent value="ai" className="mt-0 space-y-3">
-            <div className="p-3 bg-gradient-to-br from-violet-500/10 to-blue-500/10 rounded-xl border border-violet-500/20">
-              <h4 className="text-white font-medium text-sm mb-2 flex items-center gap-2"><MessageSquare className="h-4 w-4 text-violet-400" />{language === 'fr' ? 'Générateur de textes' : 'Text generator'}</h4>
-              <p className="text-white/50 text-xs mb-2">{language === 'fr' ? 'L\'IA génère des titres et slogans pour votre visuel' : 'AI generates titles and slogans for your visual'}</p>
-              <Button onClick={() => setShowTextGenerator(true)} size="sm" className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300">
-                <Sparkles className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer des textes' : 'Generate texts'}
-              </Button>
-            </div>
-            <div className="p-3 bg-gradient-to-br from-pink-500/10 to-orange-500/10 rounded-xl border border-pink-500/20">
-              <h4 className="text-white font-medium text-sm mb-2 flex items-center gap-2"><ImagePlus className="h-4 w-4 text-pink-400" />{language === 'fr' ? 'Illustrations personnalisées' : 'Custom illustrations'}</h4>
-              <p className="text-white/50 text-xs mb-2">{language === 'fr' ? 'Créez des illustrations uniques avec l\'IA' : 'Create unique illustrations with AI'}</p>
-              <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-pink-500/20 hover:bg-pink-500/30 text-pink-300">
-                <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer' : 'Create'}
-              </Button>
-            </div>
-          </TabsContent>
-
           <TabsContent value="layers" className="mt-0 space-y-2">
             <div className="space-y-1">
               {layers.length === 0 ? (
@@ -636,7 +618,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               ))}
             </div>
           </TabsContent>
-        </ScrollArea>
+        </div>
       </Tabs>
 
       {/* Canvas - Responsive */}
