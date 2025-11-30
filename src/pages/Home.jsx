@@ -671,14 +671,27 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               {messages.length <= 1 && (
                 <div className="flex flex-col items-center justify-center py-4 md:py-6 text-center">
                   <Logo size="large" showText={false} animate={true} />
-                  <h1 className="text-xl md:text-2xl text-white/80 font-light mt-10 max-w-xl leading-relaxed">
-                    {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
-                  </h1>
-                  <p className="text-white/60 mt-4 max-w-lg text-base md:text-lg font-light tracking-wide leading-relaxed">
-                    <span className="bg-gradient-to-r from-violet-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
-                      {(language === 'fr' ? settings.home_subtitle_fr : settings.home_subtitle_en) || t('heroSubtitle')}
-                    </span>
-                  </p>
+                  <h1 className="text-xl md:text-2xl text-white/80 font-light mt-10 max-w-xl leading-relaxed animate-fade-in-up">
+                                            {(language === 'fr' ? settings.home_title_fr : settings.home_title_en) || t('heroTitle')}
+                                          </h1>
+                                          <p className="text-white/60 mt-2 max-w-lg text-base md:text-lg font-light tracking-wide leading-relaxed animate-fade-in-up-delay">
+                                            <span className="bg-gradient-to-r from-violet-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+                                              {(language === 'fr' ? settings.home_subtitle_fr : settings.home_subtitle_en) || t('heroSubtitle')}
+                                            </span>
+                                          </p>
+                                          <style>{`
+                                            @keyframes fadeInUp {
+                                              from { opacity: 0; transform: translateY(10px); }
+                                              to { opacity: 1; transform: translateY(0); }
+                                            }
+                                            .animate-fade-in-up {
+                                              animation: fadeInUp 0.6s ease-out forwards;
+                                            }
+                                            .animate-fade-in-up-delay {
+                                              opacity: 0;
+                                              animation: fadeInUp 0.6s ease-out 0.2s forwards;
+                                            }
+                                          `}</style>
                 </div>
               )}
               
