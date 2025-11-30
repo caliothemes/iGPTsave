@@ -5,6 +5,13 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
 
+const getAspectRatio = (dimensions) => {
+  if (!dimensions) return '1/1';
+  const [w, h] = dimensions.split('x').map(Number);
+  if (!w || !h) return '1/1';
+  return `${w}/${h}`;
+};
+
 export default function VisualCard({ 
   visual, 
   onRegenerate, 
@@ -38,7 +45,7 @@ export default function VisualCard({
   return (
     <div className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden">
+              <div className="relative overflow-hidden" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}
         <img 
           src={visual.image_url} 
           alt={visual.title || 'Visuel généré'}

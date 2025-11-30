@@ -164,20 +164,32 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   }, [visual.id]);
 
   // Load base image
-  useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      const maxSize = 450;
-      const ratio = Math.min(maxSize / img.width, maxSize / img.height);
-      setCanvasSize({
-        width: img.width * ratio,
-        height: img.height * ratio
-      });
-      setImageLoaded(true);
-    };
-    img.src = visual.image_url;
-  }, [visual.image_url]);
+      useEffect(() => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          // Use dimensions from visual if available, otherwise use image's natural size
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+
+          if (visual.dimensions) {
+            const [w, h] = visual.dimensions.split('x').map(Number);
+            if (w && h) {
+              targetWidth = w;
+              targetHeight = h;
+            }
+          }
+
+          const maxSize = 450;
+          const ratio = Math.min(maxSize / targetWidth, maxSize / targetHeight);
+          setCanvasSize({
+            width: targetWidth * ratio,
+            height: targetHeight * ratio
+          });
+          setImageLoaded(true);
+        };
+        img.src = visual.image_url;
+      }, [visual.image_url, visual.dimensions]);
 
   // Preload layer images
   useEffect(() => {
