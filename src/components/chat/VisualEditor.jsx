@@ -674,6 +674,9 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
   const handleSave = async () => {
     setSaving(true);
     
+    // Wait a frame to ensure canvas is fully rendered with all effects
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Create a new canvas to render everything properly for export
     const exportCanvas = document.createElement('canvas');
     exportCanvas.width = canvasSize.width;
