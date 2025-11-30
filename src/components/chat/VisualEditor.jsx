@@ -168,9 +168,24 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          // Always use the image's natural size to avoid stretching
-          const targetWidth = img.width;
-          const targetHeight = img.height;
+          // Use stored dimensions if available (for proper aspect ratio), otherwise use natural size
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+
+          if (visual.dimensions) {
+            const [w, h] = visual.dimensions.split('x').map(Number);
+            if (w && h) {
+              // Calculate aspect ratios
+              const storedRatio = w / h;
+              const naturalRatio = img.width / img.height;
+
+              // If ratios are significantly different, use stored dimensions
+              if (Math.abs(storedRatio - naturalRatio) > 0.1) {
+                targetWidth = w;
+                targetHeight = h;
+              }
+            }
+          }
 
           const maxSize = 450;
           const ratio = Math.min(maxSize / targetWidth, maxSize / targetHeight);
@@ -181,7 +196,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           setImageLoaded(true);
         };
         img.src = visual.image_url;
-      }, [visual.image_url]);
+      }, [visual.image_url, visual.dimensions]);
 
   // Preload layer images
   useEffect(() => {
