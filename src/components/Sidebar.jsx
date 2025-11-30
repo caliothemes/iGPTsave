@@ -65,14 +65,14 @@ export default function Sidebar({
           {isOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
         </Button>
         {!isOpen && (
-          <button 
-            onClick={onNewChat} 
-            className="h-10 w-10 flex items-center justify-center rounded-lg bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white transition-colors"
-            title={t('newCreation')}
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-        )}
+                        <button 
+                          onClick={onNewChat} 
+                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white transition-colors"
+                          title={t('newCreation')}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      )}
       </div>
 
       {/* Sidebar */}
@@ -106,7 +106,7 @@ export default function Sidebar({
         </div>
 
         {/* Content */}
-        <ScrollArea className="flex-1 px-3">
+        <ScrollArea className="flex-1 px-3 bg-gradient-to-b from-violet-950/30 via-purple-950/20 to-violet-950/30">
           {/* Current Session Visuals */}
           {visuals.length > 0 && (
             <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4 mt-4">
