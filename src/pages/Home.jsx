@@ -927,55 +927,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                 />
                               </div>
                             )}
-              {/* Apply format to existing visual */}
-              {selectedFormat && selectedVisual && (
-                <div className="mb-2 flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    onClick={async () => {
-                      setIsGenerating(true);
-                      try {
-                        const prompt = selectedVisual.image_prompt || `Professional ${selectedVisual.visual_type}, high quality`;
-                        const finalPrompt = `${prompt}. Format: ${selectedFormat.name} (${selectedFormat.dimensions}), aspect ratio ${selectedFormat.ratio || selectedFormat.dimensions}`;
-                        
-                        const result = await base44.integrations.Core.GenerateImage({ prompt: finalPrompt });
-                        
-                        let newVisual = {
-                          ...selectedVisual,
-                          image_url: result.url,
-                          dimensions: selectedFormat.dimensions,
-                          format: selectedFormat.id,
-                          version: (selectedVisual.version || 1) + 1
-                        };
-                        delete newVisual.id;
-                        delete newVisual.created_date;
-                        delete newVisual.updated_date;
-                        
-                        if (user) {
-                          newVisual = await base44.entities.Visual.create({ user_email: user.email, ...newVisual });
-                        }
-                        
-                        setVisuals(prev => [newVisual, ...prev]);
-                        setSelectedVisual(newVisual);
-                        setSelectedFormat(null);
-                        setMessages(prev => [...prev, { 
-                          role: 'assistant', 
-                          content: language === 'fr' ? `✨ Visuel converti au format ${selectedFormat.name} !` : `✨ Visual converted to ${selectedFormat.name} format!`
-                        }]);
-                        await deductCredit();
-                      } catch (e) {
-                        console.error(e);
-                      }
-                      setIsGenerating(false);
-                    }}
-                    disabled={isGenerating}
-                    className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-xs"
-                  >
-                    {isGenerating ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : null}
-                    {language === 'fr' ? `Convertir en ${selectedFormat.name}` : `Convert to ${selectedFormat.name}`}
-                  </Button>
-                </div>
-              )}
+
 
               {/* Selected Options Display */}
               {(selectedFormat || selectedStyle || selectedPalette) && (
