@@ -1176,7 +1176,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                   <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-white/20 rounded-2xl p-6 max-w-md mx-4 shadow-2xl animate-in fade-in zoom-in duration-300">
                     <div className="text-center">
                       <div className="mx-auto mb-6">
-                        <Logo size="large" showText={true} />
+                        <Logo size="large" showText={false} />
                       </div>
                       <div className="mb-4">
                         <span className="text-lg bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
