@@ -1392,15 +1392,18 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             )}
             <div className="space-y-1">
               {layers.length === 0 ? (
-                <p className="text-white/40 text-xs text-center py-4">{language === 'fr' ? 'Aucun calque' : 'No layers'}</p>
-              ) : layers.map((layer, idx) => (
+              <p className="text-white/40 text-xs text-center py-4">{language === 'fr' ? 'Aucun calque' : 'No layers'}</p>
+              ) : layers.map((layer, idx) => {
+              const LayerIcon = layer.type === 'text' ? Type : layer.type === 'image' ? ImagePlus : layer.type === 'background' ? PaintBucket : Square;
+              return (
                 <button key={idx} onClick={() => setSelectedLayer(idx)}
                   className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
-                  {layer.type === 'text' ? <Type className="h-3 w-3" /> : layer.type === 'image' ? <ImagePlus className="h-3 w-3" /> : layer.type === 'background' ? <PaintBucket className="h-3 w-3" /> : <Square className="h-3 w-3" />}
+                  <LayerIcon className="h-3 w-3" />
                   <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 15) : layer.type === 'image' ? 'Image' : layer.type === 'background' ? (language === 'fr' ? 'Fond' : 'Background') : layer.shape}</span>
-                  <button onClick={(e) => { e.stopPropagation(); deleteLayer(idx); }} className="p-1 text-red-400/60 hover:text-red-400"><Trash2 className="h-3 w-3" /></button>
+                  <span onClick={(e) => { e.stopPropagation(); deleteLayer(idx); }} className="p-1 text-red-400/60 hover:text-red-400 cursor-pointer"><Trash2 className="h-3 w-3" /></span>
                 </button>
-              ))}
+              );
+              })}
             </div>
           </TabsContent>
         </div>
