@@ -276,6 +276,7 @@ export default function Home() {
   // Deduct 1 message/credit
   const deductCredit = async () => {
     if (!credits) return;
+    if (user?.role === 'admin') return; // Admins have unlimited credits
     if (credits.subscription_type === 'unlimited') return;
     
     if (credits.free_downloads > 0) {
