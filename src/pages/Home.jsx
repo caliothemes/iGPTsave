@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Send, Loader2, Sparkles, Image, Palette, X, Info, Heart, Plus, Mic, MicOff, Upload, CreditCard } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import FavoritesModal from '@/components/FavoritesModal';
-import LogoModal from '@/components/LogoModal';
+import PresentationModal from '@/components/PresentationModal';
 import GDPRBanner from '@/components/GDPRBanner';
 import VisualEditor from '@/components/chat/VisualEditor';
 import VideoGenerator from '@/components/VideoGenerator';
@@ -1160,11 +1160,10 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                 onSelectVisual={setSelectedVisual}
               />
 
-              {/* Logo Modal */}
-              <LogoModal
+              {/* Presentation Modal */}
+              <PresentationModal
                 isOpen={showLogoModal}
                 onClose={() => setShowLogoModal(false)}
-                content={language === 'fr' ? settings.logo_modal_fr : settings.logo_modal_en}
               />
 
               {/* GDPR Banner */}
