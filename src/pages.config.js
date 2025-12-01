@@ -11,6 +11,7 @@ import AdminLegal from './pages/AdminLegal';
 import AdminAssets from './pages/AdminAssets';
 import AdminPricing from './pages/AdminPricing';
 import PaymentSuccess from './pages/PaymentSuccess';
+import AdminPresentation from './pages/AdminPresentation';
 import __Layout from './Layout.jsx';
 
 
@@ -28,6 +29,7 @@ export const PAGES = {
     "AdminAssets": AdminAssets,
     "AdminPricing": AdminPricing,
     "PaymentSuccess": PaymentSuccess,
+    "AdminPresentation": AdminPresentation,
 }
 
 export const pagesConfig = {
