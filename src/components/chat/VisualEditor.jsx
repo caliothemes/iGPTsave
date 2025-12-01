@@ -1055,7 +1055,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                               <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Textures disponibles:' : 'Available textures:'}</p>
                               <div className="grid grid-cols-5 gap-1.5">
                                 {adminTexturesWithImage.map(texture => (
-                                  <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
+                                  <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height, true)}
                                     className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
                                     <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
