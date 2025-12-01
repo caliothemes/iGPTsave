@@ -55,7 +55,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
       {/* Styles */}
       <div>
         <p className="text-white/50 text-xs mb-3 font-medium">
-          {language === 'fr' ? 'Style visuel' : 'Visual style'}
+          {lang === 'fr' ? 'Style visuel' : 'Visual style'}
         </p>
         <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
           {STYLES.map((style) => {
@@ -78,7 +78,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
                   <IconComponent className={cn("h-4 w-4", selectedStyle?.id === style.id ? "text-white" : "text-white/60")} />
                 </div>
                 <span className={cn("text-[10px] font-medium", selectedStyle?.id === style.id ? "text-white" : "text-white/60")}>
-                  {style.name[language]}
+                  {style.name[lang]}
                 </span>
               </button>
             );
