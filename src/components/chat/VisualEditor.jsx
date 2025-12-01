@@ -12,9 +12,9 @@ import {
   AlignLeft, AlignCenter, AlignRight, Wand2,
   Layers, Sparkles, Triangle, Star, Heart, Hexagon,
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
-  Brush, FolderOpen, Plus, Save, Palette, Eraser,
+  FolderOpen, Plus, Save, Palette, Eraser,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw
+  PaintBucket, RotateCw, Upload, Scissors
 } from 'lucide-react';
 
 // Custom gradient icon component
@@ -28,6 +28,23 @@ const GradientIcon = ({ className }) => (
       </linearGradient>
     </defs>
     <circle cx="12" cy="12" r="9" fill="url(#gradientIconFill)" />
+  </svg>
+);
+
+// Custom texture icon (square with pattern)
+const TextureIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9l6-6M9 3l6 6M15 3l6 6M21 9l-6 6M21 15l-6 6M15 21l-6-6M9 21l-6-6M3 15l6-6" strokeWidth="1" opacity="0.5" />
+  </svg>
+);
+
+// Custom illustration icon (blob shape)
+const IllustrationIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M12 3c4 0 7 2 8 5s0 6-2 8-5 3-8 3-6-1-7-4 0-5 2-7 4-5 7-5z" />
+    <circle cx="9" cy="10" r="1" fill="currentColor" />
+    <circle cx="15" cy="12" r="1.5" fill="currentColor" />
   </svg>
 );
 import { useLanguage } from '../LanguageContext';
@@ -139,6 +156,7 @@ const DEFAULT_ILLUSTRATIONS = [
 export default function VisualEditor({ visual, onSave, onCancel }) {
   const { language } = useLanguage();
   const canvasRef = useRef(null);
+  const imageUploadRef = useRef(null);
   const [layers, setLayers] = useState([]);
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [activeTab, setActiveTab] = useState('text');
@@ -180,6 +198,11 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [generatedTexts, setGeneratedTexts] = useState([]);
   const [savedTexts, setSavedTexts] = useState([]);
   const [showSavedTexts, setShowSavedTexts] = useState(false);
+  
+  // Image upload
+  const [uploadingUserImage, setUploadingUserImage] = useState(false);
+  const [removingBgFromLayer, setRemovingBgFromLayer] = useState(false);
+  const imageUploadRef = useRef(null);
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -976,9 +999,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsTrigger value="text" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Type className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="background" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><PaintBucket className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-4 w-4" /></TabsTrigger>
-          <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><TextureIcon className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="gradients" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><GradientIcon className="h-4 w-4" /></TabsTrigger>
-          <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="images" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Upload className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><IllustrationIcon className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors relative">
             <Layers className="h-4 w-4" />
             {layers.length > 0 && (
@@ -1156,6 +1180,60 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 <GradientIcon className="h-8 w-8 opacity-20 mx-auto mb-2" />
                 <p className="text-white/40 text-xs">{language === 'fr' ? 'Aucun dégradé PRO disponible' : 'No PRO gradients available'}</p>
                 <p className="text-white/30 text-xs mt-1">{language === 'fr' ? 'Les admins peuvent en ajouter via Assets' : 'Admins can add them via Assets'}</p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="images" className="mt-0 space-y-3">
+            <input
+              type="file"
+              ref={imageUploadRef}
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setUploadingUserImage(true);
+                try {
+                  const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                  addImageLayer(file_url, 150, 150);
+                  showHelp(language === 'fr' ? '💡 Image ajoutée ! Redimensionnez et déplacez-la.' : '💡 Image added! Resize and move it.');
+                } catch (err) {
+                  console.error(err);
+                }
+                setUploadingUserImage(false);
+                e.target.value = '';
+              }}
+              accept="image/*"
+              className="hidden"
+            />
+            <Button
+              onClick={() => imageUploadRef.current?.click()}
+              disabled={uploadingUserImage}
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+            >
+              {uploadingUserImage ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+              {language === 'fr' ? 'Importer une image' : 'Upload an image'}
+            </Button>
+            <p className="text-white/40 text-xs text-center">
+              {language === 'fr' ? 'Importez vos propres images (logos, photos, etc.)' : 'Import your own images (logos, photos, etc.)'}
+            </p>
+            
+            {/* User library images */}
+            {userLibrary.filter(item => item.type === 'image').length > 0 && (
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes images:' : 'My images:'}</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {userLibrary.filter(item => item.type === 'image').map((item, idx) => (
+                    <div key={idx} className="relative group">
+                      <button onClick={() => addImageLayer(item.url, 150, 150)}
+                        className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                      </button>
+                      <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <X className="h-2 w-2 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </TabsContent>
@@ -1353,6 +1431,29 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
                   </div>
                 </div>
+                {/* Remove Background Button */}
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    setRemovingBgFromLayer(true);
+                    try {
+                      const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
+                      if (response.data?.image_url) {
+                        updateLayer(selectedLayer, { imageUrl: response.data.image_url });
+                        showHelp(language === 'fr' ? '✨ Fond supprimé avec succès !' : '✨ Background removed successfully!');
+                      }
+                    } catch (err) {
+                      console.error(err);
+                      showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+                    }
+                    setRemovingBgFromLayer(false);
+                  }}
+                  disabled={removingBgFromLayer}
+                  className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
+                >
+                  {removingBgFromLayer ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+                  {language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+                </Button>
               </div>
             )}
 
