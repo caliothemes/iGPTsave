@@ -556,28 +556,42 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     showHelp(language === 'fr' ? '💡 Glissez la forme. Taille et couleur en bas.' : '💡 Drag shape. Size and color below.');
   };
 
-  const addImageLayer = (imageUrl, width = 100, height = 100) => {
-    // For textures, make them cover the canvas
-    const isTexture = width === canvasSize.width;
-    const newLayer = {
-      type: 'image',
-      imageUrl,
-      x: isTexture ? 0 : canvasSize.width / 2 - width/2,
-      y: isTexture ? 0 : canvasSize.height / 2 - height/2,
-      width,
-      height,
-      opacity: isTexture ? 50 : 100
-    };
-    // Insert textures at the beginning (behind other layers)
-    if (isTexture) {
-      setLayers([newLayer, ...layers]);
-      setSelectedLayer(0);
-    } else {
-      setLayers([...layers, newLayer]);
-      setSelectedLayer(layers.length);
-    }
-    setActiveTab('layers');
-  };
+  const addImageLayer = (imageUrl, width = 100, height = 100, isTexture = false) => {
+        let finalWidth = width;
+        let finalHeight = height;
+        let x = canvasSize.width / 2 - width/2;
+        let y = canvasSize.height / 2 - height/2;
+
+        // For textures, cover the canvas without stretching (like object-fit: cover)
+        if (isTexture) {
+          // Assuming texture is square, scale to cover the entire canvas
+          const maxDimension = Math.max(canvasSize.width, canvasSize.height);
+          finalWidth = maxDimension;
+          finalHeight = maxDimension;
+          // Center the texture
+          x = (canvasSize.width - maxDimension) / 2;
+          y = (canvasSize.height - maxDimension) / 2;
+        }
+
+        const newLayer = {
+          type: 'image',
+          imageUrl,
+          x,
+          y,
+          width: finalWidth,
+          height: finalHeight,
+          opacity: isTexture ? 50 : 100
+        };
+        // Insert textures at the beginning (behind other layers)
+        if (isTexture) {
+          setLayers([newLayer, ...layers]);
+          setSelectedLayer(0);
+        } else {
+          setLayers([...layers, newLayer]);
+          setSelectedLayer(layers.length);
+        }
+        setActiveTab('layers');
+      };
 
   const addBackgroundLayer = (type, value) => {
     const newLayer = {
