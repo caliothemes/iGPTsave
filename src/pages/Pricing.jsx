@@ -211,14 +211,7 @@ export default function Pricing() {
                 </span>
               </div>
             )}
-            <div className="mt-4 px-4 py-3 bg-violet-500/10 border border-violet-500/20 rounded-xl max-w-xl mx-auto">
-              <p className="text-violet-300 text-sm flex items-center justify-center gap-2">
-                <Lock className="h-4 w-4" />
-                {language === 'fr' 
-                  ? 'Paiement 100% sécurisé par Stripe' 
-                  : '100% secure payment by Stripe'}
-              </p>
-            </div>
+
           </div>
 
           {/* Billing Toggle */}
