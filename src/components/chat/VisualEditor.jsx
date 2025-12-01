@@ -963,6 +963,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsTrigger value="background" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><PaintBucket className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="shapes" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Square className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="textures" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Brush className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="gradients" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Blend className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><ImagePlus className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="layers" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors relative">
             <Layers className="h-4 w-4" />
