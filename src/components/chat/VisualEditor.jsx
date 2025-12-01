@@ -1060,6 +1060,29 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                             </Button>
                           </div>
 
+                          {/* Bibliothèque partagée (textures des admins) */}
+                          {sharedLibrary.filter(item => item.type === 'texture').length > 0 && (
+                            <div className="pt-2 border-t border-white/10">
+                              <p className="text-white/40 text-xs px-1 mb-2 flex items-center gap-1">
+                                <Sparkles className="h-3 w-3 text-amber-400" />
+                                {language === 'fr' ? 'Textures partagées:' : 'Shared textures:'}
+                              </p>
+                              <div className="grid grid-cols-5 gap-1.5">
+                                {sharedLibrary.filter(item => item.type === 'texture').map((item, idx) => (
+                                  <div key={`shared-${idx}`} className="relative group">
+                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
+                                      className="w-full aspect-square rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors">
+                                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                                    </button>
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                      <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           {/* Bibliothèque personnelle de textures */}
                           {userLibrary.filter(item => item.type === 'texture').length > 0 && (
                             <div className="pt-2 border-t border-white/10">
