@@ -958,10 +958,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               <MessageSquare className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer texte IA' : 'Generate AI text'}
             </Button>
             <p className="text-white/40 text-xs px-1 mt-3">{language === 'fr' ? 'Polices:' : 'Fonts:'}</p>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-3 gap-1">
               {FONTS.map(font => (
                 <button key={font.id} onClick={() => currentLayer?.type === 'text' && updateLayer(selectedLayer, { fontFamily: font.family })}
-                  className={cn("p-2 rounded text-xs text-left truncate transition-colors", currentLayer?.fontFamily === font.family ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}
+                  className={cn("p-1.5 rounded text-[10px] text-left truncate transition-colors", currentLayer?.fontFamily === font.family ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60 hover:bg-white/10")}
                   style={{ fontFamily: font.family }}>{font.name}</button>
               ))}
             </div>
