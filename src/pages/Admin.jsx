@@ -111,15 +111,19 @@ export default function Admin() {
           new Date(item.created_date || item.updated_date) > fiveMinAgo
         ).length;
 
-        // Count unique users by period
+        // Get admin emails to exclude from stats
+        const adminEmails = new Set(users.filter(u => u.role === 'admin').map(u => u.email));
+
+        // Count unique users by period (excluding admins)
         const getUniqueUsers = (items, afterDate) => {
-          const users = new Set();
+          const uniqueUsers = new Set();
           items.forEach(item => {
-            if (new Date(item.created_date) > afterDate) {
-              users.add(item.user_email || item.created_by);
+            const userEmail = item.user_email || item.created_by;
+            if (new Date(item.created_date) > afterDate && userEmail && !adminEmails.has(userEmail)) {
+              uniqueUsers.add(userEmail);
             }
           });
-          return users.size;
+          return uniqueUsers.size;
         };
 
         const allItems = [...allVisuals, ...allConversations];
