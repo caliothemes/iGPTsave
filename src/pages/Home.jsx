@@ -1175,16 +1175,18 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
                   <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-white/20 rounded-2xl p-6 max-w-md mx-4 shadow-2xl animate-in fade-in zoom-in duration-300">
                     <div className="text-center">
-                      <div className="mx-auto mb-4">
-                        <Logo size="default" showText={true} />
+                      <div className="mx-auto mb-6">
+                        <Logo size="large" showText={true} />
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-2">
-                        {language === 'fr' ? 'Inscrivez-vous gratuitement' : 'Sign up for free'}
-                      </h3>
+                      <div className="mb-4">
+                        <span className="text-lg bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                          {language === 'fr' ? 'Inscrivez-vous gratuitement' : 'Sign up for free'}
+                        </span>
+                      </div>
                       <p className="text-white/70 mb-4">
                         {language === 'fr' 
-                          ? 'Vous avez utilisé vos 3 messages d\'essai. Connectez-vous pour obtenir 25 messages gratuits et sauvegarder vos créations !'
-                          : 'You\'ve used your 3 trial messages. Sign in to get 25 free messages and save your creations!'}
+                          ? 'Vous avez utilisé vos 3 messages d\'essai. Connectez-vous pour obtenir 25 messages gratuits, sauvegarder et télécharger vos créations !'
+                          : 'You\'ve used your 3 trial messages. Sign in to get 25 free messages, save and download your creations!'}
                       </p>
                       <div className="bg-violet-500/10 border border-violet-500/30 rounded-xl p-4 mb-6">
                         <p className="text-violet-300 font-medium text-sm">
@@ -1200,9 +1202,8 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                       </div>
                       <div className="flex gap-3">
                         <Button
-                          variant="outline"
                           onClick={() => setShowLoginPrompt(false)}
-                          className="flex-1 border-white/30 text-white hover:bg-white/10 hover:text-white"
+                          className="flex-1 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white border-0"
                         >
                           {language === 'fr' ? 'Plus tard' : 'Later'}
                         </Button>
