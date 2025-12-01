@@ -1,9 +1,10 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
-import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf, X } from 'lucide-react';
+import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf, X, Zap, Heart, Mountain, Camera, Music, Flame, Snowflake, Sun, Moon, Star, Crown, Feather, Coffee, Wine, Gamepad2, Rocket, Ghost, Wand2 } from 'lucide-react';
 
 const STYLES = [
+  // Classiques
   { id: 'modern', name: { fr: 'Moderne', en: 'Modern' }, icon: Sparkles, prompt: 'modern, clean, minimalist, contemporary design', color: 'from-violet-500 to-purple-500' },
   { id: 'vintage', name: { fr: 'Vintage', en: 'Vintage' }, icon: Clock, prompt: 'vintage, retro, classic, nostalgic style', color: 'from-amber-600 to-orange-600' },
   { id: 'luxe', name: { fr: 'Luxe', en: 'Luxury' }, icon: Gem, prompt: 'luxury, premium, elegant, sophisticated, gold accents', color: 'from-yellow-500 to-amber-500' },
@@ -12,6 +13,25 @@ const STYLES = [
   { id: 'artistic', name: { fr: 'Artistique', en: 'Artistic' }, icon: Brush, prompt: 'artistic, creative, unique, hand-crafted feel', color: 'from-fuchsia-500 to-pink-500' },
   { id: 'tech', name: { fr: 'Tech', en: 'Tech' }, icon: Cpu, prompt: 'tech, futuristic, digital, innovative, sleek', color: 'from-cyan-500 to-blue-500' },
   { id: 'nature', name: { fr: 'Nature', en: 'Nature' }, icon: Leaf, prompt: 'natural, organic, eco-friendly, earthy tones', color: 'from-green-500 to-emerald-500' },
+  // Nouveaux styles
+  { id: 'neon', name: { fr: 'Néon', en: 'Neon' }, icon: Zap, prompt: 'neon lights, cyberpunk, glowing, electric colors, dark background with bright accents', color: 'from-pink-500 to-cyan-500' },
+  { id: 'romantic', name: { fr: 'Romantique', en: 'Romantic' }, icon: Heart, prompt: 'romantic, soft, dreamy, pastel colors, elegant curves, love theme', color: 'from-rose-400 to-pink-400' },
+  { id: 'mountain', name: { fr: 'Aventure', en: 'Adventure' }, icon: Mountain, prompt: 'adventure, outdoor, mountain, wilderness, exploration, rugged', color: 'from-slate-600 to-stone-600' },
+  { id: 'photo', name: { fr: 'Photo réaliste', en: 'Photorealistic' }, icon: Camera, prompt: 'photorealistic, hyper realistic, detailed photography, professional photo', color: 'from-gray-600 to-zinc-600' },
+  { id: 'music', name: { fr: 'Musical', en: 'Musical' }, icon: Music, prompt: 'music inspired, rhythm, dynamic, sound waves, concert vibes', color: 'from-purple-600 to-indigo-600' },
+  { id: 'fire', name: { fr: 'Intense', en: 'Intense' }, icon: Flame, prompt: 'intense, fiery, passionate, bold colors, dramatic, powerful', color: 'from-red-600 to-orange-600' },
+  { id: 'winter', name: { fr: 'Hivernal', en: 'Winter' }, icon: Snowflake, prompt: 'winter theme, cold, icy, snow, frost, cool blue tones, crisp', color: 'from-sky-400 to-blue-400' },
+  { id: 'summer', name: { fr: 'Estival', en: 'Summer' }, icon: Sun, prompt: 'summer vibes, sunny, warm, tropical, beach, bright cheerful colors', color: 'from-yellow-400 to-orange-400' },
+  { id: 'night', name: { fr: 'Nocturne', en: 'Nocturnal' }, icon: Moon, prompt: 'night theme, dark, mysterious, moonlight, stars, deep blues and purples', color: 'from-indigo-800 to-purple-900' },
+  { id: 'cosmic', name: { fr: 'Cosmique', en: 'Cosmic' }, icon: Star, prompt: 'cosmic, space, galaxy, nebula, stars, universe, ethereal', color: 'from-violet-700 to-blue-900' },
+  { id: 'royal', name: { fr: 'Royal', en: 'Royal' }, icon: Crown, prompt: 'royal, majestic, regal, gold and purple, crown, imperial', color: 'from-amber-500 to-purple-700' },
+  { id: 'boho', name: { fr: 'Bohème', en: 'Bohemian' }, icon: Feather, prompt: 'bohemian, boho chic, free spirit, earthy, feathers, macrame, natural textures', color: 'from-orange-400 to-amber-500' },
+  { id: 'cafe', name: { fr: 'Café', en: 'Coffee' }, icon: Coffee, prompt: 'coffee shop aesthetic, warm browns, cozy, rustic, artisanal', color: 'from-amber-700 to-yellow-900' },
+  { id: 'wine', name: { fr: 'Élégant', en: 'Elegant' }, icon: Wine, prompt: 'elegant wine aesthetic, burgundy, sophisticated, refined, classy', color: 'from-rose-800 to-red-900' },
+  { id: 'gaming', name: { fr: 'Gaming', en: 'Gaming' }, icon: Gamepad2, prompt: 'gaming style, esports, dynamic, RGB colors, futuristic tech', color: 'from-green-500 to-cyan-500' },
+  { id: 'scifi', name: { fr: 'Sci-Fi', en: 'Sci-Fi' }, icon: Rocket, prompt: 'science fiction, futuristic, space age, chrome, holographic', color: 'from-blue-500 to-teal-500' },
+  { id: 'horror', name: { fr: 'Sombre', en: 'Dark' }, icon: Ghost, prompt: 'dark aesthetic, gothic, mysterious, shadows, moody atmosphere', color: 'from-gray-800 to-black' },
+  { id: 'magic', name: { fr: 'Magique', en: 'Magical' }, icon: Wand2, prompt: 'magical, fantasy, enchanted, sparkles, mystical, fairy tale', color: 'from-purple-500 to-pink-500' },
 ];
 
 const COLOR_PALETTES = [
