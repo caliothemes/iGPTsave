@@ -202,7 +202,6 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   // Image upload
   const [uploadingUserImage, setUploadingUserImage] = useState(false);
   const [removingBgFromLayer, setRemovingBgFromLayer] = useState(false);
-  const imageUploadRef = useRef(null);
 
   // Load user, library and admin assets
   useEffect(() => {
