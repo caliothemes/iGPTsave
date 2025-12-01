@@ -934,7 +934,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
         await new Promise((resolve) => {
           baseImg.onload = resolve;
-          baseImg.src = visual.image_url;
+          baseImg.src = originalImageUrl; // Always use original
         });
 
         // Draw base image
