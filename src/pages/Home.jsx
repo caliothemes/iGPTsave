@@ -264,7 +264,10 @@ export default function Home() {
     }
 
     if (format) {
-      prompt += `. Format optimized for ${format.name} (${format.dimensions})`;
+      // Parse dimensions to get aspect ratio
+      const [w, h] = format.dimensions.split('x').map(Number);
+      const aspectRatio = w && h ? `${w}:${h}` : format.ratio;
+      prompt += `. CRITICAL: Generate image with EXACT aspect ratio ${aspectRatio}, format ${format.name} (${format.dimensions}). The image MUST match this aspect ratio precisely.`;
     }
 
     // Add quality enhancers
