@@ -315,7 +315,9 @@ export default function Home() {
         setShowLoginPrompt(true);
         return;
       }
-      setGuestMessageCount(prev => prev + 1);
+      const newCount = guestMessageCount + 1;
+      setGuestMessageCount(newCount);
+      localStorage.setItem('igpt_guest_messages', String(newCount));
     }
 
     const userMessage = input.trim();
