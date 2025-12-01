@@ -179,6 +179,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [bgColor, setBgColor] = useState('#000000');
   const [bgGradient, setBgGradient] = useState({ color1: '#667eea', color2: '#764ba2', angle: 135 });
   
+  // Store original image URL separately (never changes)
+  const [originalImageUrl, setOriginalImageUrl] = useState(visual.original_image_url || visual.image_url);
+  
   // Custom texture generator
   const [showTextureGenerator, setShowTextureGenerator] = useState(false);
   const [texturePrompt, setTexturePrompt] = useState('');
