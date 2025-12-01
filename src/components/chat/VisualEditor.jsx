@@ -1026,7 +1026,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           {adminTexturesWithImage.length > 0 && (
                             <>
                               <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Textures disponibles:' : 'Available textures:'}</p>
-                              <div className="grid grid-cols-3 gap-2">
+                              <div className="grid grid-cols-5 gap-1.5">
                                 {adminTexturesWithImage.map(texture => (
                                   <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height)}
                                     className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
