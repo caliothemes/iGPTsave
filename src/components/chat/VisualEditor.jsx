@@ -1042,8 +1042,8 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
                           {/* Générateur de texture IA */}
                           <div className="pt-2 border-t border-white/10">
-                            <Button onClick={() => setShowTextureGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30 text-violet-300">
-                              <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Générer texture IA' : 'Generate AI texture'}
+                            <Button onClick={() => setShowTextureGenerator(true)} size="default" className="w-full py-3 bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg shadow-violet-500/30 border border-violet-400/30">
+                              <Wand2 className="h-5 w-5 mr-2 animate-pulse" />{language === 'fr' ? '✨ Générer texture IA' : '✨ Generate AI texture'}
                             </Button>
                           </div>
 
@@ -1051,7 +1051,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           {userLibrary.filter(item => item.type === 'texture').length > 0 && (
                             <div className="pt-2 border-t border-white/10">
                               <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes textures:' : 'My textures:'}</p>
-                              <div className="grid grid-cols-3 gap-2">
+                              <div className="grid grid-cols-5 gap-1.5">
                                 {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
                                   <div key={idx} className="relative group">
                                     <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
