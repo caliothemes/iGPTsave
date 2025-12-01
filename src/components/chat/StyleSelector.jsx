@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
-import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf, X, Zap, Heart, Mountain, Camera, Music, Flame, Snowflake, Sun, Moon, Star, Crown, Feather, Coffee, Wine, Gamepad2, Rocket, Ghost, Wand2 } from 'lucide-react';
+import { Sparkles, Clock, Gem, Palette, Building2, Brush, Cpu, Leaf, X, Zap, Heart, Mountain, Camera, Music, Flame, Snowflake, Sun, Moon, Star, Crown, Feather, Coffee, Wine, Gamepad2, Rocket, Ghost, Wand2, ChevronDown } from 'lucide-react';
 
 const STYLES = [
   // Classiques
