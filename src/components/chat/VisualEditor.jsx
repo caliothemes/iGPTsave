@@ -191,6 +191,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const assets = await base44.entities.EditorAsset.filter({ is_active: true });
         setAdminTextures(assets.filter(a => a.type === 'texture'));
         setAdminIllustrations(assets.filter(a => a.type === 'illustration'));
+        setAdminGradients(assets.filter(a => a.type === 'gradient'));
         
         // Load shared library from admin users
         const adminUsers = await base44.entities.User.filter({ role: 'admin' });
