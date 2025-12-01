@@ -266,8 +266,16 @@ export default function Home() {
     if (format) {
       // Parse dimensions to get aspect ratio
       const [w, h] = format.dimensions.split('x').map(Number);
-      const aspectRatio = w && h ? `${w}:${h}` : format.ratio;
-      prompt += `. CRITICAL: Generate image with EXACT aspect ratio ${aspectRatio}, format ${format.name} (${format.dimensions}). The image MUST match this aspect ratio precisely.`;
+      // Simplify the ratio for better AI understanding
+      const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+      const divisor = gcd(w, h);
+      const simpleW = w / divisor;
+      const simpleH = h / divisor;
+      const aspectRatio = `${simpleW}:${simpleH}`;
+      
+      // Add VERY explicit ratio instructions at the START of the prompt
+      prompt = `CRITICAL ASPECT RATIO REQUIREMENT: This image MUST be generated with aspect ratio ${aspectRatio} (width:height). The canvas is ${w} pixels wide by ${h} pixels tall. DO NOT generate a square image unless the ratio is 1:1. ` + prompt;
+      prompt += `. REMINDER: Exact aspect ratio ${aspectRatio}, dimensions ${format.dimensions} pixels.`;
     }
 
     // Add quality enhancers
