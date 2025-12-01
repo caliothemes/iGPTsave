@@ -14,8 +14,22 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   Brush, FolderOpen, Plus, Save, Palette, Eraser,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw, Blend
+  PaintBucket, RotateCw
 } from 'lucide-react';
+
+// Custom gradient icon component
+const GradientIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none">
+    <defs>
+      <linearGradient id="gradientIconFill" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#f472b6" />
+        <stop offset="50%" stopColor="#a855f7" />
+        <stop offset="100%" stopColor="#3b82f6" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="9" fill="url(#gradientIconFill)" />
+  </svg>
+);
 import { useLanguage } from '../LanguageContext';
 import { cn } from "@/lib/utils";
 import { base44 } from '@/api/base44Client';
