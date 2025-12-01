@@ -515,6 +515,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       y: canvasSize.height / 2,
       fontSize: 32,
       fontFamily: 'Inter, sans-serif',
+      fontWeight: 400,
+      letterSpacing: 0,
       color: '#FFFFFF',
       bold: false,
       italic: false,
