@@ -831,7 +831,50 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                             {showFormatSelector && (
                               <div className="mb-3">
                                 <FormatSelector 
-                                  onSelect={(format) => { setSelectedFormat(format); setShowFormatSelector(false); }}
+                                  onSelect={async (format) => { 
+                                    setSelectedFormat(format); 
+                                    setShowFormatSelector(false);
+                                    
+                                    // Si un visuel est déjà sélectionné, convertir automatiquement
+                                    if (selectedVisual) {
+                                      setIsGenerating(true);
+                                      try {
+                                        const [w, h] = format.dimensions.split('x').map(Number);
+                                        const aspectRatio = w && h ? `${w}:${h}` : format.ratio;
+                                        const prompt = selectedVisual.image_prompt || `Professional ${selectedVisual.visual_type}, high quality`;
+                                        const finalPrompt = `${prompt}. CRITICAL: Generate image with EXACT aspect ratio ${aspectRatio}, format ${format.name} (${format.dimensions}). The image MUST match this aspect ratio precisely.`;
+                                        
+                                        const result = await base44.integrations.Core.GenerateImage({ prompt: finalPrompt });
+                                        
+                                        let newVisual = {
+                                          ...selectedVisual,
+                                          image_url: result.url,
+                                          dimensions: format.dimensions,
+                                          format_name: format.name,
+                                          version: (selectedVisual.version || 1) + 1
+                                        };
+                                        delete newVisual.id;
+                                        delete newVisual.created_date;
+                                        delete newVisual.updated_date;
+                                        
+                                        if (user) {
+                                          newVisual = await base44.entities.Visual.create({ user_email: user.email, ...newVisual });
+                                        }
+                                        
+                                        setVisuals(prev => [newVisual, ...prev]);
+                                        setSelectedVisual(newVisual);
+                                        setSelectedFormat(null);
+                                        setMessages(prev => [...prev, { 
+                                          role: 'assistant', 
+                                          content: language === 'fr' ? `✨ Visuel converti au format ${format.name} !` : `✨ Visual converted to ${format.name} format!`
+                                        }]);
+                                        await deductCredit();
+                                      } catch (e) {
+                                        console.error(e);
+                                      }
+                                      setIsGenerating(false);
+                                    }
+                                  }}
                                   selectedFormat={selectedFormat}
                                   onClose={() => setShowFormatSelector(false)}
                                 />
