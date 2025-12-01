@@ -839,6 +839,13 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                   onStyleChange={setSelectedStyle}
                                   onPaletteChange={setSelectedPalette}
                                   onClose={() => setShowStyleSelector(false)}
+                                  onAutoSend={(prompt) => {
+                                    setShowStyleSelector(false);
+                                    setInput(prompt);
+                                    setTimeout(() => {
+                                      document.querySelector('button[type="submit"], button:has(.lucide-send)')?.click();
+                                    }, 100);
+                                  }}
                                 />
                               </div>
                             )}
