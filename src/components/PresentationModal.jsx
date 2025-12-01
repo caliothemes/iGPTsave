@@ -242,12 +242,25 @@ export default function PresentationModal({ isOpen, onClose }) {
             </div>
 
             {/* Footer CTA */}
-            <div className="text-center py-6">
-              <h3 className="text-2xl md:text-3xl font-light">
-                <span className="bg-gradient-to-r from-violet-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
-                  {t('footer', 'title')}
-                </span>
-              </h3>
+            <div className="text-center py-8">
+              <div className="relative inline-block animate-float-gentle">
+                {/* Glow effect behind */}
+                <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-violet-500/30 via-purple-500/30 to-blue-500/30 rounded-full scale-150" />
+                <h3 className="relative text-3xl md:text-4xl lg:text-5xl font-light tracking-wide">
+                  <span className="bg-gradient-to-r from-violet-300 via-purple-300 to-blue-300 bg-clip-text text-transparent drop-shadow-lg">
+                    {language === 'fr' ? 'Imaginez et écrivez, iGPT le crée...' : 'Imagine and write, iGPT creates it...'}
+                  </span>
+                </h3>
+              </div>
+              <style>{`
+                @keyframes float-gentle {
+                  0%, 100% { transform: translateY(0px); }
+                  50% { transform: translateY(-6px); }
+                }
+                .animate-float-gentle {
+                  animation: float-gentle 4s ease-in-out infinite;
+                }
+              `}</style>
             </div>
           </div>
         </ScrollArea>
