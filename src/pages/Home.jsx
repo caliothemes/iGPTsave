@@ -1158,6 +1158,54 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               {/* GDPR Banner */}
               <GDPRBanner />
 
+              {/* Login Prompt Modal for guests */}
+              {showLoginPrompt && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+                  <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-white/20 rounded-2xl p-6 max-w-md mx-4 shadow-2xl animate-in fade-in zoom-in duration-300">
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center">
+                        <Sparkles className="h-8 w-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        {language === 'fr' ? '🎉 Continuez gratuitement !' : '🎉 Continue for free!'}
+                      </h3>
+                      <p className="text-white/70 mb-4">
+                        {language === 'fr' 
+                          ? 'Vous avez utilisé vos 3 messages d\'essai. Connectez-vous pour obtenir 25 messages gratuits et sauvegarder vos créations !'
+                          : 'You\'ve used your 3 trial messages. Sign in to get 25 free messages and save your creations!'}
+                      </p>
+                      <div className="bg-violet-500/10 border border-violet-500/30 rounded-xl p-4 mb-6">
+                        <p className="text-violet-300 font-medium text-sm">
+                          {language === 'fr' 
+                            ? '✨ 25 messages gratuits à l\'inscription'
+                            : '✨ 25 free messages when you sign up'}
+                        </p>
+                        <p className="text-white/50 text-xs mt-1">
+                          {language === 'fr' 
+                            ? 'Aucune carte de crédit requise'
+                            : 'No credit card required'}
+                        </p>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowLoginPrompt(false)}
+                          className="flex-1 border-white/20 text-white/70 hover:bg-white/10"
+                        >
+                          {language === 'fr' ? 'Plus tard' : 'Later'}
+                        </Button>
+                        <Button
+                          onClick={() => base44.auth.redirectToLogin(createPageUrl('Home'))}
+                          className="flex-1 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
+                        >
+                          {language === 'fr' ? 'Se connecter' : 'Sign in'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Video Generator */}
               <VideoGenerator
                 isOpen={showVideoGenerator}
