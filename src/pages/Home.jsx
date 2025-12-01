@@ -201,6 +201,7 @@ export default function Home() {
 
   const getTotalCredits = () => {
     if (!credits) return 0;
+    if (user?.role === 'admin') return Infinity;
     if (credits.subscription_type === 'unlimited') return Infinity;
     return (credits.free_downloads || 0) + (credits.paid_credits || 0);
   };
