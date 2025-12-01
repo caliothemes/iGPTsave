@@ -424,11 +424,14 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         // Use selected palette or AI suggested colors
         const finalPalette = selectedPalette?.colors || analysis.suggested_colors || [];
 
+        // Force using selected format dimensions if user chose a format
+        const finalDimensions = selectedFormat?.dimensions || analysis.dimensions || '1080x1080';
+        
         let newVisual = {
                         title: analysis.title || 'Visuel',
                         image_url: imageResult.url,
                         visual_type: analysis.visual_type || 'autre',
-                        dimensions: selectedFormat?.dimensions || analysis.dimensions || '1080x1080',
+                        dimensions: finalDimensions,
                         format: selectedFormat?.id?.includes('post') || selectedFormat?.id?.includes('story') || selectedFormat?.id?.includes('banner') ? 'digital' : 'print',
                         format_name: selectedFormat?.name || null,
                         original_prompt: userMessage,
