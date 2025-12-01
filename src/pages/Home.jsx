@@ -50,7 +50,10 @@ export default function Home() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showLogoModal, setShowLogoModal] = useState(false);
   const [showVideoGenerator, setShowVideoGenerator] = useState(false);
-  const [guestMessageCount, setGuestMessageCount] = useState(0);
+  const [guestMessageCount, setGuestMessageCount] = useState(() => {
+    const stored = localStorage.getItem('igpt_guest_messages');
+    return stored ? parseInt(stored, 10) : 0;
+  });
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
