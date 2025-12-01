@@ -36,20 +36,20 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Remove.bg error:', errorText);
-      return Response.json({ error: 'Failed to remove background' }, { status: 500 });
+      return Response.json({ error: 'Failed to remove background', details: errorText }, { status: 500 });
     }
 
-    // Get the image as blob
-    const imageBlob = await response.blob();
+    // Get the image as arrayBuffer
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
     
-    // Convert to base64 for upload
-    const arrayBuffer = await imageBlob.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-    const dataUrl = `data:image/png;base64,${base64}`;
-
-    // Convert to file and upload
-    const file = new File([imageBlob], 'removed-bg.png', { type: 'image/png' });
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    // Create a Blob from the array buffer
+    const blob = new Blob([uint8Array], { type: 'image/png' });
+    
+    // Upload using the blob directly
+    const { file_url } = await base44.integrations.Core.UploadFile({ 
+      file: new File([blob], 'removed-bg.png', { type: 'image/png' })
+    });
 
     return Response.json({ success: true, image_url: file_url });
   } catch (error) {
