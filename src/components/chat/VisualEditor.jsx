@@ -1378,7 +1378,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
       {/* Library */}
       {user && userLibrary.length > 0 && (
         <div className="mt-3 pt-3 border-t border-white/10">
-          <p className="text-white/40 text-xs px-1 flex items-center gap-1 mb-2"><Library className="h-3 w-3" />{language === 'fr' ? 'Ma bibliothèque' : 'My library'}</p>
+          <p className="text-white/40 text-xs px-1 flex items-center gap-1 mb-2"><FolderOpen className="h-3 w-3" />{language === 'fr' ? 'Ma bibliothèque' : 'My library'}</p>
           <div className="flex gap-1 overflow-x-auto pb-1">
             {userLibrary.slice(-8).map((item, idx) => (
               <div key={idx} className="relative group flex-shrink-0">
