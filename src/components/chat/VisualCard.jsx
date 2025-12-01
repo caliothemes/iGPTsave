@@ -7,9 +7,13 @@ import DownloadModal from '@/components/DownloadModal';
 
 const getAspectRatio = (dimensions) => {
   if (!dimensions) return '1/1';
+  // Handle formats like "85x55" (business card) or "1080x1080"
   const [w, h] = dimensions.split('x').map(Number);
   if (!w || !h) return '1/1';
-  return `${w}/${h}`;
+  // Simplify the ratio for cleaner CSS
+  const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+  const divisor = gcd(w, h);
+  return `${w / divisor}/${h / divisor}`;
 };
 
 export default function VisualCard({ 
