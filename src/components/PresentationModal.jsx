@@ -123,7 +123,7 @@ export default function PresentationModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-4">
-                <Logo size="default" showText={false} />
+                <Logo size="large" showText={false} />
               </div>
               <p className="text-white/70 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
                 {t('header', 'description')}
