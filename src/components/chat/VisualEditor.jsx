@@ -398,7 +398,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         img.onload = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          // Draw the main image
+          // Draw the original base image (never the merged one)
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           layers.forEach((layer, idx) => {
         ctx.save();
