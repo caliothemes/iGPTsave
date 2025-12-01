@@ -1087,16 +1087,23 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                                               {language === 'fr' ? 'Recharger mes crédits' : 'Recharge my credits'}
                                                             </a>
                                                           ) : (
-                                                            <input
-                                                                                                                                type="text"
-                                                                                                                                value={input}
-                                                                                                                                onChange={(e) => setInput(e.target.value)}
-                                                                                                                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                                                                                                                                placeholder={t('inputPlaceholder')}
-                                                                                                                                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none focus:placeholder:text-transparent text-sm"
-                                                                                                                                disabled={isLoading}
-                                                                                                                              />
-                                                          )}
+                                                            <>
+                                                              <input
+                                                                type="text"
+                                                                value={input}
+                                                                onChange={(e) => setInput(e.target.value)}
+                                                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                                                                placeholder={t('inputPlaceholder')}
+                                                                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/40 focus:outline-none focus:placeholder:text-transparent text-sm"
+                                                                disabled={isLoading}
+                                                              />
+                                                              {!isAuthenticated && (
+                                                                <span className="text-white/30 text-xs flex-shrink-0 hidden sm:block">
+                                                                  {guestMessageCount}/{GUEST_MESSAGE_LIMIT}
+                                                                </span>
+                                                              )}
+                                                            </>
+                                                            )}
                                                           <Button
                                                             variant="ghost"
                                                             size="icon"
