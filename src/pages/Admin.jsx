@@ -120,7 +120,7 @@ export default function Admin() {
           const uniqueUsers = new Set();
           items.forEach(item => {
             const userEmail = item.user_email || item.created_by;
-            if (new Date(item.created_date) > afterDate && userEmail && !adminEmails.has(userEmail)) {
+            if (new Date(item.created_date) > afterDate && userEmail && !adminEmailsSet.has(userEmail)) {
               uniqueUsers.add(userEmail);
             }
           });
