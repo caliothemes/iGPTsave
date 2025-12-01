@@ -389,12 +389,23 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
           - Si un visuel existe, reprends son prompt et AJOUTE les modifications demandées
           - Ne change pas le design principal, enrichis-le
 
+          DIMENSIONS CRITIQUES PAR TYPE:
+          - carte_visite / business card: 1050x600 (paysage) ou 600x1050 (portrait)
+          - flyer: 2480x3508 (portrait A4) ou 3508x2480 (paysage)
+          - affiche / poster: 3508x4961 (portrait) ou 4961x3508 (paysage)
+          - post_instagram: 1080x1080 (carré) ou 1080x1350 (portrait)
+          - story_instagram: 1080x1920
+          - post_facebook: 1200x630
+          - post_linkedin: 1200x627
+          - banner: 1920x600
+          - logo: 2000x2000
+
           Réponds en JSON:
           - needs_image: boolean (true si création visuelle demandée)
           - response: string (réponse courte, professionnelle, en français)
           - image_prompt: string (prompt TRÈS détaillé en anglais, 100+ mots, RESPECTE les règles du type de visuel)
           - visual_type: string (logo, carte_visite, flyer, post_instagram, story_instagram, post_facebook, post_linkedin, affiche, banner, autre)
-          - dimensions: string (ex: 1080x1080)
+          - dimensions: string (UTILISE les dimensions ci-dessus selon le type détecté, ex: 1050x600 pour carte de visite)
           - title: string (titre court et accrocheur)
           - suggested_colors: array de 5 codes hex couleurs recommandées`,
         response_json_schema: {
