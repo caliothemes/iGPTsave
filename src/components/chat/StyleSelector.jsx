@@ -25,6 +25,16 @@ const COLOR_PALETTES = [
   { id: 'royal', name: { fr: 'Royal', en: 'Royal' }, colors: ['#4A0E4E', '#81267F', '#C879FF', '#FFD700', '#1A1A2E'] },
   { id: 'candy', name: { fr: 'Candy', en: 'Candy' }, colors: ['#FF69B4', '#FF1493', '#FFB6C1', '#FFC0CB', '#FF85A2'] },
   { id: 'earth', name: { fr: 'Terre', en: 'Earth' }, colors: ['#8B4513', '#A0522D', '#CD853F', '#DEB887', '#D2691E'] },
+  { id: 'neon', name: { fr: 'Néon', en: 'Neon' }, colors: ['#FF00FF', '#00FFFF', '#FF006E', '#8338EC', '#3A86FF'] },
+  { id: 'gold', name: { fr: 'Or & Noir', en: 'Gold & Black' }, colors: ['#FFD700', '#DAA520', '#B8860B', '#1A1A1A', '#000000'] },
+  { id: 'rose', name: { fr: 'Rose Gold', en: 'Rose Gold' }, colors: ['#B76E79', '#E8B4B8', '#EDD1D1', '#F5E6E8', '#FAF0F0'] },
+  { id: 'mint', name: { fr: 'Menthe', en: 'Mint' }, colors: ['#98FF98', '#3EB489', '#2E8B57', '#98D8C8', '#F7FFF7'] },
+  { id: 'aurora', name: { fr: 'Aurore', en: 'Aurora' }, colors: ['#00C9FF', '#92FE9D', '#F9D423', '#FF4E50', '#7B68EE'] },
+  { id: 'coffee', name: { fr: 'Café', en: 'Coffee' }, colors: ['#4A3728', '#6F4E37', '#A67B5B', '#C4A484', '#ECE0D1'] },
+  { id: 'ice', name: { fr: 'Glacé', en: 'Ice' }, colors: ['#A5F3FC', '#67E8F9', '#22D3EE', '#06B6D4', '#E0F2FE'] },
+  { id: 'wine', name: { fr: 'Vin', en: 'Wine' }, colors: ['#722F37', '#8B0000', '#A52A2A', '#CD5C5C', '#F5DEB3'] },
+  { id: 'lavender', name: { fr: 'Lavande', en: 'Lavender' }, colors: ['#E6E6FA', '#D8BFD8', '#DDA0DD', '#BA55D3', '#9932CC'] },
+  { id: 'tropical', name: { fr: 'Tropical', en: 'Tropical' }, colors: ['#FF6F61', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'] },
 ];
 
 export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose }) {
