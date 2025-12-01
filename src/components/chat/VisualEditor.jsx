@@ -623,9 +623,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       };
 
       const addTextureToCanvas = (saveToLibrary = false) => {
-        if (!generatedTexture) return;
-        addImageLayer(generatedTexture, canvasSize.width, canvasSize.height);
-        if (saveToLibrary && user) {
+                if (!generatedTexture) return;
+                addImageLayer(generatedTexture, canvasSize.width, canvasSize.height, true);
+                if (saveToLibrary && user) {
           const newItem = { type: 'texture', url: generatedTexture, name: texturePrompt.slice(0, 30) };
           const updatedLibrary = [...userLibrary, newItem];
           setUserLibrary(updatedLibrary);
