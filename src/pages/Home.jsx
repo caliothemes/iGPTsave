@@ -1170,11 +1170,11 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
                   <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-white/20 rounded-2xl p-6 max-w-md mx-4 shadow-2xl animate-in fade-in zoom-in duration-300">
                     <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center">
-                        <Sparkles className="h-8 w-8 text-white" />
+                      <div className="mx-auto mb-4">
+                        <Logo size="default" showText={true} />
                       </div>
                       <h3 className="text-xl font-bold text-white mb-2">
-                        {language === 'fr' ? '🎉 Continuez gratuitement !' : '🎉 Continue for free!'}
+                        {language === 'fr' ? 'Inscrivez-vous gratuitement' : 'Sign up for free'}
                       </h3>
                       <p className="text-white/70 mb-4">
                         {language === 'fr' 
@@ -1184,8 +1184,8 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                       <div className="bg-violet-500/10 border border-violet-500/30 rounded-xl p-4 mb-6">
                         <p className="text-violet-300 font-medium text-sm">
                           {language === 'fr' 
-                            ? '✨ 25 messages gratuits à l\'inscription'
-                            : '✨ 25 free messages when you sign up'}
+                            ? '25 messages gratuits à l\'inscription'
+                            : '25 free messages when you sign up'}
                         </p>
                         <p className="text-white/50 text-xs mt-1">
                           {language === 'fr' 
@@ -1197,7 +1197,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                         <Button
                           variant="outline"
                           onClick={() => setShowLoginPrompt(false)}
-                          className="flex-1 border-white/20 text-white/70 hover:bg-white/10"
+                          className="flex-1 border-white/30 text-white hover:bg-white/10 hover:text-white"
                         >
                           {language === 'fr' ? 'Plus tard' : 'Later'}
                         </Button>
@@ -1205,7 +1205,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                           onClick={() => base44.auth.redirectToLogin(createPageUrl('Home'))}
                           className="flex-1 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
                         >
-                          {language === 'fr' ? 'Se connecter' : 'Sign in'}
+                          {language === 'fr' ? 'S\'inscrire' : 'Sign up'}
                         </Button>
                       </div>
                     </div>
