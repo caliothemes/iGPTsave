@@ -946,6 +946,40 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               img.src = layer.imageUrl;
             });
             
+            exportCtx.save();
+            exportCtx.globalAlpha = layer.opacity / 100;
+            
+            // Apply shadow effect
+            if (layer.shadow) {
+              exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+              exportCtx.shadowBlur = layer.shadowBlur || 10;
+              exportCtx.shadowOffsetX = 5;
+              exportCtx.shadowOffsetY = 5;
+            }
+            
+            // Apply glow effect
+            if (layer.glow) {
+              exportCtx.shadowColor = layer.glowColor || '#ffffff';
+              exportCtx.shadowBlur = layer.glowSize || 10;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
+            }
+            
+            // Apply halo effect
+            if (layer.halo) {
+              exportCtx.shadowColor = layer.haloColor || '#FFD700';
+              exportCtx.shadowBlur = layer.haloSize || 15;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
+            }
+            
+            // Apply border radius clipping if needed
+            if (layer.borderRadius && layer.borderRadius > 0) {
+              exportCtx.beginPath();
+              exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+              exportCtx.clip();
+            }
+            
             if (layer.tintColor && layer.tintOpacity) {
               // Apply tint using temporary canvas
               const tempCanvas = document.createElement('canvas');
@@ -960,6 +994,23 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.drawImage(tempCanvas, layer.x, layer.y);
             } else {
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+            }
+            
+            exportCtx.restore();
+            
+            // Draw border on top
+            if (layer.stroke) {
+              exportCtx.save();
+              exportCtx.strokeStyle = layer.strokeColor || '#000000';
+              exportCtx.lineWidth = layer.strokeWidth || 2;
+              if (layer.borderRadius && layer.borderRadius > 0) {
+                exportCtx.beginPath();
+                exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                exportCtx.stroke();
+              } else {
+                exportCtx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+              }
+              exportCtx.restore();
             }
           } else if (layer.type === 'text') {
             const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);

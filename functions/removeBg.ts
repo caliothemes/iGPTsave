@@ -20,40 +20,43 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Remove.bg API key not configured' }, { status: 500 });
     }
 
-    // Call Remove.bg API
-    const formData = new FormData();
-    formData.append('image_url', image_url);
-    formData.append('size', 'auto');
-
+    // Call Remove.bg API with URL-encoded form data
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
       headers: {
         'X-Api-Key': apiKey,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: formData,
+      body: new URLSearchParams({
+        image_url: image_url,
+        size: 'auto',
+        format: 'png',
+      }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Remove.bg error:', errorText);
-      return Response.json({ error: 'Failed to remove background', details: errorText }, { status: 500 });
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Remove.bg error:', JSON.stringify(errorData));
+      return Response.json({ 
+        error: 'Failed to remove background', 
+        details: errorData.errors?.[0]?.title || 'Unknown error'
+      }, { status: 500 });
     }
 
     // Get the image as arrayBuffer
     const arrayBuffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
     
     // Create a Blob from the array buffer
-    const blob = new Blob([uint8Array], { type: 'image/png' });
+    const blob = new Blob([arrayBuffer], { type: 'image/png' });
     
-    // Upload using the blob directly
+    // Upload using the SDK
     const { file_url } = await base44.integrations.Core.UploadFile({ 
       file: new File([blob], 'removed-bg.png', { type: 'image/png' })
     });
 
     return Response.json({ success: true, image_url: file_url });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('RemoveBg Error:', error.message, error.stack);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
