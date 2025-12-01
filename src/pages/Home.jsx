@@ -334,22 +334,25 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
 
           RÈGLES CRITIQUES PAR TYPE DE VISUEL:
 
-          ⚠️ RÈGLE UNIVERSELLE ABSOLUE - ZÉRO TEXTE:
-              - INTERDICTION TOTALE de texte, lettres, mots, chiffres, typographie sur TOUS les visuels
-              - Dans CHAQUE prompt image, COMMENCE par: "absolutely no text, no letters, no words, no numbers, no typography, no writing, text-free design"
-              - TERMINE chaque prompt par: "completely text-free, no visible text or letters anywhere"
-              - EXCEPTION UNIQUE: si l'utilisateur écrit explicitement "avec le texte [xxx]"
+                          ⚠️ RÈGLE UNIVERSELLE ABSOLUE - ZÉRO TEXTE:
+                              - INTERDICTION TOTALE de texte, lettres, mots, chiffres, typographie sur TOUS les visuels
+                              - Dans CHAQUE prompt image, COMMENCE par: "absolutely no text, no letters, no words, no numbers, no typography, no writing, text-free design"
+                              - TERMINE chaque prompt par: "completely text-free, no visible text or letters anywhere"
+                              - EXCEPTION UNIQUE: si l'utilisateur écrit explicitement "avec le texte [xxx]"
 
-              🖨️ RÈGLE POUR TOUS LES VISUELS IMPRESSION (carte visite, flyer, sticker, affiche):
-                  - Le design doit REMPLIR ENTIÈREMENT le cadre, bord à bord, sans marges internes
-                  - AJOUTER OBLIGATOIREMENT: "full bleed design, edge-to-edge graphics filling the entire frame, no margins, no borders, design extends to all edges"
-                  - Le visuel doit être PRÊT À IMPRIMER sans recadrage nécessaire
+                          🖨️ RÈGLE CRITIQUE POUR TOUS LES VISUELS IMPRESSION (carte visite, flyer, sticker, affiche, poster, brochure, dépliant, menu, invitation, faire-part):
+                              - Design ABSTRAIT et GRAPHIQUE UNIQUEMENT - jamais de représentation réaliste
+                              - JAMAIS: bâtiments, maisons, photos, personnes, objets réalistes, scènes figuratives
+                              - TOUJOURS: formes géométriques abstraites, dégradés élégants, motifs sophistiqués, textures artistiques
+                              - Le design doit REMPLIR ENTIÈREMENT le cadre, bord à bord, sans marges internes
+                              - AJOUTER OBLIGATOIREMENT: "abstract graphic design only, no realistic imagery, no photographs, no figurative elements, FULL BLEED edge-to-edge design filling entire frame, no margins, no borders, design extends to all edges"
+                              - Le visuel doit être PRÊT À IMPRIMER sans recadrage nécessaire
+                              - Prompt type: "absolutely no text, abstract minimalist design, FULL BLEED edge-to-edge, elegant geometric shapes, subtle luxury gradient, clean lines, premium feel, sophisticated abstract pattern, completely text-free, print-ready 300dpi"
+                              - Pour un thème spécifique (ex: restaurant italien): utiliser des COULEURS et FORMES évocatrices, PAS des images réalistes (ex: dégradé rouge/vert avec formes organiques, PAS de pizza ou pâtes)
 
-                  🎴 CARTE DE VISITE / BUSINESS CARD:
-                  - Design abstrait et graphique UNIQUEMENT - jamais de représentation réaliste
-                  - JAMAIS: bâtiments, maisons, photos, personnes, objets réalistes
-                  - Prompt type: "absolutely no text, abstract minimalist business card design, FULL BLEED edge-to-edge design filling entire frame, no margins, elegant geometric shapes extending to all edges, subtle luxury gradient, clean lines, premium feel, sophisticated abstract pattern, completely text-free, print-ready 300dpi"
-                  - Pour agence immobilière: "abstract geometric shapes suggesting elegance and trust, gold and navy gradient" - PAS de maisons!
+                                  🎴 CARTE DE VISITE / BUSINESS CARD:
+                                  - Suit les règles impression ci-dessus
+                                  - Pour agence immobilière: "abstract geometric shapes suggesting elegance and trust, gold and navy gradient" - PAS de maisons!
 
                   🎨 LOGO:
                   - Symbole/icône abstrait UNIQUEMENT - jamais de lettres
