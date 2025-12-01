@@ -50,9 +50,13 @@ export default function Home() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showLogoModal, setShowLogoModal] = useState(false);
   const [showVideoGenerator, setShowVideoGenerator] = useState(false);
+  const [guestMessageCount, setGuestMessageCount] = useState(0);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
+  
+  const GUEST_MESSAGE_LIMIT = 3;
 
   useEffect(() => {
     const init = async () => {
