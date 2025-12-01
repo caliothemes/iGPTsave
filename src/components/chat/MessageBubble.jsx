@@ -20,12 +20,12 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
       {/* Avatar - for assistant with animated gradient border */}
       {!isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20 relative">
-          <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f]">
+        <div className="flex-shrink-0 w-12 h-12 rounded-full p-[3px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20 relative">
+          <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
               alt="iGPT" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-full"
             />
           </div>
           <style>{`
@@ -43,14 +43,16 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
       )}
       {/* Avatar - for user with gradient border */}
       {isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500 shadow-lg shadow-violet-500/20 order-last">
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center overflow-hidden">
+        <div className="flex-shrink-0 w-12 h-12 rounded-full p-[3px] bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500 shadow-lg shadow-violet-500/20 order-last">
+          <div className="w-full h-full rounded-full bg-[#0a0a0f] p-1 flex items-center justify-center overflow-hidden">
             {user?.profile_image ? (
-              <img src={user.profile_image} alt="" className="w-full h-full object-cover" />
+              <img src={user.profile_image} alt="" className="w-full h-full object-cover rounded-full" />
             ) : (
-              <span className="text-white text-xs font-medium">
-                {user?.full_name?.[0] || user?.email?.[0] || 'U'}
-              </span>
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {user?.full_name?.[0] || user?.email?.[0] || 'U'}
+                </span>
+              </div>
             )}
           </div>
         </div>
