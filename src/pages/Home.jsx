@@ -839,10 +839,82 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                   onStyleChange={setSelectedStyle}
                                   onPaletteChange={setSelectedPalette}
                                   onClose={() => setShowStyleSelector(false)}
-                                  onAutoSend={(prompt) => {
+                                  onAutoSend={async (prompt) => {
                                     setShowStyleSelector(false);
-                                    setInput(prompt);
-                                    setTimeout(() => handleSend(), 50);
+                                    // Envoyer directement le message
+                                    const userMessage = prompt;
+                                    const newMessages = [...messages, { role: 'user', content: userMessage }];
+                                    setMessages([...newMessages, { role: 'assistant', content: '' }]);
+                                    setIsLoading(true);
+                                    
+                                    if (isAuthenticated) {
+                                      await deductCredit();
+                                    }
+                                    
+                                    try {
+                                      const analysis = await base44.integrations.Core.InvokeLLM({
+                                        prompt: `Tu es iGPT. L'utilisateur demande: "${userMessage}". Génère un visuel créatif basé sur ce style. Réponds en JSON avec needs_image: true, response (courte), image_prompt (détaillé en anglais 100+ mots), visual_type, dimensions, title, suggested_colors.`,
+                                        response_json_schema: {
+                                          type: 'object',
+                                          properties: {
+                                            needs_image: { type: 'boolean' },
+                                            response: { type: 'string' },
+                                            image_prompt: { type: 'string' },
+                                            visual_type: { type: 'string' },
+                                            dimensions: { type: 'string' },
+                                            title: { type: 'string' },
+                                            suggested_colors: { type: 'array', items: { type: 'string' } }
+                                          }
+                                        }
+                                      });
+                                      
+                                      let updatedMessages = [...newMessages, { role: 'assistant', content: analysis.response }];
+                                      setMessages(updatedMessages);
+                                      setIsLoading(false);
+                                      
+                                      if (analysis.needs_image && analysis.image_prompt) {
+                                        setIsGenerating(true);
+                                        updatedMessages = [...updatedMessages, { role: 'assistant', content: t('generating') }];
+                                        setMessages(updatedMessages);
+                                        
+                                        const finalPrompt = buildDetailedPrompt(analysis.image_prompt, selectedStyle, selectedPalette, selectedFormat);
+                                        const imageResult = await base44.integrations.Core.GenerateImage({ prompt: finalPrompt });
+                                        
+                                        let newVisual = {
+                                          title: analysis.title || 'Visuel',
+                                          image_url: imageResult.url,
+                                          visual_type: analysis.visual_type || 'autre',
+                                          dimensions: selectedFormat?.dimensions || analysis.dimensions || '1080x1080',
+                                          format: 'digital',
+                                          original_prompt: userMessage,
+                                          image_prompt: finalPrompt,
+                                          style: selectedStyle?.name?.fr || '',
+                                          color_palette: analysis.suggested_colors || [],
+                                          version: 1
+                                        };
+                                        
+                                        if (user) {
+                                          newVisual = await base44.entities.Visual.create({ user_email: user.email, ...newVisual });
+                                        }
+                                        
+                                        setVisuals(prev => [newVisual, ...prev]);
+                                        setSelectedVisual(newVisual);
+                                        setShowValidation(true);
+                                        
+                                        updatedMessages = updatedMessages.slice(0, -1);
+                                        updatedMessages.push({ role: 'assistant', content: `✨ **${analysis.title}** ${t('ready')}` });
+                                        setMessages(updatedMessages);
+                                        setIsGenerating(false);
+                                      }
+                                      
+                                      await saveConversation(updatedMessages);
+                                    } catch (error) {
+                                      setMessages([...newMessages, { role: 'assistant', content: t('error') }]);
+                                      setIsLoading(false);
+                                    }
+                                    setSelectedFormat(null);
+                                    setSelectedStyle(null);
+                                    setSelectedPalette(null);
                                   }}
                                 />
                               </div>
