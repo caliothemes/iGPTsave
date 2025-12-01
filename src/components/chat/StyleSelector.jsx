@@ -89,7 +89,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
       {/* Color Palettes */}
       <div>
         <p className="text-white/50 text-xs mb-3 font-medium">
-          {language === 'fr' ? 'Palette de couleurs' : 'Color palette'}
+          {lang === 'fr' ? 'Palette de couleurs' : 'Color palette'}
         </p>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {COLOR_PALETTES.map((palette) => (
@@ -116,7 +116,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
                 "text-[10px] text-center font-medium",
                 selectedPalette?.id === palette.id ? "text-violet-300" : "text-white/50"
               )}>
-                {palette.name[language]}
+                {palette.name[lang]}
               </p>
             </button>
           ))}
