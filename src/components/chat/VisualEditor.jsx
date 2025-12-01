@@ -346,10 +346,12 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         ctx.save();
         ctx.globalAlpha = layer.opacity / 100;
         if (layer.type === 'text') {
-          const fontStyle = `${layer.italic ? 'italic ' : ''}${layer.bold ? 'bold ' : ''}${layer.fontSize}px ${layer.fontFamily}`;
+          const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
+          const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
           ctx.font = fontStyle;
           ctx.fillStyle = layer.color;
           ctx.textAlign = layer.align || 'left';
+          ctx.letterSpacing = `${layer.letterSpacing || 0}px`;
           
           // Reset shadows first
           ctx.shadowColor = 'transparent';
