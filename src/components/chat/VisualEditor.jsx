@@ -265,8 +265,12 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     init();
   }, [visual.id]);
 
-  // Load base image
+  // Load base image - always use original
       useEffect(() => {
+        // Set the original URL on first load
+        const baseUrl = visual.original_image_url || visual.image_url;
+        setOriginalImageUrl(baseUrl);
+        
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
@@ -290,8 +294,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           });
           setImageLoaded(true);
         };
-        img.src = visual.image_url;
-      }, [visual.image_url, visual.dimensions]);
+        img.src = baseUrl;
+      }, [visual.original_image_url, visual.image_url, visual.dimensions]);
 
   // Preload layer images
   useEffect(() => {
