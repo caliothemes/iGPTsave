@@ -842,9 +842,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                   onAutoSend={(prompt) => {
                                     setShowStyleSelector(false);
                                     setInput(prompt);
-                                    setTimeout(() => {
-                                      document.querySelector('button[type="submit"], button:has(.lucide-send)')?.click();
-                                    }, 100);
+                                    setTimeout(() => handleSend(), 50);
                                   }}
                                 />
                               </div>
