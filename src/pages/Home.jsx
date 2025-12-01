@@ -903,7 +903,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                   )}
                   {selectedStyle && (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-violet-500/20 text-violet-300">
-                      {selectedStyle.icon} {selectedStyle.name[language]}
+                      {selectedStyle.name[language]}
                       <button onClick={() => setSelectedStyle(null)} className="hover:text-white">✕</button>
                     </span>
                   )}
