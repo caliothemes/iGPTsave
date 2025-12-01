@@ -20,6 +20,7 @@ const navItems = [
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
+  { id: 'presentation', label: 'Présentation', icon: LayoutDashboard, page: 'AdminPresentation' },
   { id: 'pricing', label: 'Tarification', icon: CreditCard, page: 'AdminPricing' },
   { id: 'legal', label: 'Mentions légales', icon: Scale, page: 'AdminLegal' },
   { id: 'settings', label: 'Paramètres', icon: Settings, page: 'AdminSettings' },
