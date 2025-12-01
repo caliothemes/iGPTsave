@@ -278,6 +278,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           let targetWidth = img.width;
           let targetHeight = img.height;
 
+          // Use visual dimensions if available - this respects the format selected by user
           if (visual.dimensions) {
             const [w, h] = visual.dimensions.split('x').map(Number);
             if (w && h) {
@@ -286,11 +287,20 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             }
           }
 
+          // Scale down for display while maintaining aspect ratio
           const maxSize = 450;
           const ratio = Math.min(maxSize / targetWidth, maxSize / targetHeight);
+          const displayWidth = targetWidth * ratio;
+          const displayHeight = targetHeight * ratio;
+          
+          console.log('Visual dimensions:', visual.dimensions);
+          console.log('Image natural size:', img.width, 'x', img.height);
+          console.log('Target size:', targetWidth, 'x', targetHeight);
+          console.log('Display size:', displayWidth, 'x', displayHeight);
+          
           setCanvasSize({
-            width: targetWidth * ratio,
-            height: targetHeight * ratio
+            width: displayWidth,
+            height: displayHeight
           });
           setImageLoaded(true);
         };
