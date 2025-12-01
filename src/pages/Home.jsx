@@ -447,7 +447,13 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         const finalPalette = selectedPalette?.colors || analysis.suggested_colors || [];
 
         // Force using selected format dimensions if user chose a format
+        // If no format selected, use AI suggested dimensions (which now respect visual type)
         const finalDimensions = selectedFormat?.dimensions || analysis.dimensions || '1080x1080';
+        
+        // Log for debugging
+        console.log('Format selected:', selectedFormat);
+        console.log('AI dimensions:', analysis.dimensions);
+        console.log('Final dimensions:', finalDimensions);
         
         let newVisual = {
                         title: analysis.title || 'Visuel',
