@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plus, Trash2, Brush, ImagePlus, Save, Eye, Upload, Sparkles } from 'lucide-react';
+import { Loader2, Plus, Trash2, Brush, ImagePlus, Save, Eye, Upload, Sparkles, Circle } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 
@@ -153,6 +153,7 @@ export default function AdminAssets() {
                 <SelectContent>
                   <SelectItem value="texture">Texture</SelectItem>
                   <SelectItem value="illustration">Illustration</SelectItem>
+                  <SelectItem value="gradient">Dégradé PRO</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -244,7 +245,7 @@ export default function AdminAssets() {
         </div>
 
         {/* Filter */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant={filter === 'all' ? 'default' : 'ghost'} onClick={() => setFilter('all')} className={cn(filter === 'all' ? 'bg-violet-600' : 'text-white/60')}>
             Tous ({assets.length})
           </Button>
@@ -255,6 +256,10 @@ export default function AdminAssets() {
           <Button variant={filter === 'illustration' ? 'default' : 'ghost'} onClick={() => setFilter('illustration')} className={cn(filter === 'illustration' ? 'bg-violet-600' : 'text-white/60')}>
             <ImagePlus className="h-4 w-4 mr-1" />
             Illustrations ({assets.filter(a => a.type === 'illustration').length})
+          </Button>
+          <Button variant={filter === 'gradient' ? 'default' : 'ghost'} onClick={() => setFilter('gradient')} className={cn(filter === 'gradient' ? 'bg-violet-600' : 'text-white/60')}>
+            <Circle className="h-4 w-4 mr-1" style={{ background: 'linear-gradient(135deg, #f472b6, #a855f7, #3b82f6)', borderRadius: '50%' }} />
+            Dégradés PRO ({assets.filter(a => a.type === 'gradient').length})
           </Button>
         </div>
 
@@ -274,7 +279,7 @@ export default function AdminAssets() {
                 )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    {asset.type === 'texture' ? <Brush className="h-4 w-4 text-violet-400" /> : <ImagePlus className="h-4 w-4 text-blue-400" />}
+                    {asset.type === 'texture' ? <Brush className="h-4 w-4 text-violet-400" /> : asset.type === 'gradient' ? <Circle className="h-4 w-4" style={{ background: 'linear-gradient(135deg, #f472b6, #a855f7, #3b82f6)', borderRadius: '50%' }} /> : <ImagePlus className="h-4 w-4 text-blue-400" />}
                     <h4 className="text-white font-medium">{asset.name_fr}</h4>
                   </div>
                   <p className="text-white/40 text-xs mb-2 line-clamp-2">{asset.prompt}</p>
