@@ -1121,6 +1121,31 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                           )}
                         </TabsContent>
 
+          <TabsContent value="gradients" className="mt-0 space-y-3">
+            {adminGradients.length > 0 ? (
+              <>
+                <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Dégradés PRO disponibles:' : 'Available PRO gradients:'}</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {adminGradients.filter(g => g.preview_url).map(gradient => (
+                    <button key={gradient.id} onClick={() => addImageLayer(gradient.preview_url, canvasSize.width, canvasSize.height, true)}
+                      className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-amber-500/50 transition-colors aspect-square">
+                      <img src={gradient.preview_url} alt={gradient.name_fr} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-xs text-center px-1">{language === 'fr' ? gradient.name_fr : (gradient.name_en || gradient.name_fr)}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <Blend className="h-8 w-8 text-white/20 mx-auto mb-2" />
+                <p className="text-white/40 text-xs">{language === 'fr' ? 'Aucun dégradé PRO disponible' : 'No PRO gradients available'}</p>
+                <p className="text-white/30 text-xs mt-1">{language === 'fr' ? 'Les admins peuvent en ajouter via Assets' : 'Admins can add them via Assets'}</p>
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="illustrations" className="mt-0 space-y-2">
             <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 text-pink-300">
               <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer illustration IA' : 'Create AI illustration'}
