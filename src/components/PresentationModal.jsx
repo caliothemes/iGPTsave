@@ -6,6 +6,7 @@ import {
   Image, Layout, FileText, CreditCard, 
   Layers, Type, Square, Palette
 } from 'lucide-react';
+import { cn } from "@/lib/utils";
 import { useLanguage } from './LanguageContext';
 import { base44 } from '@/api/base44Client';
 import Logo from './Logo';
@@ -20,8 +21,8 @@ const DEFAULT_CONTENT = {
   header: {
     title_fr: "Bienvenue sur iGPT",
     title_en: "Welcome to iGPT",
-    description_fr: "Votre assistant IA pour créer des visuels professionnels en quelques clics. Logos, cartes de visite, posts réseaux sociaux et bien plus encore.",
-    description_en: "Your AI assistant to create professional visuals in a few clicks. Logos, business cards, social media posts and much more."
+    description_fr: "iGPT est votre assistant créatif propulsé par l'intelligence artificielle. Créez des visuels professionnels en quelques secondes : logos, cartes de visite, flyers, posts pour réseaux sociaux, affiches et bien plus encore. Décrivez simplement ce que vous voulez, et notre IA génère des designs uniques et personnalisables. Aucune compétence en design requise !",
+    description_en: "iGPT is your creative assistant powered by artificial intelligence. Create professional visuals in seconds: logos, business cards, flyers, social media posts, posters and much more. Simply describe what you want, and our AI generates unique, customizable designs. No design skills required!"
   },
   digital: {
     title_fr: "Visuels Digital",
@@ -34,8 +35,8 @@ const DEFAULT_CONTENT = {
     title_fr: "Supports Print",
     title_en: "Print Materials",
     icon: "Printer",
-    items_fr: ["Cartes de visite", "Flyers A5", "Affiches A3", "Invitations", "Stickers", "Cartes cadeaux"],
-    items_en: ["Business Cards", "A5 Flyers", "A3 Posters", "Invitations", "Stickers", "Gift Cards"]
+    items_fr: ["Cartes de visite", "Flyers", "Affiches", "Invitations", "Stickers", "Cartes cadeaux"],
+    items_en: ["Business Cards", "Flyers", "Posters", "Invitations", "Stickers", "Gift Cards"]
   },
   ai_images: {
     title_fr: "Images IA",
@@ -47,16 +48,16 @@ const DEFAULT_CONTENT = {
   editor: {
     title_fr: "Éditeur Magique",
     title_en: "Magic Editor",
-    description_fr: "Personnalisez vos créations avec notre éditeur intégré : ajoutez du texte, des formes, des textures générées par IA, des illustrations et bien plus. Exportez en haute définition.",
-    description_en: "Customize your creations with our built-in editor: add text, shapes, AI-generated textures, illustrations and more. Export in high definition.",
-    items_fr: ["Textes personnalisables", "Formes géométriques", "Textures IA", "Illustrations", "Effets & filtres", "Export HD"],
-    items_en: ["Custom Text", "Geometric Shapes", "AI Textures", "Illustrations", "Effects & Filters", "HD Export"]
+    description_fr: "Personnalisez vos créations avec notre éditeur intégré : ajoutez du texte avec effets (ombre, néon, 3D), des formes géométriques, des textures générées par IA, des illustrations et bien plus. Exportez en haute définition.",
+    description_en: "Customize your creations with our built-in editor: add text with effects (shadow, neon, 3D), geometric shapes, AI-generated textures, illustrations and more. Export in high definition.",
+    items_fr: ["Textes avec effets", "Formes géométriques", "Textures IA", "Illustrations", "Fonds & dégradés", "Export HD"],
+    items_en: ["Text with Effects", "Geometric Shapes", "AI Textures", "Illustrations", "Backgrounds & Gradients", "HD Export"]
   },
   footer: {
-    title_fr: "Créez en 3 étapes",
-    title_en: "Create in 3 steps",
-    description_fr: "1. Décrivez votre visuel en quelques mots\n2. L'IA génère plusieurs propositions\n3. Personnalisez et téléchargez",
-    description_en: "1. Describe your visual in a few words\n2. AI generates multiple proposals\n3. Customize and download"
+    title_fr: "Écrivez, iGPT le crée...",
+    title_en: "Write it, iGPT creates it...",
+    description_fr: "",
+    description_en: ""
   }
 };
 
@@ -122,7 +123,7 @@ export default function PresentationModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-4">
-                <Logo size="large" showText={false} />
+                <Logo size="default" showText={false} />
               </div>
               <p className="text-white/70 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
                 {t('header', 'description')}
@@ -166,52 +167,87 @@ export default function PresentationModal({ isOpen, onClose }) {
             </div>
 
             {/* Editor Section */}
-            <div className="relative rounded-2xl overflow-hidden mb-8 bg-gradient-to-br from-violet-900/30 to-purple-900/30 border border-violet-500/20">
-              {/* Background Image */}
-              {content.editor?.image_url && (
-                <div 
-                  className="absolute inset-0 opacity-10"
-                  style={{
-                    backgroundImage: `url(${content.editor.image_url})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
-              )}
+            <div className="relative rounded-2xl overflow-hidden mb-8 border border-violet-500/30">
+              {/* Background Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-900/60 via-purple-900/50 to-indigo-900/60" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-500/20 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent" />
+              
+              {/* Decorative Elements */}
+              <div className="absolute top-4 right-4 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl" />
+              <div className="absolute bottom-4 left-4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl" />
               
               <div className="relative p-6 md:p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500">
-                    <Wand2 className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-semibold text-white">
-                    {t('editor', 'title')}
-                  </h3>
-                </div>
-                
-                <p className="text-white/70 mb-6 max-w-2xl">
-                  {t('editor', 'description')}
-                </p>
-                
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {getItems('editor').map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-white/80 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-                      {item}
+                <div className="flex flex-col md:flex-row md:items-start gap-6">
+                  {/* Left: Content */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-3 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
+                        <Wand2 className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-xl md:text-2xl font-semibold text-white">
+                        {t('editor', 'title')}
+                      </h3>
                     </div>
-                  ))}
+                    
+                    <p className="text-white/70 mb-4 max-w-xl">
+                      {t('editor', 'description')}
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {getItems('editor').map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-white/80 text-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-violet-400 to-purple-400" />
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Team Update Notice */}
+                    <div className="inline-flex items-center gap-2 px-3 py-2 bg-violet-500/20 border border-violet-500/30 rounded-lg">
+                      <Sparkles className="h-4 w-4 text-violet-300" />
+                      <span className="text-violet-200 text-xs">
+                        {language === 'fr' 
+                          ? 'Notre équipe ajoute de nouvelles textures et illustrations régulièrement !' 
+                          : 'Our team adds new textures and illustrations regularly!'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Right: Illustration */}
+                  <div className="hidden md:flex items-center justify-center w-40">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-purple-500 rounded-2xl blur-xl opacity-30" />
+                      <div className="relative bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-4 backdrop-blur-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center">
+                            <Type className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
+                            <Square className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center">
+                            <Palette className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                            <Layers className="h-4 w-4 text-white" />
+                          </div>
+                        </div>
+                        <div className="mt-3 h-2 rounded-full bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Footer CTA */}
-            <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10">
-              <h3 className="text-lg md:text-xl font-medium text-white mb-2">
-                {t('footer', 'title')}
+            <div className="text-center py-6">
+              <h3 className="text-2xl md:text-3xl font-light">
+                <span className="bg-gradient-to-r from-violet-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
+                  {t('footer', 'title')}
+                </span>
               </h3>
-              <p className="text-white/60 text-sm whitespace-pre-line">
-                {t('footer', 'description')}
-              </p>
             </div>
           </div>
         </ScrollArea>
