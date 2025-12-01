@@ -60,6 +60,7 @@ const COLOR_PALETTES = [
 export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose, onAutoSend }) {
   const { language } = useLanguage();
   const lang = language || 'fr';
+  const [openSection, setOpenSection] = useState('styles'); // 'styles' or 'palettes'
 
   const handleStyleClick = (style) => {
     if (selectedStyle?.id === style.id) {
@@ -77,85 +78,128 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
   };
 
   return (
-    <div className="relative space-y-4 p-4 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-2xl">
+    <div className="relative space-y-2 p-4 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-2xl max-h-[70vh] overflow-y-auto">
       {/* Close button */}
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors z-10"
+          className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors z-10"
         >
           <X className="h-3.5 w-3.5 text-white" />
         </button>
       )}
-      {/* Styles */}
-      <div>
-        <p className="text-white/50 text-xs mb-3 font-medium">
-          {lang === 'fr' ? 'Style visuel' : 'Visual style'}
-        </p>
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-          {STYLES.map((style) => {
-            const IconComponent = style.icon;
-            return (
-              <button
-                key={style.id}
-                onClick={() => handleStyleClick(style)}
-                className={cn(
-                  "p-2 rounded-xl transition-all flex flex-col items-center gap-1.5 border",
-                  selectedStyle?.id === style.id
-                    ? "bg-gradient-to-br " + style.color + " border-white/30 shadow-lg"
-                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                )}
-              >
-                <div className={cn(
-                  "w-7 h-7 rounded-lg flex items-center justify-center",
-                  selectedStyle?.id === style.id ? "bg-white/20" : "bg-white/10"
-                )}>
-                  <IconComponent className={cn("h-4 w-4", selectedStyle?.id === style.id ? "text-white" : "text-white/60")} />
-                </div>
-                <span className={cn("text-[10px] font-medium", selectedStyle?.id === style.id ? "text-white" : "text-white/60")}>
-                  {style.name[lang]}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+
+      {/* Styles Accordion */}
+      <div className="border border-white/10 rounded-xl overflow-hidden">
+        <button
+          onClick={() => setOpenSection(openSection === 'styles' ? null : 'styles')}
+          className={cn(
+            "w-full flex items-center justify-between p-3 transition-colors",
+            openSection === 'styles' ? "bg-violet-500/20" : "bg-white/5 hover:bg-white/10"
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-violet-400" />
+            <span className="text-white/80 text-sm font-medium">
+              {lang === 'fr' ? 'Styles visuels' : 'Visual styles'}
+            </span>
+            {selectedStyle && (
+              <span className="text-xs bg-violet-500/30 text-violet-300 px-2 py-0.5 rounded-full">
+                {selectedStyle.name[lang]}
+              </span>
+            )}
+          </div>
+          <ChevronDown className={cn("h-4 w-4 text-white/50 transition-transform", openSection === 'styles' && "rotate-180")} />
+        </button>
+        {openSection === 'styles' && (
+          <div className="p-3 bg-black/20">
+            <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+              {STYLES.map((style) => {
+                const IconComponent = style.icon;
+                return (
+                  <button
+                    key={style.id}
+                    onClick={() => handleStyleClick(style)}
+                    className={cn(
+                      "p-2 rounded-xl transition-all flex flex-col items-center gap-1.5 border",
+                      selectedStyle?.id === style.id
+                        ? "bg-gradient-to-br " + style.color + " border-white/30 shadow-lg"
+                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-6 h-6 rounded-lg flex items-center justify-center",
+                      selectedStyle?.id === style.id ? "bg-white/20" : "bg-white/10"
+                    )}>
+                      <IconComponent className={cn("h-3.5 w-3.5", selectedStyle?.id === style.id ? "text-white" : "text-white/60")} />
+                    </div>
+                    <span className={cn("text-[9px] font-medium text-center leading-tight", selectedStyle?.id === style.id ? "text-white" : "text-white/60")}>
+                      {style.name[lang]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Color Palettes */}
-      <div>
-        <p className="text-white/50 text-xs mb-3 font-medium">
-          {lang === 'fr' ? 'Palette de couleurs' : 'Color palette'}
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-          {COLOR_PALETTES.map((palette) => (
-            <button
-              key={palette.id}
-              onClick={() => onPaletteChange(selectedPalette?.id === palette.id ? null : palette)}
-              className={cn(
-                "p-2 rounded-xl transition-all border group",
-                selectedPalette?.id === palette.id
-                  ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/20"
-                  : "border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20"
-              )}
-            >
-              <div className="flex gap-0.5 mb-1.5 h-5 rounded-lg overflow-hidden">
-                {palette.colors.map((color, idx) => (
-                  <div
-                    key={idx}
-                    className="flex-1 transition-transform group-hover:scale-y-110"
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-              <p className={cn(
-                "text-[10px] text-center font-medium",
-                selectedPalette?.id === palette.id ? "text-violet-300" : "text-white/50"
-              )}>
-                {palette.name[lang]}
-              </p>
-            </button>
-          ))}
-        </div>
+      {/* Color Palettes Accordion */}
+      <div className="border border-white/10 rounded-xl overflow-hidden">
+        <button
+          onClick={() => setOpenSection(openSection === 'palettes' ? null : 'palettes')}
+          className={cn(
+            "w-full flex items-center justify-between p-3 transition-colors",
+            openSection === 'palettes' ? "bg-violet-500/20" : "bg-white/5 hover:bg-white/10"
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <Palette className="h-4 w-4 text-pink-400" />
+            <span className="text-white/80 text-sm font-medium">
+              {lang === 'fr' ? 'Palettes de couleurs' : 'Color palettes'}
+            </span>
+            {selectedPalette && (
+              <span className="text-xs bg-pink-500/30 text-pink-300 px-2 py-0.5 rounded-full">
+                {selectedPalette.name[lang]}
+              </span>
+            )}
+          </div>
+          <ChevronDown className={cn("h-4 w-4 text-white/50 transition-transform", openSection === 'palettes' && "rotate-180")} />
+        </button>
+        {openSection === 'palettes' && (
+          <div className="p-3 bg-black/20">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {COLOR_PALETTES.map((palette) => (
+                <button
+                  key={palette.id}
+                  onClick={() => onPaletteChange(selectedPalette?.id === palette.id ? null : palette)}
+                  className={cn(
+                    "p-2 rounded-xl transition-all border group",
+                    selectedPalette?.id === palette.id
+                      ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/20"
+                      : "border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20"
+                  )}
+                >
+                  <div className="flex gap-0.5 mb-1.5 h-5 rounded-lg overflow-hidden">
+                    {palette.colors.map((color, idx) => (
+                      <div
+                        key={idx}
+                        className="flex-1 transition-transform group-hover:scale-y-110"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                  <p className={cn(
+                    "text-[10px] text-center font-medium",
+                    selectedPalette?.id === palette.id ? "text-violet-300" : "text-white/50"
+                  )}>
+                    {palette.name[lang]}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
