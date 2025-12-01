@@ -160,17 +160,29 @@ const STRIPE_PRODUCTS = {
   },
   packs: [
     { 
+      id: 'pack_50',
+      priceId: 'price_pack_50', // À configurer
+      credits: 50,
+      price: 5.90
+    },
+    { 
+      id: 'pack_100',
+      priceId: 'price_pack_100', // À configurer
+      credits: 100,
+      price: 9.90
+    },
+    { 
       id: 'pack_250',
       priceId: 'price_1SZIvEHfyAhC7kY5PJgk7nME', // prod_TWLcf4UtzqMQe4
       credits: 250,
-      price: 19.90
+      price: 19.90,
+      is_popular: true
     },
     { 
       id: 'pack_500',
       priceId: 'price_1SZIvjHfyAhC7kY5irsRoqBB', // prod_TWLc6dyHxZtKJS
       credits: 500,
-      price: 29.90,
-      is_popular: true
+      price: 29.90
     }
   ]
 };
@@ -399,7 +411,7 @@ export default function Pricing() {
               <Sparkles className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Recharges de crédits' : 'Credit packs'}
             </h2>
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto">
+            <div className="grid gap-4 grid-cols-2 md:grid-cols-4 max-w-4xl mx-auto">
               {STRIPE_PRODUCTS.packs.map((pack) => (
                 <div key={pack.id} className={cn(
                   "relative rounded-2xl p-6 transition-all duration-300 hover:scale-105",
