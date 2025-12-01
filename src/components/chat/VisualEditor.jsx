@@ -191,6 +191,18 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         setAdminTextures(assets.filter(a => a.type === 'texture'));
         setAdminIllustrations(assets.filter(a => a.type === 'illustration'));
         
+        // Load shared library from admin users
+        const adminUsers = await base44.entities.User.filter({ role: 'admin' });
+        const allSharedItems = [];
+        adminUsers.forEach(adminUser => {
+          if (adminUser.editor_library && Array.isArray(adminUser.editor_library)) {
+            adminUser.editor_library.forEach(item => {
+              allSharedItems.push({ ...item, sharedBy: adminUser.full_name || 'Admin' });
+            });
+          }
+        });
+        setSharedLibrary(allSharedItems);
+        
         // Load saved layers from visual
         if (visual.editor_layers && Array.isArray(visual.editor_layers)) {
           setLayers(visual.editor_layers);
