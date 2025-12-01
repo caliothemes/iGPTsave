@@ -37,9 +37,24 @@ const COLOR_PALETTES = [
   { id: 'tropical', name: { fr: 'Tropical', en: 'Tropical' }, colors: ['#FF6F61', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'] },
 ];
 
-export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose }) {
+export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose, onAutoSend }) {
   const { language } = useLanguage();
   const lang = language || 'fr';
+
+  const handleStyleClick = (style) => {
+    if (selectedStyle?.id === style.id) {
+      onStyleChange(null);
+    } else {
+      onStyleChange(style);
+      // Auto-send a prompt with this style
+      if (onAutoSend) {
+        const prompt = lang === 'fr' 
+          ? `Crée un visuel avec un style ${style.name.fr.toLowerCase()}`
+          : `Create a visual with a ${style.name.en.toLowerCase()} style`;
+        onAutoSend(prompt);
+      }
+    }
+  };
 
   return (
     <div className="relative space-y-4 p-4 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-2xl">
@@ -63,7 +78,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
             return (
               <button
                 key={style.id}
-                onClick={() => onStyleChange(selectedStyle?.id === style.id ? null : style)}
+                onClick={() => handleStyleClick(style)}
                 className={cn(
                   "p-2 rounded-xl transition-all flex flex-col items-center gap-1.5 border",
                   selectedStyle?.id === style.id
