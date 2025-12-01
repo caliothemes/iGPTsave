@@ -140,6 +140,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [user, setUser] = useState(null);
   const [adminTextures, setAdminTextures] = useState([]);
   const [adminIllustrations, setAdminIllustrations] = useState([]);
+  const [adminGradients, setAdminGradients] = useState([]);
   const [sharedLibrary, setSharedLibrary] = useState([]);
   const [saving, setSaving] = useState(false);
   const [bgType, setBgType] = useState('none'); // none, solid, gradient
