@@ -1073,16 +1073,18 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
       // Update the visual with new image AND keep layers for future editing
+      // Also store original image URL so we can always go back
       if (visual.id) {
         await base44.entities.Visual.update(visual.id, {
           image_url: file_url,
+          original_image_url: originalImageUrl, // Keep original for re-editing
           editor_layers: layers // Keep layers for re-editing
         });
       }
       
       setSaving(false);
-      // Pass the new URL and layers back so the parent can update immediately
-      onSave?.(file_url, layers);
+      // Pass the new URL, layers, and original back so the parent can update immediately
+      onSave?.(file_url, layers, originalImageUrl);
     } catch (e) {
       console.error(e);
       setSaving(false);
