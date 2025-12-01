@@ -14,7 +14,7 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   Brush, FolderOpen, Plus, Save, Palette, Eraser,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw
+  PaintBucket, RotateCw, Blend
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import { cn } from "@/lib/utils";
