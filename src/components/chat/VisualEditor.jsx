@@ -820,10 +820,12 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
             }
           } else if (layer.type === 'text') {
-            const fontStyle = `${layer.italic ? 'italic ' : ''}${layer.bold ? 'bold ' : ''}${layer.fontSize}px ${layer.fontFamily}`;
+            const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
+            const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
             exportCtx.font = fontStyle;
             exportCtx.fillStyle = layer.color;
             exportCtx.textAlign = layer.align || 'left';
+            exportCtx.letterSpacing = `${layer.letterSpacing || 0}px`;
             if (layer.stroke) {
               exportCtx.strokeStyle = layer.strokeColor || '#000000';
               exportCtx.lineWidth = layer.strokeWidth || 2;
