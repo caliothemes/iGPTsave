@@ -39,6 +39,7 @@ const COLOR_PALETTES = [
 
 export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose }) {
   const { language } = useLanguage();
+  const lang = language || 'fr';
 
   return (
     <div className="relative space-y-4 p-4 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-2xl">
