@@ -12,6 +12,20 @@ const STRIPE_PRODUCTS = {
   subscriptions: {
     monthly: [
       { 
+        id: 'free',
+        priceId: null, // Gratuit, pas de paiement
+        name: { fr: 'GRATUIT', en: 'FREE' },
+        price: 0,
+        credits: 25,
+        icon: 'MessageSquare',
+        gradient: 'from-slate-600 to-gray-600',
+        isFree: true,
+        features: { 
+          fr: ['25 messages à l\'inscription', 'Visuels avec filigrane', 'Support communauté'],
+          en: ['25 messages on signup', 'Visuals with watermark', 'Community support']
+        }
+      },
+      { 
         id: 'starter_monthly',
         priceId: 'price_1SZIx2HfyAhC7kY5qlFmFIP8', // prod_TWLeCLUbXfQ4KF
         name: { fr: 'STARTER', en: 'STARTER' },
@@ -66,6 +80,21 @@ const STRIPE_PRODUCTS = {
       }
     ],
     yearly: [
+      { 
+        id: 'free',
+        priceId: null,
+        name: { fr: 'GRATUIT', en: 'FREE' },
+        price: 0,
+        credits: 25,
+        creditsPerMonth: 0,
+        icon: 'MessageSquare',
+        gradient: 'from-slate-600 to-gray-600',
+        isFree: true,
+        features: { 
+          fr: ['25 messages à l\'inscription', 'Visuels avec filigrane', 'Support communauté'],
+          en: ['25 messages on signup', 'Visuals with watermark', 'Community support']
+        }
+      },
       { 
         id: 'starter_yearly',
         priceId: 'price_1SZIyTHfyAhC7kY5BAIvAIyy', // prod_TWLfJW2UaDTeo5
@@ -297,16 +326,32 @@ export default function Pricing() {
 
                     {/* Messages */}
                     <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
-                      <span className="text-white font-medium">
-                        {billingCycle === 'yearly' ? sub.creditsPerMonth : sub.credits}
-                      </span>
-                      <span className="text-white/60 text-sm"> messages/{language === 'fr' ? 'mois' : 'mo'}</span>
+                      {sub.isFree ? (
+                        <>
+                          <span className="text-white font-medium">{sub.credits}</span>
+                          <span className="text-white/60 text-sm"> {language === 'fr' ? 'messages offerts' : 'free messages'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-white font-medium">
+                            {billingCycle === 'yearly' ? sub.creditsPerMonth : sub.credits}
+                          </span>
+                          <span className="text-white/60 text-sm"> messages/{language === 'fr' ? 'mois' : 'mo'}</span>
+                        </>
+                      )}
                     </div>
 
                     {/* Cost per message */}
-                    <p className="text-xs text-emerald-400 mb-3 text-center">
-                      {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/message
-                    </p>
+                    {!sub.isFree && (
+                      <p className="text-xs text-emerald-400 mb-3 text-center">
+                        {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/message
+                      </p>
+                    )}
+                    {sub.isFree && (
+                      <p className="text-xs text-white/40 mb-3 text-center">
+                        {language === 'fr' ? 'Aucun paiement requis' : 'No payment required'}
+                      </p>
+                    )}
 
                     {/* Features */}
                     <ul className="space-y-1.5 mb-4 flex-1">
@@ -319,16 +364,29 @@ export default function Pricing() {
                     </ul>
 
                     {/* Button */}
-                    <Button 
-                      onClick={() => handlePurchase(sub.priceId, user)} 
-                      disabled={purchasing === sub.priceId}
-                      size="sm"
-                      className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", sub.gradient)}
-                    >
-                      {purchasing === sub.priceId
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : (language === 'fr' ? 'Souscrire' : 'Subscribe')}
-                    </Button>
+                    {sub.isFree ? (
+                      <Button 
+                        onClick={() => !user && base44.auth.redirectToLogin(createPageUrl('Pricing'))}
+                        size="sm"
+                        className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", sub.gradient)}
+                        disabled={!!user}
+                      >
+                        {user 
+                          ? (language === 'fr' ? 'Actuel' : 'Current')
+                          : (language === 'fr' ? 'S\'inscrire' : 'Sign up')}
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handlePurchase(sub.priceId, user)} 
+                        disabled={purchasing === sub.priceId}
+                        size="sm"
+                        className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", sub.gradient)}
+                      >
+                        {purchasing === sub.priceId
+                          ? <Loader2 className="h-4 w-4 animate-spin" />
+                          : (language === 'fr' ? 'Souscrire' : 'Subscribe')}
+                      </Button>
+                    )}
                   </div>
                 );
               })}
