@@ -1445,7 +1445,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         <div className="bg-white/5 rounded-xl p-3 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-white/60 text-xs flex items-center gap-2">
-              {currentLayer.type === 'text' ? <Type className="h-3 w-3" /> : currentLayer.type === 'image' ? <ImagePlus className="h-3 w-3" /> : <Square className="h-3 w-3" />}
+              {currentLayer.type === 'text' && <Type className="h-3 w-3" />}
+              {currentLayer.type === 'image' && <ImagePlus className="h-3 w-3" />}
+              {currentLayer.type === 'shape' && <Square className="h-3 w-3" />}
+              {currentLayer.type === 'background' && <PaintBucket className="h-3 w-3" />}
               {language === 'fr' ? 'Propriétés' : 'Properties'}
             </span>
             <div className="flex gap-1">
