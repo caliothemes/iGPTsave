@@ -1153,7 +1153,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               </>
             ) : (
               <div className="text-center py-8">
-                <Blend className="h-8 w-8 text-white/20 mx-auto mb-2" />
+                <GradientIcon className="h-8 w-8 opacity-20 mx-auto mb-2" />
                 <p className="text-white/40 text-xs">{language === 'fr' ? 'Aucun dégradé PRO disponible' : 'No PRO gradients available'}</p>
                 <p className="text-white/30 text-xs mt-1">{language === 'fr' ? 'Les admins peuvent en ajouter via Assets' : 'Admins can add them via Assets'}</p>
               </div>
