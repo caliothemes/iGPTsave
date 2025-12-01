@@ -502,6 +502,66 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           ctx.fill();
           if (layer.stroke) { ctx.strokeStyle = layer.strokeColor || '#000000'; ctx.lineWidth = layer.strokeWidth || 2; ctx.stroke(); }
         } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
+          // Apply effects for images
+          ctx.save();
+          
+          // Halo effect (drawn first, behind the image)
+          if (layer.halo) {
+            ctx.shadowColor = layer.haloColor || '#FFD700';
+            ctx.shadowBlur = layer.haloSize || 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            // Draw a rect to create the halo
+            ctx.fillStyle = layer.haloColor || '#FFD700';
+            ctx.globalAlpha = 0.3;
+            if (layer.borderRadius) {
+              ctx.beginPath();
+              ctx.roundRect(layer.x - 2, layer.y - 2, layer.width + 4, layer.height + 4, layer.borderRadius);
+              ctx.fill();
+            } else {
+              ctx.fillRect(layer.x - 2, layer.y - 2, layer.width + 4, layer.height + 4);
+            }
+            ctx.globalAlpha = layer.opacity / 100;
+          }
+          
+          // Glow effect
+          if (layer.glow) {
+            ctx.shadowColor = layer.glowColor || '#ffffff';
+            ctx.shadowBlur = layer.glowSize || 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+          }
+          
+          // Shadow effect
+          if (layer.shadow && !layer.glow && !layer.halo) {
+            ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = layer.shadowBlur || 10;
+            ctx.shadowOffsetX = 5;
+            ctx.shadowOffsetY = 5;
+          }
+          
+          ctx.restore();
+          ctx.save();
+          ctx.globalAlpha = layer.opacity / 100;
+          
+          // Apply border radius clipping if needed
+          if (layer.borderRadius && layer.borderRadius > 0) {
+            ctx.beginPath();
+            ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+            ctx.clip();
+          }
+          
+          // Re-apply shadow/glow after clip
+          if (layer.glow) {
+            ctx.shadowColor = layer.glowColor || '#ffffff';
+            ctx.shadowBlur = layer.glowSize || 10;
+          } else if (layer.shadow) {
+            ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = layer.shadowBlur || 10;
+            ctx.shadowOffsetX = 5;
+            ctx.shadowOffsetY = 5;
+          }
+          
           // Apply color tint using a temporary canvas
           if (layer.tintColor && layer.tintOpacity) {
             const tempCanvas = document.createElement('canvas');
@@ -522,6 +582,23 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             ctx.drawImage(tempCanvas, layer.x, layer.y);
           } else {
             ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+          }
+          
+          ctx.restore();
+          
+          // Draw border on top
+          if (layer.stroke) {
+            ctx.save();
+            ctx.strokeStyle = layer.strokeColor || '#000000';
+            ctx.lineWidth = layer.strokeWidth || 2;
+            if (layer.borderRadius && layer.borderRadius > 0) {
+              ctx.beginPath();
+              ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+              ctx.stroke();
+            } else {
+              ctx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+            }
+            ctx.restore();
           }
         } else if (layer.type === 'background') {
           if (layer.bgType === 'solid') {
@@ -1430,6 +1507,73 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
                   </div>
                 </div>
+                
+                {/* Effects */}
+                <div className="pt-2 border-t border-white/10 space-y-2">
+                  <p className="text-white/40 text-xs">{language === 'fr' ? 'Effets:' : 'Effects:'}</p>
+                  <div className="grid grid-cols-4 gap-1">
+                    <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                      {language === 'fr' ? 'Bordure' : 'Border'}
+                    </button>
+                    <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                      {language === 'fr' ? 'Ombre' : 'Shadow'}
+                    </button>
+                    <button onClick={() => updateLayer(selectedLayer, { glow: !currentLayer.glow })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                      {language === 'fr' ? 'Lueur' : 'Glow'}
+                    </button>
+                    <button onClick={() => updateLayer(selectedLayer, { halo: !currentLayer.halo })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                      Halo
+                    </button>
+                  </div>
+                  
+                  {/* Border options */}
+                  {currentLayer.stroke && (
+                    <div className="space-y-2">
+                      <div className="flex gap-2 items-center">
+                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Bordure:' : 'Border:'}</span>
+                        <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                        <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
+                        <span className="text-white/40 text-xs w-6">{currentLayer.strokeWidth || 2}</span>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Radius:' : 'Radius:'}</span>
+                        <Slider value={[currentLayer.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={100} step={1} className="flex-1" />
+                        <span className="text-white/40 text-xs w-6">{currentLayer.borderRadius || 0}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Shadow options */}
+                  {currentLayer.shadow && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Ombre:' : 'Shadow:'}</span>
+                      <input type="color" value={currentLayer.shadowColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { shadowColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                      <Slider value={[currentLayer.shadowBlur || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowBlur: v })} min={5} max={50} step={1} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.shadowBlur || 10}</span>
+                    </div>
+                  )}
+                  
+                  {/* Glow options */}
+                  {currentLayer.glow && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Lueur:' : 'Glow:'}</span>
+                      <input type="color" value={currentLayer.glowColor || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { glowColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                      <Slider value={[currentLayer.glowSize || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { glowSize: v })} min={5} max={40} step={1} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.glowSize || 10}</span>
+                    </div>
+                  )}
+                  
+                  {/* Halo options */}
+                  {currentLayer.halo && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">Halo:</span>
+                      <input type="color" value={currentLayer.haloColor || '#FFD700'} onChange={(e) => updateLayer(selectedLayer, { haloColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                      <Slider value={[currentLayer.haloSize || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { haloSize: v })} min={5} max={50} step={1} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.haloSize || 15}</span>
+                    </div>
+                  )}
+                </div>
+                
                 {/* Remove Background Button */}
                 <Button
                   size="sm"
