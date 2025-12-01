@@ -1084,7 +1084,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                               <div className="grid grid-cols-5 gap-1.5">
                                 {sharedLibrary.filter(item => item.type === 'texture').map((item, idx) => (
                                   <div key={`shared-${idx}`} className="relative group">
-                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
+                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
                                       className="w-full aspect-square rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors">
                                       <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                                     </button>
@@ -1104,7 +1104,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                               <div className="grid grid-cols-5 gap-1.5">
                                 {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
                                   <div key={idx} className="relative group">
-                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height)}
+                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
                                       className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
                                       <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
                                     </button>
