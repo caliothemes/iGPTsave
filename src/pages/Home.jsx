@@ -306,6 +306,15 @@ export default function Home() {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Check guest message limit
+    if (!isAuthenticated) {
+      if (guestMessageCount >= GUEST_MESSAGE_LIMIT) {
+        setShowLoginPrompt(true);
+        return;
+      }
+      setGuestMessageCount(prev => prev + 1);
+    }
+
     const userMessage = input.trim();
     setInput('');
     const newMessages = [...messages, { role: 'user', content: userMessage }];
