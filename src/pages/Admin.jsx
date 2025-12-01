@@ -115,9 +115,6 @@ export default function Admin() {
           return new Date(item.created_date || item.updated_date) > fiveMinAgo && !adminEmailsSet.has(userEmail);
         }).length;
 
-        // Get admin emails to exclude from stats
-        const adminEmails = new Set(users.filter(u => u.role === 'admin').map(u => u.email));
-
         // Count unique users by period (excluding admins)
         const getUniqueUsers = (items, afterDate) => {
           const uniqueUsers = new Set();
