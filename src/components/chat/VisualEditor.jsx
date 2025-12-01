@@ -634,8 +634,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         }
       });
     };
-    img.src = visual.image_url;
-  }, [imageLoaded, layers, selectedLayer, visual.image_url, loadedImages, bgType, bgColor, bgGradient]);
+    img.src = originalImageUrl;
+  }, [imageLoaded, layers, selectedLayer, originalImageUrl, loadedImages, bgType, bgColor, bgGradient]);
 
   const [helpMessage, setHelpMessage] = useState(null);
 
