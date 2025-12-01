@@ -290,7 +290,7 @@ export default function Pricing() {
               <Crown className="h-5 w-5 text-amber-400" />
               {language === 'fr' ? 'Abonnements' : 'Subscriptions'}
             </h2>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
               {subscriptions.map((sub) => {
                 const IconComp = ICONS[sub.icon] || MessageSquare;
                 const savings = getSavings(sub);
