@@ -12,7 +12,7 @@ import {
   AlignLeft, AlignCenter, AlignRight, Wand2,
   Layers, Sparkles, Triangle, Star, Heart, Hexagon,
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
-  FolderOpen, Plus, Save, Palette, Eraser,
+  FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
   PaintBucket, RotateCw, Upload, Scissors
 } from 'lucide-react';
