@@ -105,11 +105,15 @@ export default function Admin() {
         const yearAgo = new Date(now);
         yearAgo.setFullYear(yearAgo.getFullYear() - 1);
 
-        // Simulate current visitors based on recent activity (last 5 minutes)
+        // Get admin emails to exclude
+        const adminEmailsSet = new Set(users.filter(u => u.role === 'admin').map(u => u.email));
+
+        // Simulate current visitors based on recent activity (last 5 minutes), excluding admins
         const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
-        const recentActivity = [...allVisuals, ...allConversations].filter(item => 
-          new Date(item.created_date || item.updated_date) > fiveMinAgo
-        ).length;
+        const recentActivity = [...allVisuals, ...allConversations].filter(item => {
+          const userEmail = item.user_email || item.created_by;
+          return new Date(item.created_date || item.updated_date) > fiveMinAgo && !adminEmailsSet.has(userEmail);
+        }).length;
 
         // Get admin emails to exclude from stats
         const adminEmails = new Set(users.filter(u => u.role === 'admin').map(u => u.email));
