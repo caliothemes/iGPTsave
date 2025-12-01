@@ -1159,13 +1159,29 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             <div className="space-y-2">
               <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white text-sm h-8" />
               <div className="flex gap-2 items-center">
+                <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Taille' : 'Size'}</span>
                 <div className="flex-1">
                   <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={120} step={1} />
                 </div>
                 <span className="text-white/50 text-xs w-12">{currentLayer.fontSize}px</span>
               </div>
+              {/* Font Weight */}
+              <div className="flex gap-2 items-center">
+                <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Poids' : 'Weight'}</span>
+                <div className="flex-1">
+                  <Slider value={[currentLayer.fontWeight || 400]} onValueChange={([v]) => updateLayer(selectedLayer, { fontWeight: v, bold: v >= 600 })} min={100} max={900} step={100} />
+                </div>
+                <span className="text-white/50 text-xs w-12">{currentLayer.fontWeight || 400}</span>
+              </div>
+              {/* Letter Spacing */}
+              <div className="flex gap-2 items-center">
+                <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Espac.' : 'Space'}</span>
+                <div className="flex-1">
+                  <Slider value={[currentLayer.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} />
+                </div>
+                <span className="text-white/50 text-xs w-12">{currentLayer.letterSpacing || 0}px</span>
+              </div>
               <div className="flex gap-1 flex-wrap">
-                <button onClick={() => updateLayer(selectedLayer, { bold: !currentLayer.bold })} className={cn("p-1.5 rounded text-sm", currentLayer.bold ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Bold className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("p-1.5 rounded text-sm", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Italic className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-1.5 rounded", currentLayer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignLeft className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { align: 'center' })} className={cn("p-1.5 rounded", currentLayer.align === 'center' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignCenter className="h-3 w-3" /></button>
