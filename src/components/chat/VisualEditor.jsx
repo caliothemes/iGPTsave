@@ -775,14 +775,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           height: finalHeight,
           opacity: isTexture ? 50 : 100
         };
-        // Insert textures at the beginning (behind other layers)
-        if (isTexture) {
-          setLayers([newLayer, ...layers]);
-          setSelectedLayer(0);
-        } else {
-          setLayers([...layers, newLayer]);
-          setSelectedLayer(layers.length);
-        }
+        // Always add at the end (on top)
+        setLayers([...layers, newLayer]);
+        setSelectedLayer(layers.length);
         setActiveTab('layers');
       };
 
@@ -797,9 +792,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       height: canvasSize.height,
       opacity: 100
     };
-    // Insert backgrounds at the very beginning
-    setLayers([newLayer, ...layers]);
-    setSelectedLayer(0);
+    // Always add at the end (on top)
+    setLayers([...layers, newLayer]);
+    setSelectedLayer(layers.length);
     setActiveTab('layers');
     showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
   };
@@ -815,9 +810,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       height: canvasSize.height,
       opacity: 100
     };
-    // Insert backgrounds at the very beginning
-    setLayers([newLayer, ...layers]);
-    setSelectedLayer(0);
+    // Always add at the end (on top)
+    setLayers([...layers, newLayer]);
+    setSelectedLayer(layers.length);
     setActiveTab('layers');
     showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
   };
@@ -842,9 +837,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       glowSize: 10,
       isBackgroundShape: true // Mark as background shape
     };
-    // Insert at the very beginning (behind all layers including backgrounds)
-    setLayers([newLayer, ...layers]);
-    setSelectedLayer(0);
+    // Always add at the end (on top)
+    setLayers([...layers, newLayer]);
+    setSelectedLayer(layers.length);
     setActiveTab('layers');
     showHelp(language === 'fr' ? '💡 Forme ajoutée en fond. Ajustez la taille et couleur.' : '💡 Shape added as background. Adjust size and color.');
   };
