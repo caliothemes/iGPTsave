@@ -63,7 +63,9 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
           "inline-block rounded-2xl px-4 py-3",
           isUser 
             ? "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/10 text-white shadow-lg" 
-            : "bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 text-white/90 shadow-lg shadow-violet-500/5"
+            : isWarning
+              ? "bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-violet-500/10 backdrop-blur-md border border-amber-500/30 text-white/90 shadow-lg shadow-amber-500/10"
+              : "bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 text-white/90 shadow-lg shadow-violet-500/5"
         )}>
           {isStreaming ? (
             <TypingIndicator />
