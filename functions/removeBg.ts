@@ -22,35 +22,15 @@ Deno.serve(async (req) => {
 
     console.log('Attempting to remove background from:', image_url);
 
-    // First, fetch the image to get its binary data
-    let imageResponse;
-    try {
-      imageResponse = await fetch(image_url);
-    } catch (fetchError) {
-      console.error('Fetch error:', fetchError.message);
-      return Response.json({ error: 'Cannot fetch image', details: fetchError.message }, { status: 400 });
-    }
-    
-    if (!imageResponse.ok) {
-      console.error('Failed to fetch image:', imageResponse.status, imageResponse.statusText);
-      return Response.json({ error: 'Failed to fetch source image', details: `Status: ${imageResponse.status}` }, { status: 400 });
-    }
-    
-    const imageArrayBuffer = await imageResponse.arrayBuffer();
-    const imageUint8Array = new Uint8Array(imageArrayBuffer);
-    console.log('Image fetched, size:', imageUint8Array.length);
-
-    // Call Remove.bg API with base64
-    const base64Image = btoa(String.fromCharCode(...imageUint8Array));
-    
+    // Call Remove.bg API directly with URL
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
       headers: {
         'X-Api-Key': apiKey,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams({
-        image_file_b64: base64Image,
+      body: JSON.stringify({
+        image_url: image_url,
         size: 'auto',
         format: 'png',
       }),
