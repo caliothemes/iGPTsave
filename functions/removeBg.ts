@@ -22,18 +22,27 @@ Deno.serve(async (req) => {
 
     console.log('Attempting to remove background from:', image_url);
 
-    // Call Remove.bg API directly with URL
+    // Fetch the image first
+    const imageResponse = await fetch(image_url);
+    if (!imageResponse.ok) {
+      return Response.json({ error: 'Failed to fetch image', details: `HTTP ${imageResponse.status}` }, { status: 400 });
+    }
+    
+    const imageBlob = await imageResponse.blob();
+    console.log('Image fetched, size:', imageBlob.size, 'type:', imageBlob.type);
+
+    // Create form data with the image file
+    const formData = new FormData();
+    formData.append('image_file', imageBlob, 'image.png');
+    formData.append('size', 'auto');
+
+    // Call Remove.bg API with form data
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
       headers: {
         'X-Api-Key': apiKey,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        image_url: image_url,
-        size: 'auto',
-        format: 'png',
-      }),
+      body: formData,
     });
 
     console.log('Remove.bg response status:', response.status);
