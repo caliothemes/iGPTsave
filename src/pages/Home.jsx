@@ -990,33 +990,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         </main>
       </div>
 
-      {/* Style Tip Toast with arrow pointing to + */}
-                {showStyleTip && (
-                  <div 
-                    className={cn(
-                      "fixed bottom-20 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300",
-                      sidebarOpen ? "md:left-[calc(50%+128px)] left-1/2" : "left-1/2"
-                    )}
-                    style={{ transform: 'translateX(-50%)' }}
-                  >
-                    <div 
-                      className="relative flex items-center gap-2 px-4 py-2 bg-violet-900/95 border border-violet-500/30 rounded-xl shadow-lg cursor-pointer hover:bg-violet-800/95 transition-colors"
-                      onClick={() => {
-                        setShowStyleTip(false);
-                        localStorage.setItem('hideStyleTip', 'true');
-                      }}
-                    >
-                      <Palette className="h-4 w-4 text-violet-300" />
-                      <p className="text-violet-100 text-sm">
-                        {language === 'fr' 
-                          ? "Cliquez sur + pour appliquer un style ou des couleurs" 
-                          : "Click + to apply a style or colors"}
-                      </p>
-                      {/* Arrow pointing down to + button */}
-                      <div className="absolute -bottom-2 left-6 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-violet-900/95" />
-                    </div>
-                  </div>
-                )}
+
 
                 {/* Fixed Input Area at Bottom */}
                 <div className={cn(
