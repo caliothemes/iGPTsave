@@ -43,8 +43,8 @@ Deno.serve(async (req) => {
       }, { status: 500 });
     }
 
-    // Call noBG.me API
-    const response = await fetch('https://nobg.me/api/removeBackground', {
+    // Call noBG API
+    const response = await fetch('https://clearbg-qej8.onrender.com/api/remove-bg', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
