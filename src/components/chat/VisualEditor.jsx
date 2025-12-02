@@ -1283,10 +1283,16 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               onClick={async () => {
                 setRemovingBg(true);
                 try {
-                  const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
+                  // Use AI-based background removal (free)
+                  const response = await base44.functions.invoke('removeBgAI', { image_url: originalImageUrl });
                   if (response.data?.success && response.data?.image_url) {
+                    // Find and update the base image layer
+                    const baseLayerIdx = layers.findIndex(l => l.isBaseImage);
+                    if (baseLayerIdx !== -1) {
+                      updateLayer(baseLayerIdx, { imageUrl: response.data.image_url });
+                    }
                     setOriginalImageUrl(response.data.image_url);
-                    showHelp(language === 'fr' ? '✅ Fond supprimé avec succès !' : '✅ Background removed successfully!');
+                    showHelp(language === 'fr' ? '✅ Fond supprimé ! (1 crédit utilisé)' : '✅ Background removed! (1 credit used)');
                   } else {
                     showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
                   }
@@ -1301,7 +1307,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             >
               <div className="flex items-center">
                 {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
-                {language === 'fr' ? 'Supprimer le fond de l\'image' : 'Remove image background'}
+                {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
               </div>
               <span className="text-[10px] text-white/70 font-normal leading-relaxed text-center">
                 {language === 'fr' 
@@ -2057,19 +2063,20 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   onClick={async () => {
                     setRemovingBgFromLayer(true);
                     try {
-                      const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
-                      console.log('RemoveBg response:', response);
-                      if (response.data?.image_url) {
+                      // Use AI-based background removal (free)
+                      const response = await base44.functions.invoke('removeBgAI', { image_url: currentLayer.imageUrl });
+                      console.log('RemoveBgAI response:', response);
+                      if (response.data?.success && response.data?.image_url) {
                         updateLayer(selectedLayer, { imageUrl: response.data.image_url });
-                        showHelp(language === 'fr' ? '✨ Fond supprimé avec succès !' : '✨ Background removed successfully!');
+                        showHelp(language === 'fr' ? '✨ Fond supprimé ! (1 crédit)' : '✨ Background removed! (1 credit)');
                       } else if (response.data?.error) {
-                        console.error('RemoveBg error:', response.data.error, response.data.details);
-                        showHelp(language === 'fr' ? `❌ ${response.data.details || response.data.error}` : `❌ ${response.data.details || response.data.error}`);
+                        console.error('RemoveBgAI error:', response.data.error);
+                        showHelp(language === 'fr' ? `❌ ${response.data.error}` : `❌ ${response.data.error}`);
                       } else {
                         showHelp(language === 'fr' ? '❌ Réponse inattendue du serveur' : '❌ Unexpected server response');
                       }
                     } catch (err) {
-                      console.error('RemoveBg catch error:', err);
+                      console.error('RemoveBgAI catch error:', err);
                       const errorMessage = err?.response?.data?.error || err?.message || 'Unknown error';
                       showHelp(language === 'fr' ? `❌ Erreur: ${errorMessage}` : `❌ Error: ${errorMessage}`);
                     }
@@ -2079,7 +2086,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
                 >
                   {removingBgFromLayer ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
-                  {language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+                  {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
                 </Button>
               </div>
             )}
