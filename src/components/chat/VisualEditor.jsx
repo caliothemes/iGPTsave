@@ -855,7 +855,14 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     gradients: false,
     proGradients: false,
     textures: false,
-    shapes: false
+    shapes: false,
+    texturesTab: false,
+    sharedTextures: false,
+    myTextures: false,
+    adminIllustrations: false,
+    sharedIllustrations: false,
+    myIllustrations: false,
+    generateIllustrations: false
   });
   
   const toggleBgAccordion = (key) => {
@@ -1450,22 +1457,22 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               </div>
             )}
 
-            {/* Accordion: Textures */}
+            {/* Accordion: Textures PRO */}
             {adminTexturesWithImage.length > 0 && (
-              <div className="border border-white/10 rounded-lg overflow-hidden">
-                <button onClick={() => toggleBgAccordion('textures')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
-                  <span className="text-white/70 text-xs flex items-center gap-2">
-                    <TextureIcon className="h-3 w-3 text-violet-400" />
-                    {language === 'fr' ? 'Textures' : 'Textures'}
+              <div className="border border-amber-500/30 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('textures')} className="w-full px-3 py-2 flex items-center justify-between bg-amber-500/10 hover:bg-amber-500/20 transition-colors">
+                  <span className="text-amber-300 text-xs flex items-center gap-2">
+                    <Sparkles className="h-3 w-3" />
+                    {language === 'fr' ? 'Textures PRO' : 'PRO Textures'}
                   </span>
-                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.textures && "rotate-180")} />
+                  <ChevronDown className={cn("h-4 w-4 text-amber-400/60 transition-transform", bgAccordion.textures && "rotate-180")} />
                 </button>
                 {bgAccordion.textures && (
                   <div className="p-2">
                     <div className="grid grid-cols-5 gap-1">
                       {adminTexturesWithImage.map(texture => (
                         <button key={texture.id} onClick={() => addBackgroundImageLayer(texture.preview_url)}
-                          className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
+                          className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
                           <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
                         </button>
                       ))}
@@ -1521,75 +1528,100 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </div>
           </TabsContent>
 
-          <TabsContent value="textures" className="mt-0 space-y-3">
-                          {/* Textures statiques (admin) */}
-                          {adminTexturesWithImage.length > 0 && (
-                            <>
-                              <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Textures disponibles:' : 'Available textures:'}</p>
-                              <div className="grid grid-cols-5 gap-1.5">
-                                {adminTexturesWithImage.map(texture => (
-                                  <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height, true)}
-                                    className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
-                                    <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                      <span className="text-white text-xs text-center px-1">{texture.name[language]}</span>
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            </>
-                          )}
+          <TabsContent value="textures" className="mt-0 space-y-2">
+            {/* Générateur de texture IA - en premier */}
+            <Button onClick={() => setShowTextureGenerator(true)} size="default" className="w-full py-3 bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg shadow-violet-500/30 border border-violet-400/30">
+              <Wand2 className="h-5 w-5 mr-2 animate-pulse" />{language === 'fr' ? '✨ Générer texture IA' : '✨ Generate AI texture'}
+            </Button>
 
-                          {/* Générateur de texture IA */}
-                          <div className="pt-2 border-t border-white/10">
-                            <Button onClick={() => setShowTextureGenerator(true)} size="default" className="w-full py-3 bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg shadow-violet-500/30 border border-violet-400/30">
-                              <Wand2 className="h-5 w-5 mr-2 animate-pulse" />{language === 'fr' ? '✨ Générer texture IA' : '✨ Generate AI texture'}
-                            </Button>
+            {/* Accordion: Textures PRO (admin) */}
+            {adminTexturesWithImage.length > 0 && (
+              <div className="border border-amber-500/30 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('texturesTab')} className="w-full px-3 py-2 flex items-center justify-between bg-amber-500/10 hover:bg-amber-500/20 transition-colors">
+                  <span className="text-amber-300 text-xs flex items-center gap-2">
+                    <Sparkles className="h-3 w-3" />
+                    {language === 'fr' ? 'Textures PRO disponibles' : 'Available PRO Textures'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-amber-400/60 transition-transform", bgAccordion.texturesTab && "rotate-180")} />
+                </button>
+                {bgAccordion.texturesTab && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {adminTexturesWithImage.map(texture => (
+                        <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height, true)}
+                          className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
+                          <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-xs text-center px-1">{texture.name[language]}</span>
                           </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
-                          {/* Bibliothèque partagée (textures des admins) */}
-                          {sharedLibrary.filter(item => item.type === 'texture').length > 0 && (
-                            <div className="pt-2 border-t border-white/10">
-                              <p className="text-white/40 text-xs px-1 mb-2 flex items-center gap-1">
-                                <Sparkles className="h-3 w-3 text-amber-400" />
-                                {language === 'fr' ? 'Textures partagées:' : 'Shared textures:'}
-                              </p>
-                              <div className="grid grid-cols-5 gap-1.5">
-                                {sharedLibrary.filter(item => item.type === 'texture').map((item, idx) => (
-                                  <div key={`shared-${idx}`} className="relative group">
-                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
-                                      className="w-full aspect-square rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors">
-                                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                                    </button>
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                      <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+            {/* Accordion: Textures partagées */}
+            {sharedLibrary.filter(item => item.type === 'texture').length > 0 && (
+              <div className="border border-white/10 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('sharedTextures')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/70 text-xs flex items-center gap-2">
+                    <Sparkles className="h-3 w-3 text-amber-400" />
+                    {language === 'fr' ? 'Textures partagées' : 'Shared textures'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.sharedTextures && "rotate-180")} />
+                </button>
+                {bgAccordion.sharedTextures && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {sharedLibrary.filter(item => item.type === 'texture').map((item, idx) => (
+                        <div key={`shared-${idx}`} className="relative group">
+                          <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
+                            className="w-full aspect-square rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors">
+                            <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                          </button>
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg pointer-events-none">
+                            <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
-                          {/* Bibliothèque personnelle de textures */}
-                          {userLibrary.filter(item => item.type === 'texture').length > 0 && (
-                            <div className="pt-2 border-t border-white/10">
-                              <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes textures:' : 'My textures:'}</p>
-                              <div className="grid grid-cols-5 gap-1.5">
-                                {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
-                                  <div key={idx} className="relative group">
-                                    <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
-                                      className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
-                                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                                    </button>
-                                    <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <X className="h-2 w-2 text-white" />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </TabsContent>
+            {/* Accordion: Mes textures */}
+            {userLibrary.filter(item => item.type === 'texture').length > 0 && (
+              <div className="border border-white/10 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('myTextures')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/70 text-xs flex items-center gap-2">
+                    <FolderOpen className="h-3 w-3" />
+                    {language === 'fr' ? 'Mes textures' : 'My textures'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.myTextures && "rotate-180")} />
+                </button>
+                {bgAccordion.myTextures && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {userLibrary.filter(item => item.type === 'texture').map((item, idx) => (
+                        <div key={idx} className="relative group">
+                          <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
+                            className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                            <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                          </button>
+                          <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <X className="h-2 w-2 text-white" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </TabsContent>
 
           <TabsContent value="gradients" className="mt-0 space-y-3">
             {adminGradients.length > 0 ? (
@@ -1671,85 +1703,125 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           </TabsContent>
 
           <TabsContent value="illustrations" className="mt-0 space-y-2">
-            <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 text-pink-300">
-              <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer illustration IA' : 'Create AI illustration'}
+            {/* Bouton créer illustration IA - en premier */}
+            <Button onClick={() => setShowIllustGenerator(true)} size="default" className="w-full py-3 bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 hover:from-pink-700 hover:via-purple-700 hover:to-violet-700 text-white font-semibold shadow-lg shadow-pink-500/30 border border-pink-400/30">
+              <Wand2 className="h-5 w-5 mr-2 animate-pulse" />{language === 'fr' ? '✨ Créer illustration IA' : '✨ Create AI illustration'}
             </Button>
             
-            {/* Illustrations avec preview (admin) */}
+            {/* Accordion: Illustrations disponibles (admin) */}
             {adminIllustrations.filter(a => a.preview_url).length > 0 && (
-              <>
-                <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Illustrations disponibles:' : 'Available illustrations:'}</p>
-                <div className="grid grid-cols-6 gap-1.5">
-                  {adminIllustrations.filter(a => a.preview_url).map(illust => (
-                    <button key={illust.id} onClick={() => addImageLayer(illust.preview_url, 150, 150)}
-                      className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
-                      <img src={illust.preview_url} alt={illust.name_fr} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white text-[8px] text-center px-0.5">{language === 'fr' ? illust.name_fr : (illust.name_en || illust.name_fr)}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Bibliothèque partagée (illustrations des admins) */}
-            {sharedLibrary.filter(item => item.type === 'illustration').length > 0 && (
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-white/40 text-xs px-1 mb-2 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-amber-400" />
-                  {language === 'fr' ? 'Illustrations partagées:' : 'Shared illustrations:'}
-                </p>
-                <div className="grid grid-cols-6 gap-1.5">
-                  {sharedLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
-                    <button 
-                      key={`shared-illust-${idx}`} 
-                      onClick={() => addImageLayer(item.url, 150, 150)}
-                      className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square"
-                    >
-                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                        <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Bibliothèque personnelle d'illustrations */}
-            {userLibrary.filter(item => item.type === 'illustration').length > 0 && (
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes illustrations:' : 'My illustrations:'}</p>
-                <div className="grid grid-cols-6 gap-1.5">
-                  {userLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
-                    <div key={idx} className="relative group">
-                      <button onClick={() => addImageLayer(item.url, 150, 150)}
-                        className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
-                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                      </button>
-                      <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                        <X className="h-2 w-2 text-white" />
-                      </button>
+              <div className="border border-amber-500/30 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('adminIllustrations')} className="w-full px-3 py-2 flex items-center justify-between bg-amber-500/10 hover:bg-amber-500/20 transition-colors">
+                  <span className="text-amber-300 text-xs flex items-center gap-2">
+                    <Sparkles className="h-3 w-3" />
+                    {language === 'fr' ? 'Illustrations PRO disponibles' : 'Available PRO Illustrations'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-amber-400/60 transition-transform", bgAccordion.adminIllustrations && "rotate-180")} />
+                </button>
+                {bgAccordion.adminIllustrations && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-6 gap-1.5">
+                      {adminIllustrations.filter(a => a.preview_url).map(illust => (
+                        <button key={illust.id} onClick={() => addImageLayer(illust.preview_url, 150, 150)}
+                          className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
+                          <img src={illust.preview_url} alt={illust.name_fr} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-[8px] text-center px-0.5">{language === 'fr' ? illust.name_fr : (illust.name_en || illust.name_fr)}</span>
+                          </div>
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Illustrations génératives (IA) */}
-            <div className="pt-2 border-t border-white/10">
-              <p className="text-white/40 text-xs px-1 flex items-center gap-1 mb-2"><Wand2 className="h-3 w-3" />{language === 'fr' ? 'Générer avec IA:' : 'Generate with AI:'}</p>
-              <div className="grid grid-cols-3 gap-1.5">
-                {allIllustrations.filter(i => !i.preview_url).map(illust => (
-                  <button key={illust.id} onClick={() => generateIllustration(illust)} disabled={generatingIllustration !== null}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[10px] flex items-center gap-1">
-                    {generatingIllustration === (illust.id || illust.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
-                    {illust.name[language] || illust.name.fr}
-                  </button>
-                ))}
+            {/* Accordion: Illustrations partagées */}
+            {sharedLibrary.filter(item => item.type === 'illustration').length > 0 && (
+              <div className="border border-white/10 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('sharedIllustrations')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/70 text-xs flex items-center gap-2">
+                    <Sparkles className="h-3 w-3 text-amber-400" />
+                    {language === 'fr' ? 'Illustrations partagées' : 'Shared illustrations'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.sharedIllustrations && "rotate-180")} />
+                </button>
+                {bgAccordion.sharedIllustrations && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-6 gap-1.5">
+                      {sharedLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
+                        <button 
+                          key={`shared-illust-${idx}`} 
+                          onClick={() => addImageLayer(item.url, 150, 150)}
+                          className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square"
+                        >
+                          <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                            <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
+
+            {/* Accordion: Mes illustrations */}
+            {userLibrary.filter(item => item.type === 'illustration').length > 0 && (
+              <div className="border border-white/10 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('myIllustrations')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/70 text-xs flex items-center gap-2">
+                    <FolderOpen className="h-3 w-3" />
+                    {language === 'fr' ? 'Mes illustrations' : 'My illustrations'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.myIllustrations && "rotate-180")} />
+                </button>
+                {bgAccordion.myIllustrations && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-6 gap-1.5">
+                      {userLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
+                        <div key={idx} className="relative group">
+                          <button onClick={() => addImageLayer(item.url, 150, 150)}
+                            className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                            <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                          </button>
+                          <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <X className="h-2 w-2 text-white" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Accordion: Générer avec IA */}
+            {allIllustrations.filter(i => !i.preview_url).length > 0 && (
+              <div className="border border-white/10 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('generateIllustrations')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/70 text-xs flex items-center gap-2">
+                    <Wand2 className="h-3 w-3 text-violet-400" />
+                    {language === 'fr' ? 'Générer avec IA' : 'Generate with AI'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.generateIllustrations && "rotate-180")} />
+                </button>
+                {bgAccordion.generateIllustrations && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {allIllustrations.filter(i => !i.preview_url).map(illust => (
+                        <button key={illust.id} onClick={() => generateIllustration(illust)} disabled={generatingIllustration !== null}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[10px] flex items-center gap-1">
+                          {generatingIllustration === (illust.id || illust.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
+                          {illust.name[language] || illust.name.fr}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="layers" className="mt-0 space-y-2">
