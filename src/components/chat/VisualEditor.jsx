@@ -1066,7 +1066,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           baseImg.src = originalImageUrl; // Always use original
         });
 
-        // First, draw background layers BEFORE the base image
+        // First, draw background layers and background shapes BEFORE the base image
         for (const layer of layers) {
           if (layer.type === 'background') {
             exportCtx.save();
@@ -1089,6 +1089,24 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 img.src = layer.bgValue;
               });
               exportCtx.drawImage(bgImg, 0, 0, canvasSize.width, canvasSize.height);
+            }
+            exportCtx.restore();
+          } else if (layer.type === 'shape' && layer.isBackgroundShape) {
+            // Draw background shapes before base image
+            exportCtx.save();
+            exportCtx.globalAlpha = layer.opacity / 100;
+            const centerX = layer.x + layer.width / 2;
+            const centerY = layer.y + layer.height / 2;
+            exportCtx.translate(centerX, centerY);
+            exportCtx.rotate((layer.rotation || 0) * Math.PI / 180);
+            exportCtx.translate(-centerX, -centerY);
+            exportCtx.fillStyle = layer.color;
+            drawShape(exportCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
+            exportCtx.fill();
+            if (layer.stroke) {
+              exportCtx.strokeStyle = layer.strokeColor || '#000000';
+              exportCtx.lineWidth = layer.strokeWidth || 2;
+              exportCtx.stroke();
             }
             exportCtx.restore();
           }
