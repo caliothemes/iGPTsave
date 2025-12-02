@@ -50,6 +50,7 @@ export default function Home() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showLogoModal, setShowLogoModal] = useState(false);
   const [showVideoGenerator, setShowVideoGenerator] = useState(false);
+  const [showStyleTip, setShowStyleTip] = useState(false);
   const [guestMessageCount, setGuestMessageCount] = useState(() => {
     const stored = localStorage.getItem('igpt_guest_messages');
     return stored ? parseInt(stored, 10) : 0;
@@ -642,10 +643,16 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         }
 
         setVisuals(prev => [newVisual, ...prev]);
-        setSelectedVisual(newVisual);
-        setShowValidation(true);
+                    setSelectedVisual(newVisual);
+                    setShowValidation(true);
 
-        // Show watermark notice if not dismissed (for 4 seconds)
+                    // Show style tip toast for 3 seconds
+                    if (!localStorage.getItem('hideStyleTip')) {
+                      setShowStyleTip(true);
+                      setTimeout(() => setShowStyleTip(false), 3000);
+                    }
+
+                    // Show watermark notice if not dismissed (for 4 seconds)
         if (isAuthenticated && credits?.subscription_type === 'free' && !localStorage.getItem('hideWatermarkNotice')) {
           setShowWatermarkNotice(true);
           setTimeout(() => setShowWatermarkNotice(false), 4000);
@@ -1010,11 +1017,31 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         </main>
       </div>
 
-      {/* Fixed Input Area at Bottom */}
-      <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 transition-all duration-300",
-        sidebarOpen && "md:left-64"
-      )}>
+      {/* Style Tip Toast */}
+                {showStyleTip && (
+                  <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div 
+                      className="flex items-center gap-2 px-4 py-2 bg-violet-900/95 border border-violet-500/30 rounded-xl shadow-lg cursor-pointer hover:bg-violet-800/95 transition-colors"
+                      onClick={() => {
+                        setShowStyleTip(false);
+                        localStorage.setItem('hideStyleTip', 'true');
+                      }}
+                    >
+                      <Palette className="h-4 w-4 text-violet-300" />
+                      <p className="text-violet-100 text-sm">
+                        {language === 'fr' 
+                          ? "Astuce : Cliquez sur + pour appliquer un style ou des couleurs !" 
+                          : "Tip: Click + to apply a style or colors!"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Fixed Input Area at Bottom */}
+                <div className={cn(
+                  "fixed bottom-0 left-0 right-0 z-50 transition-all duration-300",
+                  sidebarOpen && "md:left-64"
+                )}>
         <div className="bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/98 to-transparent pt-8 pb-4 px-4">
           <div className="max-w-3xl mx-auto">
             {/* Format Selector */}
