@@ -414,9 +414,31 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         img.onload = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+          // First, draw background layers BEFORE the base image
+          layers.forEach((layer) => {
+            if (layer.type === 'background') {
+              ctx.save();
+              ctx.globalAlpha = layer.opacity / 100;
+              if (layer.bgType === 'solid') {
+                ctx.fillStyle = layer.bgValue;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+              } else if (layer.bgType === 'gradient') {
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, layer.bgValue.color1);
+                gradient.addColorStop(1, layer.bgValue.color2);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+              }
+              ctx.restore();
+            }
+          });
+
           // Draw the original base image (never the merged one)
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Draw other layers (excluding background which was already drawn)
           layers.forEach((layer, idx) => {
+            if (layer.type === 'background') return; // Skip, already drawn
         ctx.save();
         ctx.globalAlpha = layer.opacity / 100;
         if (layer.type === 'text') {
