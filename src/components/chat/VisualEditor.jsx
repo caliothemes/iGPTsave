@@ -324,6 +324,15 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         };
         img.src = layer.imageUrl;
       }
+      // Also preload background images
+      if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue && !loadedImages[layer.bgValue]) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          setLoadedImages(prev => ({ ...prev, [layer.bgValue]: img }));
+        };
+        img.src = layer.bgValue;
+      }
     });
   }, [layers]);
 
