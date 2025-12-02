@@ -56,7 +56,7 @@ export default function ServiceUnavailableModal({ isOpen, onClose, user, errorTy
               <Button
                 onClick={onClose}
                 variant="outline"
-                className="flex-1 border-white/20 text-white/70 hover:text-white hover:bg-white/10"
+                className="flex-1 border-white/20 text-white/70 hover:text-white hover:bg-white/10 bg-black/50"
               >
                 {language === 'fr' ? 'Fermer' : 'Close'}
               </Button>
