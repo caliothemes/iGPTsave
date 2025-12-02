@@ -1007,20 +1007,12 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         const exportCtx = exportCanvas.getContext('2d');
         exportCtx.scale(scale, scale);
 
-        // Redraw everything on export canvas
-        const baseImg = new Image();
-        baseImg.crossOrigin = 'anonymous';
-
-        await new Promise((resolve) => {
-          baseImg.onload = resolve;
-          baseImg.src = originalImageUrl; // Always use original
-        });
-
-        // First, draw background layers and background shapes BEFORE the base image
+        // Draw all layers in order (same as rendering)
         for (const layer of layers) {
+          exportCtx.save();
+          exportCtx.globalAlpha = layer.opacity / 100;
+          
           if (layer.type === 'background') {
-            exportCtx.save();
-            exportCtx.globalAlpha = layer.opacity / 100;
             if (layer.bgType === 'solid') {
               exportCtx.fillStyle = layer.bgValue;
               exportCtx.fillRect(0, 0, canvasSize.width, canvasSize.height);
@@ -1031,7 +1023,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.fillStyle = gradient;
               exportCtx.fillRect(0, 0, canvasSize.width, canvasSize.height);
             } else if (layer.bgType === 'image') {
-              // Draw background image
               const bgImg = loadedImages[layer.bgValue] || await new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
@@ -1040,16 +1031,23 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               });
               exportCtx.drawImage(bgImg, 0, 0, canvasSize.width, canvasSize.height);
             }
-            exportCtx.restore();
-          } else if (layer.type === 'shape' && layer.isBackgroundShape) {
-            // Draw background shapes before base image
-            exportCtx.save();
-            exportCtx.globalAlpha = layer.opacity / 100;
+          } else if (layer.type === 'shape') {
             const centerX = layer.x + layer.width / 2;
             const centerY = layer.y + layer.height / 2;
             exportCtx.translate(centerX, centerY);
             exportCtx.rotate((layer.rotation || 0) * Math.PI / 180);
             exportCtx.translate(-centerX, -centerY);
+            
+            if (layer.shadow) {
+              exportCtx.shadowColor = 'rgba(0,0,0,0.5)';
+              exportCtx.shadowBlur = 10;
+              exportCtx.shadowOffsetX = 5;
+              exportCtx.shadowOffsetY = 5;
+            }
+            if (layer.glow) {
+              exportCtx.shadowColor = layer.glowColor || '#ffffff';
+              exportCtx.shadowBlur = layer.glowSize || 10;
+            }
             exportCtx.fillStyle = layer.color;
             drawShape(exportCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
             exportCtx.fill();
@@ -1058,21 +1056,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.lineWidth = layer.strokeWidth || 2;
               exportCtx.stroke();
             }
-            exportCtx.restore();
-          }
-        }
-
-        // Draw base image
-        exportCtx.drawImage(baseImg, 0, 0, canvasSize.width, canvasSize.height);
-
-        // Draw all other layers (excluding background and background shapes)
-        for (const layer of layers) {
-          if (layer.type === 'background') continue; // Already drawn
-          if (layer.type === 'shape' && layer.isBackgroundShape) continue; // Already drawn
-          exportCtx.save();
-          exportCtx.globalAlpha = layer.opacity / 100;
-
-          if (layer.type === 'image' && layer.imageUrl) {
+          } else if (layer.type === 'image' && layer.imageUrl) {
             const layerImg = loadedImages[layer.imageUrl] || await new Promise((resolve) => {
               const img = new Image();
               img.crossOrigin = 'anonymous';
@@ -1080,34 +1064,19 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               img.src = layer.imageUrl;
             });
             
-            exportCtx.save();
-            exportCtx.globalAlpha = layer.opacity / 100;
-            
-            // Apply shadow effect
-            if (layer.shadow) {
+            if (layer.halo) {
+              exportCtx.shadowColor = layer.haloColor || '#FFD700';
+              exportCtx.shadowBlur = layer.haloSize || 15;
+            } else if (layer.glow) {
+              exportCtx.shadowColor = layer.glowColor || '#ffffff';
+              exportCtx.shadowBlur = layer.glowSize || 10;
+            } else if (layer.shadow) {
               exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
               exportCtx.shadowBlur = layer.shadowBlur || 10;
               exportCtx.shadowOffsetX = 5;
               exportCtx.shadowOffsetY = 5;
             }
             
-            // Apply glow effect
-            if (layer.glow) {
-              exportCtx.shadowColor = layer.glowColor || '#ffffff';
-              exportCtx.shadowBlur = layer.glowSize || 10;
-              exportCtx.shadowOffsetX = 0;
-              exportCtx.shadowOffsetY = 0;
-            }
-            
-            // Apply halo effect
-            if (layer.halo) {
-              exportCtx.shadowColor = layer.haloColor || '#FFD700';
-              exportCtx.shadowBlur = layer.haloSize || 15;
-              exportCtx.shadowOffsetX = 0;
-              exportCtx.shadowOffsetY = 0;
-            }
-            
-            // Apply border radius clipping if needed
             if (layer.borderRadius && layer.borderRadius > 0) {
               exportCtx.beginPath();
               exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
@@ -1115,7 +1084,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             }
             
             if (layer.tintColor && layer.tintOpacity) {
-              // Apply tint using temporary canvas
               const tempCanvas = document.createElement('canvas');
               tempCanvas.width = layer.width;
               tempCanvas.height = layer.height;
@@ -1130,11 +1098,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
             }
             
-            exportCtx.restore();
-            
-            // Draw border on top
             if (layer.stroke) {
+              exportCtx.restore();
               exportCtx.save();
+              exportCtx.globalAlpha = layer.opacity / 100;
               exportCtx.strokeStyle = layer.strokeColor || '#000000';
               exportCtx.lineWidth = layer.strokeWidth || 2;
               if (layer.borderRadius && layer.borderRadius > 0) {
@@ -1144,7 +1111,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               } else {
                 exportCtx.strokeRect(layer.x, layer.y, layer.width, layer.height);
               }
-              exportCtx.restore();
             }
           } else if (layer.type === 'text') {
             const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
@@ -1152,28 +1118,60 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             exportCtx.font = fontStyle;
             exportCtx.fillStyle = layer.color;
             exportCtx.textAlign = layer.align || 'left';
-            exportCtx.letterSpacing = `${layer.letterSpacing || 0}px`;
-            if (layer.stroke) {
-              exportCtx.strokeStyle = layer.strokeColor || '#000000';
-              exportCtx.lineWidth = layer.strokeWidth || 2;
-              exportCtx.strokeText(layer.text, layer.x, layer.y);
+            
+            if (layer.effect3d) {
+              const depth = 6;
+              for (let i = depth; i > 0; i--) {
+                exportCtx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
+                exportCtx.fillText(layer.text, layer.x + i, layer.y + i);
+              }
+              exportCtx.fillStyle = layer.color;
             }
-            if (layer.shadow) {
+            
+            if (layer.halo) {
+              exportCtx.save();
+              exportCtx.shadowColor = layer.haloColor || '#FFD700';
+              exportCtx.shadowBlur = layer.haloSize || 15;
+              exportCtx.fillStyle = layer.haloColor || '#FFD700';
+              exportCtx.fillText(layer.text, layer.x, layer.y);
+              exportCtx.fillText(layer.text, layer.x, layer.y);
+              exportCtx.restore();
+              exportCtx.fillStyle = layer.color;
+            }
+            
+            if (layer.neon) {
+              exportCtx.save();
+              const neonColor = layer.neonColor || '#ff00ff';
+              const intensity = layer.neonIntensity || 15;
+              exportCtx.shadowColor = neonColor;
+              exportCtx.shadowBlur = intensity;
+              exportCtx.fillStyle = neonColor;
+              exportCtx.fillText(layer.text, layer.x, layer.y);
+              exportCtx.shadowBlur = intensity * 2;
+              exportCtx.fillText(layer.text, layer.x, layer.y);
+              exportCtx.restore();
+              exportCtx.fillStyle = '#ffffff';
+            }
+            
+            if (layer.glow) {
+              exportCtx.shadowColor = layer.glowColor || '#ffffff';
+              exportCtx.shadowBlur = layer.glowSize || 10;
+            }
+            
+            if (layer.shadow && !layer.glow && !layer.neon) {
               exportCtx.shadowColor = 'rgba(0,0,0,0.6)';
               exportCtx.shadowBlur = 6;
               exportCtx.shadowOffsetX = 3;
               exportCtx.shadowOffsetY = 3;
             }
-            exportCtx.fillText(layer.text, layer.x, layer.y);
-          } else if (layer.type === 'shape') {
-            exportCtx.fillStyle = layer.color;
-            drawShape(exportCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
-            exportCtx.fill();
+            
             if (layer.stroke) {
               exportCtx.strokeStyle = layer.strokeColor || '#000000';
               exportCtx.lineWidth = layer.strokeWidth || 2;
-              exportCtx.stroke();
+              exportCtx.strokeText(layer.text, layer.x, layer.y);
             }
+            
+            exportCtx.fillText(layer.text, layer.x, layer.y);
           }
           exportCtx.restore();
         }
