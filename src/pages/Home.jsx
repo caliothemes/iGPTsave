@@ -646,11 +646,10 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                     setSelectedVisual(newVisual);
                     setShowValidation(true);
 
-                    // Show style tip toast for 5 seconds
-                                if (!localStorage.getItem('hideStyleTip')) {
-                                  setShowStyleTip(true);
-                                  setTimeout(() => setShowStyleTip(false), 5000);
-                                }
+                    // Show style tip (user must close it manually)
+                    if (!localStorage.getItem('hideStyleTip')) {
+                      setShowStyleTip(true);
+                    }
 
 
 
