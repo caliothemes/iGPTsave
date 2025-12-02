@@ -226,8 +226,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             setSavedTexts(texts);
           }
         }
-        // Load admin assets
-        const assets = await base44.entities.EditorAsset.filter({ is_active: true });
+        // Load admin assets (sorted by most recent first)
+        const assets = await base44.entities.EditorAsset.filter({ is_active: true }, '-created_date');
         setAdminTextures(assets.filter(a => a.type === 'texture'));
         setAdminIllustrations(assets.filter(a => a.type === 'illustration'));
         setAdminGradients(assets.filter(a => a.type === 'gradient'));
