@@ -187,24 +187,106 @@ export default function Home() {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingImage(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setMessages(prev => [...prev, { 
-        role: 'user', 
-        content: `[Image uploadée]`,
-        image_url: file_url 
-      }]);
-      // Trigger analysis of the image
-      setInput(language === 'fr' ? 'Analyse cette image et propose des améliorations visuelles' : 'Analyze this image and suggest visual improvements');
-    } catch (err) {
-      console.error(err);
-    }
-    setUploadingImage(false);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingImage(true);
+        try {
+          const { file_url } = await base44.integrations.Core.UploadFile({ file });
+
+          // Add message showing uploaded image
+          const newMessages = [...messages, { 
+            role: 'user', 
+            content: language === 'fr' ? `J'ai uploadé cette image pour l'améliorer` : `I uploaded this image to improve it`,
+            image_url: file_url 
+          }];
+          setMessages([...newMessages, { role: 'assistant', content: '' }]);
+          setIsLoading(true);
+
+          // Deduct credit
+          if (isAuthenticated) {
+            await deductCredit();
+          }
+
+          // Analyze the image with AI
+          const analysis = await base44.integrations.Core.InvokeLLM({
+            prompt: `Tu es un expert en analyse d'images. Analyse cette image en détail et génère un prompt pour recréer une version AMÉLIORÉE de cette MÊME image.
+
+  RÈGLES CRITIQUES:
+  - Tu dois garder EXACTEMENT le même sujet, thème, ambiance et scène
+  - Si c'est un chat, le résultat doit être un chat dans la même pose/ambiance
+  - Si c'est un paysage, le résultat doit être le même type de paysage
+  - Si c'est un logo, le résultat doit être un logo similaire amélioré
+  - Améliore: qualité, éclairage, couleurs, détails, composition
+  - NE CHANGE PAS le sujet principal
+
+  Réponds en JSON:
+  - description: description détaillée de ce que tu vois dans l'image (sujet, couleurs, ambiance, style)
+  - improvement_prompt: prompt en anglais (100+ mots) pour générer une version AMÉLIORÉE de cette MÊME image avec plus de qualité, meilleur éclairage, couleurs plus vibrantes, mais en gardant EXACTEMENT le même sujet et la même scène
+  - title: titre court pour l'image`,
+            file_urls: [file_url],
+            response_json_schema: {
+              type: 'object',
+              properties: {
+                description: { type: 'string' },
+                improvement_prompt: { type: 'string' },
+                title: { type: 'string' }
+              }
+            }
+          });
+
+          // Show analysis
+          let updatedMessages = [...newMessages, { 
+            role: 'assistant', 
+            content: language === 'fr' 
+              ? `📸 **Analyse de votre image:**\n${analysis.description}\n\n✨ Je génère maintenant une version améliorée...`
+              : `📸 **Image analysis:**\n${analysis.description}\n\n✨ Now generating an improved version...`
+          }];
+          setMessages(updatedMessages);
+          setIsLoading(false);
+          setIsGenerating(true);
+
+          // Generate improved version
+          const imageResult = await base44.integrations.Core.GenerateImage({
+            prompt: analysis.improvement_prompt
+          });
+
+          let newVisual = {
+            title: analysis.title || 'Image améliorée',
+            image_url: imageResult.url,
+            visual_type: 'autre',
+            dimensions: '1024x1024',
+            format: 'digital',
+            original_prompt: language === 'fr' ? 'Amélioration d\'image uploadée' : 'Uploaded image improvement',
+            image_prompt: analysis.improvement_prompt,
+            version: 1
+          };
+
+          if (user) {
+            newVisual = await base44.entities.Visual.create({ user_email: user.email, ...newVisual });
+          }
+
+          setVisuals(prev => [newVisual, ...prev]);
+          setSelectedVisual(newVisual);
+          setShowValidation(true);
+
+          updatedMessages = [...updatedMessages.slice(0, -1), {
+            role: 'assistant',
+            content: language === 'fr' 
+              ? `📸 **Analyse de votre image:**\n${analysis.description}\n\n✨ **${analysis.title}** - Voici une version améliorée de votre image !`
+              : `📸 **Image analysis:**\n${analysis.description}\n\n✨ **${analysis.title}** - Here's an improved version of your image!`
+          }];
+          setMessages(updatedMessages);
+          setIsGenerating(false);
+
+          await saveConversation(updatedMessages);
+        } catch (err) {
+          console.error(err);
+          setIsLoading(false);
+          setIsGenerating(false);
+        }
+        setUploadingImage(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
 
   const getTotalCredits = () => {
     if (!credits) return 0;
