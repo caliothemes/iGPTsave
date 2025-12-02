@@ -43,28 +43,16 @@ Deno.serve(async (req) => {
       }, { status: 500 });
     }
 
-    // Download the image first
-    const imageResponse = await fetch(image_url);
-    if (!imageResponse.ok) {
-      return Response.json({ 
-        success: false, 
-        error: 'Impossible de télécharger l\'image' 
-      }, { status: 400 });
-    }
-    
-    const imageBlob = await imageResponse.blob();
-    
-    // Create FormData with the file
-    const formData = new FormData();
-    formData.append('file', imageBlob, 'image.png');
-
-    // Call ClearBG API
-    const response = await fetch('https://clearbg-qej8.onrender.com/api/remove-bg', {
+    // Call noBG.me API
+    const response = await fetch('https://nobg.me/api/removeBackground', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
-      body: formData
+      body: JSON.stringify({
+        imageUrl: image_url
+      })
     });
 
     if (!response.ok) {
@@ -79,17 +67,17 @@ Deno.serve(async (req) => {
       }
       return Response.json({ 
         success: false, 
-        error: errorMessage || 'Erreur API ClearBG' 
+        error: errorMessage || 'Erreur API noBG.me' 
       });
     }
 
     const result = await response.json();
 
-    // ClearBG returns processedUrl in the response
-    if (result.processedUrl) {
+    // noBG.me returns processedUrl or processed_url in the response
+    if (result.processedUrl || result.processed_url) {
       return Response.json({ 
         success: true,
-        image_url: result.processedUrl
+        image_url: result.processedUrl || result.processed_url
       });
     }
 
