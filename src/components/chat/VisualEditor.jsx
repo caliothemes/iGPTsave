@@ -428,6 +428,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
                 gradient.addColorStop(1, layer.bgValue.color2);
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+              } else if (layer.bgType === 'image' && loadedImages[layer.bgValue]) {
+                // Draw background image covering the entire canvas
+                ctx.drawImage(loadedImages[layer.bgValue], 0, 0, canvas.width, canvas.height);
               }
               ctx.restore();
             }
