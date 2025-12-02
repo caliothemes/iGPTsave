@@ -645,7 +645,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             }
             ctx.restore();
           }
-        
+        }
         ctx.restore();
         if (selectedLayer === idx) {
           ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
