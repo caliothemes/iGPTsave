@@ -12,19 +12,19 @@ const STRIPE_PRODUCTS = {
   subscriptions: {
     monthly: [
       { 
-        id: 'free',
-        priceId: null, // Gratuit, pas de paiement
-        name: { fr: 'GRATUIT', en: 'FREE' },
-        price: 0,
-        credits: 25,
-        icon: 'MessageSquare',
-        gradient: 'from-slate-600 to-gray-600',
-        isFree: true,
-        features: { 
-          fr: ['25 messages à l\'inscription', 'Visuels avec filigrane', 'Support communauté'],
-          en: ['25 messages on signup', 'Visuals with watermark', 'Community support']
-        }
-      },
+                    id: 'free',
+                    priceId: null, // Gratuit, pas de paiement
+                    name: { fr: 'GRATUIT', en: 'FREE' },
+                    price: 0,
+                    credits: 25,
+                    icon: 'MessageSquare',
+                    gradient: 'from-slate-600 to-gray-600',
+                    isFree: true,
+                    features: { 
+                      fr: ['25 messages offerts / mois', 'Visuels avec filigrane', 'Support communauté'],
+                      en: ['25 free messages / month', 'Visuals with watermark', 'Community support']
+                    }
+                  },
       { 
         id: 'starter_monthly',
         priceId: 'price_1SZIx2HfyAhC7kY5qlFmFIP8', // prod_TWLeCLUbXfQ4KF
@@ -81,20 +81,20 @@ const STRIPE_PRODUCTS = {
     ],
     yearly: [
       { 
-        id: 'free',
-        priceId: null,
-        name: { fr: 'GRATUIT', en: 'FREE' },
-        price: 0,
-        credits: 25,
-        creditsPerMonth: 0,
-        icon: 'MessageSquare',
-        gradient: 'from-slate-600 to-gray-600',
-        isFree: true,
-        features: { 
-          fr: ['25 messages à l\'inscription', 'Visuels avec filigrane', 'Support communauté'],
-          en: ['25 messages on signup', 'Visuals with watermark', 'Community support']
-        }
-      },
+                    id: 'free',
+                    priceId: null,
+                    name: { fr: 'GRATUIT', en: 'FREE' },
+                    price: 0,
+                    credits: 25,
+                    creditsPerMonth: 25,
+                    icon: 'MessageSquare',
+                    gradient: 'from-slate-600 to-gray-600',
+                    isFree: true,
+                    features: { 
+                      fr: ['25 messages offerts / mois', 'Visuels avec filigrane', 'Support communauté'],
+                      en: ['25 free messages / month', 'Visuals with watermark', 'Community support']
+                    }
+                  },
       { 
         id: 'starter_yearly',
         priceId: 'price_1SZIyTHfyAhC7kY5BAIvAIyy', // prod_TWLfJW2UaDTeo5
@@ -337,13 +337,13 @@ export default function Pricing() {
                     )}
 
                     {/* Messages */}
-                    <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
-                      {sub.isFree ? (
-                        <>
-                          <span className="text-white font-medium">{sub.credits}</span>
-                          <span className="text-white/60 text-sm"> {language === 'fr' ? 'messages offerts' : 'free messages'}</span>
-                        </>
-                      ) : (
+                                              <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
+                                                {sub.isFree ? (
+                                                  <>
+                                                    <span className="text-white font-medium">{sub.credits}</span>
+                                                    <span className="text-white/60 text-sm"> {language === 'fr' ? 'messages offerts / mois' : 'free messages / month'}</span>
+                                                  </>
+                                                ) : (
                         <>
                           <span className="text-white font-medium">
                             {billingCycle === 'yearly' ? sub.creditsPerMonth : sub.credits}
