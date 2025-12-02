@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays } from 'lucide-react';
+import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StatCard from '@/components/admin/StatCard';
 import { 
@@ -31,9 +31,37 @@ export default function Admin() {
   const [visitStats, setVisitStats] = useState({
     currentVisitors: 0,
     today: 0,
+    yesterday: 0,
+    lastWeek: 0,
+    lastMonth: 0
+  });
+  const [userStats, setUserStats] = useState({
+    totalUsers: 0,
+    newToday: 0,
+    newThisWeek: 0,
+    newThisMonth: 0,
+    starterSubs: 0,
+    proSubs: 0,
+    eliteSubs: 0,
+    elitePlusSubs: 0,
+    revenueToday: 0,
+    revenueThisWeek: 0,
+    revenueThisMonth: 0,
+    avgRevenuePerUser: 0
+  });
+  const [conversationStats, setConversationStats] = useState({
+    total: 0,
+    today: 0,
     thisWeek: 0,
     thisMonth: 0,
-    thisYear: 0
+    avgPerUser: 0,
+    totalMessages: 0,
+    avgMessagesPerConv: 0,
+    totalVisuals: 0,
+    visualsToday: 0,
+    visualsThisWeek: 0,
+    downloadsToday: 0,
+    downloadsThisWeek: 0
   });
   const [activityData, setActivityData] = useState([]);
   const [visualTypesData, setVisualTypesData] = useState([]);
