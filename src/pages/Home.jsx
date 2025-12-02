@@ -1174,11 +1174,11 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                     .style-tip-shimmer {
                       background: linear-gradient(
                         90deg,
-                        rgba(139, 92, 246, 0.9) 0%,
-                        rgba(167, 139, 250, 0.95) 25%,
-                        rgba(139, 92, 246, 0.9) 50%,
-                        rgba(167, 139, 250, 0.95) 75%,
-                        rgba(139, 92, 246, 0.9) 100%
+                        rgba(88, 28, 135, 0.95) 0%,
+                        rgba(109, 40, 167, 0.98) 25%,
+                        rgba(88, 28, 135, 0.95) 50%,
+                        rgba(109, 40, 167, 0.98) 75%,
+                        rgba(88, 28, 135, 0.95) 100%
                       );
                       background-size: 200% 100%;
                       animation: shimmer 3s ease-in-out infinite;
