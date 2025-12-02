@@ -1391,15 +1391,80 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             <Button onClick={() => setShowIllustGenerator(true)} size="sm" className="w-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 text-pink-300">
               <Wand2 className="h-4 w-4 mr-2" />{language === 'fr' ? 'Créer illustration IA' : 'Create AI illustration'}
             </Button>
-            <p className="text-white/40 text-xs px-1 flex items-center gap-1 mt-2"><Sparkles className="h-3 w-3" />{language === 'fr' ? 'Illustrations prédéfinies:' : 'Preset illustrations:'}</p>
-            <div className="grid grid-cols-2 gap-2">
-              {allIllustrations.map(illust => (
-                <button key={illust.id} onClick={() => generateIllustration(illust)} disabled={generatingIllustration !== null}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xs flex items-center gap-2">
-                  {generatingIllustration === (illust.id || illust.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
-                  {illust.name[language] || illust.name.fr}
-                </button>
-              ))}
+            
+            {/* Illustrations avec preview (admin) */}
+            {adminIllustrations.filter(a => a.preview_url).length > 0 && (
+              <>
+                <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Illustrations disponibles:' : 'Available illustrations:'}</p>
+                <div className="grid grid-cols-6 gap-1.5">
+                  {adminIllustrations.filter(a => a.preview_url).map(illust => (
+                    <button key={illust.id} onClick={() => addImageLayer(illust.preview_url, 150, 150)}
+                      className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
+                      <img src={illust.preview_url} alt={illust.name_fr} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-[8px] text-center px-0.5">{language === 'fr' ? illust.name_fr : (illust.name_en || illust.name_fr)}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Bibliothèque partagée (illustrations des admins) */}
+            {sharedLibrary.filter(item => item.type === 'illustration').length > 0 && (
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-white/40 text-xs px-1 mb-2 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-amber-400" />
+                  {language === 'fr' ? 'Illustrations partagées:' : 'Shared illustrations:'}
+                </p>
+                <div className="grid grid-cols-6 gap-1.5">
+                  {sharedLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
+                    <div key={`shared-illust-${idx}`} className="relative group">
+                      <button onClick={() => addImageLayer(item.url, 150, 150)}
+                        className="w-full aspect-square rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors">
+                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                      </button>
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                        <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Bibliothèque personnelle d'illustrations */}
+            {userLibrary.filter(item => item.type === 'illustration').length > 0 && (
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-white/40 text-xs px-1 mb-2">{language === 'fr' ? 'Mes illustrations:' : 'My illustrations:'}</p>
+                <div className="grid grid-cols-6 gap-1.5">
+                  {userLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
+                    <div key={idx} className="relative group">
+                      <button onClick={() => addImageLayer(item.url, 150, 150)}
+                        className="w-full aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors">
+                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                      </button>
+                      <button onClick={() => removeFromLibrary(userLibrary.indexOf(item))} className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <X className="h-2 w-2 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Illustrations génératives (IA) */}
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-white/40 text-xs px-1 flex items-center gap-1 mb-2"><Wand2 className="h-3 w-3" />{language === 'fr' ? 'Générer avec IA:' : 'Generate with AI:'}</p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {allIllustrations.filter(i => !i.preview_url).map(illust => (
+                  <button key={illust.id} onClick={() => generateIllustration(illust)} disabled={generatingIllustration !== null}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[10px] flex items-center gap-1">
+                    {generatingIllustration === (illust.id || illust.name_fr) ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImagePlus className="h-3 w-3" />}
+                    {illust.name[language] || illust.name.fr}
+                  </button>
+                ))}
+              </div>
             </div>
           </TabsContent>
 
