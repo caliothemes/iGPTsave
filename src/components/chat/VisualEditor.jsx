@@ -165,7 +165,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const imageUploadRef = useRef(null);
   const [layers, setLayers] = useState([]);
   const [selectedLayer, setSelectedLayer] = useState(null);
-  const [activeTab, setActiveTab] = useState('text');
+  const [activeTab, setActiveTab] = useState('background');
   const [imageLoaded, setImageLoaded] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 400 });
   const [dragging, setDragging] = useState(null);
