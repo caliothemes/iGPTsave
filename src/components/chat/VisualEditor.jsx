@@ -760,6 +760,24 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
   };
 
+  const addBackgroundImageLayer = (imageUrl) => {
+    const newLayer = {
+      type: 'background',
+      bgType: 'image',
+      bgValue: imageUrl,
+      x: 0,
+      y: 0,
+      width: canvasSize.width,
+      height: canvasSize.height,
+      opacity: 100
+    };
+    // Insert backgrounds at the very beginning
+    setLayers([newLayer, ...layers]);
+    setSelectedLayer(0);
+    setActiveTab('layers');
+    showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
+  };
+
   const generateCustomTexture = async () => {
         if (!texturePrompt.trim()) return;
         setGeneratingCustomTexture(true);
