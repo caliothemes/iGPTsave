@@ -1784,7 +1784,12 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
       {/* Help Message */}
               {helpMessage && (
-                <div className="mb-3 px-3 py-2 bg-violet-500/20 border border-violet-500/30 rounded-lg text-violet-300 text-xs text-center animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className={cn(
+                  "mb-3 px-3 py-2 rounded-lg text-xs text-center animate-in fade-in slide-in-from-top-2 duration-300 flex items-center justify-center gap-2",
+                  helpMessage.includes('✅') 
+                    ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300" 
+                    : "bg-violet-500/20 border border-violet-500/30 text-violet-300"
+                )}>
                   {helpMessage}
                 </div>
               )}
