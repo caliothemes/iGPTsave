@@ -1143,28 +1143,49 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                             )}
 
 
-              {/* Style Tip - above prompt area */}
-                                {showStyleTip && (
-                                  <div className="mb-2 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-violet-900/90 border border-violet-500/30 rounded-lg">
-                                      <Palette className="h-3.5 w-3.5 text-violet-300" />
-                                      <p className="text-violet-100 text-xs">
-                                        {language === 'fr' 
-                                          ? "Cliquez sur + pour appliquer un style ou des couleurs" 
-                                          : "Click + to apply a style or colors"}
-                                      </p>
-                                      <button 
-                                        onClick={() => {
-                                          setShowStyleTip(false);
-                                          localStorage.setItem('hideStyleTip', 'true');
-                                        }}
-                                        className="text-violet-300/60 hover:text-violet-100 transition-colors ml-1"
-                                      >
-                                        <X className="h-3.5 w-3.5" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
+              {/* Style Tip - above prompt area with arrow pointing to + button */}
+              {showStyleTip && (
+                <div className="mb-2 flex items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="relative">
+                    {/* Arrow pointing down-left to the + button */}
+                    <div className="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-violet-900/90" />
+                    <div className="flex items-center gap-2 px-3 py-2 bg-violet-900/90 border border-violet-500/30 rounded-lg style-tip-shimmer">
+                      <p className="text-violet-100 text-xs">
+                        {language === 'fr' 
+                          ? "Cliquez sur + pour appliquer un style prédéfini ou une palette de couleurs" 
+                          : "Click + to apply a preset style or color palette"}
+                      </p>
+                      <button 
+                        onClick={() => {
+                          setShowStyleTip(false);
+                          localStorage.setItem('hideStyleTip', 'true');
+                        }}
+                        className="text-violet-300/60 hover:text-violet-100 transition-colors ml-1 flex-shrink-0"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <style>{`
+                    @keyframes shimmer {
+                      0% { background-position: -200% 0; }
+                      100% { background-position: 200% 0; }
+                    }
+                    .style-tip-shimmer {
+                      background: linear-gradient(
+                        90deg,
+                        rgba(139, 92, 246, 0.9) 0%,
+                        rgba(167, 139, 250, 0.95) 25%,
+                        rgba(139, 92, 246, 0.9) 50%,
+                        rgba(167, 139, 250, 0.95) 75%,
+                        rgba(139, 92, 246, 0.9) 100%
+                      );
+                      background-size: 200% 100%;
+                      animation: shimmer 3s ease-in-out infinite;
+                    }
+                  `}</style>
+                </div>
+              )}
 
                                 {/* Selected Options Display */}
                                 {(selectedFormat || selectedStyle || selectedPalette) && (
