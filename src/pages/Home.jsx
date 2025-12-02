@@ -1148,7 +1148,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                 <div className="mb-2 flex items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="relative">
                     {/* Arrow pointing down-left to the + button */}
-                    <div className="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-violet-900/90" />
+                    <div className="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-purple-900" />
                     <div className="flex items-center gap-2 px-3 py-2 bg-violet-900/90 border border-violet-500/30 rounded-lg style-tip-shimmer">
                       <p className="text-violet-100 text-xs">
                         {language === 'fr' 
