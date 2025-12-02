@@ -356,12 +356,29 @@ tu DOIS reprendre le prompt original et l'enrichir avec les modifications demand
 NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant ses éléments principaux.
 ` : '';
 
+      // Detect if user wants to change subject completely
+      const previousUserMessages = messages.filter(m => m.role === 'user').map(m => m.content).join(' ');
+      const hasExistingContext = previousUserMessages.length > 0 && selectedVisual;
+
       const analysis = await base44.integrations.Core.InvokeLLM({
                 prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels de niveau agence de design.
 
-          L'utilisateur demande: "${userMessage}"
-          ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
-          ${existingVisualContext}
+      L'utilisateur demande: "${userMessage}"
+      ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
+      ${existingVisualContext}
+
+      RÈGLE IMPORTANTE - DÉTECTION DE CHANGEMENT DE SUJET:
+      ${hasExistingContext ? `
+      L'utilisateur a déjà un visuel en cours sur un sujet précédent.
+      Analyse si la nouvelle demande "${userMessage}" est:
+      1. Une MODIFICATION du visuel existant (ajouter du texte, changer couleur, mettre dans un rond, etc.) -> continue normalement
+      2. Un NOUVEAU SUJET COMPLÈTEMENT DIFFÉRENT (nouveau thème, nouveau type de visuel sans rapport) -> dans ce cas, mets "subject_change_warning": true dans ta réponse
+
+      Si tu détectes un changement de sujet radical (ex: passer d'un lion à un salon de coiffure), tu dois:
+      - Mettre "subject_change_warning": true
+      - Dans "response", explique gentiment que les conversations sont suivies dans iGPT et que pour un nouveau sujet, il vaut mieux démarrer un nouveau chat en cliquant sur le bouton + bleu en haut à gauche, sinon iGPT va mélanger les sujets.
+      - Ne génère PAS d'image dans ce cas (needs_image: false)
+      ` : ''}
 
           RÈGLES CRITIQUES PAR TYPE DE VISUEL:
 
