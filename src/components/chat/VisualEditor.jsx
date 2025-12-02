@@ -1180,6 +1180,31 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           </TabsContent>
 
           <TabsContent value="background" className="mt-0 space-y-3">
+            {/* Remove Background Button */}
+            <Button
+              onClick={async () => {
+                setRemovingBg(true);
+                try {
+                  const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
+                  if (response.data?.success && response.data?.image_url) {
+                    setOriginalImageUrl(response.data.image_url);
+                    showHelp(language === 'fr' ? '✨ Fond supprimé ! Ajoutez maintenant une couleur de fond.' : '✨ Background removed! Now add a background color.');
+                  } else {
+                    showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
+                  }
+                } catch (err) {
+                  console.error(err);
+                  showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+                }
+                setRemovingBg(false);
+              }}
+              disabled={removingBg}
+              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 mb-2"
+            >
+              {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+              {language === 'fr' ? 'Supprimer le fond de l\'image' : 'Remove image background'}
+            </Button>
+
             <p className="text-white/40 text-xs">{language === 'fr' ? 'Couleurs unies:' : 'Solid colors:'}</p>
             <div className="flex gap-1 flex-wrap">
               {PRESET_COLORS.map(color => (
