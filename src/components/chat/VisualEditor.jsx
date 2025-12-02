@@ -252,7 +252,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         setSharedLibrary(allSharedItems);
         
         // Load saved layers from visual
-        if (visual.editor_layers && Array.isArray(visual.editor_layers)) {
+        if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
           setLayers(visual.editor_layers);
           // Restore background state if there's a background layer
           const bgLayer = visual.editor_layers.find(l => l.type === 'background');
@@ -264,6 +264,9 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
               setBgGradient(bgLayer.bgValue);
             }
           }
+        } else {
+          // No saved layers - create the base image as a movable layer
+          // This will be done after the image loads in the other useEffect
         }
       } catch (e) {
         console.error(e);
@@ -309,6 +312,23 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             width: displayWidth,
             height: displayHeight
           });
+          
+          // Create the base image as a movable layer if no layers exist
+          if (!visual.editor_layers || visual.editor_layers.length === 0) {
+            const baseImageLayer = {
+              type: 'image',
+              imageUrl: baseUrl,
+              x: 0,
+              y: 0,
+              width: displayWidth,
+              height: displayHeight,
+              opacity: 100,
+              isBaseImage: true // Mark as the original generated image
+            };
+            setLayers([baseImageLayer]);
+            setSelectedLayer(0);
+          }
+          
           setImageLoaded(true);
         };
         img.src = baseUrl;
@@ -419,16 +439,28 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           });
         }
 
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
+        // Also preload background images
+        layers.forEach(layer => {
+          if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue && !loadedImages[layer.bgValue]) {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              setLoadedImages(prev => ({ ...prev, [layer.bgValue]: img }));
+            };
+            img.src = layer.bgValue;
+          }
+        });
+
+        // Draw canvas
+        const drawCanvas = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          // First, draw background layers and background shapes BEFORE the base image
-          layers.forEach((layer) => {
+          // Draw all layers in order (first = bottom, last = top)
+          layers.forEach((layer, idx) => {
+            ctx.save();
+            ctx.globalAlpha = layer.opacity / 100;
+            
             if (layer.type === 'background') {
-              ctx.save();
-              ctx.globalAlpha = layer.opacity / 100;
               if (layer.bgType === 'solid') {
                 ctx.fillStyle = layer.bgValue;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -439,19 +471,16 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
               } else if (layer.bgType === 'image' && loadedImages[layer.bgValue]) {
-                // Draw background image covering the entire canvas
                 ctx.drawImage(loadedImages[layer.bgValue], 0, 0, canvas.width, canvas.height);
               }
-              ctx.restore();
-            } else if (layer.type === 'shape' && layer.isBackgroundShape) {
-              // Draw background shapes (from Fond tab) before the main image
-              ctx.save();
-              ctx.globalAlpha = layer.opacity / 100;
+            } else if (layer.type === 'shape') {
+              // Apply rotation
               const centerX = layer.x + layer.width / 2;
               const centerY = layer.y + layer.height / 2;
               ctx.translate(centerX, centerY);
               ctx.rotate((layer.rotation || 0) * Math.PI / 180);
               ctx.translate(-centerX, -centerY);
+              
               if (layer.shadow) {
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
                 ctx.shadowBlur = 10;
@@ -472,20 +501,60 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
                 ctx.lineWidth = layer.strokeWidth || 2;
                 ctx.stroke();
               }
-              ctx.restore();
-            }
-          });
-
-          // Draw the original base image (never the merged one)
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
-          // Draw other layers (excluding background and background shapes which were already drawn)
-          layers.forEach((layer, idx) => {
-            if (layer.type === 'background') return; // Skip, already drawn
-            if (layer.type === 'shape' && layer.isBackgroundShape) return; // Skip background shapes, already drawn
-        ctx.save();
-        ctx.globalAlpha = layer.opacity / 100;
-        if (layer.type === 'text') {
+            } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
+            // Apply effects for images
+              if (layer.halo) {
+                ctx.shadowColor = layer.haloColor || '#FFD700';
+                ctx.shadowBlur = layer.haloSize || 15;
+              } else if (layer.glow) {
+                ctx.shadowColor = layer.glowColor || '#ffffff';
+                ctx.shadowBlur = layer.glowSize || 10;
+              } else if (layer.shadow) {
+                ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = layer.shadowBlur || 10;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+              }
+              
+              // Apply border radius clipping if needed
+              if (layer.borderRadius && layer.borderRadius > 0) {
+                ctx.beginPath();
+                ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                ctx.clip();
+              }
+              
+              // Apply color tint using a temporary canvas
+              if (layer.tintColor && layer.tintOpacity) {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = layer.width;
+                tempCanvas.height = layer.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
+                tempCtx.globalCompositeOperation = 'overlay';
+                tempCtx.globalAlpha = layer.tintOpacity / 100;
+                tempCtx.fillStyle = layer.tintColor;
+                tempCtx.fillRect(0, 0, layer.width, layer.height);
+                ctx.drawImage(tempCanvas, layer.x, layer.y);
+              } else {
+                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+              }
+              
+              // Draw border on top
+              if (layer.stroke) {
+                ctx.restore();
+                ctx.save();
+                ctx.globalAlpha = layer.opacity / 100;
+                ctx.strokeStyle = layer.strokeColor || '#000000';
+                ctx.lineWidth = layer.strokeWidth || 2;
+                if (layer.borderRadius && layer.borderRadius > 0) {
+                  ctx.beginPath();
+                  ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                  ctx.stroke();
+                } else {
+                  ctx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+                }
+              }
+            } else if (layer.type === 'text') {
           const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
           const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
           ctx.font = fontStyle;
@@ -561,152 +630,31 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             ctx.strokeText(layer.text, layer.x, layer.y);
           }
           
-          ctx.fillText(layer.text, layer.x, layer.y);
-        } else if (layer.type === 'shape') {
-          // Apply rotation
-          const centerX = layer.x + layer.width / 2;
-          const centerY = layer.y + layer.height / 2;
-          ctx.translate(centerX, centerY);
-          ctx.rotate((layer.rotation || 0) * Math.PI / 180);
-          ctx.translate(-centerX, -centerY);
-          
-          // Shadow effect
-          if (layer.shadow) {
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetX = 5;
-            ctx.shadowOffsetY = 5;
-          }
-          
-          // Glow effect
-          if (layer.glow) {
-            ctx.shadowColor = layer.glowColor || '#ffffff';
-            ctx.shadowBlur = layer.glowSize || 10;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-          }
-          
-          ctx.fillStyle = layer.color;
-          drawShape(ctx, layer.shape, layer.x, layer.y, layer.width, layer.height);
-          ctx.fill();
-          if (layer.stroke) { ctx.strokeStyle = layer.strokeColor || '#000000'; ctx.lineWidth = layer.strokeWidth || 2; ctx.stroke(); }
-        } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-          // Apply effects for images
-          ctx.save();
-          
-          // Halo effect (drawn first, behind the image)
-          if (layer.halo) {
-            ctx.shadowColor = layer.haloColor || '#FFD700';
-            ctx.shadowBlur = layer.haloSize || 15;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            // Draw a rect to create the halo
-            ctx.fillStyle = layer.haloColor || '#FFD700';
-            ctx.globalAlpha = 0.3;
-            if (layer.borderRadius) {
-              ctx.beginPath();
-              ctx.roundRect(layer.x - 2, layer.y - 2, layer.width + 4, layer.height + 4, layer.borderRadius);
-              ctx.fill();
-            } else {
-              ctx.fillRect(layer.x - 2, layer.y - 2, layer.width + 4, layer.height + 4);
+              ctx.fillText(layer.text, layer.x, layer.y);
             }
-            ctx.globalAlpha = layer.opacity / 100;
-          }
-          
-          // Glow effect
-          if (layer.glow) {
-            ctx.shadowColor = layer.glowColor || '#ffffff';
-            ctx.shadowBlur = layer.glowSize || 10;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-          }
-          
-          // Shadow effect
-          if (layer.shadow && !layer.glow && !layer.halo) {
-            ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = layer.shadowBlur || 10;
-            ctx.shadowOffsetX = 5;
-            ctx.shadowOffsetY = 5;
-          }
-          
-          ctx.restore();
-          ctx.save();
-          ctx.globalAlpha = layer.opacity / 100;
-          
-          // Apply border radius clipping if needed
-          if (layer.borderRadius && layer.borderRadius > 0) {
-            ctx.beginPath();
-            ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-            ctx.clip();
-          }
-          
-          // Re-apply shadow/glow after clip
-          if (layer.glow) {
-            ctx.shadowColor = layer.glowColor || '#ffffff';
-            ctx.shadowBlur = layer.glowSize || 10;
-          } else if (layer.shadow) {
-            ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = layer.shadowBlur || 10;
-            ctx.shadowOffsetX = 5;
-            ctx.shadowOffsetY = 5;
-          }
-          
-          // Apply color tint using a temporary canvas
-          if (layer.tintColor && layer.tintOpacity) {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = layer.width;
-            tempCanvas.height = layer.height;
-            const tempCtx = tempCanvas.getContext('2d');
             
-            // Draw the image
-            tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
-            
-            // Apply tint with color blend
-            tempCtx.globalCompositeOperation = 'overlay';
-            tempCtx.globalAlpha = layer.tintOpacity / 100;
-            tempCtx.fillStyle = layer.tintColor;
-            tempCtx.fillRect(0, 0, layer.width, layer.height);
-            
-            // Draw the tinted result
-            ctx.drawImage(tempCanvas, layer.x, layer.y);
-          } else {
-            ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-          }
-          
-          ctx.restore();
-          
-          // Draw border on top
-          if (layer.stroke) {
-            ctx.save();
-            ctx.strokeStyle = layer.strokeColor || '#000000';
-            ctx.lineWidth = layer.strokeWidth || 2;
-            if (layer.borderRadius && layer.borderRadius > 0) {
-              ctx.beginPath();
-              ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-              ctx.stroke();
-            } else {
-              ctx.strokeRect(layer.x, layer.y, layer.width, layer.height);
-            }
             ctx.restore();
-          }
-        }
-        ctx.restore();
-        if (selectedLayer === idx) {
-          ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
-          if (layer.type === 'text') {
-            ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
-            const metrics = ctx.measureText(layer.text);
-            const textX = layer.x - (layer.align === 'center' ? metrics.width/2 : layer.align === 'right' ? metrics.width : 0);
-            ctx.strokeRect(textX - 5, layer.y - layer.fontSize, metrics.width + 10, layer.fontSize + 10);
-          } else {
-            ctx.strokeRect(layer.x - 5, layer.y - 5, layer.width + 10, layer.height + 10);
-          }
-          ctx.setLineDash([]);
-        }
-      });
-    };
-    img.src = originalImageUrl;
-  }, [imageLoaded, layers, selectedLayer, originalImageUrl, loadedImages, bgType, bgColor, bgGradient]);
+            
+            // Draw selection indicator
+            if (selectedLayer === idx) {
+              ctx.strokeStyle = '#8B5CF6';
+              ctx.lineWidth = 2;
+              ctx.setLineDash([5, 5]);
+              if (layer.type === 'text') {
+                ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
+                const metrics = ctx.measureText(layer.text);
+                const textX = layer.x - (layer.align === 'center' ? metrics.width/2 : layer.align === 'right' ? metrics.width : 0);
+                ctx.strokeRect(textX - 5, layer.y - layer.fontSize, metrics.width + 10, layer.fontSize + 10);
+              } else if (layer.type !== 'background') {
+                ctx.strokeRect(layer.x - 5, layer.y - 5, layer.width + 10, layer.height + 10);
+              }
+              ctx.setLineDash([]);
+            }
+          });
+        };
+
+        drawCanvas();
+      }, [imageLoaded, layers, selectedLayer, loadedImages, bgType, bgColor, bgGradient]);
 
   const [helpMessage, setHelpMessage] = useState(null);
 
