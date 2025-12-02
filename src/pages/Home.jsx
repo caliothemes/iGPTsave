@@ -1059,7 +1059,16 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                   selectedStyle={selectedStyle}
                                   selectedPalette={selectedPalette}
                                   onStyleChange={setSelectedStyle}
-                                  onPaletteChange={setSelectedPalette}
+                                  onPaletteChange={(palette) => {
+                                          setSelectedPalette(palette);
+                                          // If a visual is already selected, auto-fill the prompt
+                                          if (selectedVisual && palette) {
+                                            const paletteText = language === 'fr' 
+                                              ? `Modifie les couleurs avec cette palette: ${palette.name.fr}` 
+                                              : `Change the colors with this palette: ${palette.name.en}`;
+                                            setInput(paletteText);
+                                          }
+                                        }}
                                   onClose={() => setShowStyleSelector(false)}
                                   onAutoSend={async (prompt) => {
                                     setShowStyleSelector(false);
