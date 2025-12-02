@@ -1309,7 +1309,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </p>
                 <div className="grid grid-cols-5 gap-1">
                   {adminGradients.filter(g => g.preview_url).map(gradient => (
-                    <button key={gradient.id} onClick={() => addImageLayer(gradient.preview_url, canvasSize.width, canvasSize.height, true)}
+                    <button key={gradient.id} onClick={() => addBackgroundImageLayer(gradient.preview_url)}
                       className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
                       <img src={gradient.preview_url} alt={gradient.name_fr} className="w-full h-full object-cover" />
                     </button>
@@ -1327,7 +1327,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </p>
                 <div className="grid grid-cols-5 gap-1">
                   {adminTexturesWithImage.map(texture => (
-                    <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height, true)}
+                    <button key={texture.id} onClick={() => addBackgroundImageLayer(texture.preview_url)}
                       className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
                       <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
                     </button>
