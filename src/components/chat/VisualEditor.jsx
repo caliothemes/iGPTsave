@@ -479,9 +479,10 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           // Draw the original base image (never the merged one)
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           
-          // Draw other layers (excluding background which was already drawn)
+          // Draw other layers (excluding background and background shapes which were already drawn)
           layers.forEach((layer, idx) => {
             if (layer.type === 'background') return; // Skip, already drawn
+            if (layer.type === 'shape' && layer.isBackgroundShape) return; // Skip background shapes, already drawn
         ctx.save();
         ctx.globalAlpha = layer.opacity / 100;
         if (layer.type === 'text') {
