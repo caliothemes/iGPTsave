@@ -645,18 +645,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             }
             ctx.restore();
           }
-        } else if (layer.type === 'background') {
-          if (layer.bgType === 'solid') {
-            ctx.fillStyle = layer.bgValue;
-            ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
-          } else if (layer.bgType === 'gradient') {
-            const gradient = ctx.createLinearGradient(layer.x, layer.y, layer.x + layer.width, layer.y + layer.height);
-            gradient.addColorStop(0, layer.bgValue.color1);
-            gradient.addColorStop(1, layer.bgValue.color2);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
-          }
-        }
+        
         ctx.restore();
         if (selectedLayer === idx) {
           ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
