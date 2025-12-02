@@ -35,6 +35,7 @@ const STYLES = [
 ];
 
 const COLOR_PALETTES = [
+  // Classiques populaires
   { id: 'vibrant', name: { fr: 'Vibrant', en: 'Vibrant' }, colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'] },
   { id: 'pastel', name: { fr: 'Pastel', en: 'Pastel' }, colors: ['#FFB5BA', '#B5D8FF', '#C5FFB5', '#FFE5B5', '#E5B5FF'] },
   { id: 'dark', name: { fr: 'Sombre', en: 'Dark' }, colors: ['#1A1A2E', '#16213E', '#0F3460', '#533483', '#E94560'] },
@@ -55,12 +56,33 @@ const COLOR_PALETTES = [
   { id: 'wine', name: { fr: 'Vin', en: 'Wine' }, colors: ['#722F37', '#8B0000', '#A52A2A', '#CD5C5C', '#F5DEB3'] },
   { id: 'lavender', name: { fr: 'Lavande', en: 'Lavender' }, colors: ['#E6E6FA', '#D8BFD8', '#DDA0DD', '#BA55D3', '#9932CC'] },
   { id: 'tropical', name: { fr: 'Tropical', en: 'Tropical' }, colors: ['#FF6F61', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'] },
+  // Nouvelles palettes
+  { id: 'cherry', name: { fr: 'Cerise', en: 'Cherry' }, colors: ['#7B2D3C', '#DE3163', '#FF6B8A', '#FFB6C1', '#FFF0F5'] },
+  { id: 'midnight', name: { fr: 'Minuit', en: 'Midnight' }, colors: ['#0D1B2A', '#1B263B', '#415A77', '#778DA9', '#E0E1DD'] },
+  { id: 'sahara', name: { fr: 'Sahara', en: 'Sahara' }, colors: ['#C19A6B', '#EDC9AF', '#F5DEB3', '#FAEBD7', '#8B7355'] },
+  { id: 'peacock', name: { fr: 'Paon', en: 'Peacock' }, colors: ['#005F73', '#0A9396', '#94D2BD', '#E9D8A6', '#EE9B00'] },
+  { id: 'berry', name: { fr: 'Baies', en: 'Berry' }, colors: ['#3D1A4A', '#6B2D5C', '#9B4F96', '#C8A2C8', '#E8D5E8'] },
+  { id: 'peach', name: { fr: 'Pêche', en: 'Peach' }, colors: ['#FFCBA4', '#FFE5B4', '#FFDAB9', '#FFF8DC', '#FF9966'] },
+  { id: 'emerald', name: { fr: 'Émeraude', en: 'Emerald' }, colors: ['#064E3B', '#047857', '#10B981', '#6EE7B7', '#D1FAE5'] },
+  { id: 'coral', name: { fr: 'Corail', en: 'Coral' }, colors: ['#FF7F50', '#FF6347', '#FF4500', '#FFD700', '#FFA07A'] },
+  { id: 'steel', name: { fr: 'Acier', en: 'Steel' }, colors: ['#2F4F4F', '#708090', '#A9A9A9', '#C0C0C0', '#DCDCDC'] },
+  { id: 'cherry_blossom', name: { fr: 'Sakura', en: 'Sakura' }, colors: ['#FFB7C5', '#FADADD', '#FFC0CB', '#F8E8EE', '#8B4513'] },
+  { id: 'electric', name: { fr: 'Électrique', en: 'Electric' }, colors: ['#00FFFF', '#00FF00', '#FFFF00', '#FF00FF', '#FF0000'] },
+  { id: 'vintage', name: { fr: 'Rétro', en: 'Retro' }, colors: ['#D4A373', '#CCD5AE', '#E9EDC9', '#FEFAE0', '#FAEDCD'] },
+  { id: 'nordic', name: { fr: 'Nordique', en: 'Nordic' }, colors: ['#2E3440', '#3B4252', '#434C5E', '#4C566A', '#ECEFF4'] },
+  { id: 'autumn', name: { fr: 'Automne', en: 'Autumn' }, colors: ['#8B4513', '#CD853F', '#DAA520', '#B8860B', '#D2691E'] },
+  { id: 'spring', name: { fr: 'Printemps', en: 'Spring' }, colors: ['#98FB98', '#90EE90', '#7CFC00', '#32CD32', '#FFD700'] },
+  { id: 'galaxy', name: { fr: 'Galaxie', en: 'Galaxy' }, colors: ['#0D0221', '#190132', '#380474', '#6B0F8C', '#8B2FC9'] },
+  { id: 'terracotta', name: { fr: 'Terracotta', en: 'Terracotta' }, colors: ['#E2725B', '#CD5C5C', '#BC8F8F', '#D2B48C', '#FFF8DC'] },
+  { id: 'cyberpunk', name: { fr: 'Cyberpunk', en: 'Cyberpunk' }, colors: ['#FF00FF', '#00BFFF', '#FF1493', '#7B68EE', '#0D0D0D'] },
+  { id: 'zen', name: { fr: 'Zen', en: 'Zen' }, colors: ['#F5F5DC', '#E8E4C9', '#C4B7A6', '#8B8378', '#5C5346'] },
+  { id: 'pop_art', name: { fr: 'Pop Art', en: 'Pop Art' }, colors: ['#FFFF00', '#FF0000', '#0000FF', '#FF69B4', '#00FF00'] },
 ];
 
 export default function StyleSelector({ selectedStyle, selectedPalette, onStyleChange, onPaletteChange, onClose, onAutoSend }) {
   const { language } = useLanguage();
   const lang = language || 'fr';
-  const [openSection, setOpenSection] = useState('styles'); // 'styles' or 'palettes'
+  const [openSection, setOpenSection] = useState('palettes'); // 'palettes' or 'styles'
 
   const handleStyleClick = (style) => {
     if (selectedStyle?.id === style.id) {
@@ -89,62 +111,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
         </button>
       )}
 
-      {/* Styles Accordion */}
-      <div className="border border-white/10 rounded-xl overflow-hidden">
-        <button
-          onClick={() => setOpenSection(openSection === 'styles' ? null : 'styles')}
-          className={cn(
-            "w-full flex items-center justify-between p-3 transition-colors",
-            openSection === 'styles' ? "bg-violet-500/20" : "bg-white/5 hover:bg-white/10"
-          )}
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-violet-400" />
-            <span className="text-white/80 text-sm font-medium">
-              {lang === 'fr' ? 'Styles visuels' : 'Visual styles'}
-            </span>
-            {selectedStyle && (
-              <span className="text-xs bg-violet-500/30 text-violet-300 px-2 py-0.5 rounded-full">
-                {selectedStyle.name[lang]}
-              </span>
-            )}
-          </div>
-          <ChevronDown className={cn("h-4 w-4 text-white/50 transition-transform", openSection === 'styles' && "rotate-180")} />
-        </button>
-        {openSection === 'styles' && (
-          <div className="p-3 bg-black/20">
-            <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
-              {STYLES.map((style) => {
-                const IconComponent = style.icon;
-                return (
-                  <button
-                    key={style.id}
-                    onClick={() => handleStyleClick(style)}
-                    className={cn(
-                      "p-2 rounded-xl transition-all flex flex-col items-center gap-1.5 border",
-                      selectedStyle?.id === style.id
-                        ? "bg-gradient-to-br " + style.color + " border-white/30 shadow-lg"
-                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-6 h-6 rounded-lg flex items-center justify-center",
-                      selectedStyle?.id === style.id ? "bg-white/20" : "bg-white/10"
-                    )}>
-                      <IconComponent className={cn("h-3.5 w-3.5", selectedStyle?.id === style.id ? "text-white" : "text-white/60")} />
-                    </div>
-                    <span className={cn("text-[9px] font-medium text-center leading-tight", selectedStyle?.id === style.id ? "text-white" : "text-white/60")}>
-                      {style.name[lang]}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Color Palettes Accordion */}
+      {/* Color Palettes Accordion - EN PREMIER */}
       <div className="border border-white/10 rounded-xl overflow-hidden">
         <button
           onClick={() => setOpenSection(openSection === 'palettes' ? null : 'palettes')}
@@ -167,7 +134,7 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
           <ChevronDown className={cn("h-4 w-4 text-white/50 transition-transform", openSection === 'palettes' && "rotate-180")} />
         </button>
         {openSection === 'palettes' && (
-          <div className="p-3 bg-black/20">
+          <div className="p-3 bg-black/20 max-h-[200px] overflow-y-auto">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               {COLOR_PALETTES.map((palette) => (
                 <button
@@ -197,6 +164,61 @@ export default function StyleSelector({ selectedStyle, selectedPalette, onStyleC
                   </p>
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Styles Accordion - EN SECOND */}
+      <div className="border border-white/10 rounded-xl overflow-hidden">
+        <button
+          onClick={() => setOpenSection(openSection === 'styles' ? null : 'styles')}
+          className={cn(
+            "w-full flex items-center justify-between p-3 transition-colors",
+            openSection === 'styles' ? "bg-violet-500/20" : "bg-white/5 hover:bg-white/10"
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-violet-400" />
+            <span className="text-white/80 text-sm font-medium">
+              {lang === 'fr' ? 'Styles visuels' : 'Visual styles'}
+            </span>
+            {selectedStyle && (
+              <span className="text-xs bg-violet-500/30 text-violet-300 px-2 py-0.5 rounded-full">
+                {selectedStyle.name[lang]}
+              </span>
+            )}
+          </div>
+          <ChevronDown className={cn("h-4 w-4 text-white/50 transition-transform", openSection === 'styles' && "rotate-180")} />
+        </button>
+        {openSection === 'styles' && (
+          <div className="p-3 bg-black/20 max-h-[200px] overflow-y-auto">
+            <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+              {STYLES.map((style) => {
+                const IconComponent = style.icon;
+                return (
+                  <button
+                    key={style.id}
+                    onClick={() => handleStyleClick(style)}
+                    className={cn(
+                      "p-2 rounded-xl transition-all flex flex-col items-center gap-1.5 border",
+                      selectedStyle?.id === style.id
+                        ? "bg-gradient-to-br " + style.color + " border-white/30 shadow-lg"
+                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-6 h-6 rounded-lg flex items-center justify-center",
+                      selectedStyle?.id === style.id ? "bg-white/20" : "bg-white/10"
+                    )}>
+                      <IconComponent className={cn("h-3.5 w-3.5", selectedStyle?.id === style.id ? "text-white" : "text-white/60")} />
+                    </div>
+                    <span className={cn("text-[9px] font-medium text-center leading-tight", selectedStyle?.id === style.id ? "text-white" : "text-white/60")}>
+                      {style.name[lang]}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
