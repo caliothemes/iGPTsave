@@ -88,12 +88,28 @@ export default function Home() {
                               user_email: currentUser.email,
                               free_downloads: 25,
                               paid_credits: 0,
-                              subscription_type: 'free'
+                              subscription_type: 'free',
+                              last_free_reset: new Date().toISOString().split('T')[0]
                             });
-            setCredits(newCredits);
-          } else {
-            setCredits(userCredits[0]);
-          }
+                            setCredits(newCredits);
+                          } else {
+                            // Check if we need to reset monthly free credits
+                            const userCreds = userCredits[0];
+                            const now = new Date();
+                            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                            const lastReset = userCreds.last_free_reset ? userCreds.last_free_reset.slice(0, 7) : null;
+
+                            if (userCreds.subscription_type === 'free' && lastReset !== currentMonth) {
+                              // Reset free credits for new month
+                              await base44.entities.UserCredits.update(userCreds.id, {
+                                free_downloads: 25,
+                                last_free_reset: now.toISOString().split('T')[0]
+                              });
+                              setCredits({ ...userCreds, free_downloads: 25, last_free_reset: now.toISOString().split('T')[0] });
+                            } else {
+                              setCredits(userCreds);
+                            }
+                          }
 
           setVisuals(userVisuals);
           setConversations(userConversations);
