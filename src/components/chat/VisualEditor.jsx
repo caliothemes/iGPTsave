@@ -791,6 +791,32 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
     showHelp(language === 'fr' ? '💡 Fond ajouté. Ajustez l\'opacité en bas.' : '💡 Background added. Adjust opacity below.');
   };
 
+  const addBackgroundShapeLayer = (shape) => {
+    const newLayer = {
+      type: 'shape',
+      shape,
+      x: canvasSize.width / 2 - canvasSize.width * 0.4,
+      y: canvasSize.height / 2 - canvasSize.height * 0.4,
+      width: canvasSize.width * 0.8,
+      height: canvasSize.height * 0.8,
+      color: bgShapeColor,
+      opacity: 100,
+      stroke: false,
+      strokeColor: '#000000',
+      strokeWidth: 2,
+      rotation: 0,
+      shadow: false,
+      glow: false,
+      glowColor: '#ffffff',
+      glowSize: 10
+    };
+    // Insert at the beginning (behind other layers)
+    setLayers([newLayer, ...layers]);
+    setSelectedLayer(0);
+    setActiveTab('layers');
+    showHelp(language === 'fr' ? '💡 Forme ajoutée en fond. Ajustez la taille et couleur.' : '💡 Shape added as background. Adjust size and color.');
+  };
+
   const generateCustomTexture = async () => {
         if (!texturePrompt.trim()) return;
         setGeneratingCustomTexture(true);
