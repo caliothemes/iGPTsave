@@ -1593,21 +1593,26 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsContent value="layers" className="mt-0 space-y-2">
             {layers.length > 0 && (
               <p className="text-amber-400/80 text-xs px-2 py-1 bg-amber-500/10 rounded-lg flex items-center gap-1">
-                💡 {language === 'fr' ? 'Glissez les éléments sur l\'image. Supprimez-les ici.' : 'Drag elements on image. Delete them here.'}
+                💡 {language === 'fr' ? 'Utilisez les flèches pour réordonner. Haut = devant.' : 'Use arrows to reorder. Top = front.'}
               </p>
             )}
             <div className="space-y-1">
               {layers.length === 0 ? (
               <p className="text-white/40 text-xs text-center py-4">{language === 'fr' ? 'Aucun calque' : 'No layers'}</p>
-              ) : layers.map((layer, idx) => {
+              ) : [...layers].reverse().map((layer, reversedIdx) => {
+              const idx = layers.length - 1 - reversedIdx;
               const LayerIcon = layer.type === 'text' ? Type : layer.type === 'image' ? ImagePlus : layer.type === 'background' ? PaintBucket : Square;
               return (
-                <button key={idx} onClick={() => setSelectedLayer(idx)}
-                  className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
-                  <LayerIcon className="h-3 w-3" />
+                <div key={idx} onClick={() => setSelectedLayer(idx)}
+                  className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all cursor-pointer", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
+                  <LayerIcon className="h-3 w-3 flex-shrink-0" />
                   <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 15) : layer.type === 'image' ? 'Image' : layer.type === 'background' ? (language === 'fr' ? 'Fond' : 'Background') : layer.shape}</span>
-                  <span onClick={(e) => { e.stopPropagation(); deleteLayer(idx); }} className="p-1 text-red-400/60 hover:text-red-400 cursor-pointer"><Trash2 className="h-3 w-3" /></span>
-                </button>
+                  <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <button onClick={(e) => { e.stopPropagation(); moveLayer(idx, 'up'); }} disabled={idx === layers.length - 1} className="p-1 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed"><ChevronUp className="h-3 w-3" /></button>
+                    <button onClick={(e) => { e.stopPropagation(); moveLayer(idx, 'down'); }} disabled={idx === 0} className="p-1 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed"><ChevronDown className="h-3 w-3" /></button>
+                    <button onClick={(e) => { e.stopPropagation(); deleteLayer(idx); }} className="p-1 text-red-400/60 hover:text-red-400"><Trash2 className="h-3 w-3" /></button>
+                  </div>
+                </div>
               );
               })}
             </div>
