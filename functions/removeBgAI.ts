@@ -15,6 +15,25 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'image_url required' }, { status: 400 });
     }
 
+    // Deduct 1 credit from user
+    const userCredits = await base44.entities.UserCredits.filter({ user_email: user.email });
+    if (userCredits.length > 0) {
+      const credits = userCredits[0];
+      // Check if user has credits (admin has unlimited)
+      if (user.role !== 'admin' && credits.subscription_type !== 'unlimited') {
+        const totalCredits = (credits.free_downloads || 0) + (credits.paid_credits || 0);
+        if (totalCredits <= 0) {
+          return Response.json({ success: false, error: 'Crédits insuffisants' }, { status: 400 });
+        }
+        // Deduct credit
+        if (credits.free_downloads > 0) {
+          await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+        } else if (credits.paid_credits > 0) {
+          await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+        }
+      }
+    }
+
     // Use AI to generate a version without background
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `Analyze this image and describe it in detail for recreation WITHOUT any background.
