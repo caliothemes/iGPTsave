@@ -1349,13 +1349,13 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 setRemovingBg(false);
               }}
               disabled={removingBg}
-              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 py-3 flex flex-col items-center gap-1"
+              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 py-4 px-4 flex flex-col items-center gap-1.5 h-auto"
             >
               <div className="flex items-center">
                 {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
                 {language === 'fr' ? 'Supprimer le fond de l\'image' : 'Remove image background'}
               </div>
-              <span className="text-[10px] text-white/70 font-normal">
+              <span className="text-[10px] text-white/70 font-normal leading-relaxed text-center">
                 {language === 'fr' 
                   ? 'Recommandé pour personnaliser librement le fond' 
                   : 'Recommended to freely customize the background'}
