@@ -1279,7 +1279,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </p>
           </TabsContent>
 
-          <TabsContent value="background" className="mt-0 space-y-3">
+          <TabsContent value="background" className="mt-0 space-y-2">
             {/* Remove Background Button */}
             <Button
               onClick={async () => {
@@ -1299,116 +1299,162 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 setRemovingBg(false);
               }}
               disabled={removingBg}
-              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 mb-2"
+              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 py-3 flex flex-col items-center gap-1"
             >
-              {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
-              {language === 'fr' ? 'Supprimer le fond de l\'image' : 'Remove image background'}
+              <div className="flex items-center">
+                {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+                {language === 'fr' ? 'Supprimer le fond de l\'image' : 'Remove image background'}
+              </div>
+              <span className="text-[10px] text-white/70 font-normal">
+                {language === 'fr' 
+                  ? 'Recommandé pour personnaliser librement le fond' 
+                  : 'Recommended to freely customize the background'}
+              </span>
             </Button>
 
-            <p className="text-white/40 text-xs">{language === 'fr' ? 'Couleurs unies:' : 'Solid colors:'}</p>
-            <div className="flex gap-1 flex-wrap">
-              {PRESET_COLORS.map(color => (
-                <button key={color} onClick={() => addBackgroundLayer('solid', color)} className="w-7 h-7 rounded-lg border-2 border-transparent hover:border-violet-400 transition-all hover:scale-110" style={{ backgroundColor: color }} />
-              ))}
-              <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-7 h-7 rounded cursor-pointer" />
-              <button onClick={() => addBackgroundLayer('solid', bgColor)} className="px-2 h-7 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs">
-                +
+            {/* Accordion: Couleurs */}
+            <div className="border border-white/10 rounded-lg overflow-hidden">
+              <button onClick={() => toggleBgAccordion('colors')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                <span className="text-white/70 text-xs flex items-center gap-2">
+                  <Palette className="h-3 w-3" />
+                  {language === 'fr' ? 'Couleurs unies' : 'Solid colors'}
+                </span>
+                <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.colors && "rotate-180")} />
               </button>
+              {bgAccordion.colors && (
+                <div className="p-2">
+                  <div className="flex gap-1 flex-wrap">
+                    {PRESET_COLORS.map(color => (
+                      <button key={color} onClick={() => addBackgroundLayer('solid', color)} className="w-6 h-6 rounded-lg border-2 border-transparent hover:border-violet-400 transition-all hover:scale-110" style={{ backgroundColor: color }} />
+                    ))}
+                    <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer" />
+                    <button onClick={() => addBackgroundLayer('solid', bgColor)} className="px-2 h-6 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs">+</button>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <p className="text-white/40 text-xs mt-3">{language === 'fr' ? 'Dégradés:' : 'Gradients:'}</p>
-            <div className="grid grid-cols-4 gap-1">
-              {[
-                { color1: '#667eea', color2: '#764ba2' },
-                { color1: '#f093fb', color2: '#f5576c' },
-                { color1: '#4facfe', color2: '#00f2fe' },
-                { color1: '#43e97b', color2: '#38f9d7' },
-                { color1: '#fa709a', color2: '#fee140' },
-                { color1: '#a18cd1', color2: '#fbc2eb' },
-                { color1: '#ff0844', color2: '#ffb199' },
-                { color1: '#30cfd0', color2: '#330867' },
-                { color1: '#000000', color2: '#434343' },
-                { color1: '#200122', color2: '#6f0000' },
-                { color1: '#0f0c29', color2: '#302b63' },
-                { color1: '#ffe259', color2: '#ffa751' },
-              ].map((preset, idx) => (
-                <button key={idx} onClick={() => addBackgroundLayer('gradient', preset)} 
-                  className="h-10 rounded-lg border border-white/10 hover:border-violet-400 transition-colors hover:scale-105"
-                  style={{ background: `linear-gradient(135deg, ${preset.color1}, ${preset.color2})` }} />
-              ))}
-            </div>
-            
-            <div className="pt-2 border-t border-white/10">
-              <p className="text-white/40 text-xs mb-2">{language === 'fr' ? 'Dégradé personnalisé:' : 'Custom gradient:'}</p>
-              <div className="flex gap-2 items-center">
-                <input type="color" value={bgGradient.color1} onChange={(e) => setBgGradient({...bgGradient, color1: e.target.value})} className="w-8 h-8 rounded cursor-pointer" />
-                <input type="color" value={bgGradient.color2} onChange={(e) => setBgGradient({...bgGradient, color2: e.target.value})} className="w-8 h-8 rounded cursor-pointer" />
-                <div className="flex-1 h-8 rounded-lg" style={{ background: `linear-gradient(135deg, ${bgGradient.color1}, ${bgGradient.color2})` }} />
-                <button onClick={() => addBackgroundLayer('gradient', bgGradient)} className="px-3 h-8 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs">
-                  {language === 'fr' ? 'Ajouter' : 'Add'}
-                </button>
-              </div>
+            {/* Accordion: Dégradés */}
+            <div className="border border-white/10 rounded-lg overflow-hidden">
+              <button onClick={() => toggleBgAccordion('gradients')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                <span className="text-white/70 text-xs flex items-center gap-2">
+                  <GradientIcon className="h-3 w-3" />
+                  {language === 'fr' ? 'Dégradés' : 'Gradients'}
+                </span>
+                <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.gradients && "rotate-180")} />
+              </button>
+              {bgAccordion.gradients && (
+                <div className="p-2 space-y-2">
+                  <div className="grid grid-cols-4 gap-1">
+                    {[
+                      { color1: '#667eea', color2: '#764ba2' },
+                      { color1: '#f093fb', color2: '#f5576c' },
+                      { color1: '#4facfe', color2: '#00f2fe' },
+                      { color1: '#43e97b', color2: '#38f9d7' },
+                      { color1: '#fa709a', color2: '#fee140' },
+                      { color1: '#a18cd1', color2: '#fbc2eb' },
+                      { color1: '#ff0844', color2: '#ffb199' },
+                      { color1: '#30cfd0', color2: '#330867' },
+                      { color1: '#000000', color2: '#434343' },
+                      { color1: '#200122', color2: '#6f0000' },
+                      { color1: '#0f0c29', color2: '#302b63' },
+                      { color1: '#ffe259', color2: '#ffa751' },
+                    ].map((preset, idx) => (
+                      <button key={idx} onClick={() => addBackgroundLayer('gradient', preset)} 
+                        className="h-8 rounded-lg border border-white/10 hover:border-violet-400 transition-colors hover:scale-105"
+                        style={{ background: `linear-gradient(135deg, ${preset.color1}, ${preset.color2})` }} />
+                    ))}
+                  </div>
+                  <div className="flex gap-2 items-center pt-1 border-t border-white/5">
+                    <input type="color" value={bgGradient.color1} onChange={(e) => setBgGradient({...bgGradient, color1: e.target.value})} className="w-6 h-6 rounded cursor-pointer" />
+                    <input type="color" value={bgGradient.color2} onChange={(e) => setBgGradient({...bgGradient, color2: e.target.value})} className="w-6 h-6 rounded cursor-pointer" />
+                    <div className="flex-1 h-6 rounded-lg" style={{ background: `linear-gradient(135deg, ${bgGradient.color1}, ${bgGradient.color2})` }} />
+                    <button onClick={() => addBackgroundLayer('gradient', bgGradient)} className="px-2 h-6 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 text-xs">+</button>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Dégradés PRO en fond */}
+            {/* Accordion: Dégradés PRO */}
             {adminGradients.filter(g => g.preview_url).length > 0 && (
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-amber-400" />
-                  {language === 'fr' ? 'Dégradés PRO (en fond):' : 'PRO Gradients (as background):'}
-                </p>
-                <div className="grid grid-cols-5 gap-1">
-                  {adminGradients.filter(g => g.preview_url).map(gradient => (
-                    <button key={gradient.id} onClick={() => addBackgroundImageLayer(gradient.preview_url)}
-                      className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
-                      <img src={gradient.preview_url} alt={gradient.name_fr} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
+              <div className="border border-amber-500/30 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('proGradients')} className="w-full px-3 py-2 flex items-center justify-between bg-amber-500/10 hover:bg-amber-500/20 transition-colors">
+                  <span className="text-amber-300 text-xs flex items-center gap-2">
+                    <Sparkles className="h-3 w-3" />
+                    {language === 'fr' ? 'Dégradés PRO' : 'PRO Gradients'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-amber-400/60 transition-transform", bgAccordion.proGradients && "rotate-180")} />
+                </button>
+                {bgAccordion.proGradients && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-5 gap-1">
+                      {adminGradients.filter(g => g.preview_url).map(gradient => (
+                        <button key={gradient.id} onClick={() => addBackgroundImageLayer(gradient.preview_url)}
+                          className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
+                          <img src={gradient.preview_url} alt={gradient.name_fr} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Textures en fond */}
+            {/* Accordion: Textures */}
             {adminTexturesWithImage.length > 0 && (
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
-                  <TextureIcon className="h-3 w-3 text-violet-400" />
-                  {language === 'fr' ? 'Textures (en fond):' : 'Textures (as background):'}
-                </p>
-                <div className="grid grid-cols-5 gap-1">
-                  {adminTexturesWithImage.map(texture => (
-                    <button key={texture.id} onClick={() => addBackgroundImageLayer(texture.preview_url)}
-                      className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
-                      <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
+              <div className="border border-white/10 rounded-lg overflow-hidden">
+                <button onClick={() => toggleBgAccordion('textures')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                  <span className="text-white/70 text-xs flex items-center gap-2">
+                    <TextureIcon className="h-3 w-3 text-violet-400" />
+                    {language === 'fr' ? 'Textures' : 'Textures'}
+                  </span>
+                  <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.textures && "rotate-180")} />
+                </button>
+                {bgAccordion.textures && (
+                  <div className="p-2">
+                    <div className="grid grid-cols-5 gap-1">
+                      {adminTexturesWithImage.map(texture => (
+                        <button key={texture.id} onClick={() => addBackgroundImageLayer(texture.preview_url)}
+                          className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
+                          <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Formes en fond */}
-            <div className="pt-2 border-t border-white/10">
-              <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
-                <Square className="h-3 w-3 text-blue-400" />
-                {language === 'fr' ? 'Formes (en fond):' : 'Shapes (as background):'}
-              </p>
-              <div className="grid grid-cols-6 gap-1">
-                {SHAPES.map(shape => {
-                  const ShapeIcon = shape.icon;
-                  return (
-                    <button key={shape.id} onClick={() => addBackgroundShapeLayer(shape.id)} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-0.5">
-                      <ShapeIcon className="h-4 w-4" />
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="flex gap-1 mt-2 flex-wrap">
-                <span className="text-white/30 text-xs">{language === 'fr' ? 'Couleur:' : 'Color:'}</span>
-                {PRESET_COLORS.slice(0, 8).map(color => (
-                  <button key={color} onClick={() => setBgShapeColor(color)} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", bgShapeColor === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
-                ))}
-                <input type="color" value={bgShapeColor} onChange={(e) => setBgShapeColor(e.target.value)} className="w-5 h-5 rounded cursor-pointer" />
-              </div>
+            {/* Accordion: Formes */}
+            <div className="border border-white/10 rounded-lg overflow-hidden">
+              <button onClick={() => toggleBgAccordion('shapes')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
+                <span className="text-white/70 text-xs flex items-center gap-2">
+                  <Square className="h-3 w-3 text-blue-400" />
+                  {language === 'fr' ? 'Formes' : 'Shapes'}
+                </span>
+                <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", bgAccordion.shapes && "rotate-180")} />
+              </button>
+              {bgAccordion.shapes && (
+                <div className="p-2 space-y-2">
+                  <div className="grid grid-cols-6 gap-1">
+                    {SHAPES.map(shape => {
+                      const ShapeIcon = shape.icon;
+                      return (
+                        <button key={shape.id} onClick={() => addBackgroundShapeLayer(shape.id)} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-0.5">
+                          <ShapeIcon className="h-4 w-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex gap-1 flex-wrap">
+                    <span className="text-white/30 text-xs">{language === 'fr' ? 'Couleur:' : 'Color:'}</span>
+                    {PRESET_COLORS.slice(0, 8).map(color => (
+                      <button key={color} onClick={() => setBgShapeColor(color)} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", bgShapeColor === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                    ))}
+                    <input type="color" value={bgShapeColor} onChange={(e) => setBgShapeColor(e.target.value)} className="w-5 h-5 rounded cursor-pointer" />
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
 
