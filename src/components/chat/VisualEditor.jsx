@@ -1226,12 +1226,12 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           </TabsContent>
 
           <TabsContent value="shapes" className="mt-0 space-y-2">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-6 gap-1.5">
               {SHAPES.map(shape => {
                 const ShapeIcon = shape.icon;
                 return (
-                  <button key={shape.id} onClick={() => addShapeLayer(shape.id)} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-1">
-                    <ShapeIcon className="h-5 w-5" /><span className="text-[10px]">{shape.name}</span>
+                  <button key={shape.id} onClick={() => addShapeLayer(shape.id)} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-0.5">
+                    <ShapeIcon className="h-4 w-4" /><span className="text-[9px]">{shape.name}</span>
                   </button>
                 );
               })}
