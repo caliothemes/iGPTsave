@@ -118,12 +118,12 @@ export default function Sidebar({
                 <ChevronDown className={cn("h-4 w-4 transition-transform", visualsOpen && "rotate-180")} />
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="grid grid-cols-2 gap-1.5 p-2">
+                <div className="grid grid-cols-2 gap-1 p-1.5">
                   {visuals.slice(0, 4).map((visual, idx) => (
                     <div
                       key={visual.id || idx}
                       onClick={() => onSelectVisual(visual)}
-                      className="aspect-square rounded-md overflow-hidden cursor-pointer border border-white/10 hover:border-violet-500/50 transition-colors"
+                      className="aspect-square rounded-md overflow-hidden cursor-pointer border border-white/10 hover:border-violet-500/50 transition-colors max-w-[100px]"
                     >
                       <img src={visual.image_url} alt={visual.title} className="w-full h-full object-cover" />
                     </div>
