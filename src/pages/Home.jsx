@@ -41,7 +41,7 @@ export default function Home() {
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
-  const [showWatermarkNotice, setShowWatermarkNotice] = useState(false);
+  
   const [showVisualsTooltip, setShowVisualsTooltip] = useState(false);
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
@@ -652,11 +652,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                   setTimeout(() => setShowStyleTip(false), 5000);
                                 }
 
-                    // Show watermark notice if not dismissed (for 4 seconds)
-        if (isAuthenticated && credits?.subscription_type === 'free' && !localStorage.getItem('hideWatermarkNotice')) {
-          setShowWatermarkNotice(true);
-          setTimeout(() => setShowWatermarkNotice(false), 4000);
-        }
+
 
         // Show visuals tooltip after a short delay (if not dismissed)
         if (!localStorage.getItem('hideVisualsTooltip')) {
@@ -823,30 +819,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
       <AnimatedBackground />
       <GlobalHeader />
 
-      {/* Watermark Notice Toast */}
-      {showWatermarkNotice && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex flex-col gap-2 px-4 py-3 bg-blue-900/95 border border-blue-400/30 rounded-xl shadow-lg">
-            <div className="flex items-center gap-3">
-              <Info className="h-4 w-4 text-blue-300 flex-shrink-0" />
-              <p className="text-blue-100 text-sm">
-                {language === 'fr' 
-                  ? "Le filigrane ne sera pas présent sur la version téléchargée" 
-                  : "The watermark will not appear on the downloaded version"}
-              </p>
-            </div>
-            <button 
-              onClick={() => {
-                setShowWatermarkNotice(false);
-                localStorage.setItem('hideWatermarkNotice', 'true');
-              }}
-              className="text-blue-300/60 hover:text-blue-200 text-xs transition-colors self-end"
-            >
-              {language === 'fr' ? "Ne plus afficher ce message" : "Don't show this again"}
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* Visuals Tooltip */}
       {showVisualsTooltip && sidebarOpen && (
