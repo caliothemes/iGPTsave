@@ -1312,7 +1312,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             {adminGradients.length > 0 ? (
               <>
                 <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Dégradés PRO disponibles:' : 'Available PRO gradients:'}</p>
-                <div className="grid grid-cols-4 gap-1.5">
+                <div className="grid grid-cols-5 gap-1.5">
                   {adminGradients.filter(g => g.preview_url).map(gradient => (
                     <button key={gradient.id} onClick={() => addImageLayer(gradient.preview_url, canvasSize.width, canvasSize.height, true)}
                       className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-amber-500/50 transition-colors aspect-square">
