@@ -1283,8 +1283,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               onClick={async () => {
                 setRemovingBg(true);
                 try {
-                  // Use AI-based background removal (free)
-                  const response = await base44.functions.invoke('removeBgAI', { image_url: originalImageUrl });
+                  const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
                   if (response.data?.success && response.data?.image_url) {
                     // Find and update the base image layer
                     const baseLayerIdx = layers.findIndex(l => l.isBaseImage);
@@ -2063,20 +2062,17 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   onClick={async () => {
                     setRemovingBgFromLayer(true);
                     try {
-                      // Use AI-based background removal (free)
-                      const response = await base44.functions.invoke('removeBgAI', { image_url: currentLayer.imageUrl });
-                      console.log('RemoveBgAI response:', response);
+                      const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
                       if (response.data?.success && response.data?.image_url) {
                         updateLayer(selectedLayer, { imageUrl: response.data.image_url });
                         showHelp(language === 'fr' ? '✨ Fond supprimé ! (1 crédit)' : '✨ Background removed! (1 credit)');
                       } else if (response.data?.error) {
-                        console.error('RemoveBgAI error:', response.data.error);
                         showHelp(language === 'fr' ? `❌ ${response.data.error}` : `❌ ${response.data.error}`);
                       } else {
                         showHelp(language === 'fr' ? '❌ Réponse inattendue du serveur' : '❌ Unexpected server response');
                       }
                     } catch (err) {
-                      console.error('RemoveBgAI catch error:', err);
+                      console.error('RemoveBg error:', err);
                       const errorMessage = err?.response?.data?.error || err?.message || 'Unknown error';
                       showHelp(language === 'fr' ? `❌ Erreur: ${errorMessage}` : `❌ Error: ${errorMessage}`);
                     }
