@@ -15,7 +15,7 @@ function TypingIndicator() {
 
 export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion...", user }) {
   const isUser = message.role === 'user';
-  const isWarning = message.content?.includes('Nouveau sujet détecté') || message.content?.includes('New subject detected');
+  const isWarning = message.content?.includes('Nouveau sujet détecté') || message.content?.includes('New subject detected') || message.content?.includes('Ajout de texte détecté') || message.content?.includes('Text addition detected');
 
   return (
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
