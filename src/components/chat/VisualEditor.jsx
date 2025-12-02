@@ -808,13 +808,27 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       shadow: false,
       glow: false,
       glowColor: '#ffffff',
-      glowSize: 10
+      glowSize: 10,
+      isBackgroundShape: true // Mark as background shape
     };
-    // Insert at the beginning (behind other layers)
+    // Insert at the very beginning (behind all layers including backgrounds)
     setLayers([newLayer, ...layers]);
     setSelectedLayer(0);
     setActiveTab('layers');
     showHelp(language === 'fr' ? '💡 Forme ajoutée en fond. Ajustez la taille et couleur.' : '💡 Shape added as background. Adjust size and color.');
+  };
+  
+  // Accordion state for background tab
+  const [bgAccordion, setBgAccordion] = useState({
+    colors: false,
+    gradients: false,
+    proGradients: false,
+    textures: false,
+    shapes: false
+  });
+  
+  const toggleBgAccordion = (key) => {
+    setBgAccordion(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   const generateCustomTexture = async () => {
