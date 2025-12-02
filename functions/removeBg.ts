@@ -20,26 +20,43 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Remove.bg API key not configured' }, { status: 500 });
     }
 
-    // Call Remove.bg API with URL-encoded form data
+    console.log('Attempting to remove background from:', image_url);
+
+    // First, fetch the image to get its binary data
+    const imageResponse = await fetch(image_url);
+    if (!imageResponse.ok) {
+      console.error('Failed to fetch image:', imageResponse.status);
+      return Response.json({ error: 'Failed to fetch source image' }, { status: 400 });
+    }
+    
+    const imageBlob = await imageResponse.blob();
+    console.log('Image fetched, size:', imageBlob.size, 'type:', imageBlob.type);
+
+    // Create FormData with the image file
+    const formData = new FormData();
+    formData.append('image_file', imageBlob, 'image.png');
+    formData.append('size', 'auto');
+    formData.append('format', 'png');
+
+    // Call Remove.bg API with file upload
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
       headers: {
         'X-Api-Key': apiKey,
-        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        image_url: image_url,
-        size: 'auto',
-        format: 'png',
-      }),
+      body: formData,
     });
 
+    console.log('Remove.bg response status:', response.status);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Remove.bg error:', JSON.stringify(errorData));
+      const errorText = await response.text();
+      console.error('Remove.bg error:', errorText);
+      let errorData = {};
+      try { errorData = JSON.parse(errorText); } catch(e) {}
       return Response.json({ 
         error: 'Failed to remove background', 
-        details: errorData.errors?.[0]?.title || 'Unknown error'
+        details: errorData.errors?.[0]?.title || errorText || 'Unknown error'
       }, { status: 500 });
     }
 
