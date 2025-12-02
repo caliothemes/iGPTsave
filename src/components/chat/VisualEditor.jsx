@@ -1338,7 +1338,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
                   if (response.data?.success && response.data?.image_url) {
                     setOriginalImageUrl(response.data.image_url);
-                    showHelp(language === 'fr' ? '✨ Fond supprimé ! Ajoutez maintenant une couleur de fond.' : '✨ Background removed! Now add a background color.');
+                    showHelp(language === 'fr' ? '✅ Fond supprimé avec succès !' : '✅ Background removed successfully!');
                   } else {
                     showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
                   }
