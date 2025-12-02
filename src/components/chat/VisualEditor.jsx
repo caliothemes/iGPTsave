@@ -14,8 +14,14 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw, Upload, Scissors
+  PaintBucket, RotateCw, Upload, Scissors, ChevronDown as ChevronDownIcon
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Custom gradient icon component
 const GradientIcon = ({ className }) => (
