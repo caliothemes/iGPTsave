@@ -1269,6 +1269,42 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </button>
               </div>
             </div>
+
+            {/* Dégradés PRO en fond */}
+            {adminGradients.filter(g => g.preview_url).length > 0 && (
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-amber-400" />
+                  {language === 'fr' ? 'Dégradés PRO (en fond):' : 'PRO Gradients (as background):'}
+                </p>
+                <div className="grid grid-cols-5 gap-1">
+                  {adminGradients.filter(g => g.preview_url).map(gradient => (
+                    <button key={gradient.id} onClick={() => addImageLayer(gradient.preview_url, canvasSize.width, canvasSize.height, true)}
+                      className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
+                      <img src={gradient.preview_url} alt={gradient.name_fr} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Textures en fond */}
+            {adminTexturesWithImage.length > 0 && (
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
+                  <TextureIcon className="h-3 w-3 text-violet-400" />
+                  {language === 'fr' ? 'Textures (en fond):' : 'Textures (as background):'}
+                </p>
+                <div className="grid grid-cols-5 gap-1">
+                  {adminTexturesWithImage.map(texture => (
+                    <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height, true)}
+                      className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-colors aspect-square">
+                      <img src={texture.preview_url} alt={texture.name[language]} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="shapes" className="mt-0 space-y-2">
