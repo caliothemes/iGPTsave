@@ -1115,9 +1115,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
         // Draw base image
         exportCtx.drawImage(baseImg, 0, 0, canvasSize.width, canvasSize.height);
 
-        // Draw all other layers (excluding background)
+        // Draw all other layers (excluding background and background shapes)
         for (const layer of layers) {
           if (layer.type === 'background') continue; // Already drawn
+          if (layer.type === 'shape' && layer.isBackgroundShape) continue; // Already drawn
           exportCtx.save();
           exportCtx.globalAlpha = layer.opacity / 100;
 
