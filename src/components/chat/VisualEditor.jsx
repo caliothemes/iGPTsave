@@ -1419,15 +1419,16 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </p>
                 <div className="grid grid-cols-6 gap-1.5">
                   {sharedLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
-                    <div key={`shared-illust-${idx}`} className="relative group">
-                      <button onClick={() => addImageLayer(item.url, 150, 150)}
-                        className="w-full aspect-square rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors">
-                        <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
-                      </button>
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <button 
+                      key={`shared-illust-${idx}`} 
+                      onClick={() => addImageLayer(item.url, 150, 150)}
+                      className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square"
+                    >
+                      <img src={item.url} alt={item.name} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                         <span className="text-white text-[8px] text-center px-0.5">{item.name}</span>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
