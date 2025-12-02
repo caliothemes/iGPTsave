@@ -73,6 +73,13 @@ export default function Admin() {
   const [topRequests, setTopRequests] = useState([]);
   const [requestsPage, setRequestsPage] = useState(0);
   const REQUESTS_PER_PAGE = 10;
+  
+  const [revenueChartData, setRevenueChartData] = useState([]);
+  const [visitsChartData, setVisitsChartData] = useState([]);
+  const [registrationsChartData, setRegistrationsChartData] = useState([]);
+  const [revenueView, setRevenueView] = useState('day');
+  const [visitsView, setVisitsView] = useState('day');
+  const [registrationsView, setRegistrationsView] = useState('day');
   const [activityData, setActivityData] = useState([]);
   const [visualTypesData, setVisualTypesData] = useState([]);
 
@@ -299,6 +306,66 @@ export default function Admin() {
           .slice(0, 100);
 
         setTopRequests(topRequestsList);
+
+        // Build chart data helper
+        const buildChartData = (items, dateField, valueField, aggregateType = 'count') => {
+          const dataByDay = {};
+          const dataByWeek = {};
+          const dataByMonth = {};
+          
+          items.forEach(item => {
+            const date = new Date(item[dateField]);
+            if (isNaN(date.getTime())) return;
+            
+            const dayKey = date.toISOString().split('T')[0];
+            const weekKey = `${date.getFullYear()}-W${Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7).toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            
+            const value = aggregateType === 'sum' ? (item[valueField] || 0) : 1;
+            
+            dataByDay[dayKey] = (dataByDay[dayKey] || 0) + value;
+            dataByWeek[weekKey] = (dataByWeek[weekKey] || 0) + value;
+            dataByMonth[monthKey] = (dataByMonth[monthKey] || 0) + value;
+          });
+          
+          return { dataByDay, dataByWeek, dataByMonth };
+        };
+
+        // Revenue chart data
+        const completedTransactions = allTransactions.filter(t => t.status === 'completed');
+        const revenueData = buildChartData(completedTransactions, 'created_date', 'amount', 'sum');
+        
+        // Visits chart data (based on unique users per day from conversations + visuals)
+        const visitsData = buildChartData(allItems.filter(i => !adminEmailsSet.has(i.user_email || i.created_by)), 'created_date', null, 'count');
+        
+        // Registrations chart data
+        const nonAdminUsers = users.filter(u => u.role !== 'admin');
+        const registrationsData = buildChartData(nonAdminUsers, 'created_date', null, 'count');
+        
+        // Paid subscriptions (users with paid_credits > 0 or subscription_type !== 'free')
+        const paidSubs = allCredits.filter(c => (c.paid_credits > 0 || c.subscription_type !== 'free') && !adminEmailsSet.has(c.user_email));
+        const paidSubsData = buildChartData(paidSubs, 'created_date', null, 'count');
+
+        // Format chart data for display
+        const formatChartData = (dataByDay, dataByWeek, dataByMonth, view, label) => {
+          let data;
+          if (view === 'day') {
+            data = Object.entries(dataByDay).sort((a, b) => a[0].localeCompare(b[0])).slice(-30);
+          } else if (view === 'week') {
+            data = Object.entries(dataByWeek).sort((a, b) => a[0].localeCompare(b[0])).slice(-12);
+          } else {
+            data = Object.entries(dataByMonth).sort((a, b) => a[0].localeCompare(b[0])).slice(-12);
+          }
+          return data.map(([date, value]) => ({ date, [label]: value }));
+        };
+
+        setRevenueChartData({ ...revenueData, formatFn: formatChartData });
+        setVisitsChartData({ ...visitsData, formatFn: formatChartData });
+        setRegistrationsChartData({ 
+          registrations: registrationsData, 
+          paidSubs: paidSubsData,
+          formatFn: formatChartData 
+        });
 
       } catch (e) {
         console.error(e);
@@ -602,6 +669,134 @@ export default function Admin() {
               {topRequests.length === 0 && (
                 <p className="text-white/40 text-center py-8">Aucune demande</p>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Revenue Chart */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-green-400" />
+              Revenus
+            </h3>
+            <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+              {['day', 'week', 'month'].map(view => (
+                <button
+                  key={view}
+                  onClick={() => setRevenueView(view)}
+                  className={`px-3 py-1 text-xs rounded-md transition-colors ${revenueView === view ? 'bg-green-600 text-white' : 'text-white/50 hover:text-white'}`}
+                >
+                  {view === 'day' ? 'Jour' : view === 'week' ? 'Semaine' : 'Mois'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={revenueChartData.formatFn ? revenueChartData.formatFn(revenueChartData.dataByDay || {}, revenueChartData.dataByWeek || {}, revenueChartData.dataByMonth || {}, revenueView, 'revenue') : []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" stroke="#9ca3af" fontSize={10} tickFormatter={(v) => revenueView === 'day' ? v.slice(5) : revenueView === 'week' ? v.slice(5) : v} />
+                <YAxis stroke="#9ca3af" fontSize={10} tickFormatter={(v) => `${v}€`} />
+                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }} formatter={(v) => [`${v.toFixed(2)}€`, 'Revenus']} />
+                <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Visits Chart */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Eye className="h-5 w-5 text-blue-400" />
+              Visites
+            </h3>
+            <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+              {['day', 'week', 'month'].map(view => (
+                <button
+                  key={view}
+                  onClick={() => setVisitsView(view)}
+                  className={`px-3 py-1 text-xs rounded-md transition-colors ${visitsView === view ? 'bg-blue-600 text-white' : 'text-white/50 hover:text-white'}`}
+                >
+                  {view === 'day' ? 'Jour' : view === 'week' ? 'Semaine' : 'Mois'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={visitsChartData.formatFn ? visitsChartData.formatFn(visitsChartData.dataByDay || {}, visitsChartData.dataByWeek || {}, visitsChartData.dataByMonth || {}, visitsView, 'visits') : []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" stroke="#9ca3af" fontSize={10} tickFormatter={(v) => visitsView === 'day' ? v.slice(5) : visitsView === 'week' ? v.slice(5) : v} />
+                <YAxis stroke="#9ca3af" fontSize={10} />
+                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }} />
+                <Area type="monotone" dataKey="visits" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Registrations & Subscriptions Chart */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-violet-400" />
+              Inscriptions & Abonnements
+            </h3>
+            <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+              {['day', 'week', 'month'].map(view => (
+                <button
+                  key={view}
+                  onClick={() => setRegistrationsView(view)}
+                  className={`px-3 py-1 text-xs rounded-md transition-colors ${registrationsView === view ? 'bg-violet-600 text-white' : 'text-white/50 hover:text-white'}`}
+                >
+                  {view === 'day' ? 'Jour' : view === 'week' ? 'Semaine' : 'Mois'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={(() => {
+                if (!registrationsChartData.formatFn) return [];
+                const regs = registrationsChartData.formatFn(
+                  registrationsChartData.registrations?.dataByDay || {}, 
+                  registrationsChartData.registrations?.dataByWeek || {}, 
+                  registrationsChartData.registrations?.dataByMonth || {}, 
+                  registrationsView, 
+                  'inscriptions'
+                );
+                const subs = registrationsChartData.formatFn(
+                  registrationsChartData.paidSubs?.dataByDay || {}, 
+                  registrationsChartData.paidSubs?.dataByWeek || {}, 
+                  registrationsChartData.paidSubs?.dataByMonth || {}, 
+                  registrationsView, 
+                  'abonnements'
+                );
+                // Merge both datasets
+                const merged = {};
+                regs.forEach(r => { merged[r.date] = { ...merged[r.date], date: r.date, inscriptions: r.inscriptions }; });
+                subs.forEach(s => { merged[s.date] = { ...merged[s.date], date: s.date, abonnements: s.abonnements }; });
+                return Object.values(merged).sort((a, b) => a.date.localeCompare(b.date));
+              })()}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" stroke="#9ca3af" fontSize={10} tickFormatter={(v) => registrationsView === 'day' ? v.slice(5) : registrationsView === 'week' ? v.slice(5) : v} />
+                <YAxis stroke="#9ca3af" fontSize={10} />
+                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }} />
+                <Area type="monotone" dataKey="inscriptions" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} name="Inscriptions" />
+                <Area type="monotone" dataKey="abonnements" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} name="Abonnements payants" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex items-center justify-center gap-6 mt-3">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-violet-500" />
+              <span className="text-white/60 text-xs">Inscriptions</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-amber-500" />
+              <span className="text-white/60 text-xs">Abonnements payants</span>
             </div>
           </div>
         </div>
