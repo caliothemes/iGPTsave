@@ -1292,6 +1292,19 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     }
                     setOriginalImageUrl(response.data.image_url);
                     showHelp(language === 'fr' ? '✅ Fond supprimé ! (1 crédit utilisé)' : '✅ Background removed! (1 credit used)');
+                  } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                    // Show special message and offer to report
+                    const reportIssue = window.confirm(language === 'fr' 
+                      ? 'Cette fonction est indisponible pour le moment. Cliquez OK pour signaler ce problème à un admin.' 
+                      : 'This feature is currently unavailable. Click OK to report this issue to an admin.');
+                    if (reportIssue) {
+                      base44.integrations.Core.SendEmail({
+                        to: 'caliothemes@gmail.com',
+                        subject: '[iGPT] Problème Remove BG signalé',
+                        body: `Un utilisateur a signalé un problème avec la fonction Remove BG.\n\nUtilisateur: ${user?.email || 'Non connecté'}\nDate: ${new Date().toLocaleString()}\nErreur: ${response.data?.error}`
+                      });
+                      showHelp(language === 'fr' ? '📧 Problème signalé à l\'admin !' : '📧 Issue reported to admin!');
+                    }
                   } else {
                     showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
                   }
@@ -2066,6 +2079,18 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                       if (response.data?.success && response.data?.image_url) {
                         updateLayer(selectedLayer, { imageUrl: response.data.image_url });
                         showHelp(language === 'fr' ? '✨ Fond supprimé ! (1 crédit)' : '✨ Background removed! (1 credit)');
+                      } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                        const reportIssue = window.confirm(language === 'fr' 
+                          ? 'Cette fonction est indisponible pour le moment. Cliquez OK pour signaler ce problème à un admin.' 
+                          : 'This feature is currently unavailable. Click OK to report this issue to an admin.');
+                        if (reportIssue) {
+                          base44.integrations.Core.SendEmail({
+                            to: 'caliothemes@gmail.com',
+                            subject: '[iGPT] Problème Remove BG signalé',
+                            body: `Un utilisateur a signalé un problème avec la fonction Remove BG.\n\nUtilisateur: ${user?.email || 'Non connecté'}\nDate: ${new Date().toLocaleString()}\nErreur: ${response.data?.error}`
+                          });
+                          showHelp(language === 'fr' ? '📧 Problème signalé à l\'admin !' : '📧 Issue reported to admin!');
+                        }
                       } else if (response.data?.error) {
                         showHelp(language === 'fr' ? `❌ ${response.data.error}` : `❌ ${response.data.error}`);
                       } else {

@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
       if (user.role !== 'admin' && credits.subscription_type !== 'unlimited') {
         const totalCredits = (credits.free_downloads || 0) + (credits.paid_credits || 0);
         if (totalCredits <= 0) {
-          return Response.json({ success: false, error: 'Crédits insuffisants' }, { status: 400 });
+          return Response.json({ success: false, error: 'no_credits' }, { status: 400 });
         }
         // Deduct credit
         if (credits.free_downloads > 0) {
@@ -57,9 +57,17 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.json();
+      const errorTitle = errorData.errors?.[0]?.title || '';
+      // If it's a credit issue from remove.bg API, return special error
+      if (errorTitle.toLowerCase().includes('credit') || errorTitle.toLowerCase().includes('insufficient')) {
+        return Response.json({ 
+          success: false, 
+          error: 'service_unavailable'
+        });
+      }
       return Response.json({ 
         success: false, 
-        error: errorData.errors?.[0]?.title || 'Erreur API remove.bg' 
+        error: errorTitle || 'Erreur API remove.bg' 
       });
     }
 
