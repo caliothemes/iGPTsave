@@ -44,14 +44,14 @@ Deno.serve(async (req) => {
     }
 
     // Call noBG.me API
-    const response = await fetch('https://api.nobg.me/v1/remove-background', {
+    const response = await fetch('https://nobg.me/api/removeBackground', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        image_url: image_url
+        imageUrl: image_url
       })
     });
 
@@ -73,22 +73,11 @@ Deno.serve(async (req) => {
 
     const result = await response.json();
 
-    // noBG.me returns the image URL directly in the response
-    if (result.image_url || result.result_url || result.url) {
+    // noBG.me returns processedUrl in the response
+    if (result.processedUrl) {
       return Response.json({ 
         success: true,
-        image_url: result.image_url || result.result_url || result.url
-      });
-    }
-
-    // If the API returns raw image data, upload it
-    if (result.image_data) {
-      const binaryData = Uint8Array.from(atob(result.image_data), c => c.charCodeAt(0));
-      const file = new File([binaryData], `bg-removed-${Date.now()}.png`, { type: 'image/png' });
-      const uploadResult = await base44.integrations.Core.UploadFile({ file });
-      return Response.json({ 
-        success: true,
-        image_url: uploadResult.file_url 
+        image_url: result.processedUrl
       });
     }
 
