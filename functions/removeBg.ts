@@ -34,32 +34,32 @@ Deno.serve(async (req) => {
       }
     }
 
-    const apiKey = Deno.env.get("REMOVE_BG_API_KEY");
-    
+    const apiKey = Deno.env.get("NOBG_API_KEY");
+
     if (!apiKey) {
       return Response.json({ 
         success: false, 
-        error: "REMOVE_BG_API_KEY non configurée" 
+        error: "NOBG_API_KEY non configurée" 
       }, { status: 500 });
     }
 
-    const formData = new FormData();
-    formData.append('image_url', image_url);
-    formData.append('size', 'auto');
-    
-    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+    // Call noBG.me API
+    const response = await fetch('https://api.nobg.me/v1/remove-background', {
       method: 'POST',
       headers: {
-        'X-Api-Key': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
-      body: formData
+      body: JSON.stringify({
+        image_url: image_url
+      })
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      const errorTitle = errorData.errors?.[0]?.title || '';
-      // If it's a credit issue from remove.bg API, return special error
-      if (errorTitle.toLowerCase().includes('credit') || errorTitle.toLowerCase().includes('insufficient')) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error || errorData.message || '';
+      // If it's a credit issue, return special error
+      if (errorMessage.toLowerCase().includes('credit') || errorMessage.toLowerCase().includes('insufficient') || errorMessage.toLowerCase().includes('quota')) {
         return Response.json({ 
           success: false, 
           error: 'service_unavailable'
@@ -67,19 +67,34 @@ Deno.serve(async (req) => {
       }
       return Response.json({ 
         success: false, 
-        error: errorTitle || 'Erreur API remove.bg' 
+        error: errorMessage || 'Erreur API noBG.me' 
       });
     }
 
-    const blob = await response.blob();
-    
-    // Upload to storage
-    const file = new File([blob], `bg-removed-${Date.now()}.png`, { type: 'image/png' });
-    const uploadResult = await base44.integrations.Core.UploadFile({ file });
-    
+    const result = await response.json();
+
+    // noBG.me returns the image URL directly in the response
+    if (result.image_url || result.result_url || result.url) {
+      return Response.json({ 
+        success: true,
+        image_url: result.image_url || result.result_url || result.url
+      });
+    }
+
+    // If the API returns raw image data, upload it
+    if (result.image_data) {
+      const binaryData = Uint8Array.from(atob(result.image_data), c => c.charCodeAt(0));
+      const file = new File([binaryData], `bg-removed-${Date.now()}.png`, { type: 'image/png' });
+      const uploadResult = await base44.integrations.Core.UploadFile({ file });
+      return Response.json({ 
+        success: true,
+        image_url: uploadResult.file_url 
+      });
+    }
+
     return Response.json({ 
-      success: true,
-      image_url: uploadResult.file_url 
+      success: false, 
+      error: 'Format de réponse inattendu' 
     });
   } catch (error) {
     return Response.json({
