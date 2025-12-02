@@ -424,7 +424,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         img.onload = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          // First, draw background layers BEFORE the base image
+          // First, draw background layers and background shapes BEFORE the base image
           layers.forEach((layer) => {
             if (layer.type === 'background') {
               ctx.save();
@@ -441,6 +441,36 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
               } else if (layer.bgType === 'image' && loadedImages[layer.bgValue]) {
                 // Draw background image covering the entire canvas
                 ctx.drawImage(loadedImages[layer.bgValue], 0, 0, canvas.width, canvas.height);
+              }
+              ctx.restore();
+            } else if (layer.type === 'shape' && layer.isBackgroundShape) {
+              // Draw background shapes (from Fond tab) before the main image
+              ctx.save();
+              ctx.globalAlpha = layer.opacity / 100;
+              const centerX = layer.x + layer.width / 2;
+              const centerY = layer.y + layer.height / 2;
+              ctx.translate(centerX, centerY);
+              ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+              ctx.translate(-centerX, -centerY);
+              if (layer.shadow) {
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+              }
+              if (layer.glow) {
+                ctx.shadowColor = layer.glowColor || '#ffffff';
+                ctx.shadowBlur = layer.glowSize || 10;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+              }
+              ctx.fillStyle = layer.color;
+              drawShape(ctx, layer.shape, layer.x, layer.y, layer.width, layer.height);
+              ctx.fill();
+              if (layer.stroke) {
+                ctx.strokeStyle = layer.strokeColor || '#000000';
+                ctx.lineWidth = layer.strokeWidth || 2;
+                ctx.stroke();
               }
               ctx.restore();
             }
