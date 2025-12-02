@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3 } from 'lucide-react';
+import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3, ChevronLeft, ChevronRight, Search, Star } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StatCard from '@/components/admin/StatCard';
 import { 
@@ -32,8 +32,11 @@ export default function Admin() {
     currentVisitors: 0,
     today: 0,
     yesterday: 0,
+    thisWeek: 0,
     lastWeek: 0,
-    lastMonth: 0
+    thisMonth: 0,
+    lastMonth: 0,
+    thisYear: 0
   });
   const [userStats, setUserStats] = useState({
     totalUsers: 0,
@@ -54,15 +57,22 @@ export default function Admin() {
     today: 0,
     thisWeek: 0,
     thisMonth: 0,
+    thisYear: 0,
     avgPerUser: 0,
     totalMessages: 0,
     avgMessagesPerConv: 0,
     totalVisuals: 0,
     visualsToday: 0,
     visualsThisWeek: 0,
+    visualsThisMonth: 0,
+    visualsThisYear: 0,
     downloadsToday: 0,
     downloadsThisWeek: 0
   });
+  const [recentRequests, setRecentRequests] = useState([]);
+  const [topRequests, setTopRequests] = useState([]);
+  const [requestsPage, setRequestsPage] = useState(0);
+  const REQUESTS_PER_PAGE = 10;
   const [activityData, setActivityData] = useState([]);
   const [visualTypesData, setVisualTypesData] = useState([]);
 
@@ -169,12 +179,18 @@ export default function Admin() {
 
         const allItems = [...allVisuals, ...allConversations];
 
+        const yearAgo = new Date(now);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+
         setVisitStats({
           currentVisitors: Math.max(1, recentActivity),
           today: getUniqueUsers(allItems, todayStart),
           yesterday: getUniqueUsers(allItems, yesterdayStart, yesterdayEnd),
+          thisWeek: getUniqueUsers(allItems, weekAgo),
           lastWeek: getUniqueUsers(allItems, lastWeekStart, weekAgo),
-          lastMonth: getUniqueUsers(allItems, lastMonthStart, monthAgo)
+          thisMonth: getUniqueUsers(allItems, monthAgo),
+          lastMonth: getUniqueUsers(allItems, lastMonthStart, monthAgo),
+          thisYear: getUniqueUsers(allItems, yearAgo)
         });
 
         // User & Subscription Stats
@@ -195,6 +211,8 @@ export default function Admin() {
         const payingUsers = new Set(allTransactions.filter(t => t.status === 'completed').map(t => t.user_email)).size;
         const avgRevenuePerUser = payingUsers > 0 ? totalRevenue / payingUsers : 0;
 
+        const revenueThisYear = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) > yearAgo).reduce((sum, t) => sum + (t.amount || 0), 0);
+
         setUserStats({
           totalUsers: users.length,
           newToday: newUsersToday,
@@ -207,6 +225,7 @@ export default function Admin() {
           revenueToday,
           revenueThisWeek,
           revenueThisMonth,
+          revenueThisYear,
           avgRevenuePerUser
         });
 
@@ -219,8 +238,12 @@ export default function Admin() {
         const activeUserCount = new Set(allConversations.map(c => c.user_email)).size;
         const avgConvsPerUser = activeUserCount > 0 ? allConversations.length / activeUserCount : 0;
 
+        const convsThisYear = allConversations.filter(c => new Date(c.created_date) > yearAgo).length;
+
         const visualsToday = allVisuals.filter(v => v.created_date?.startsWith(todayStr)).length;
         const visualsThisWeek = allVisuals.filter(v => new Date(v.created_date) > weekAgo).length;
+        const visualsThisMonth = allVisuals.filter(v => new Date(v.created_date) > monthAgo).length;
+        const visualsThisYear = allVisuals.filter(v => new Date(v.created_date) > yearAgo).length;
         const downloadsToday = allVisuals.filter(v => v.downloaded && v.updated_date?.startsWith(todayStr)).length;
         const downloadsThisWeek = allVisuals.filter(v => v.downloaded && new Date(v.updated_date) > weekAgo).length;
 
@@ -229,15 +252,53 @@ export default function Admin() {
           today: convsToday,
           thisWeek: convsThisWeek,
           thisMonth: convsThisMonth,
+          thisYear: convsThisYear,
           avgPerUser: avgConvsPerUser,
           totalMessages,
           avgMessagesPerConv,
           totalVisuals: allVisuals.length,
           visualsToday,
           visualsThisWeek,
+          visualsThisMonth,
+          visualsThisYear,
           downloadsToday,
           downloadsThisWeek
         });
+
+        // Extract first user questions from conversations (excluding admins)
+        const firstQuestions = allConversations
+          .filter(c => !adminEmailsSet.has(c.user_email))
+          .map(c => {
+            const firstUserMsg = c.messages?.find(m => m.role === 'user');
+            return firstUserMsg ? {
+              question: firstUserMsg.content,
+              user_email: c.user_email,
+              created_date: c.created_date,
+              conv_id: c.id
+            } : null;
+          })
+          .filter(Boolean)
+          .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+          .slice(0, 100);
+
+        setRecentRequests(firstQuestions);
+
+        // Count question frequencies for top requests
+        const questionCounts = {};
+        firstQuestions.forEach(q => {
+          // Normalize question (lowercase, trim, remove punctuation for grouping)
+          const normalized = q.question.toLowerCase().trim().slice(0, 100);
+          if (!questionCounts[normalized]) {
+            questionCounts[normalized] = { question: q.question, count: 0 };
+          }
+          questionCounts[normalized].count++;
+        });
+
+        const topRequestsList = Object.values(questionCounts)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 100);
+
+        setTopRequests(topRequestsList);
 
       } catch (e) {
         console.error(e);
@@ -273,46 +334,62 @@ export default function Admin() {
             <Eye className="h-5 w-5 text-violet-400" />
             Statistiques de visites
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Activity className="h-4 w-4 text-green-400" />
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <Activity className="h-3 w-3 text-green-400" />
                 <span className="text-green-300 text-xs">En ce moment</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.currentVisitors}</p>
-              <p className="text-white/50 text-xs">visiteurs actifs</p>
+              <p className="text-xl font-bold text-white">{visitStats.currentVisitors}</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4 text-blue-400" />
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-1">
+                <Calendar className="h-3 w-3 text-blue-400" />
                 <span className="text-blue-300 text-xs">Aujourd'hui</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.today}</p>
-              <p className="text-white/50 text-xs">visiteurs</p>
+              <p className="text-xl font-bold text-white">{visitStats.today}</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-slate-400" />
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="h-3 w-3 text-slate-400" />
                 <span className="text-slate-300 text-xs">Hier</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.yesterday}</p>
-              <p className="text-white/50 text-xs">visiteurs</p>
+              <p className="text-xl font-bold text-white">{visitStats.yesterday}</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <CalendarDays className="h-4 w-4 text-violet-400" />
-                <span className="text-violet-300 text-xs">Semaine dernière</span>
+            <div className="p-3 rounded-xl bg-violet-600/20 border border-violet-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-3 w-3 text-violet-400" />
+                <span className="text-violet-300 text-xs">Cette semaine</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.lastWeek}</p>
-              <p className="text-white/50 text-xs">visiteurs</p>
+              <p className="text-xl font-bold text-white">{visitStats.thisWeek}</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <CalendarDays className="h-4 w-4 text-amber-400" />
-                <span className="text-amber-300 text-xs">Mois dernier</span>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-3 w-3 text-slate-400" />
+                <span className="text-slate-300 text-xs">Sem. dernière</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.lastMonth}</p>
-              <p className="text-white/50 text-xs">visiteurs</p>
+              <p className="text-xl font-bold text-white">{visitStats.lastWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-amber-600/20 border border-amber-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-3 w-3 text-amber-400" />
+                <span className="text-amber-300 text-xs">Ce mois-ci</span>
+              </div>
+              <p className="text-xl font-bold text-white">{visitStats.thisMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-3 w-3 text-slate-400" />
+                <span className="text-slate-300 text-xs">Mois dernier</span>
+              </div>
+              <p className="text-xl font-bold text-white">{visitStats.lastMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-pink-600/20 border border-pink-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-3 w-3 text-pink-400" />
+                <span className="text-pink-300 text-xs">Cette année</span>
+              </div>
+              <p className="text-xl font-bold text-white">{visitStats.thisYear}</p>
             </div>
           </div>
         </div>
@@ -357,7 +434,7 @@ export default function Admin() {
               <p className="text-xl font-bold text-white">{userStats.elitePlusSubs}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
             <div className="p-3 rounded-xl bg-green-600/20 border border-green-500/30">
               <p className="text-green-300 text-xs mb-1">Revenus totaux</p>
               <p className="text-xl font-bold text-white">{stats.totalRevenue.toFixed(2)}€</p>
@@ -369,6 +446,14 @@ export default function Admin() {
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Revenus cette semaine</p>
               <p className="text-xl font-bold text-white">{userStats.revenueThisWeek.toFixed(2)}€</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Revenus ce mois</p>
+              <p className="text-xl font-bold text-white">{userStats.revenueThisMonth.toFixed(2)}€</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Revenus cette année</p>
+              <p className="text-xl font-bold text-white">{userStats.revenueThisYear.toFixed(2)}€</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Revenu moy/client</p>
@@ -383,18 +468,26 @@ export default function Admin() {
             <MessageSquare className="h-5 w-5 text-blue-400" />
             Conversations & Visuels
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500/30">
-              <p className="text-blue-300 text-xs mb-1">Total conversations</p>
+              <p className="text-blue-300 text-xs mb-1">Total convs</p>
               <p className="text-xl font-bold text-white">{conversationStats.total}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-white/50 text-xs mb-1">Convs aujourd'hui</p>
+              <p className="text-white/50 text-xs mb-1">Convs auj.</p>
               <p className="text-xl font-bold text-white">{conversationStats.today}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-white/50 text-xs mb-1">Convs cette semaine</p>
+              <p className="text-white/50 text-xs mb-1">Convs semaine</p>
               <p className="text-xl font-bold text-white">{conversationStats.thisWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Convs mois</p>
+              <p className="text-xl font-bold text-white">{conversationStats.thisMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Convs année</p>
+              <p className="text-xl font-bold text-white">{conversationStats.thisYear}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Moy conv/user</p>
@@ -409,30 +502,106 @@ export default function Admin() {
               <p className="text-xl font-bold text-white">{conversationStats.avgMessagesPerConv.toFixed(1)}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mt-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mt-3">
             <div className="p-3 rounded-xl bg-pink-600/20 border border-pink-500/30">
               <p className="text-pink-300 text-xs mb-1">Total visuels</p>
               <p className="text-xl font-bold text-white">{conversationStats.totalVisuals}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-white/50 text-xs mb-1">Visuels aujourd'hui</p>
+              <p className="text-white/50 text-xs mb-1">Visuels auj.</p>
               <p className="text-xl font-bold text-white">{conversationStats.visualsToday}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-white/50 text-xs mb-1">Visuels cette semaine</p>
+              <p className="text-white/50 text-xs mb-1">Visuels semaine</p>
               <p className="text-xl font-bold text-white">{conversationStats.visualsThisWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Visuels mois</p>
+              <p className="text-xl font-bold text-white">{conversationStats.visualsThisMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Visuels année</p>
+              <p className="text-xl font-bold text-white">{conversationStats.visualsThisYear}</p>
             </div>
             <div className="p-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30">
               <p className="text-cyan-300 text-xs mb-1">Téléchargements</p>
               <p className="text-xl font-bold text-white">{stats.totalDownloads}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-white/50 text-xs mb-1">DL aujourd'hui</p>
+              <p className="text-white/50 text-xs mb-1">DL auj.</p>
               <p className="text-xl font-bold text-white">{conversationStats.downloadsToday}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-white/50 text-xs mb-1">DL cette semaine</p>
+              <p className="text-white/50 text-xs mb-1">DL semaine</p>
               <p className="text-xl font-bold text-white">{conversationStats.downloadsThisWeek}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent & Top Requests */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Requests */}
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Clock className="h-5 w-5 text-blue-400" />
+              Dernières demandes ({recentRequests.length})
+            </h3>
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {recentRequests
+                .slice(requestsPage * REQUESTS_PER_PAGE, (requestsPage + 1) * REQUESTS_PER_PAGE)
+                .map((req, idx) => (
+                  <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5">
+                    <p className="text-white text-sm line-clamp-2">{req.question}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-white/40 text-xs">{req.user_email}</span>
+                      <span className="text-white/30 text-xs">
+                        {new Date(req.created_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            {recentRequests.length > REQUESTS_PER_PAGE && (
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+                <button
+                  onClick={() => setRequestsPage(p => Math.max(0, p - 1))}
+                  disabled={requestsPage === 0}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="text-white/50 text-sm">
+                  Page {requestsPage + 1} / {Math.ceil(recentRequests.length / REQUESTS_PER_PAGE)}
+                </span>
+                <button
+                  onClick={() => setRequestsPage(p => Math.min(Math.ceil(recentRequests.length / REQUESTS_PER_PAGE) - 1, p + 1))}
+                  disabled={requestsPage >= Math.ceil(recentRequests.length / REQUESTS_PER_PAGE) - 1}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Top Requests */}
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Star className="h-5 w-5 text-amber-400" />
+              Demandes les plus fréquentes
+            </h3>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {topRequests.slice(0, 20).map((req, idx) => (
+                <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-600/30 to-orange-600/30 border border-amber-500/30 flex items-center justify-center">
+                    <span className="text-amber-300 text-xs font-bold">{req.count}</span>
+                  </div>
+                  <p className="text-white text-sm line-clamp-2 flex-1">{req.question}</p>
+                </div>
+              ))}
+              {topRequests.length === 0 && (
+                <p className="text-white/40 text-center py-8">Aucune demande</p>
+              )}
             </div>
           </div>
         </div>
