@@ -964,11 +964,31 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           baseImg.src = originalImageUrl; // Always use original
         });
 
+        // First, draw background layers BEFORE the base image
+        for (const layer of layers) {
+          if (layer.type === 'background') {
+            exportCtx.save();
+            exportCtx.globalAlpha = layer.opacity / 100;
+            if (layer.bgType === 'solid') {
+              exportCtx.fillStyle = layer.bgValue;
+              exportCtx.fillRect(0, 0, canvasSize.width, canvasSize.height);
+            } else if (layer.bgType === 'gradient') {
+              const gradient = exportCtx.createLinearGradient(0, 0, canvasSize.width, canvasSize.height);
+              gradient.addColorStop(0, layer.bgValue.color1);
+              gradient.addColorStop(1, layer.bgValue.color2);
+              exportCtx.fillStyle = gradient;
+              exportCtx.fillRect(0, 0, canvasSize.width, canvasSize.height);
+            }
+            exportCtx.restore();
+          }
+        }
+
         // Draw base image
         exportCtx.drawImage(baseImg, 0, 0, canvasSize.width, canvasSize.height);
 
-        // Draw all layers
+        // Draw all other layers (excluding background)
         for (const layer of layers) {
+          if (layer.type === 'background') continue; // Already drawn
           exportCtx.save();
           exportCtx.globalAlpha = layer.opacity / 100;
 
