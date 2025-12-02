@@ -999,6 +999,15 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               gradient.addColorStop(1, layer.bgValue.color2);
               exportCtx.fillStyle = gradient;
               exportCtx.fillRect(0, 0, canvasSize.width, canvasSize.height);
+            } else if (layer.bgType === 'image') {
+              // Draw background image
+              const bgImg = loadedImages[layer.bgValue] || await new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.src = layer.bgValue;
+              });
+              exportCtx.drawImage(bgImg, 0, 0, canvasSize.width, canvasSize.height);
             }
             exportCtx.restore();
           }
