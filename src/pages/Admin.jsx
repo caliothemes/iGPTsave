@@ -126,12 +126,21 @@ export default function Admin() {
         // Calculate visit stats based on conversations/visuals activity
         const now = new Date();
         const todayStr = now.toISOString().split('T')[0];
+        const todayStart = new Date(todayStr);
+        
+        const yesterdayStart = new Date(todayStart);
+        yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+        const yesterdayEnd = new Date(todayStart);
+        
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
+        const lastWeekStart = new Date(weekAgo);
+        lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+        
         const monthAgo = new Date(now);
         monthAgo.setMonth(monthAgo.getMonth() - 1);
-        const yearAgo = new Date(now);
-        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        const lastMonthStart = new Date(monthAgo);
+        lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
 
         // Get admin emails to exclude
         const adminEmailsSet = new Set(users.filter(u => u.role === 'admin').map(u => u.email));
@@ -144,11 +153,14 @@ export default function Admin() {
         }).length;
 
         // Count unique users by period (excluding admins)
-        const getUniqueUsers = (items, afterDate) => {
+        const getUniqueUsers = (items, afterDate, beforeDate = null) => {
           const uniqueUsers = new Set();
           items.forEach(item => {
             const userEmail = item.user_email || item.created_by;
-            if (new Date(item.created_date) > afterDate && userEmail && !adminEmailsSet.has(userEmail)) {
+            const itemDate = new Date(item.created_date);
+            const afterCheck = itemDate > afterDate;
+            const beforeCheck = beforeDate ? itemDate < beforeDate : true;
+            if (afterCheck && beforeCheck && userEmail && !adminEmailsSet.has(userEmail)) {
               uniqueUsers.add(userEmail);
             }
           });
@@ -156,14 +168,75 @@ export default function Admin() {
         };
 
         const allItems = [...allVisuals, ...allConversations];
-        const todayStart = new Date(todayStr);
 
         setVisitStats({
           currentVisitors: Math.max(1, recentActivity),
           today: getUniqueUsers(allItems, todayStart),
-          thisWeek: getUniqueUsers(allItems, weekAgo),
-          thisMonth: getUniqueUsers(allItems, monthAgo),
-          thisYear: getUniqueUsers(allItems, yearAgo)
+          yesterday: getUniqueUsers(allItems, yesterdayStart, yesterdayEnd),
+          lastWeek: getUniqueUsers(allItems, lastWeekStart, weekAgo),
+          lastMonth: getUniqueUsers(allItems, lastMonthStart, monthAgo)
+        });
+
+        // User & Subscription Stats
+        const newUsersToday = users.filter(u => u.created_date?.startsWith(todayStr)).length;
+        const newUsersWeek = users.filter(u => new Date(u.created_date) > weekAgo).length;
+        const newUsersMonth = users.filter(u => new Date(u.created_date) > monthAgo).length;
+
+        // Count subscriptions by type
+        const starterSubs = allCredits.filter(c => c.subscription_type === 'limited' && (c.paid_credits || 0) <= 100).length;
+        const proSubs = allCredits.filter(c => c.subscription_type === 'limited' && (c.paid_credits || 0) > 100 && (c.paid_credits || 0) <= 250).length;
+        const eliteSubs = allCredits.filter(c => c.subscription_type === 'limited' && (c.paid_credits || 0) > 250 && (c.paid_credits || 0) <= 500).length;
+        const elitePlusSubs = allCredits.filter(c => c.subscription_type === 'unlimited' || ((c.paid_credits || 0) > 500)).length;
+
+        // Revenue stats
+        const revenueToday = allTransactions.filter(t => t.status === 'completed' && t.created_date?.startsWith(todayStr)).reduce((sum, t) => sum + (t.amount || 0), 0);
+        const revenueThisWeek = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) > weekAgo).reduce((sum, t) => sum + (t.amount || 0), 0);
+        const revenueThisMonth = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) > monthAgo).reduce((sum, t) => sum + (t.amount || 0), 0);
+        const payingUsers = new Set(allTransactions.filter(t => t.status === 'completed').map(t => t.user_email)).size;
+        const avgRevenuePerUser = payingUsers > 0 ? totalRevenue / payingUsers : 0;
+
+        setUserStats({
+          totalUsers: users.length,
+          newToday: newUsersToday,
+          newThisWeek: newUsersWeek,
+          newThisMonth: newUsersMonth,
+          starterSubs,
+          proSubs,
+          eliteSubs,
+          elitePlusSubs,
+          revenueToday,
+          revenueThisWeek,
+          revenueThisMonth,
+          avgRevenuePerUser
+        });
+
+        // Conversation Stats
+        const convsToday = allConversations.filter(c => c.created_date?.startsWith(todayStr)).length;
+        const convsThisWeek = allConversations.filter(c => new Date(c.created_date) > weekAgo).length;
+        const convsThisMonth = allConversations.filter(c => new Date(c.created_date) > monthAgo).length;
+        const totalMessages = allConversations.reduce((sum, c) => sum + (c.messages?.length || 0), 0);
+        const avgMessagesPerConv = allConversations.length > 0 ? totalMessages / allConversations.length : 0;
+        const activeUserCount = new Set(allConversations.map(c => c.user_email)).size;
+        const avgConvsPerUser = activeUserCount > 0 ? allConversations.length / activeUserCount : 0;
+
+        const visualsToday = allVisuals.filter(v => v.created_date?.startsWith(todayStr)).length;
+        const visualsThisWeek = allVisuals.filter(v => new Date(v.created_date) > weekAgo).length;
+        const downloadsToday = allVisuals.filter(v => v.downloaded && v.updated_date?.startsWith(todayStr)).length;
+        const downloadsThisWeek = allVisuals.filter(v => v.downloaded && new Date(v.updated_date) > weekAgo).length;
+
+        setConversationStats({
+          total: allConversations.length,
+          today: convsToday,
+          thisWeek: convsThisWeek,
+          thisMonth: convsThisMonth,
+          avgPerUser: avgConvsPerUser,
+          totalMessages,
+          avgMessagesPerConv,
+          totalVisuals: allVisuals.length,
+          visualsToday,
+          visualsThisWeek,
+          downloadsToday,
+          downloadsThisWeek
         });
 
       } catch (e) {
