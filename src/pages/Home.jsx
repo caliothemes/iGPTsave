@@ -1144,8 +1144,31 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                             )}
 
 
-              {/* Selected Options Display */}
-              {(selectedFormat || selectedStyle || selectedPalette) && (
+              {/* Style Tip - above prompt area */}
+                                {showStyleTip && (
+                                  <div className="mb-2 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-violet-900/90 border border-violet-500/30 rounded-lg">
+                                      <Palette className="h-3.5 w-3.5 text-violet-300" />
+                                      <p className="text-violet-100 text-xs">
+                                        {language === 'fr' 
+                                          ? "Cliquez sur + pour appliquer un style ou des couleurs" 
+                                          : "Click + to apply a style or colors"}
+                                      </p>
+                                      <button 
+                                        onClick={() => {
+                                          setShowStyleTip(false);
+                                          localStorage.setItem('hideStyleTip', 'true');
+                                        }}
+                                        className="text-violet-300/60 hover:text-violet-100 transition-colors ml-1"
+                                      >
+                                        <X className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Selected Options Display */}
+                                {(selectedFormat || selectedStyle || selectedPalette) && (
                 <div className="mb-2 flex items-center gap-2 text-xs flex-wrap">
                   {selectedFormat && (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
