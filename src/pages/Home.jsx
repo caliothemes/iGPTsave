@@ -452,10 +452,23 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
             visual_type: { type: 'string' },
             dimensions: { type: 'string' },
             title: { type: 'string' },
-            suggested_colors: { type: 'array', items: { type: 'string' } }
+            suggested_colors: { type: 'array', items: { type: 'string' } },
+            subject_change_warning: { type: 'boolean' }
           }
         }
-      });
+        });
+
+        // If subject change detected, show warning and stop
+        if (analysis.subject_change_warning) {
+        const warningMessage = language === 'fr' 
+          ? `💡 **Nouveau sujet détecté !**\n\nLes conversations sont suivies dans iGPT. Si vous souhaitez créer un visuel sur un nouveau sujet, je vous recommande de démarrer un nouveau chat en cliquant sur le bouton **+ bleu** en haut à gauche.\n\nSinon, iGPT va inclure le sujet de base de ce chat dans les prochaines créations. 😊`
+          : `💡 **New subject detected!**\n\nConversations are tracked in iGPT. If you want to create a visual on a new subject, I recommend starting a new chat by clicking the **blue + button** at the top left.\n\nOtherwise, iGPT will include the original subject of this chat in future creations. 😊`;
+
+        setMessages([...newMessages, { role: 'assistant', content: warningMessage }]);
+        setIsLoading(false);
+        await saveConversation([...newMessages, { role: 'assistant', content: warningMessage }]);
+        return;
+        }
 
       let updatedMessages = [...newMessages, { role: 'assistant', content: analysis.response }];
       setMessages(updatedMessages);
