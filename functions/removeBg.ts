@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
     }
 
     // Call noBG.me API
-    const response = await fetch('https://nobg.me/api/removeBackground', {
+    const response = await fetch('https://nobgme.base44.app/api/removeBackground', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
