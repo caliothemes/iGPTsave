@@ -23,57 +23,69 @@ Deno.serve(async (req) => {
     console.log('Attempting to remove background from:', image_url);
 
     // First, fetch the image to get its binary data
-    const imageResponse = await fetch(image_url);
-    if (!imageResponse.ok) {
-      console.error('Failed to fetch image:', imageResponse.status);
-      return Response.json({ error: 'Failed to fetch source image' }, { status: 400 });
+    let imageResponse;
+    try {
+      imageResponse = await fetch(image_url);
+    } catch (fetchError) {
+      console.error('Fetch error:', fetchError.message);
+      return Response.json({ error: 'Cannot fetch image', details: fetchError.message }, { status: 400 });
     }
     
-    const imageBlob = await imageResponse.blob();
-    console.log('Image fetched, size:', imageBlob.size, 'type:', imageBlob.type);
+    if (!imageResponse.ok) {
+      console.error('Failed to fetch image:', imageResponse.status, imageResponse.statusText);
+      return Response.json({ error: 'Failed to fetch source image', details: `Status: ${imageResponse.status}` }, { status: 400 });
+    }
+    
+    const imageArrayBuffer = await imageResponse.arrayBuffer();
+    const imageUint8Array = new Uint8Array(imageArrayBuffer);
+    console.log('Image fetched, size:', imageUint8Array.length);
 
-    // Create FormData with the image file
-    const formData = new FormData();
-    formData.append('image_file', imageBlob, 'image.png');
-    formData.append('size', 'auto');
-    formData.append('format', 'png');
-
-    // Call Remove.bg API with file upload
+    // Call Remove.bg API with base64
+    const base64Image = btoa(String.fromCharCode(...imageUint8Array));
+    
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
       headers: {
         'X-Api-Key': apiKey,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: formData,
+      body: new URLSearchParams({
+        image_file_b64: base64Image,
+        size: 'auto',
+        format: 'png',
+      }),
     });
 
     console.log('Remove.bg response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Remove.bg error:', errorText);
+      console.error('Remove.bg error response:', errorText);
       let errorData = {};
       try { errorData = JSON.parse(errorText); } catch(e) {}
+      const errorDetail = errorData.errors?.[0]?.title || errorData.errors?.[0]?.detail || errorText || 'Unknown error';
       return Response.json({ 
         error: 'Failed to remove background', 
-        details: errorData.errors?.[0]?.title || errorText || 'Unknown error'
+        details: errorDetail
       }, { status: 500 });
     }
 
     // Get the image as arrayBuffer
-    const arrayBuffer = await response.arrayBuffer();
+    const resultArrayBuffer = await response.arrayBuffer();
+    console.log('Result image size:', resultArrayBuffer.byteLength);
     
     // Create a Blob from the array buffer
-    const blob = new Blob([arrayBuffer], { type: 'image/png' });
+    const blob = new Blob([resultArrayBuffer], { type: 'image/png' });
     
     // Upload using the SDK
     const { file_url } = await base44.integrations.Core.UploadFile({ 
       file: new File([blob], 'removed-bg.png', { type: 'image/png' })
     });
 
+    console.log('Uploaded to:', file_url);
     return Response.json({ success: true, image_url: file_url });
   } catch (error) {
     console.error('RemoveBg Error:', error.message, error.stack);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: 'Server error', details: error.message }, { status: 500 });
   }
 });
