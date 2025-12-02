@@ -1551,7 +1551,33 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
           {currentLayer.type === 'text' && (
             <div className="space-y-2">
-              <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white text-sm h-8" />
+              <div className="flex gap-2 items-center">
+                <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white text-sm h-8 flex-1" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-1 px-2 h-8 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-white/70 text-xs transition-colors min-w-[100px]">
+                      <Type className="h-3 w-3" />
+                      <span className="truncate flex-1 text-left" style={{ fontFamily: currentLayer.fontFamily }}>{FONTS.find(f => f.family === currentLayer.fontFamily)?.name || 'Police'}</span>
+                      <ChevronDownIcon className="h-3 w-3 opacity-50" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-900 border-white/10 max-h-64 overflow-y-auto w-48">
+                    {FONTS.map(font => (
+                      <DropdownMenuItem 
+                        key={font.id} 
+                        onClick={() => updateLayer(selectedLayer, { fontFamily: font.family })}
+                        className={cn(
+                          "text-white/70 hover:text-white hover:bg-white/10 cursor-pointer",
+                          currentLayer.fontFamily === font.family && "bg-violet-500/20 text-violet-300"
+                        )}
+                        style={{ fontFamily: font.family }}
+                      >
+                        {font.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <div className="flex gap-2 items-center">
                 <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Taille' : 'Size'}</span>
                 <div className="flex-1">
