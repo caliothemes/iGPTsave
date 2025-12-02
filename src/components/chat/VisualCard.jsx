@@ -35,6 +35,18 @@ export default function VisualCard({
   const { t, language } = useLanguage();
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const [showWatermarkBanner, setShowWatermarkBanner] = useState(false);
+
+  // Show watermark banner on mount if hasWatermark
+  React.useEffect(() => {
+    if (hasWatermark && !localStorage.getItem('hideWatermarkBanner')) {
+      const timer = setTimeout(() => {
+        setShowWatermarkBanner(true);
+        setTimeout(() => setShowWatermarkBanner(false), 4000);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasWatermark]);
 
   const handleDownloadClick = () => {
     if (!canDownload) return;
@@ -84,6 +96,25 @@ export default function VisualCard({
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-white/20 text-3xl font-bold rotate-[-30deg] select-none">
               iGPT
+            </div>
+          </div>
+        )}
+
+        {/* Watermark Info Banner - appears inside image */}
+        {showWatermarkBanner && (
+          <div 
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 animate-in fade-in slide-in-from-bottom-2 duration-300 cursor-pointer"
+            onClick={() => {
+              setShowWatermarkBanner(false);
+              localStorage.setItem('hideWatermarkBanner', 'true');
+            }}
+          >
+            <div className="px-3 py-2 bg-blue-900/90 backdrop-blur-sm border border-blue-400/30 rounded-lg shadow-lg">
+              <p className="text-blue-100 text-xs text-center whitespace-nowrap">
+                {language === 'fr' 
+                  ? "Le filigrane disparaît au téléchargement" 
+                  : "Watermark disappears on download"}
+              </p>
             </div>
           </div>
         )}
