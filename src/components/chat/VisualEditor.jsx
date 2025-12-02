@@ -1094,18 +1094,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.lineWidth = layer.strokeWidth || 2;
               exportCtx.stroke();
             }
-          } else if (layer.type === 'background') {
-            if (layer.bgType === 'solid') {
-              exportCtx.fillStyle = layer.bgValue;
-              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
-            } else if (layer.bgType === 'gradient') {
-              const gradient = exportCtx.createLinearGradient(layer.x, layer.y, layer.x + layer.width, layer.y + layer.height);
-              gradient.addColorStop(0, layer.bgValue.color1);
-              gradient.addColorStop(1, layer.bgValue.color2);
-              exportCtx.fillStyle = gradient;
-              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
-            }
-          }
+          
           exportCtx.restore();
         }
 
