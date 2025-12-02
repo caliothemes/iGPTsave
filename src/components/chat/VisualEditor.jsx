@@ -1344,6 +1344,31 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </div>
               </div>
             )}
+
+            {/* Formes en fond */}
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-white/40 text-xs mb-2 flex items-center gap-1">
+                <Square className="h-3 w-3 text-blue-400" />
+                {language === 'fr' ? 'Formes (en fond):' : 'Shapes (as background):'}
+              </p>
+              <div className="grid grid-cols-6 gap-1">
+                {SHAPES.map(shape => {
+                  const ShapeIcon = shape.icon;
+                  return (
+                    <button key={shape.id} onClick={() => addBackgroundShapeLayer(shape.id)} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors flex flex-col items-center gap-0.5">
+                      <ShapeIcon className="h-4 w-4" />
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex gap-1 mt-2 flex-wrap">
+                <span className="text-white/30 text-xs">{language === 'fr' ? 'Couleur:' : 'Color:'}</span>
+                {PRESET_COLORS.slice(0, 8).map(color => (
+                  <button key={color} onClick={() => setBgShapeColor(color)} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", bgShapeColor === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                ))}
+                <input type="color" value={bgShapeColor} onChange={(e) => setBgShapeColor(e.target.value)} className="w-5 h-5 rounded cursor-pointer" />
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="shapes" className="mt-0 space-y-2">
