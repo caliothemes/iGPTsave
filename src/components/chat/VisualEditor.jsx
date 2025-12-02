@@ -1313,13 +1313,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
           <TabsTrigger value="gradients" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><GradientIcon className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="images" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Upload className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><IllustrationIcon className="h-4 w-4" /></TabsTrigger>
-            <Layers className="h-4 w-4" />
-            {layers.length > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-emerald-500 rounded-full text-[10px] text-white font-medium flex items-center justify-center">
-                {layers.length}
-              </span>
-            )}
-          </TabsTrigger>
         </TabsList>
 
         {/* Tool Content Panel */}
