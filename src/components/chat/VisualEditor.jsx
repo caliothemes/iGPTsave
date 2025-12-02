@@ -1094,7 +1094,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               exportCtx.lineWidth = layer.strokeWidth || 2;
               exportCtx.stroke();
             }
-          
+          }
           exportCtx.restore();
         }
 
