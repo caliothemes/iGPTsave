@@ -1725,13 +1725,20 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     setRemovingBgFromLayer(true);
                     try {
                       const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
+                      console.log('RemoveBg response:', response);
                       if (response.data?.image_url) {
                         updateLayer(selectedLayer, { imageUrl: response.data.image_url });
                         showHelp(language === 'fr' ? '✨ Fond supprimé avec succès !' : '✨ Background removed successfully!');
+                      } else if (response.data?.error) {
+                        console.error('RemoveBg error:', response.data.error, response.data.details);
+                        showHelp(language === 'fr' ? `❌ ${response.data.details || response.data.error}` : `❌ ${response.data.details || response.data.error}`);
+                      } else {
+                        showHelp(language === 'fr' ? '❌ Réponse inattendue du serveur' : '❌ Unexpected server response');
                       }
                     } catch (err) {
-                      console.error(err);
-                      showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+                      console.error('RemoveBg catch error:', err);
+                      const errorMessage = err?.response?.data?.error || err?.message || 'Unknown error';
+                      showHelp(language === 'fr' ? `❌ Erreur: ${errorMessage}` : `❌ Error: ${errorMessage}`);
                     }
                     setRemovingBgFromLayer(false);
                   }}
