@@ -360,6 +360,21 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
       const previousUserMessages = messages.filter(m => m.role === 'user').map(m => m.content).join(' ');
       const hasExistingContext = previousUserMessages.length > 0 && selectedVisual;
 
+      // Detect if user wants to add text to existing visual
+      const textRequestPatterns = /ajout(e|er|ez)?(\s+)?(du|un|le|ce|mon|le texte|ce texte|du texte)|met(s|tre|tez)?(\s+)?(du|un|le|ce|mon|le texte|ce texte|du texte)|écri(s|re|vez)?|inscri(s|re|vez)?|marque(r|z)?|avec (le |ce |du |un )?texte|texte\s*[:«"']|[:«"'].+[:»"']|"[^"]+"|«[^»]+»/i;
+      const isTextRequest = selectedVisual && textRequestPatterns.test(userMessage);
+
+      if (isTextRequest) {
+        const textWarningMessage = language === 'fr'
+          ? `⚠️ **Ajout de texte détecté**\n\nL'IA générative n'est pas toujours précise pour reproduire des textes exacts. Pour un résultat optimal avec un texte **modifiable, stylisable et parfaitement lisible**, je vous recommande d'utiliser l'**Éditeur Magique** :\n\n👉 Cliquez sur **"Personnaliser"** sous votre visuel, puis ajoutez votre texte avec l'éditeur.\n\nSouhaitez-vous quand même que je tente de générer le texte directement dans l'image ?`
+          : `⚠️ **Text addition detected**\n\nGenerative AI isn't always accurate for reproducing exact text. For optimal results with **editable, stylable, and perfectly readable text**, I recommend using the **Magic Editor**:\n\n👉 Click **"Customize"** below your visual, then add your text with the editor.\n\nWould you still like me to try generating the text directly in the image?`;
+
+        setMessages([...newMessages, { role: 'assistant', content: textWarningMessage }]);
+        setIsLoading(false);
+        await saveConversation([...newMessages, { role: 'assistant', content: textWarningMessage }]);
+        return;
+      }
+
       const analysis = await base44.integrations.Core.InvokeLLM({
                 prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels de niveau agence de design.
 
