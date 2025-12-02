@@ -292,63 +292,149 @@ export default function Admin() {
             </div>
             <div className="p-4 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-2 mb-2">
-                <CalendarDays className="h-4 w-4 text-violet-400" />
-                <span className="text-violet-300 text-xs">Cette semaine</span>
+                <Clock className="h-4 w-4 text-slate-400" />
+                <span className="text-slate-300 text-xs">Hier</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.thisWeek}</p>
+              <p className="text-2xl font-bold text-white">{visitStats.yesterday}</p>
+              <p className="text-white/50 text-xs">visiteurs</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarDays className="h-4 w-4 text-violet-400" />
+                <span className="text-violet-300 text-xs">Semaine dernière</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{visitStats.lastWeek}</p>
               <p className="text-white/50 text-xs">visiteurs</p>
             </div>
             <div className="p-4 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-2 mb-2">
                 <CalendarDays className="h-4 w-4 text-amber-400" />
-                <span className="text-amber-300 text-xs">Ce mois-ci</span>
+                <span className="text-amber-300 text-xs">Mois dernier</span>
               </div>
-              <p className="text-2xl font-bold text-white">{visitStats.thisMonth}</p>
-              <p className="text-white/50 text-xs">visiteurs</p>
-            </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <CalendarDays className="h-4 w-4 text-pink-400" />
-                <span className="text-pink-300 text-xs">Cette année</span>
-              </div>
-              <p className="text-2xl font-bold text-white">{visitStats.thisYear}</p>
+              <p className="text-2xl font-bold text-white">{visitStats.lastMonth}</p>
               <p className="text-white/50 text-xs">visiteurs</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <StatCard
-            title="Revenus totaux"
-            value={`${stats.totalRevenue.toFixed(2)}€`}
-            icon={DollarSign}
-            gradient="bg-gradient-to-br from-green-600 to-emerald-600"
-          />
-          <StatCard
-            title="Téléchargements"
-            value={stats.totalDownloads}
-            icon={Download}
-            gradient="bg-gradient-to-br from-blue-600 to-cyan-600"
-          />
-          <StatCard
-            title="Conversations"
-            value={stats.totalConversations}
-            icon={MessageSquare}
-            gradient="bg-gradient-to-br from-violet-600 to-purple-600"
-          />
-          <StatCard
-            title="Abonnements actifs"
-            value={stats.activeSubscriptions}
-            icon={TrendingUp}
-            gradient="bg-gradient-to-br from-amber-600 to-orange-600"
-          />
-          <StatCard
-            title="Utilisateurs"
-            value={stats.totalUsers}
-            icon={Users}
-            gradient="bg-gradient-to-br from-pink-600 to-rose-600"
-          />
+        {/* Inscriptions & Abonnements Stats */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <UserPlus className="h-5 w-5 text-emerald-400" />
+            Inscriptions, Abonnements & Revenus
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div className="p-3 rounded-xl bg-emerald-600/20 border border-emerald-500/30">
+              <p className="text-emerald-300 text-xs mb-1">Total utilisateurs</p>
+              <p className="text-xl font-bold text-white">{userStats.totalUsers}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Inscrits aujourd'hui</p>
+              <p className="text-xl font-bold text-white">{userStats.newToday}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Inscrits cette semaine</p>
+              <p className="text-xl font-bold text-white">{userStats.newThisWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Inscrits ce mois</p>
+              <p className="text-xl font-bold text-white">{userStats.newThisMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500/30">
+              <p className="text-blue-300 text-xs mb-1">Starter</p>
+              <p className="text-xl font-bold text-white">{userStats.starterSubs}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-violet-600/20 border border-violet-500/30">
+              <p className="text-violet-300 text-xs mb-1">Pro</p>
+              <p className="text-xl font-bold text-white">{userStats.proSubs}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-amber-600/20 border border-amber-500/30">
+              <p className="text-amber-300 text-xs mb-1">Elite</p>
+              <p className="text-xl font-bold text-white">{userStats.eliteSubs}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-pink-600/20 border border-pink-500/30">
+              <p className="text-pink-300 text-xs mb-1">Elite+</p>
+              <p className="text-xl font-bold text-white">{userStats.elitePlusSubs}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+            <div className="p-3 rounded-xl bg-green-600/20 border border-green-500/30">
+              <p className="text-green-300 text-xs mb-1">Revenus totaux</p>
+              <p className="text-xl font-bold text-white">{stats.totalRevenue.toFixed(2)}€</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Revenus aujourd'hui</p>
+              <p className="text-xl font-bold text-white">{userStats.revenueToday.toFixed(2)}€</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Revenus cette semaine</p>
+              <p className="text-xl font-bold text-white">{userStats.revenueThisWeek.toFixed(2)}€</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Revenu moy/client</p>
+              <p className="text-xl font-bold text-white">{userStats.avgRevenuePerUser.toFixed(2)}€</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Conversations & Visuels Stats */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-blue-400" />
+            Conversations & Visuels
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500/30">
+              <p className="text-blue-300 text-xs mb-1">Total conversations</p>
+              <p className="text-xl font-bold text-white">{conversationStats.total}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Convs aujourd'hui</p>
+              <p className="text-xl font-bold text-white">{conversationStats.today}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Convs cette semaine</p>
+              <p className="text-xl font-bold text-white">{conversationStats.thisWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Moy conv/user</p>
+              <p className="text-xl font-bold text-white">{conversationStats.avgPerUser.toFixed(1)}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-violet-600/20 border border-violet-500/30">
+              <p className="text-violet-300 text-xs mb-1">Total messages</p>
+              <p className="text-xl font-bold text-white">{conversationStats.totalMessages}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Moy msg/conv</p>
+              <p className="text-xl font-bold text-white">{conversationStats.avgMessagesPerConv.toFixed(1)}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mt-3">
+            <div className="p-3 rounded-xl bg-pink-600/20 border border-pink-500/30">
+              <p className="text-pink-300 text-xs mb-1">Total visuels</p>
+              <p className="text-xl font-bold text-white">{conversationStats.totalVisuals}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Visuels aujourd'hui</p>
+              <p className="text-xl font-bold text-white">{conversationStats.visualsToday}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Visuels cette semaine</p>
+              <p className="text-xl font-bold text-white">{conversationStats.visualsThisWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30">
+              <p className="text-cyan-300 text-xs mb-1">Téléchargements</p>
+              <p className="text-xl font-bold text-white">{stats.totalDownloads}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">DL aujourd'hui</p>
+              <p className="text-xl font-bold text-white">{conversationStats.downloadsToday}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">DL cette semaine</p>
+              <p className="text-xl font-bold text-white">{conversationStats.downloadsThisWeek}</p>
+            </div>
+          </div>
         </div>
 
         {/* Charts */}
