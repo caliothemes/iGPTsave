@@ -153,7 +153,7 @@ export default function Portfolio() {
         </div>
 
         {/* Masonry Grid */}
-        <div className="px-4 pb-32 flex-1">
+        <div className="px-3 pb-32 flex-1 w-full">
           {visuals.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-white/40 text-lg">
@@ -161,7 +161,14 @@ export default function Portfolio() {
               </p>
             </div>
           ) : (
-            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-3 space-y-3">
+            <div 
+              className="gap-2 space-y-2"
+              style={{
+                columnCount: 'auto',
+                columnWidth: '180px',
+                columnGap: '8px'
+              }}
+            >
               {visuals.map((visual, index) => {
                 const isLast = index === visuals.length - 1;
                 return (
