@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Trash2, Download, Image } from 'lucide-react';
+import { Loader2, Search, Trash2, Download, Image, Star } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 
@@ -37,6 +37,12 @@ export default function AdminVisuals() {
     if (!confirm('Supprimer ce visuel ?')) return;
     await base44.entities.Visual.delete(visualId);
     setVisuals(prev => prev.filter(v => v.id !== visualId));
+  };
+
+  const togglePortfolio = async (visual) => {
+    const newValue = !visual.in_portfolio;
+    await base44.entities.Visual.update(visual.id, { in_portfolio: newValue });
+    setVisuals(prev => prev.map(v => v.id === visual.id ? { ...v, in_portfolio: newValue } : v));
   };
 
   const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
@@ -92,7 +98,7 @@ export default function AdminVisuals() {
         </div>
 
         {/* Stats */}
-        <div className="flex gap-4 text-sm">
+        <div className="flex gap-4 text-sm flex-wrap">
           <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10">
             <span className="text-white/60">Téléchargés: </span>
             <span className="text-white font-medium">{visuals.filter(v => v.downloaded).length}</span>
@@ -101,6 +107,18 @@ export default function AdminVisuals() {
             <span className="text-white/60">Favoris: </span>
             <span className="text-white font-medium">{visuals.filter(v => v.is_favorite).length}</span>
           </div>
+          <div className="px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30">
+            <span className="text-amber-400">Portfolio: </span>
+            <span className="text-amber-300 font-medium">{visuals.filter(v => v.in_portfolio).length}</span>
+          </div>
+          <a 
+            href={createPageUrl('Portfolio')} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="px-4 py-2 rounded-lg bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors"
+          >
+            Voir le portfolio →
+          </a>
         </div>
 
         {/* Visuals Grid */}
@@ -131,15 +149,31 @@ export default function AdminVisuals() {
                   </div>
                 </div>
 
-                {/* Delete button */}
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => handleDelete(visual.id)}
-                  className="absolute top-2 right-2 h-8 w-8 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-300 hover:bg-red-500/20"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {/* Action buttons */}
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => togglePortfolio(visual)}
+                    className={cn(
+                      "h-8 w-8 bg-black/50",
+                      visual.in_portfolio 
+                        ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/20" 
+                        : "text-white/60 hover:text-amber-400 hover:bg-amber-500/20"
+                    )}
+                    title={visual.in_portfolio ? "Retirer du portfolio" : "Ajouter au portfolio"}
+                  >
+                    <Star className={cn("h-4 w-4", visual.in_portfolio && "fill-current")} />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleDelete(visual.id)}
+                    className="h-8 w-8 bg-black/50 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
 
                 {/* Status badges */}
                 <div className="absolute top-2 left-2 flex gap-1">
