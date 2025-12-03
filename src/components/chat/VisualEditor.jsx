@@ -2062,37 +2062,6 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   )}
                 </div>
                 
-                {/* Remove Background Button */}
-                <Button
-                  size="sm"
-                  onClick={async () => {
-                    setRemovingBgFromLayer(true);
-                    try {
-                      const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
-                      if (response.data?.success && response.data?.image_url) {
-                        updateLayer(selectedLayer, { imageUrl: response.data.image_url });
-                        showHelp(language === 'fr' ? '✨ Fond supprimé ! (1 crédit)' : '✨ Background removed! (1 credit)');
-                      } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
-                        setServiceErrorType(response.data?.error);
-                        setShowServiceUnavailable(true);
-                      } else if (response.data?.error) {
-                        showHelp(language === 'fr' ? `❌ ${response.data.error}` : `❌ ${response.data.error}`);
-                      } else {
-                        showHelp(language === 'fr' ? '❌ Réponse inattendue du serveur' : '❌ Unexpected server response');
-                      }
-                    } catch (err) {
-                      console.error('RemoveBg error:', err);
-                      const errorMessage = err?.response?.data?.error || err?.message || 'Unknown error';
-                      showHelp(language === 'fr' ? `❌ Erreur: ${errorMessage}` : `❌ Error: ${errorMessage}`);
-                    }
-                    setRemovingBgFromLayer(false);
-                  }}
-                  disabled={removingBgFromLayer}
-                  className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
-                >
-                  {removingBgFromLayer ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
-                  {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
-                </Button>
               </div>
             )}
 
