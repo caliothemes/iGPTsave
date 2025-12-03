@@ -34,25 +34,37 @@ Deno.serve(async (req) => {
       }
     }
 
-    const apiKey = Deno.env.get("NOBG_API_KEY");
+    const apiKey = Deno.env.get("REMOVE_BG_API_KEY");
 
     if (!apiKey) {
       return Response.json({ 
         success: false, 
-        error: "NOBG_API_KEY non configurée" 
+        error: "REMOVE_BG_API_KEY non configurée" 
       }, { status: 500 });
     }
 
-    // Call noBG.me API
-    const response = await fetch('https://nobgme.base44.app/api/removeBackground', {
+    // Download the image first
+    const imageResponse = await fetch(image_url);
+    if (!imageResponse.ok) {
+      return Response.json({ 
+        success: false, 
+        error: 'Impossible de télécharger l\'image' 
+      }, { status: 400 });
+    }
+    
+    const imageBlob = await imageResponse.blob();
+    
+    // Create FormData with the image
+    const formData = new FormData();
+    formData.append('image', imageBlob, 'image.png');
+
+    // Call ClearBG API
+    const response = await fetch('https://ta-01kbgncvdagtbn4x4bdv5dgtra-5173.wo-yp2mwny34druk964qr1qstnyv.w.modal.host/api/removeBackground', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        imageUrl: image_url
-      })
+      body: formData
     });
 
     if (!response.ok) {
@@ -64,7 +76,6 @@ Deno.serve(async (req) => {
         // Not JSON
       }
       const errorMessage = errorData.error || errorData.message || errorText || '';
-      // If it's a credit issue, return special error
       if (errorMessage.toLowerCase().includes('credit') || errorMessage.toLowerCase().includes('insufficient') || errorMessage.toLowerCase().includes('quota')) {
         return Response.json({ 
           success: false, 
@@ -73,17 +84,17 @@ Deno.serve(async (req) => {
       }
       return Response.json({ 
         success: false, 
-        error: `Erreur ${response.status}: ${errorMessage || 'Erreur API noBG.me'}`
+        error: `Erreur ${response.status}: ${errorMessage || 'Erreur API ClearBG'}`
       });
     }
 
     const result = await response.json();
 
-    // noBG.me returns processedUrl or processed_url in the response
-    if (result.processedUrl || result.processed_url) {
+    // API returns processed_url in the response
+    if (result.processed_url || result.processedUrl) {
       return Response.json({ 
         success: true,
-        image_url: result.processedUrl || result.processed_url
+        image_url: result.processed_url || result.processedUrl
       });
     }
 
