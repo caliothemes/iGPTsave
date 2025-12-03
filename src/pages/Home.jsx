@@ -1326,6 +1326,8 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               <p className="text-white/25 text-xs">
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                 {' • '}
+                <a href={createPageUrl('Portfolio')} className="hover:text-violet-400 transition-colors">Portfolio</a>
+                {' • '}
                 <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
               </p>
             </div>
