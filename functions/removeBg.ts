@@ -56,8 +56,14 @@ Deno.serve(async (req) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const errorMessage = errorData.error || errorData.message || '';
+      const errorText = await response.text().catch(() => '');
+      let errorData = {};
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        // Not JSON
+      }
+      const errorMessage = errorData.error || errorData.message || errorText || '';
       // If it's a credit issue, return special error
       if (errorMessage.toLowerCase().includes('credit') || errorMessage.toLowerCase().includes('insufficient') || errorMessage.toLowerCase().includes('quota')) {
         return Response.json({ 
@@ -67,7 +73,7 @@ Deno.serve(async (req) => {
       }
       return Response.json({ 
         success: false, 
-        error: errorMessage || 'Erreur API noBG.me' 
+        error: `Erreur ${response.status}: ${errorMessage || 'Erreur API noBG.me'}`
       });
     }
 
