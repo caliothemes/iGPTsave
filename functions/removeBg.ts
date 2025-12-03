@@ -63,11 +63,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // API returns the image blob directly
+    // API returns the image blob directly as PNG
     const resultBlob = await response.blob();
     
-    // Upload the processed image to Base44 storage
-    const uploadResult = await base44.integrations.Core.UploadFile({ file: resultBlob });
+    // Upload the processed image to Base44 storage using the SDK
+    const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: resultBlob });
 
     return Response.json({ 
       success: true,
