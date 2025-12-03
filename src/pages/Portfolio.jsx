@@ -162,10 +162,10 @@ export default function Portfolio() {
             </div>
           ) : (
             <div 
-              className="gap-2 space-y-2"
+              className="gap-2"
               style={{
                 columnCount: 'auto',
-                columnWidth: '180px',
+                columnWidth: '150px',
                 columnGap: '8px'
               }}
             >
@@ -175,7 +175,7 @@ export default function Portfolio() {
                   <div
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
-                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300"
+                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 mb-2"
                   >
                     <img
                       src={visual.image_url}
