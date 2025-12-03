@@ -788,11 +788,11 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
       glowSize: 10,
       isBackgroundShape: true // Mark as background shape
     };
-    // Always add at the end (on top)
-    setLayers([...layers, newLayer]);
-    setSelectedLayer(layers.length);
+    // Add at the beginning (below all other layers)
+    setLayers([newLayer, ...layers]);
+    setSelectedLayer(0);
     setActiveTab('layers');
-    showHelp(language === 'fr' ? '💡 Forme ajoutée en fond. Ajustez la taille et couleur.' : '💡 Shape added as background. Adjust size and color.');
+    showHelp(language === 'fr' ? '💡 Forme ajoutée sous l\'image. Ajustez la taille et couleur.' : '💡 Shape added below image. Adjust size and color.');
   };
   
   // Accordion state for background tab
