@@ -26,25 +26,14 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
     try {
       let imageUrl = visual.image_url;
       
-      // If transparent format selected, call remove.bg API
+      // If transparent format selected, call our backend removeBg function (uses Render API)
       if (format.removeBg) {
         try {
-          // Call remove.bg via fetch with the image URL
-          const formData = new FormData();
-          formData.append('image_url', visual.image_url);
-          formData.append('size', 'auto');
-          
-          const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
-            method: 'POST',
-            headers: {
-              'X-Api-Key': import.meta.env.VITE_REMOVE_BG_API_KEY
-            },
-            body: formData
-          });
-          
-          if (removeBgResponse.ok) {
-            const removedBgBlob = await removeBgResponse.blob();
-            imageUrl = URL.createObjectURL(removedBgBlob);
+          const response = await base44.functions.invoke('removeBg', { image_url: visual.image_url });
+          if (response.data?.success && response.data?.image_url) {
+            imageUrl = response.data.image_url;
+          } else {
+            console.error('Remove bg failed:', response.data?.error);
           }
         } catch (bgError) {
           console.error('Remove bg failed, using original:', bgError);
