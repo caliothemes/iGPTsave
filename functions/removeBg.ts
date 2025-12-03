@@ -34,15 +34,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    const apiKey = Deno.env.get("NOBG_API_KEY");
-
-    if (!apiKey) {
-      return Response.json({ 
-        success: false, 
-        error: "NOBG_API_KEY non configurée" 
-      }, { status: 500 });
-    }
-
     // Download the image first
     const imageResponse = await fetch(image_url);
     if (!imageResponse.ok) {
@@ -54,53 +45,33 @@ Deno.serve(async (req) => {
     
     const imageBlob = await imageResponse.blob();
     
-    // Create FormData with the image
+    // Create FormData with the image (use "file" as field name for Render API)
     const formData = new FormData();
-    formData.append('image', imageBlob, 'image.png');
+    formData.append('file', imageBlob, 'image.png');
 
-    // Call ClearBG API
-    const response = await fetch('https://ta-01kbgncvdagtbn4x4bdv5dgtra-5173.wo-yp2mwny34druk964qr1qstnyv.w.modal.host/api/removeBackground', {
+    // Call ClearBG Render API (no API key needed)
+    const response = await fetch('https://clearbg-qej8.onrender.com/api/remove-bg', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-      },
       body: formData
     });
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
-      let errorData = {};
-      try {
-        errorData = JSON.parse(errorText);
-      } catch (e) {
-        // Not JSON
-      }
-      const errorMessage = errorData.error || errorData.message || errorText || '';
-      if (errorMessage.toLowerCase().includes('credit') || errorMessage.toLowerCase().includes('insufficient') || errorMessage.toLowerCase().includes('quota')) {
-        return Response.json({ 
-          success: false, 
-          error: 'service_unavailable'
-        });
-      }
       return Response.json({ 
         success: false, 
-        error: `Erreur ${response.status}: ${errorMessage || 'Erreur API ClearBG'}`
+        error: `Erreur ${response.status}: ${errorText || 'Erreur API ClearBG'}`
       });
     }
 
-    const result = await response.json();
-
-    // API returns processed_url in the response
-    if (result.processed_url || result.processedUrl) {
-      return Response.json({ 
-        success: true,
-        image_url: result.processed_url || result.processedUrl
-      });
-    }
+    // API returns the image blob directly
+    const resultBlob = await response.blob();
+    
+    // Upload the processed image to Base44 storage
+    const uploadResult = await base44.integrations.Core.UploadFile({ file: resultBlob });
 
     return Response.json({ 
-      success: false, 
-      error: 'Format de réponse inattendu' 
+      success: true,
+      image_url: uploadResult.file_url
     });
   } catch (error) {
     return Response.json({
