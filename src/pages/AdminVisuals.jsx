@@ -13,6 +13,7 @@ export default function AdminVisuals() {
   const [visuals, setVisuals] = useState([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [portfolioFilter, setPortfolioFilter] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -51,7 +52,8 @@ export default function AdminVisuals() {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase()) ||
                          v.user_email?.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'all' || v.visual_type === typeFilter;
-    return matchesSearch && matchesType;
+    const matchesPortfolio = !portfolioFilter || v.in_portfolio;
+    return matchesSearch && matchesType && matchesPortfolio;
   });
 
   if (loading) {
@@ -107,10 +109,19 @@ export default function AdminVisuals() {
             <span className="text-white/60">Favoris: </span>
             <span className="text-white font-medium">{visuals.filter(v => v.is_favorite).length}</span>
           </div>
-          <div className="px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30">
-            <span className="text-amber-400">Portfolio: </span>
-            <span className="text-amber-300 font-medium">{visuals.filter(v => v.in_portfolio).length}</span>
-          </div>
+          <button 
+            onClick={() => setPortfolioFilter(!portfolioFilter)}
+            className={cn(
+              "px-4 py-2 rounded-lg border transition-colors cursor-pointer",
+              portfolioFilter 
+                ? "bg-amber-500/30 border-amber-400 text-amber-300" 
+                : "bg-amber-500/20 border-amber-500/30 text-amber-400 hover:bg-amber-500/30"
+            )}
+          >
+            <span>Portfolio: </span>
+            <span className="font-medium">{visuals.filter(v => v.in_portfolio).length}</span>
+            {portfolioFilter && <span className="ml-2">✓</span>}
+          </button>
           <a 
             href={createPageUrl('Portfolio')} 
             target="_blank" 
