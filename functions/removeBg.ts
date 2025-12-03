@@ -34,12 +34,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    const apiKey = Deno.env.get("REMOVE_BG_API_KEY");
+    const apiKey = Deno.env.get("NOBG_API_KEY");
 
     if (!apiKey) {
       return Response.json({ 
         success: false, 
-        error: "REMOVE_BG_API_KEY non configurée" 
+        error: "NOBG_API_KEY non configurée" 
       }, { status: 500 });
     }
 
