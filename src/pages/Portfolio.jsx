@@ -153,7 +153,7 @@ export default function Portfolio() {
         </div>
 
         {/* Masonry Grid */}
-        <div className="px-3 pb-32 flex-1 w-full">
+        <div className="px-2 pb-32 flex-1 w-full">
           {visuals.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-white/40 text-lg">
@@ -162,11 +162,10 @@ export default function Portfolio() {
             </div>
           ) : (
             <div 
-              className="gap-2"
               style={{
                 columnCount: 'auto',
-                columnWidth: '150px',
-                columnGap: '8px'
+                columnWidth: '180px',
+                columnGap: '6px'
               }}
             >
               {visuals.map((visual, index) => {
@@ -175,12 +174,12 @@ export default function Portfolio() {
                   <div
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
-                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 mb-2"
+                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 mb-1.5"
                   >
                     <img
                       src={visual.image_url}
                       alt={visual.title || 'Création iGPT'}
-                      className="w-full h-auto object-cover"
+                      className="w-full h-auto block"
                       loading="lazy"
                     />
                     {/* Hover overlay */}

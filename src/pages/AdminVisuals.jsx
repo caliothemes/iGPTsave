@@ -132,22 +132,28 @@ export default function AdminVisuals() {
           </a>
         </div>
 
-        {/* Visuals Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {/* Visuals Grid - Masonry */}
+        <div 
+          style={{
+            columnCount: 'auto',
+            columnWidth: '200px',
+            columnGap: '12px'
+          }}
+        >
           {filteredVisuals.map((visual) => (
             <div 
               key={visual.id}
-              className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all"
+              className="break-inside-avoid group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all mb-3"
             >
-              <div className="aspect-square relative">
+              <div className="relative">
                 {visual.image_url ? (
                   <img 
                     src={visual.image_url} 
                     alt={visual.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto block"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-white/5">
+                  <div className="aspect-square w-full flex items-center justify-center bg-white/5">
                     <Image className="h-8 w-8 text-white/20" />
                   </div>
                 )}
@@ -191,6 +197,11 @@ export default function AdminVisuals() {
                   {visual.downloaded && (
                     <span className="p-1 rounded-full bg-green-500/80">
                       <Download className="h-3 w-3 text-white" />
+                    </span>
+                  )}
+                  {visual.in_portfolio && (
+                    <span className="p-1 rounded-full bg-amber-500/80">
+                      <Star className="h-3 w-3 text-white fill-current" />
                     </span>
                   )}
                 </div>
