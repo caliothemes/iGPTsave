@@ -785,6 +785,24 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
               ctx.fillStyle = layer.color;
             }
             
+            // Text Gradient Effect
+            if (layer.textGradient) {
+              const metrics = ctx.measureText(layer.text);
+              const textWidth = metrics.width;
+              const textHeight = layer.fontSize;
+              const textX = layer.x - (layer.align === 'center' ? textWidth/2 : layer.align === 'right' ? textWidth : 0);
+              
+              let gradient;
+              if (layer.gradientDirection === 'vertical') {
+                gradient = ctx.createLinearGradient(textX, layer.y - textHeight, textX, layer.y);
+              } else {
+                gradient = ctx.createLinearGradient(textX, layer.y, textX + textWidth, layer.y);
+              }
+              gradient.addColorStop(0, layer.gradientColor1 || '#ff00ff');
+              gradient.addColorStop(1, layer.gradientColor2 || '#00ffff');
+              ctx.fillStyle = gradient;
+            }
+            
             // Halo effect (golden glow behind)
             if (layer.halo) {
               ctx.save();
