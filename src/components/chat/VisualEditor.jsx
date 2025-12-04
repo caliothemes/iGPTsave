@@ -1468,10 +1468,9 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
                 // Create a temporary canvas for the reflection with gradient fade
                 const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvasSize.width * scale;
-                tempCanvas.height = (reflectionHeight + 20) * scale;
+                tempCanvas.width = canvasSize.width;
+                tempCanvas.height = reflectionHeight + 20;
                 const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.scale(scale, scale);
 
                 // Draw flipped text on temp canvas
                 tempCtx.save();
@@ -1502,7 +1501,7 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
                 // Draw the reflection on main canvas
                 exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
-                exportCtx.drawImage(tempCanvas, 0, reflectY * scale, tempCanvas.width, tempCanvas.height, 0, reflectY, canvasSize.width, reflectionHeight + 20);
+                exportCtx.drawImage(tempCanvas, 0, reflectY);
 
                 exportCtx.restore();
               }
