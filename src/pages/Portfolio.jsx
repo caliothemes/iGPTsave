@@ -114,7 +114,7 @@ export default function Portfolio() {
   return (
     <div className="min-h-screen relative">
       <AnimatedBackground />
-      <GlobalHeader />
+      <GlobalHeader page="Portfolio" />
 
       {/* Sidebar */}
       <Sidebar

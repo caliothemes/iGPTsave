@@ -816,7 +816,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
   return (
     <div className="min-h-screen relative">
       <AnimatedBackground />
-      <GlobalHeader />
+      <GlobalHeader page="Home" />
 
 
 
