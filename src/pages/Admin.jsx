@@ -397,10 +397,11 @@ export default function Admin() {
 
         {/* Visitor Stats Grid */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
             <Users className="h-5 w-5 text-cyan-400" />
             Statistiques de visiteurs
           </h3>
+          <p className="text-white/40 text-sm mb-4">Nombre d'utilisateurs uniques ayant visité l'application (basé sur les comptes connectés)</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div className="p-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30">
               <p className="text-cyan-300 text-xs mb-1">Total visiteurs</p>
@@ -439,10 +440,11 @@ export default function Admin() {
 
         {/* Active Visit Stats Grid */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
             <Eye className="h-5 w-5 text-violet-400" />
             Statistiques de visites actives
           </h3>
+          <p className="text-white/40 text-sm mb-4">Utilisateurs ayant interagi avec l'application (conversations, visuels créés)</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30">
               <div className="flex items-center gap-2 mb-1">
