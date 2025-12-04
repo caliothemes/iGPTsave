@@ -2331,9 +2331,16 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     <span className="text-white/40 text-xs w-6">{currentLayer.neonIntensity || 15}</span>
                   </div>
                 )}
-              </div>
-            </div>
-          )}
+                {currentLayer.reflection && (
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Reflet:' : 'Reflect:'}</span>
+                    <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
+                    <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
+                  </div>
+                )}
+                </div>
+                </div>
+                )}
 
           {currentLayer.type === 'image' && (
               <div className="space-y-2">
