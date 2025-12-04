@@ -1145,7 +1145,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
     updateLayer(dragging, { x: newX, y: newY });
   };
 
-  const handleCanvasMouseUp = () => setDragging(null);
+  const handleCanvasMouseUp = () => {
+    setDragging(null);
+    setGuides({ showVertical: false, showHorizontal: false });
+  };
 
   const handleSave = async () => {
         setSaving(true);
