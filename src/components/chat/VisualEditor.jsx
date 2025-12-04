@@ -287,39 +287,22 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          let targetWidth = img.width;
-          let targetHeight = img.height;
-          
-          // If visual has stored dimensions (from format selection), use those for aspect ratio
-          // This is important because AI sometimes generates square images even for portrait formats
-          if (visual.dimensions) {
-            const [metaW, metaH] = visual.dimensions.split('x').map(Number);
-            if (metaW && metaH) {
-              // Use the metadata aspect ratio
-              const metaRatio = metaW / metaH;
-              const imgRatio = img.width / img.height;
-              
-              // If ratios are significantly different, trust the metadata
-              if (Math.abs(metaRatio - imgRatio) > 0.1) {
-                console.log('Using metadata dimensions instead of image dimensions');
-                targetWidth = metaW;
-                targetHeight = metaH;
-              }
-            }
-          }
+          // Always use the actual image dimensions - never force a different ratio
+          // The AI generates the image at a certain size, we should respect that
+          const imgWidth = img.width;
+          const imgHeight = img.height;
 
-          // Scale down for display while maintaining aspect ratio
-          const isPortrait = targetHeight > targetWidth;
+          // Scale down for display while maintaining the ACTUAL image aspect ratio
+          const isPortrait = imgHeight > imgWidth;
           const maxWidth = isPortrait ? 280 : 450;
           const maxHeight = isPortrait ? 450 : 350;
           
-          const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
-          const displayWidth = Math.round(targetWidth * ratio);
-          const displayHeight = Math.round(targetHeight * ratio);
+          const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
+          const displayWidth = Math.round(imgWidth * ratio);
+          const displayHeight = Math.round(imgHeight * ratio);
           
           console.log('Visual dimensions (metadata):', visual.dimensions);
           console.log('Image natural size:', img.width, 'x', img.height);
-          console.log('Target size used:', targetWidth, 'x', targetHeight);
           console.log('Display size:', displayWidth, 'x', displayHeight);
           
           setCanvasSize({
@@ -346,7 +329,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           setImageLoaded(true);
         };
         img.src = baseUrl;
-      }, [visual.original_image_url, visual.image_url, visual.dimensions]);
+      }, [visual.original_image_url, visual.image_url]);
 
   // Preload layer images
   useEffect(() => {
