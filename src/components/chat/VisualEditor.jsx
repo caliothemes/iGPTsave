@@ -2053,26 +2053,41 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
               {/* Canvas - Responsive */}
               <div className="flex items-center justify-center bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
-        <canvas 
-          ref={canvasRef} 
-          width={canvasSize.width} 
-          height={canvasSize.height} 
-          className="rounded-lg cursor-move shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain"
-          style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
-          onMouseDown={handleCanvasMouseDown} 
-          onMouseMove={handleCanvasMouseMove} 
-          onMouseUp={handleCanvasMouseUp} 
-          onMouseLeave={handleCanvasMouseUp} 
-          onTouchStart={(e) => {
-            const touch = e.touches[0];
-            handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
-          }}
-          onTouchMove={(e) => {
-            const touch = e.touches[0];
-            handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
-          }}
-          onTouchEnd={handleCanvasMouseUp}
-        />
+        <div className="relative">
+          <canvas 
+            ref={canvasRef} 
+            width={canvasSize.width} 
+            height={canvasSize.height} 
+            className="rounded-lg cursor-move shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain"
+            style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
+            onMouseDown={handleCanvasMouseDown} 
+            onMouseMove={handleCanvasMouseMove} 
+            onMouseUp={handleCanvasMouseUp} 
+            onMouseLeave={handleCanvasMouseUp} 
+            onTouchStart={(e) => {
+              const touch = e.touches[0];
+              handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+            }}
+            onTouchMove={(e) => {
+              const touch = e.touches[0];
+              handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+            }}
+            onTouchEnd={handleCanvasMouseUp}
+          />
+          {/* Center guides overlay */}
+          {guides.showVertical && (
+            <div 
+              className="absolute top-0 bottom-0 w-px bg-cyan-400/70 pointer-events-none z-10"
+              style={{ left: '50%', transform: 'translateX(-50%)' }}
+            />
+          )}
+          {guides.showHorizontal && (
+            <div 
+              className="absolute left-0 right-0 h-px bg-cyan-400/70 pointer-events-none z-10"
+              style={{ top: '50%', transform: 'translateY(-50%)' }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Bottom Panel - Layer Properties */}
