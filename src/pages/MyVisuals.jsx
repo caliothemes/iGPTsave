@@ -32,7 +32,7 @@ export default function MyVisuals() {
     const load = async () => {
       try {
         const user = await base44.auth.me();
-        const userVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-created_date', 200);
+        const userVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-updated_date', 200);
         setVisuals(userVisuals);
       } catch (e) {
         console.error(e);
