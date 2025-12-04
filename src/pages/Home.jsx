@@ -1383,9 +1383,9 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                                           </Button>
                                                           <Button
                                                             onClick={handleSend}
-                                                            disabled={!input.trim() || isLoading}
+                                                            disabled={!input.trim() || isLoading || !selectedCategory}
                                                             size="icon"
-                                                            className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8 relative overflow-hidden"
+                                                            className="bg-gradient-to-r from-violet-800 to-blue-800 hover:from-violet-900 hover:to-blue-900 flex-shrink-0 h-8 w-8 relative overflow-hidden disabled:opacity-50"
                                                           >
                                                             {isLoading ? (
                                                               <div className="relative">
