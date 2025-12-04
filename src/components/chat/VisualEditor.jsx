@@ -1640,6 +1640,57 @@ Réponds en JSON avec:
 
               exportCtx.fillText(layer.text, layer.x, layer.y);
 
+              // Sparkle effect for export
+              if (layer.sparkle) {
+                const intensity = layer.sparkleIntensity || 50;
+                const numSparkles = Math.floor(intensity / 5);
+                const metrics = exportCtx.measureText(layer.text);
+                const textWidth = metrics.width;
+                const textHeight = layer.fontSize;
+                const textX = layer.x - (layer.align === 'center' ? textWidth/2 : layer.align === 'right' ? textWidth : 0);
+                
+                const seed = layer.text.length + layer.fontSize;
+                const seededRandom = (i) => {
+                  const x = Math.sin(seed * 9999 + i * 12345) * 10000;
+                  return x - Math.floor(x);
+                };
+                
+                for (let i = 0; i < numSparkles; i++) {
+                  const angle = seededRandom(i) * Math.PI * 2;
+                  const distance = 10 + seededRandom(i + 100) * (30 + intensity * 0.3);
+                  const sparkleX = textX + textWidth/2 + Math.cos(angle) * distance + (seededRandom(i + 200) - 0.5) * textWidth;
+                  const sparkleY = layer.y - textHeight/2 + Math.sin(angle) * distance + (seededRandom(i + 300) - 0.5) * textHeight;
+                  const size = 1 + seededRandom(i + 400) * 3;
+                  const opacity = 0.4 + seededRandom(i + 500) * 0.6;
+                  
+                  exportCtx.save();
+                  exportCtx.globalAlpha = opacity * (layer.opacity / 100);
+                  exportCtx.fillStyle = '#FFFFFF';
+                  
+                  if (seededRandom(i + 600) > 0.5) {
+                    exportCtx.beginPath();
+                    const starSize = size * 1.5;
+                    exportCtx.moveTo(sparkleX, sparkleY - starSize);
+                    exportCtx.lineTo(sparkleX + starSize * 0.3, sparkleY - starSize * 0.3);
+                    exportCtx.lineTo(sparkleX + starSize, sparkleY);
+                    exportCtx.lineTo(sparkleX + starSize * 0.3, sparkleY + starSize * 0.3);
+                    exportCtx.lineTo(sparkleX, sparkleY + starSize);
+                    exportCtx.lineTo(sparkleX - starSize * 0.3, sparkleY + starSize * 0.3);
+                    exportCtx.lineTo(sparkleX - starSize, sparkleY);
+                    exportCtx.lineTo(sparkleX - starSize * 0.3, sparkleY - starSize * 0.3);
+                    exportCtx.closePath();
+                    exportCtx.fill();
+                  } else {
+                    exportCtx.shadowColor = '#FFFFFF';
+                    exportCtx.shadowBlur = size * 2;
+                    exportCtx.beginPath();
+                    exportCtx.arc(sparkleX, sparkleY, size, 0, Math.PI * 2);
+                    exportCtx.fill();
+                  }
+                  exportCtx.restore();
+                }
+              }
+
               // Reflection effect (water reflection below text with fade) for export
               if (layer.reflection) {
                 exportCtx.save();
