@@ -2676,19 +2676,19 @@ Réponds en JSON avec:
                         {language === 'fr' ? 'Lueur' : 'Glow'}
                       </button>
                     </div>
+                    {currentLayer.shape === 'rectangle' && (
+                      <div className="flex gap-2 items-center">
+                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Radius:' : 'Radius:'}</span>
+                        <Slider value={[currentLayer.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={100} step={1} className="flex-1" />
+                        <span className="text-white/40 text-xs w-6">{currentLayer.borderRadius || 0}</span>
+                      </div>
+                    )}
                     {currentLayer.stroke && (
                       <div className="flex gap-2 items-center">
                         <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Bordure:' : 'Border:'}</span>
                         <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
                         <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
                         <span className="text-white/40 text-xs w-6">{currentLayer.strokeWidth || 2}</span>
-                      </div>
-                    )}
-                    {currentLayer.shape === 'rectangle' && (
-                      <div className="flex gap-2 items-center">
-                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Radius:' : 'Radius:'}</span>
-                        <Slider value={[currentLayer.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={100} step={1} className="flex-1" />
-                        <span className="text-white/40 text-xs w-6">{currentLayer.borderRadius || 0}</span>
                       </div>
                     )}
                     {currentLayer.glow && (
