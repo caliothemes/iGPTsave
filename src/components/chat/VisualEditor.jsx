@@ -737,9 +737,48 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
               ctx.lineWidth = layer.strokeWidth || 2;
               ctx.strokeText(layer.text, layer.x, layer.y);
             }
-            
+
             ctx.fillText(layer.text, layer.x, layer.y);
-          }
+
+            // Reflection effect (water reflection)
+            if (layer.reflection) {
+              ctx.save();
+
+              // Calculate text metrics for reflection positioning
+              const textMetrics = ctx.measureText(layer.text);
+              const textHeight = layer.fontSize;
+              const reflectionGap = 4;
+
+              // Position for reflection (below the text)
+              const reflectY = layer.y + reflectionGap;
+
+              // Flip vertically
+              ctx.translate(0, reflectY * 2 + textHeight);
+              ctx.scale(1, -1);
+
+              // Create gradient for fade effect
+              const fadeGradient = ctx.createLinearGradient(0, reflectY, 0, reflectY + textHeight);
+              fadeGradient.addColorStop(0, layer.color);
+              fadeGradient.addColorStop(0.3, layer.color.replace(')', ', 0.5)').replace('rgb', 'rgba').replace('#', 'rgba('));
+              fadeGradient.addColorStop(1, 'transparent');
+
+              // Draw reflection with reduced opacity
+              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              ctx.fillStyle = layer.color;
+
+              if (layer.stroke) {
+                ctx.strokeStyle = layer.strokeColor || '#000000';
+                ctx.lineWidth = layer.strokeWidth || 2;
+                ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100 * 0.5;
+                ctx.strokeText(layer.text, layer.x, reflectY);
+              }
+
+              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              ctx.fillText(layer.text, layer.x, reflectY);
+
+              ctx.restore();
+            }
+            }
             }
             
             ctx.restore();
