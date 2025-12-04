@@ -2573,7 +2573,7 @@ Réponds en JSON avec:
                 >
                   <span className="text-white/70 text-xs flex items-center gap-2">
                     <Type className="h-3 w-3" />
-                    {language === 'fr' ? 'Édition du texte' : 'Text editing'}
+                    {language === 'fr' ? 'Propriétés' : 'Properties'}
                   </span>
                   <ChevronDown className={cn("h-4 w-4 text-white/40 transition-transform", textAccordion === 'properties' && "rotate-180")} />
                 </button>
