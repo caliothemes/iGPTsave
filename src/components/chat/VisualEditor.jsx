@@ -307,6 +307,92 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const baseUrl = visual.original_image_url || visual.image_url;
         setOriginalImageUrl(baseUrl);
         
+        // If we have saved layers, preload their images first
+        if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
+          // Preload all image URLs from layers
+          const imageUrls = [];
+          visual.editor_layers.forEach(layer => {
+            if (layer.type === 'image' && layer.imageUrl) {
+              imageUrls.push(layer.imageUrl);
+            }
+            if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue) {
+              imageUrls.push(layer.bgValue);
+            }
+          });
+          
+          // Load all images
+          let loadedCount = 0;
+          const totalToLoad = imageUrls.length;
+          
+          if (totalToLoad === 0) {
+            // No images to load, just set canvas size from dimensions
+            if (visual.dimensions) {
+              const [metaW, metaH] = visual.dimensions.split('x').map(Number);
+              if (metaW && metaH) {
+                const isPortrait = metaH > metaW;
+                const maxWidth = isPortrait ? 280 : 450;
+                const maxHeight = isPortrait ? 450 : 350;
+                const ratio = Math.min(maxWidth / metaW, maxHeight / metaH);
+                setCanvasSize({
+                  width: Math.round(metaW * ratio),
+                  height: Math.round(metaH * ratio)
+                });
+              }
+            }
+            setImageLoaded(true);
+            return;
+          }
+          
+          imageUrls.forEach(url => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              setLoadedImages(prev => ({ ...prev, [url]: img }));
+              loadedCount++;
+              
+              // When all images are loaded, set canvas size and mark as loaded
+              if (loadedCount === totalToLoad) {
+                // Use dimensions from metadata
+                if (visual.dimensions) {
+                  const [metaW, metaH] = visual.dimensions.split('x').map(Number);
+                  if (metaW && metaH) {
+                    const isPortrait = metaH > metaW;
+                    const maxWidth = isPortrait ? 280 : 450;
+                    const maxHeight = isPortrait ? 450 : 350;
+                    const ratio = Math.min(maxWidth / metaW, maxHeight / metaH);
+                    setCanvasSize({
+                      width: Math.round(metaW * ratio),
+                      height: Math.round(metaH * ratio)
+                    });
+                  }
+                } else {
+                  // Fallback: use first image dimensions
+                  const firstImg = loadedImages[imageUrls[0]] || img;
+                  const isPortrait = firstImg.height > firstImg.width;
+                  const maxWidth = isPortrait ? 280 : 450;
+                  const maxHeight = isPortrait ? 450 : 350;
+                  const ratio = Math.min(maxWidth / firstImg.width, maxHeight / firstImg.height);
+                  setCanvasSize({
+                    width: Math.round(firstImg.width * ratio),
+                    height: Math.round(firstImg.height * ratio)
+                  });
+                }
+                setImageLoaded(true);
+              }
+            };
+            img.onerror = () => {
+              console.error('Failed to load image:', url);
+              loadedCount++;
+              if (loadedCount === totalToLoad) {
+                setImageLoaded(true);
+              }
+            };
+            img.src = url;
+          });
+          return;
+        }
+        
+        // No saved layers - load base image and create initial layer
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
@@ -360,26 +446,27 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             height: displayHeight
           });
           
-          // Create the base image as a movable layer if no layers exist
-          if (!visual.editor_layers || visual.editor_layers.length === 0) {
-            const baseImageLayer = {
-              type: 'image',
-              imageUrl: baseUrl,
-              x: Math.round(drawX),
-              y: Math.round(drawY),
-              width: Math.round(drawWidth),
-              height: Math.round(drawHeight),
-              opacity: 100,
-              isBaseImage: true // Mark as the original generated image
-            };
-            setLayers([baseImageLayer]);
-            setSelectedLayer(0);
-          }
+          // Store the loaded image
+          setLoadedImages(prev => ({ ...prev, [baseUrl]: img }));
+          
+          // Create the base image as a movable layer
+          const baseImageLayer = {
+            type: 'image',
+            imageUrl: baseUrl,
+            x: Math.round(drawX),
+            y: Math.round(drawY),
+            width: Math.round(drawWidth),
+            height: Math.round(drawHeight),
+            opacity: 100,
+            isBaseImage: true // Mark as the original generated image
+          };
+          setLayers([baseImageLayer]);
+          setSelectedLayer(0);
           
           setImageLoaded(true);
         };
         img.src = baseUrl;
-      }, [visual.original_image_url, visual.image_url, visual.dimensions]);
+      }, [visual.original_image_url, visual.image_url, visual.dimensions, visual.editor_layers]);
 
   // Preload layer images
   useEffect(() => {
