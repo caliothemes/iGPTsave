@@ -24,7 +24,7 @@ export default function AdminVisuals() {
           return;
         }
 
-        const fetchedVisuals = await base44.entities.Visual.list('-created_date', 200);
+        const fetchedVisuals = await base44.entities.Visual.list('-updated_date', 200);
         setVisuals(fetchedVisuals);
       } catch (e) {
         window.location.href = createPageUrl('Home');
