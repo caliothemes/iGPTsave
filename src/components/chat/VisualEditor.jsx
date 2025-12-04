@@ -592,69 +592,110 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           ctx.shadowOffsetX = 0;
           ctx.shadowOffsetY = 0;
           
-          // 3D Effect (draw multiple offset layers)
-          if (layer.effect3d) {
-            const depth = 6;
-            for (let i = depth; i > 0; i--) {
-              ctx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
-              ctx.fillText(layer.text, layer.x + i, layer.y + i);
+          // Apply rotation if set
+          if (layer.rotation) {
+            ctx.translate(layer.x, layer.y);
+            ctx.rotate((layer.rotation || 0) * Math.PI / 180);
+            ctx.translate(-layer.x, -layer.y);
+          }
+          
+          // Draw curved text if enabled
+          if (layer.curvedText) {
+            const radius = layer.curveRadius || 100;
+            const text = layer.text;
+            const centerX = layer.x;
+            const centerY = layer.y;
+            
+            // Calculate total angle for text
+            ctx.font = fontStyle;
+            const totalWidth = ctx.measureText(text).width;
+            const anglePerChar = totalWidth / (radius * text.length) * 0.8;
+            const startAngle = -Math.PI / 2 - (anglePerChar * text.length) / 2;
+            
+            for (let i = 0; i < text.length; i++) {
+              const char = text[i];
+              const angle = startAngle + anglePerChar * i;
+              const charX = centerX + Math.cos(angle) * radius;
+              const charY = centerY + Math.sin(angle) * radius;
+              
+              ctx.save();
+              ctx.translate(charX, charY);
+              ctx.rotate(angle + Math.PI / 2);
+              
+              if (layer.stroke) {
+                ctx.strokeStyle = layer.strokeColor || '#000000';
+                ctx.lineWidth = layer.strokeWidth || 2;
+                ctx.strokeText(char, 0, 0);
+              }
+              ctx.fillText(char, 0, 0);
+              ctx.restore();
             }
-            ctx.fillStyle = layer.color;
-          }
-          
-          // Halo effect (golden glow behind)
-          if (layer.halo) {
-            ctx.save();
-            ctx.shadowColor = layer.haloColor || '#FFD700';
-            ctx.shadowBlur = layer.haloSize || 15;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            ctx.fillStyle = layer.haloColor || '#FFD700';
-            ctx.fillText(layer.text, layer.x, layer.y);
-            ctx.fillText(layer.text, layer.x, layer.y);
-            ctx.restore();
-            ctx.fillStyle = layer.color;
-          }
-          
-          // Neon effect
-          if (layer.neon) {
-            ctx.save();
-            const neonColor = layer.neonColor || '#ff00ff';
-            const intensity = layer.neonIntensity || 15;
-            ctx.shadowColor = neonColor;
-            ctx.shadowBlur = intensity;
-            ctx.fillStyle = neonColor;
-            ctx.fillText(layer.text, layer.x, layer.y);
-            ctx.shadowBlur = intensity * 2;
-            ctx.fillText(layer.text, layer.x, layer.y);
-            ctx.restore();
-            ctx.fillStyle = '#ffffff';
-          }
-          
-          // Glow effect
-          if (layer.glow) {
-            ctx.shadowColor = layer.glowColor || '#ffffff';
-            ctx.shadowBlur = layer.glowSize || 10;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-          }
-          
-          // Shadow effect
-          if (layer.shadow && !layer.glow && !layer.neon) {
-            ctx.shadowColor = 'rgba(0,0,0,0.6)';
-            ctx.shadowBlur = 6;
-            ctx.shadowOffsetX = 3;
-            ctx.shadowOffsetY = 3;
-          }
-          
-          // Stroke
-          if (layer.stroke) {
-            ctx.strokeStyle = layer.strokeColor || '#000000';
-            ctx.lineWidth = layer.strokeWidth || 2;
-            ctx.strokeText(layer.text, layer.x, layer.y);
-          }
-          
+          } else {
+            // Normal text rendering
+            // 3D Effect (draw multiple offset layers)
+            if (layer.effect3d) {
+              const depth = 6;
+              for (let i = depth; i > 0; i--) {
+                ctx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
+                ctx.fillText(layer.text, layer.x + i, layer.y + i);
+              }
+              ctx.fillStyle = layer.color;
+            }
+            
+            // Halo effect (golden glow behind)
+            if (layer.halo) {
+              ctx.save();
+              ctx.shadowColor = layer.haloColor || '#FFD700';
+              ctx.shadowBlur = layer.haloSize || 15;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
+              ctx.fillStyle = layer.haloColor || '#FFD700';
               ctx.fillText(layer.text, layer.x, layer.y);
+              ctx.fillText(layer.text, layer.x, layer.y);
+              ctx.restore();
+              ctx.fillStyle = layer.color;
+            }
+            
+            // Neon effect
+            if (layer.neon) {
+              ctx.save();
+              const neonColor = layer.neonColor || '#ff00ff';
+              const intensity = layer.neonIntensity || 15;
+              ctx.shadowColor = neonColor;
+              ctx.shadowBlur = intensity;
+              ctx.fillStyle = neonColor;
+              ctx.fillText(layer.text, layer.x, layer.y);
+              ctx.shadowBlur = intensity * 2;
+              ctx.fillText(layer.text, layer.x, layer.y);
+              ctx.restore();
+              ctx.fillStyle = '#ffffff';
+            }
+            
+            // Glow effect
+            if (layer.glow) {
+              ctx.shadowColor = layer.glowColor || '#ffffff';
+              ctx.shadowBlur = layer.glowSize || 10;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
+            }
+            
+            // Shadow effect
+            if (layer.shadow && !layer.glow && !layer.neon) {
+              ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+              ctx.shadowBlur = layer.shadowBlur || 6;
+              ctx.shadowOffsetX = layer.shadowOffsetX || 3;
+              ctx.shadowOffsetY = layer.shadowOffsetY || 3;
+            }
+            
+            // Stroke
+            if (layer.stroke) {
+              ctx.strokeStyle = layer.strokeColor || '#000000';
+              ctx.lineWidth = layer.strokeWidth || 2;
+              ctx.strokeText(layer.text, layer.x, layer.y);
+            }
+            
+            ctx.fillText(layer.text, layer.x, layer.y);
+          }
             }
             
             ctx.restore();
