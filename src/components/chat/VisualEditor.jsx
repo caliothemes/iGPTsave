@@ -210,6 +210,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [generatedTexts, setGeneratedTexts] = useState([]);
   const [savedTexts, setSavedTexts] = useState([]);
   const [showSavedTexts, setShowSavedTexts] = useState(false);
+  const [stylizingText, setStylizingText] = useState(false);
   
   // Image upload
   const [uploadingUserImage, setUploadingUserImage] = useState(false);
@@ -1091,6 +1092,109 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
     addTextLayer(text);
     setShowTextGenerator(false);
     setShowSavedTexts(false);
+  };
+
+  const stylizeTextWithAI = async () => {
+    if (selectedLayer === null || !currentLayer || currentLayer.type !== 'text') return;
+    setStylizingText(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Tu es un expert en design graphique. Choisis UN style professionnel et moderne pour ce texte: "${currentLayer.text}"
+        
+Le texte sera affiché sur un visuel de type: ${visual.visual_type || 'design'}
+
+Choisis UN style parmi ces options et donne les valeurs exactes:
+- Style "Néon Cyberpunk": neon activé, couleur néon vive (#ff00ff ou #00ffff), fond sombre
+- Style "Or Luxe": halo doré (#FFD700), contour fin doré, texte blanc ou noir
+- Style "3D Pop": effet 3D activé, couleurs vives, contour contrasté
+- Style "Ombre Élégante": ombre portée douce, couleurs neutres ou pastels
+- Style "Lueur Moderne": glow blanc ou coloré, texte épuré
+- Style "Reflet Premium": reflet activé, couleurs métalliques ou élégantes
+
+Réponds en JSON avec:
+- style_name: nom du style choisi
+- color: couleur du texte (hex)
+- fontSize: taille recommandée (32-80)
+- fontWeight: poids (400-900)
+- neon: boolean
+- neonColor: hex si neon
+- neonIntensity: 10-25 si neon
+- glow: boolean
+- glowColor: hex si glow
+- glowSize: 10-30 si glow
+- halo: boolean
+- haloColor: hex si halo
+- haloSize: 10-40 si halo
+- effect3d: boolean
+- shadow: boolean
+- shadowColor: hex si shadow
+- shadowBlur: 5-15 si shadow
+- stroke: boolean
+- strokeColor: hex si stroke
+- strokeWidth: 1-4 si stroke
+- reflection: boolean
+- reflectionOpacity: 30-60 si reflection`,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            style_name: { type: 'string' },
+            color: { type: 'string' },
+            fontSize: { type: 'number' },
+            fontWeight: { type: 'number' },
+            neon: { type: 'boolean' },
+            neonColor: { type: 'string' },
+            neonIntensity: { type: 'number' },
+            glow: { type: 'boolean' },
+            glowColor: { type: 'string' },
+            glowSize: { type: 'number' },
+            halo: { type: 'boolean' },
+            haloColor: { type: 'string' },
+            haloSize: { type: 'number' },
+            effect3d: { type: 'boolean' },
+            shadow: { type: 'boolean' },
+            shadowColor: { type: 'string' },
+            shadowBlur: { type: 'number' },
+            stroke: { type: 'boolean' },
+            strokeColor: { type: 'string' },
+            strokeWidth: { type: 'number' },
+            reflection: { type: 'boolean' },
+            reflectionOpacity: { type: 'number' }
+          }
+        }
+      });
+
+      // Apply the AI-generated style
+      const updates = {
+        color: result.color || currentLayer.color,
+        fontSize: result.fontSize || currentLayer.fontSize,
+        fontWeight: result.fontWeight || currentLayer.fontWeight,
+        neon: result.neon || false,
+        neonColor: result.neonColor,
+        neonIntensity: result.neonIntensity,
+        glow: result.glow || false,
+        glowColor: result.glowColor,
+        glowSize: result.glowSize,
+        halo: result.halo || false,
+        haloColor: result.haloColor,
+        haloSize: result.haloSize,
+        effect3d: result.effect3d || false,
+        shadow: result.shadow || false,
+        shadowColor: result.shadowColor,
+        shadowBlur: result.shadowBlur,
+        stroke: result.stroke || false,
+        strokeColor: result.strokeColor,
+        strokeWidth: result.strokeWidth,
+        reflection: result.reflection || false,
+        reflectionOpacity: result.reflectionOpacity
+      };
+
+      updateLayer(selectedLayer, updates);
+      showHelp(language === 'fr' ? `✨ Style "${result.style_name}" appliqué !` : `✨ "${result.style_name}" style applied!`);
+    } catch (e) {
+      console.error(e);
+      showHelp(language === 'fr' ? '❌ Erreur lors de la stylisation' : '❌ Error during styling');
+    }
+    setStylizingText(false);
   };
 
   const removeFromLibrary = async (idx) => {
@@ -2208,6 +2312,20 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
           {currentLayer.type === 'text' && (
             <div className="space-y-2">
+              {/* AI Stylize Button */}
+              <Button
+                onClick={stylizeTextWithAI}
+                disabled={stylizingText}
+                className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 hover:from-pink-700 hover:via-purple-700 hover:to-violet-700 text-white font-medium shadow-lg shadow-purple-500/20"
+              >
+                {stylizingText ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                {language === 'fr' ? '✨ Styliser avec l\'IA' : '✨ Stylize with AI'}
+              </Button>
+
               <div className="flex gap-2 items-center">
                 <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white text-sm h-8 flex-1" />
                 <DropdownMenu>
