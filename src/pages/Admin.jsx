@@ -38,6 +38,19 @@ export default function Admin() {
     lastMonth: 0,
     thisYear: 0
   });
+  const [visitorStats, setVisitorStats] = useState({
+    total: 0,
+    today: 0,
+    yesterday: 0,
+    thisWeek: 0,
+    lastWeek: 0,
+    thisMonth: 0,
+    lastMonth: 0,
+    thisYear: 0,
+    uniqueToday: 0,
+    uniqueThisWeek: 0,
+    uniqueThisMonth: 0
+  });
   const [userStats, setUserStats] = useState({
     totalUsers: 0,
     newToday: 0,
@@ -92,12 +105,13 @@ export default function Admin() {
           return;
         }
 
-        const [users, allCredits, allVisuals, allTransactions, allConversations] = await Promise.all([
+        const [users, allCredits, allVisuals, allTransactions, allConversations, allVisits] = await Promise.all([
           base44.entities.User.list(),
           base44.entities.UserCredits.list(),
           base44.entities.Visual.list('-created_date', 500),
           base44.entities.Transaction.list(),
-          base44.entities.Conversation.list()
+          base44.entities.Conversation.list(),
+          base44.entities.Visit.list('-created_date', 5000)
         ]);
 
         // Calculate stats
@@ -198,6 +212,43 @@ export default function Admin() {
           thisMonth: getUniqueUsers(allItems, monthAgo),
           lastMonth: getUniqueUsers(allItems, lastMonthStart, monthAgo),
           thisYear: getUniqueUsers(allItems, yearAgo)
+        });
+
+        // Real visitor stats from Visit entity
+        const countVisits = (visits, afterDate, beforeDate = null) => {
+          return visits.filter(v => {
+            const visitDate = new Date(v.created_date);
+            const afterCheck = visitDate > afterDate;
+            const beforeCheck = beforeDate ? visitDate < beforeDate : true;
+            return afterCheck && beforeCheck;
+          }).length;
+        };
+
+        const countUniqueVisitors = (visits, afterDate, beforeDate = null) => {
+          const uniqueSessions = new Set();
+          visits.forEach(v => {
+            const visitDate = new Date(v.created_date);
+            const afterCheck = visitDate > afterDate;
+            const beforeCheck = beforeDate ? visitDate < beforeDate : true;
+            if (afterCheck && beforeCheck && v.session_id) {
+              uniqueSessions.add(v.session_id);
+            }
+          });
+          return uniqueSessions.size;
+        };
+
+        setVisitorStats({
+          total: allVisits.length,
+          today: countVisits(allVisits, todayStart),
+          yesterday: countVisits(allVisits, yesterdayStart, yesterdayEnd),
+          thisWeek: countVisits(allVisits, weekAgo),
+          lastWeek: countVisits(allVisits, lastWeekStart, weekAgo),
+          thisMonth: countVisits(allVisits, monthAgo),
+          lastMonth: countVisits(allVisits, lastMonthStart, monthAgo),
+          thisYear: countVisits(allVisits, yearAgo),
+          uniqueToday: countUniqueVisitors(allVisits, todayStart),
+          uniqueThisWeek: countUniqueVisitors(allVisits, weekAgo),
+          uniqueThisMonth: countUniqueVisitors(allVisits, monthAgo)
         });
 
         // User & Subscription Stats
@@ -401,39 +452,42 @@ export default function Admin() {
             <Users className="h-5 w-5 text-cyan-400" />
             Statistiques de visiteurs
           </h3>
-          <p className="text-white/40 text-sm mb-4">Nombre d'utilisateurs uniques ayant visité l'application (basé sur les comptes connectés)</p>
+          <p className="text-white/40 text-sm mb-4">Nombre de visites sur l'application (toutes les visites, connectés ou non)</p>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div className="p-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30">
-              <p className="text-cyan-300 text-xs mb-1">Total visiteurs</p>
-              <p className="text-xl font-bold text-white">{visitStats.thisYear}</p>
+              <p className="text-cyan-300 text-xs mb-1">Total visites</p>
+              <p className="text-xl font-bold text-white">{visitorStats.total}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Aujourd'hui</p>
-              <p className="text-xl font-bold text-white">{visitStats.today}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.today}</p>
+              <p className="text-white/30 text-[10px]">{visitorStats.uniqueToday} uniques</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Hier</p>
-              <p className="text-xl font-bold text-white">{visitStats.yesterday}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.yesterday}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Cette semaine</p>
-              <p className="text-xl font-bold text-white">{visitStats.thisWeek}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.thisWeek}</p>
+              <p className="text-white/30 text-[10px]">{visitorStats.uniqueThisWeek} uniques</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Sem. dernière</p>
-              <p className="text-xl font-bold text-white">{visitStats.lastWeek}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.lastWeek}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Ce mois</p>
-              <p className="text-xl font-bold text-white">{visitStats.thisMonth}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.thisMonth}</p>
+              <p className="text-white/30 text-[10px]">{visitorStats.uniqueThisMonth} uniques</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Mois dernier</p>
-              <p className="text-xl font-bold text-white">{visitStats.lastMonth}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.lastMonth}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-white/50 text-xs mb-1">Cette année</p>
-              <p className="text-xl font-bold text-white">{visitStats.thisYear}</p>
+              <p className="text-xl font-bold text-white">{visitorStats.thisYear}</p>
             </div>
           </div>
         </div>
