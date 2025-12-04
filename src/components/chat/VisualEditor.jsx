@@ -287,23 +287,50 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          // Always use the actual image dimensions - never force a different ratio
-          // The AI generates the image at a certain size, we should respect that
-          const imgWidth = img.width;
-          const imgHeight = img.height;
+          // Use metadata dimensions if available (user-selected format like story)
+          // Otherwise fall back to image natural dimensions
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+          
+          if (visual.dimensions) {
+            const [metaW, metaH] = visual.dimensions.split('x').map(Number);
+            if (metaW && metaH) {
+              targetWidth = metaW;
+              targetHeight = metaH;
+            }
+          }
 
-          // Scale down for display while maintaining the ACTUAL image aspect ratio
-          const isPortrait = imgHeight > imgWidth;
+          // Scale down for display while maintaining the target aspect ratio
+          const isPortrait = targetHeight > targetWidth;
           const maxWidth = isPortrait ? 280 : 450;
           const maxHeight = isPortrait ? 450 : 350;
           
-          const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
-          const displayWidth = Math.round(imgWidth * ratio);
-          const displayHeight = Math.round(imgHeight * ratio);
+          const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
+          const displayWidth = Math.round(targetWidth * ratio);
+          const displayHeight = Math.round(targetHeight * ratio);
+          
+          // Calculate how to crop/position the image to fill the canvas (like object-fit: cover)
+          const imgRatio = img.width / img.height;
+          const canvasRatio = displayWidth / displayHeight;
+          
+          let drawWidth, drawHeight, drawX, drawY;
+          if (imgRatio > canvasRatio) {
+            // Image is wider - crop horizontally
+            drawHeight = displayHeight;
+            drawWidth = displayHeight * imgRatio;
+            drawX = (displayWidth - drawWidth) / 2;
+            drawY = 0;
+          } else {
+            // Image is taller - crop vertically
+            drawWidth = displayWidth;
+            drawHeight = displayWidth / imgRatio;
+            drawX = 0;
+            drawY = (displayHeight - drawHeight) / 2;
+          }
           
           console.log('Visual dimensions (metadata):', visual.dimensions);
           console.log('Image natural size:', img.width, 'x', img.height);
-          console.log('Display size:', displayWidth, 'x', displayHeight);
+          console.log('Canvas size:', displayWidth, 'x', displayHeight);
           
           setCanvasSize({
             width: displayWidth,
@@ -315,10 +342,10 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             const baseImageLayer = {
               type: 'image',
               imageUrl: baseUrl,
-              x: 0,
-              y: 0,
-              width: displayWidth,
-              height: displayHeight,
+              x: Math.round(drawX),
+              y: Math.round(drawY),
+              width: Math.round(drawWidth),
+              height: Math.round(drawHeight),
               opacity: 100,
               isBaseImage: true // Mark as the original generated image
             };
@@ -329,7 +356,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
           setImageLoaded(true);
         };
         img.src = baseUrl;
-      }, [visual.original_image_url, visual.image_url]);
+      }, [visual.original_image_url, visual.image_url, visual.dimensions]);
 
   // Preload layer images
   useEffect(() => {
