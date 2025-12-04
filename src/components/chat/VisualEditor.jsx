@@ -740,34 +740,33 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
 
             ctx.fillText(layer.text, layer.x, layer.y);
 
-            // Reflection effect (water reflection)
+            // Reflection effect (water reflection below text)
             if (layer.reflection) {
               ctx.save();
 
-              // Calculate text metrics for reflection positioning
               const textHeight = layer.fontSize;
-              const reflectionGap = 4;
+              const reflectionGap = 8;
 
-              // Position for reflection (below the text)
+              // Position for reflection start (just below the original text)
               const reflectY = layer.y + reflectionGap;
 
-              // Flip vertically
-              ctx.translate(0, reflectY * 2 + textHeight);
-              ctx.scale(1, -1);
-
-              // Draw reflection with reduced opacity
+              // Set reduced opacity for reflection
               ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+
+              // Scale vertically to flip the text (mirror effect)
+              ctx.translate(0, reflectY + textHeight / 2);
+              ctx.scale(1, -1);
+              ctx.translate(0, -(reflectY + textHeight / 2));
+
               ctx.fillStyle = layer.color;
 
               if (layer.stroke) {
                 ctx.strokeStyle = layer.strokeColor || '#000000';
                 ctx.lineWidth = layer.strokeWidth || 2;
-                ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100 * 0.5;
-                ctx.strokeText(layer.text, layer.x, reflectY);
+                ctx.strokeText(layer.text, layer.x, reflectY + textHeight);
               }
 
-              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
-              ctx.fillText(layer.text, layer.x, reflectY);
+              ctx.fillText(layer.text, layer.x, reflectY + textHeight);
 
               ctx.restore();
             }

@@ -119,7 +119,7 @@ export default function Sidebar({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className="grid grid-cols-2 gap-1 p-1 w-[230px]">
-                  {visuals.slice(0, 4).map((visual, idx) => (
+                  {[...visuals].sort((a, b) => new Date(b.updated_date || b.created_date) - new Date(a.updated_date || a.created_date)).slice(0, 4).map((visual, idx) => (
                     <div
                       key={visual.id || idx}
                       onClick={() => onSelectVisual(visual)}
