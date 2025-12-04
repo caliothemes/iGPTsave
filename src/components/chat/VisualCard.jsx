@@ -170,7 +170,7 @@ export default function VisualCard({
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Variation, Regenerate, Download on same line */}
           <div className="flex gap-2">
             {/* Variation Button */}
             {onVariation && (
@@ -195,29 +195,30 @@ export default function VisualCard({
               <RefreshCw className={cn("h-4 w-4 mr-1.5", isRegenerating && "animate-spin")} />
               <span className="text-xs">{t('regenerate')}</span>
             </Button>
+
+            {/* Download Button (icon only) */}
+            {showValidation && (
+              <Button
+                size="sm"
+                onClick={handleDownloadClick}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-3"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
-          {/* Validation Buttons */}
+          {/* Customize Button - Full width */}
           {showValidation && (
             <div className="space-y-2">
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleDownloadClick}
-                  className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-                >
-                  <Download className="h-4 w-4 mr-1.5" />
-                  <span className="text-xs">{language === 'fr' ? 'Télécharger' : 'Download'}</span>
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => onValidate?.('edit')}
-                  className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-                >
-                  <Pencil className="h-4 w-4 mr-1.5" />
-                  <span className="text-xs">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
-                </Button>
-              </div>
+              <Button
+                size="default"
+                onClick={() => onValidate?.('edit')}
+                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 py-3"
+              >
+                <Pencil className="h-5 w-5 mr-2" />
+                <span className="text-sm font-medium">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
+              </Button>
               {/* Animation button temporarily hidden
               {onAnimate && (
                 <Button
