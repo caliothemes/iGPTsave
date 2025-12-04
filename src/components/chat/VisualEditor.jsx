@@ -1227,59 +1227,138 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             exportCtx.fillStyle = layer.color;
             exportCtx.textAlign = layer.align || 'left';
             
-            if (layer.effect3d) {
-              const depth = 6;
-              for (let i = depth; i > 0; i--) {
-                exportCtx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
-                exportCtx.fillText(layer.text, layer.x + i, layer.y + i);
+            // Apply rotation if set
+            if (layer.rotation && !layer.curvedText) {
+              exportCtx.translate(layer.x, layer.y);
+              exportCtx.rotate((layer.rotation || 0) * Math.PI / 180);
+              exportCtx.translate(-layer.x, -layer.y);
+            }
+            
+            // Draw curved text if enabled
+            if (layer.curvedText) {
+              const radius = layer.curveRadius || 100;
+              const text = layer.text;
+              const centerX = layer.x;
+              const centerY = layer.y + radius;
+              const curveDirection = layer.curveDirection || 'top';
+              
+              exportCtx.textAlign = 'center';
+              exportCtx.textBaseline = 'middle';
+              
+              let totalWidth = 0;
+              const charWidths = [];
+              for (let i = 0; i < text.length; i++) {
+                const w = exportCtx.measureText(text[i]).width;
+                charWidths.push(w);
+                totalWidth += w;
               }
-              exportCtx.fillStyle = layer.color;
-            }
-            
-            if (layer.halo) {
-              exportCtx.save();
-              exportCtx.shadowColor = layer.haloColor || '#FFD700';
-              exportCtx.shadowBlur = layer.haloSize || 15;
-              exportCtx.fillStyle = layer.haloColor || '#FFD700';
+              
+              const totalAngle = totalWidth / radius;
+              const startAngle = curveDirection === 'top' 
+                ? -Math.PI / 2 - totalAngle / 2
+                : Math.PI / 2 - totalAngle / 2;
+              
+              let currentAngle = startAngle;
+              
+              for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const charWidth = charWidths[i];
+                const halfCharAngle = (charWidth / 2) / radius;
+                
+                currentAngle += halfCharAngle;
+                
+                const charX = centerX + Math.cos(currentAngle) * radius;
+                const charY = centerY + Math.sin(currentAngle) * radius;
+                
+                exportCtx.save();
+                exportCtx.translate(charX, charY);
+                
+                if (curveDirection === 'top') {
+                  exportCtx.rotate(currentAngle + Math.PI / 2);
+                } else {
+                  exportCtx.rotate(currentAngle - Math.PI / 2);
+                }
+                
+                if (layer.shadow && !layer.glow && !layer.neon) {
+                  exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                  exportCtx.shadowBlur = layer.shadowBlur || 6;
+                  exportCtx.shadowOffsetX = layer.shadowOffsetX || 3;
+                  exportCtx.shadowOffsetY = layer.shadowOffsetY || 3;
+                }
+                
+                if (layer.glow) {
+                  exportCtx.shadowColor = layer.glowColor || '#ffffff';
+                  exportCtx.shadowBlur = layer.glowSize || 10;
+                }
+                
+                if (layer.stroke) {
+                  exportCtx.strokeStyle = layer.strokeColor || '#000000';
+                  exportCtx.lineWidth = layer.strokeWidth || 2;
+                  exportCtx.strokeText(char, 0, 0);
+                }
+                
+                exportCtx.fillStyle = layer.color;
+                exportCtx.fillText(char, 0, 0);
+                exportCtx.restore();
+                
+                currentAngle += halfCharAngle;
+              }
+            } else {
+              // Normal text rendering
+              if (layer.effect3d) {
+                const depth = 6;
+                for (let i = depth; i > 0; i--) {
+                  exportCtx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
+                  exportCtx.fillText(layer.text, layer.x + i, layer.y + i);
+                }
+                exportCtx.fillStyle = layer.color;
+              }
+              
+              if (layer.halo) {
+                exportCtx.save();
+                exportCtx.shadowColor = layer.haloColor || '#FFD700';
+                exportCtx.shadowBlur = layer.haloSize || 15;
+                exportCtx.fillStyle = layer.haloColor || '#FFD700';
+                exportCtx.fillText(layer.text, layer.x, layer.y);
+                exportCtx.fillText(layer.text, layer.x, layer.y);
+                exportCtx.restore();
+                exportCtx.fillStyle = layer.color;
+              }
+              
+              if (layer.neon) {
+                exportCtx.save();
+                const neonColor = layer.neonColor || '#ff00ff';
+                const intensity = layer.neonIntensity || 15;
+                exportCtx.shadowColor = neonColor;
+                exportCtx.shadowBlur = intensity;
+                exportCtx.fillStyle = neonColor;
+                exportCtx.fillText(layer.text, layer.x, layer.y);
+                exportCtx.shadowBlur = intensity * 2;
+                exportCtx.fillText(layer.text, layer.x, layer.y);
+                exportCtx.restore();
+                exportCtx.fillStyle = '#ffffff';
+              }
+              
+              if (layer.glow) {
+                exportCtx.shadowColor = layer.glowColor || '#ffffff';
+                exportCtx.shadowBlur = layer.glowSize || 10;
+              }
+              
+              if (layer.shadow && !layer.glow && !layer.neon) {
+                exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                exportCtx.shadowBlur = layer.shadowBlur || 6;
+                exportCtx.shadowOffsetX = layer.shadowOffsetX || 3;
+                exportCtx.shadowOffsetY = layer.shadowOffsetY || 3;
+              }
+              
+              if (layer.stroke) {
+                exportCtx.strokeStyle = layer.strokeColor || '#000000';
+                exportCtx.lineWidth = layer.strokeWidth || 2;
+                exportCtx.strokeText(layer.text, layer.x, layer.y);
+              }
+              
               exportCtx.fillText(layer.text, layer.x, layer.y);
-              exportCtx.fillText(layer.text, layer.x, layer.y);
-              exportCtx.restore();
-              exportCtx.fillStyle = layer.color;
             }
-            
-            if (layer.neon) {
-              exportCtx.save();
-              const neonColor = layer.neonColor || '#ff00ff';
-              const intensity = layer.neonIntensity || 15;
-              exportCtx.shadowColor = neonColor;
-              exportCtx.shadowBlur = intensity;
-              exportCtx.fillStyle = neonColor;
-              exportCtx.fillText(layer.text, layer.x, layer.y);
-              exportCtx.shadowBlur = intensity * 2;
-              exportCtx.fillText(layer.text, layer.x, layer.y);
-              exportCtx.restore();
-              exportCtx.fillStyle = '#ffffff';
-            }
-            
-            if (layer.glow) {
-              exportCtx.shadowColor = layer.glowColor || '#ffffff';
-              exportCtx.shadowBlur = layer.glowSize || 10;
-            }
-            
-            if (layer.shadow && !layer.glow && !layer.neon) {
-              exportCtx.shadowColor = 'rgba(0,0,0,0.6)';
-              exportCtx.shadowBlur = 6;
-              exportCtx.shadowOffsetX = 3;
-              exportCtx.shadowOffsetY = 3;
-            }
-            
-            if (layer.stroke) {
-              exportCtx.strokeStyle = layer.strokeColor || '#000000';
-              exportCtx.lineWidth = layer.strokeWidth || 2;
-              exportCtx.strokeText(layer.text, layer.x, layer.y);
-            }
-            
-            exportCtx.fillText(layer.text, layer.x, layer.y);
           }
           exportCtx.restore();
         }
