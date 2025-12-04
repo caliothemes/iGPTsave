@@ -408,8 +408,46 @@ export default function Home() {
     }
   };
 
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    // Add a message confirming the category selection
+    const categoryConfig = getCategoryPromptConfig(category.category, category.subOption);
+    const categoryNames = {
+      logo: { fr: 'Logo HD', en: 'HD Logo' },
+      print: { fr: 'Print', en: 'Print' },
+      realistic: { fr: 'Image réaliste', en: 'Realistic Image' },
+      social: { fr: 'Réseaux sociaux', en: 'Social Media' }
+    };
+    const subOptionNames = {
+      portrait: { fr: 'Portrait', en: 'Portrait' },
+      landscape: { fr: 'Paysage', en: 'Landscape' },
+      square: { fr: 'Carré', en: 'Square' },
+      story: { fr: 'Story', en: 'Story' }
+    };
+    
+    let categoryText = categoryNames[category.category]?.[language] || category.category;
+    if (category.subOption) {
+      categoryText += ` - ${subOptionNames[category.subOption]?.[language] || category.subOption}`;
+    }
+    
+    const confirmMessage = language === 'fr'
+      ? `✅ **${categoryText}** sélectionné !\n\nDécrivez-moi maintenant ce que vous souhaitez créer.`
+      : `✅ **${categoryText}** selected!\n\nNow describe what you want to create.`;
+    
+    setMessages(prev => [...prev, { role: 'assistant', content: confirmMessage }]);
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+    
+    // Check if category is selected
+    if (!selectedCategory) {
+      const warningMsg = language === 'fr'
+        ? '⚠️ Veuillez d\'abord sélectionner un type de création ci-dessus.'
+        : '⚠️ Please first select a creation type above.';
+      setMessages(prev => [...prev, { role: 'assistant', content: warningMsg }]);
+      return;
+    }
 
     // Check guest message limit
     if (!isAuthenticated) {
