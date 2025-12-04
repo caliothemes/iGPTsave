@@ -395,11 +395,53 @@ export default function Admin() {
           <p className="text-white/60">Vue d'ensemble de votre application</p>
         </div>
 
-        {/* Visit Stats Grid */}
+        {/* Visitor Stats Grid */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Users className="h-5 w-5 text-cyan-400" />
+            Statistiques de visiteurs
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div className="p-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30">
+              <p className="text-cyan-300 text-xs mb-1">Total visiteurs</p>
+              <p className="text-xl font-bold text-white">{visitStats.thisYear}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Aujourd'hui</p>
+              <p className="text-xl font-bold text-white">{visitStats.today}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Hier</p>
+              <p className="text-xl font-bold text-white">{visitStats.yesterday}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Cette semaine</p>
+              <p className="text-xl font-bold text-white">{visitStats.thisWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Sem. dernière</p>
+              <p className="text-xl font-bold text-white">{visitStats.lastWeek}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Ce mois</p>
+              <p className="text-xl font-bold text-white">{visitStats.thisMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Mois dernier</p>
+              <p className="text-xl font-bold text-white">{visitStats.lastMonth}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-white/50 text-xs mb-1">Cette année</p>
+              <p className="text-xl font-bold text-white">{visitStats.thisYear}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Visit Stats Grid */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <Eye className="h-5 w-5 text-violet-400" />
-            Statistiques de visites
+            Statistiques de visites actives
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30">
