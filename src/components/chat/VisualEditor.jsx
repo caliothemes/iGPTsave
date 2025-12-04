@@ -740,33 +740,51 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
 
             ctx.fillText(layer.text, layer.x, layer.y);
 
-            // Reflection effect (water reflection below text)
+            // Reflection effect (water reflection below text with fade)
             if (layer.reflection) {
               ctx.save();
 
               const textHeight = layer.fontSize;
-              const reflectionGap = 8;
-
-              // Position for reflection start (just below the original text)
+              const reflectionGap = 4;
               const reflectY = layer.y + reflectionGap;
+              const reflectionHeight = textHeight * 1.2;
 
-              // Set reduced opacity for reflection
-              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              // Create a temporary canvas for the reflection with gradient fade
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = canvasSize.width;
+              tempCanvas.height = reflectionHeight + 20;
+              const tempCtx = tempCanvas.getContext('2d');
 
-              // Scale vertically to flip the text (mirror effect)
-              ctx.translate(0, reflectY + textHeight / 2);
-              ctx.scale(1, -1);
-              ctx.translate(0, -(reflectY + textHeight / 2));
+              // Draw flipped text on temp canvas
+              tempCtx.save();
+              tempCtx.font = ctx.font;
+              tempCtx.textAlign = layer.align || 'left';
+              tempCtx.fillStyle = layer.color;
 
-              ctx.fillStyle = layer.color;
+              // Flip vertically
+              tempCtx.translate(0, reflectionHeight);
+              tempCtx.scale(1, -1);
 
               if (layer.stroke) {
-                ctx.strokeStyle = layer.strokeColor || '#000000';
-                ctx.lineWidth = layer.strokeWidth || 2;
-                ctx.strokeText(layer.text, layer.x, reflectY + textHeight);
+                tempCtx.strokeStyle = layer.strokeColor || '#000000';
+                tempCtx.lineWidth = layer.strokeWidth || 2;
+                tempCtx.strokeText(layer.text, layer.x, textHeight - 5);
               }
+              tempCtx.fillText(layer.text, layer.x, textHeight - 5);
+              tempCtx.restore();
 
-              ctx.fillText(layer.text, layer.x, reflectY + textHeight);
+              // Apply fade gradient mask
+              tempCtx.globalCompositeOperation = 'destination-out';
+              const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
+              fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
+              fadeGradient.addColorStop(0.3, 'rgba(0,0,0,0.3)');
+              fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
+              tempCtx.fillStyle = fadeGradient;
+              tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+              // Draw the reflection on main canvas
+              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              ctx.drawImage(tempCanvas, 0, reflectY);
 
               ctx.restore();
             }
@@ -1439,29 +1457,52 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
               exportCtx.fillText(layer.text, layer.x, layer.y);
 
-              // Reflection effect (water reflection below text) for export
+              // Reflection effect (water reflection below text with fade) for export
               if (layer.reflection) {
                 exportCtx.save();
 
                 const textHeight = layer.fontSize;
-                const reflectionGap = 8;
+                const reflectionGap = 4;
                 const reflectY = layer.y + reflectionGap;
+                const reflectionHeight = textHeight * 1.2;
 
-                exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+                // Create a temporary canvas for the reflection with gradient fade
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvasSize.width * scale;
+                tempCanvas.height = (reflectionHeight + 20) * scale;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.scale(scale, scale);
 
-                exportCtx.translate(0, reflectY + textHeight / 2);
-                exportCtx.scale(1, -1);
-                exportCtx.translate(0, -(reflectY + textHeight / 2));
+                // Draw flipped text on temp canvas
+                tempCtx.save();
+                tempCtx.font = exportCtx.font;
+                tempCtx.textAlign = layer.align || 'left';
+                tempCtx.fillStyle = layer.color;
 
-                exportCtx.fillStyle = layer.color;
+                // Flip vertically
+                tempCtx.translate(0, reflectionHeight);
+                tempCtx.scale(1, -1);
 
                 if (layer.stroke) {
-                  exportCtx.strokeStyle = layer.strokeColor || '#000000';
-                  exportCtx.lineWidth = layer.strokeWidth || 2;
-                  exportCtx.strokeText(layer.text, layer.x, reflectY + textHeight);
+                  tempCtx.strokeStyle = layer.strokeColor || '#000000';
+                  tempCtx.lineWidth = layer.strokeWidth || 2;
+                  tempCtx.strokeText(layer.text, layer.x, textHeight - 5);
                 }
+                tempCtx.fillText(layer.text, layer.x, textHeight - 5);
+                tempCtx.restore();
 
-                exportCtx.fillText(layer.text, layer.x, reflectY + textHeight);
+                // Apply fade gradient mask
+                tempCtx.globalCompositeOperation = 'destination-out';
+                const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
+                fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
+                fadeGradient.addColorStop(0.3, 'rgba(0,0,0,0.3)');
+                fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
+                tempCtx.fillStyle = fadeGradient;
+                tempCtx.fillRect(0, 0, canvasSize.width, reflectionHeight + 20);
+
+                // Draw the reflection on main canvas
+                exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+                exportCtx.drawImage(tempCanvas, 0, reflectY * scale, tempCanvas.width, tempCanvas.height, 0, reflectY, canvasSize.width, reflectionHeight + 20);
 
                 exportCtx.restore();
               }
