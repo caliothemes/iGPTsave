@@ -187,6 +187,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   const [bgGradient, setBgGradient] = useState({ color1: '#667eea', color2: '#764ba2', angle: 135 });
   const [bgShapeColor, setBgShapeColor] = useState('#FFFFFF');
   const [guides, setGuides] = useState({ showVertical: false, showHorizontal: false }); // Center guides
+  const [textAccordion, setTextAccordion] = useState('properties'); // 'properties' or 'effects'
   
   // Store original image URL separately (never changes)
   const [originalImageUrl, setOriginalImageUrl] = useState(visual.original_image_url || visual.image_url);
