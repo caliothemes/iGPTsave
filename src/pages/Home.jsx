@@ -515,8 +515,18 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
         return;
       }
 
+      // Get category-specific prompt config
+      const categoryConfig = getCategoryPromptConfig(selectedCategory.category, selectedCategory.subOption);
+      const categorySystemPrompt = categoryConfig?.systemPrompt || '';
+      const categoryDimensions = categoryConfig?.dimensions || '1080x1080';
+      const categoryVisualType = categoryConfig?.visualType || 'autre';
+
       const analysis = await base44.integrations.Core.InvokeLLM({
                 prompt: `Tu es iGPT, un assistant expert PREMIUM en création de visuels professionnels de niveau agence de design.
+
+      CATÉGORIE SÉLECTIONNÉE: ${selectedCategory.category}${selectedCategory.subOption ? ` - ${selectedCategory.subOption}` : ''}
+      RÈGLES SPÉCIFIQUES À CETTE CATÉGORIE:
+      ${categorySystemPrompt}
 
       L'utilisateur demande: "${userMessage}"
       ${contextInfo ? `Contexte choisi par l'utilisateur: ${contextInfo}` : ''}
