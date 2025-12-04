@@ -976,7 +976,18 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               
               {/* Chat Messages */}
               {messages.map((message, idx) => (
-                <MessageBubble key={idx} message={message} isStreaming={isLoading && idx === messages.length - 1} thinkingText={t('thinking')} user={user} />
+                <React.Fragment key={idx}>
+                  <MessageBubble message={message} isStreaming={isLoading && idx === messages.length - 1} thinkingText={t('thinking')} user={user} />
+                  {/* Show category selector after first assistant message if no category selected */}
+                  {idx === 0 && message.role === 'assistant' && !selectedCategory && !selectedVisual && (
+                    <div className="mt-4">
+                      <CategorySelector 
+                        onSelect={handleCategorySelect}
+                        selectedCategory={selectedCategory}
+                      />
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
 
               {/* Selected Visual Preview */}
