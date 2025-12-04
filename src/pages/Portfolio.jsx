@@ -180,9 +180,11 @@ export default function Portfolio() {
                     <img
                       src={visual.image_url}
                       alt={visual.title || 'Création iGPT'}
-                      className="w-full h-auto block"
+                      className="w-full h-auto block pointer-events-none select-none"
                       loading="lazy"
                       style={{ display: 'block' }}
+                      draggable={false}
+                      onContextMenu={(e) => e.preventDefault()}
                     />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
