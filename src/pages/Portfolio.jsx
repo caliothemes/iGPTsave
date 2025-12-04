@@ -164,8 +164,8 @@ export default function Portfolio() {
             <div 
               style={{
                 columnCount: 'auto',
-                columnWidth: '180px',
-                columnGap: '6px'
+                columnWidth: '220px',
+                columnGap: '8px'
               }}
             >
               {visuals.map((visual, index) => {
@@ -174,13 +174,15 @@ export default function Portfolio() {
                   <div
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
-                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 mb-1.5"
+                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 mb-2"
+                    style={{ display: 'inline-block', width: '100%' }}
                   >
                     <img
                       src={visual.image_url}
                       alt={visual.title || 'Création iGPT'}
                       className="w-full h-auto block"
                       loading="lazy"
+                      style={{ display: 'block' }}
                     />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
