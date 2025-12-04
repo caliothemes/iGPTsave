@@ -2237,7 +2237,10 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   <button onClick={() => updateLayer(selectedLayer, { neon: !currentLayer.neon })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
                     Néon
                   </button>
-                </div>
+                  <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                    {language === 'fr' ? 'Reflet' : 'Reflect'}
+                  </button>
+                  </div>
                 {currentLayer.stroke && (
                   <div className="flex gap-2 items-center">
                     <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Contour:' : 'Stroke:'}</span>
