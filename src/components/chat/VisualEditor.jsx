@@ -520,12 +520,24 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
                 ctx.shadowOffsetY = 0;
               }
               ctx.fillStyle = layer.color;
-              drawShape(ctx, layer.shape, layer.x, layer.y, layer.width, layer.height);
-              ctx.fill();
-              if (layer.stroke) {
-                ctx.strokeStyle = layer.strokeColor || '#000000';
-                ctx.lineWidth = layer.strokeWidth || 2;
-                ctx.stroke();
+              // Use roundRect for rectangle with border radius
+              if (layer.shape === 'rectangle' && layer.borderRadius > 0) {
+                ctx.beginPath();
+                ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                ctx.fill();
+                if (layer.stroke) {
+                  ctx.strokeStyle = layer.strokeColor || '#000000';
+                  ctx.lineWidth = layer.strokeWidth || 2;
+                  ctx.stroke();
+                }
+              } else {
+                drawShape(ctx, layer.shape, layer.x, layer.y, layer.width, layer.height);
+                ctx.fill();
+                if (layer.stroke) {
+                  ctx.strokeStyle = layer.strokeColor || '#000000';
+                  ctx.lineWidth = layer.strokeWidth || 2;
+                  ctx.stroke();
+                }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
             // Apply effects for images
@@ -849,7 +861,7 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
   };
 
   const addShapeLayer = (shape) => {
-    const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2, rotation: 0, shadow: false, glow: false, glowColor: '#ffffff', glowSize: 10 };
+    const newLayer = { type: 'shape', shape, x: canvasSize.width / 2 - 50, y: canvasSize.height / 2 - 50, width: 100, height: 100, color: '#FFFFFF', opacity: 80, stroke: false, strokeColor: '#000000', strokeWidth: 2, rotation: 0, shadow: false, glow: false, glowColor: '#ffffff', glowSize: 10, borderRadius: 0 };
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
     setActiveTab('layers');
@@ -1359,12 +1371,24 @@ Réponds en JSON avec:
               exportCtx.shadowBlur = layer.glowSize || 10;
             }
             exportCtx.fillStyle = layer.color;
-            drawShape(exportCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
-            exportCtx.fill();
-            if (layer.stroke) {
-              exportCtx.strokeStyle = layer.strokeColor || '#000000';
-              exportCtx.lineWidth = layer.strokeWidth || 2;
-              exportCtx.stroke();
+            // Use roundRect for rectangle with border radius
+            if (layer.shape === 'rectangle' && layer.borderRadius > 0) {
+              exportCtx.beginPath();
+              exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+              exportCtx.fill();
+              if (layer.stroke) {
+                exportCtx.strokeStyle = layer.strokeColor || '#000000';
+                exportCtx.lineWidth = layer.strokeWidth || 2;
+                exportCtx.stroke();
+              }
+            } else {
+              drawShape(exportCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
+              exportCtx.fill();
+              if (layer.stroke) {
+                exportCtx.strokeStyle = layer.strokeColor || '#000000';
+                exportCtx.lineWidth = layer.strokeWidth || 2;
+                exportCtx.stroke();
+              }
             }
           } else if (layer.type === 'image' && layer.imageUrl) {
             const layerImg = loadedImages[layer.imageUrl] || await new Promise((resolve) => {
@@ -2658,6 +2682,13 @@ Réponds en JSON avec:
                         <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
                         <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
                         <span className="text-white/40 text-xs w-6">{currentLayer.strokeWidth || 2}</span>
+                      </div>
+                    )}
+                    {currentLayer.shape === 'rectangle' && (
+                      <div className="flex gap-2 items-center">
+                        <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Radius:' : 'Radius:'}</span>
+                        <Slider value={[currentLayer.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={100} step={1} className="flex-1" />
+                        <span className="text-white/40 text-xs w-6">{currentLayer.borderRadius || 0}</span>
                       </div>
                     )}
                     {currentLayer.glow && (
