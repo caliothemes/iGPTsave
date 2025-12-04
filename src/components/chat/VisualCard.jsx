@@ -69,20 +69,40 @@ export default function VisualCard({
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         
-        {/* Favorite Button */}
-        {onToggleFavorite && (
-          <button
-            onClick={() => onToggleFavorite(visual)}
-            className="absolute top-3 right-3 p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all"
-          >
-            <Heart 
-              className={cn(
-                "h-5 w-5 transition-all",
-                visual.is_favorite ? "fill-red-500 text-red-500" : "text-white/80"
-              )} 
-            />
-          </button>
-        )}
+        {/* Top Right Buttons */}
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+          {/* Favorite Button */}
+          {onToggleFavorite && (
+            <button
+              onClick={() => onToggleFavorite(visual)}
+              className="p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all"
+            >
+              <Heart 
+                className={cn(
+                  "h-5 w-5 transition-all",
+                  visual.is_favorite ? "fill-red-500 text-red-500" : "text-white/80"
+                )} 
+              />
+            </button>
+          )}
+
+          {/* Magic Editor Button (top) */}
+          {showValidation && onValidate && (
+            <button
+              onClick={() => onValidate?.('edit')}
+              className="group relative p-2.5 rounded-xl bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm hover:from-violet-500 hover:to-purple-500 transition-all shadow-lg shadow-violet-500/30 border border-violet-400/30"
+            >
+              <Pencil className="h-5 w-5 text-white" />
+              {/* Tooltip on hover */}
+              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
+                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</p>
+                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Fond, texture, texte...' : 'Background, texture, text...'}</p>
+                </div>
+              </div>
+            </button>
+          )}
+        </div>
 
         {/* Version Badge */}
         {visual.version > 1 && (
@@ -208,17 +228,23 @@ export default function VisualCard({
             )}
           </div>
 
-          {/* Customize Button - Full width */}
+          {/* Magic Editor Button - Full width */}
           {showValidation && (
             <div className="space-y-2">
-              <Button
-                size="default"
+              <button
                 onClick={() => onValidate?.('edit')}
-                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 py-3"
+                className="w-full bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-500 hover:via-purple-500 hover:to-fuchsia-500 rounded-xl p-4 transition-all shadow-lg shadow-violet-500/20 border border-violet-400/20 group"
               >
-                <Pencil className="h-5 w-5 mr-2" />
-                <span className="text-sm font-medium">{language === 'fr' ? 'Personnaliser' : 'Customize'}</span>
-              </Button>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+                    <Pencil className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-white font-semibold text-sm">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</p>
+                    <p className="text-white/70 text-[11px] leading-tight">{language === 'fr' ? 'Personnalisez votre visuel en ajoutant un fond, une texture, un texte etc...' : 'Customize your visual by adding a background, texture, text etc...'}</p>
+                  </div>
+                </div>
+              </button>
               {/* Animation button temporarily hidden
               {onAnimate && (
                 <Button

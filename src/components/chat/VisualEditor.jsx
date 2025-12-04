@@ -2683,7 +2683,58 @@ Réponds en JSON avec:
                   <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/5 text-white/60")}>
                     ✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}
                   </button>
+                  <button onClick={() => updateLayer(selectedLayer, { textGradient: !currentLayer.textGradient })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/5 text-white/60")}>
+                    🌈 {language === 'fr' ? 'Dégradé' : 'Gradient'}
+                  </button>
                   </div>
+                {/* Text Gradient Options */}
+                {currentLayer.textGradient && (
+                  <div className="space-y-2 p-2 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/60 text-xs font-medium">🌈 {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Direction:' : 'Direction:'}</span>
+                      <button 
+                        onClick={() => updateLayer(selectedLayer, { gradientDirection: 'horizontal' })} 
+                        className={cn("flex-1 p-1.5 rounded text-xs", (currentLayer.gradientDirection || 'horizontal') === 'horizontal' ? "bg-pink-500/30 text-pink-300" : "bg-white/5 text-white/60")}
+                      >
+                        ← → {language === 'fr' ? 'Horizontal' : 'Horizontal'}
+                      </button>
+                      <button 
+                        onClick={() => updateLayer(selectedLayer, { gradientDirection: 'vertical' })} 
+                        className={cn("flex-1 p-1.5 rounded text-xs", currentLayer.gradientDirection === 'vertical' ? "bg-pink-500/30 text-pink-300" : "bg-white/5 text-white/60")}
+                      >
+                        ↑ ↓ {language === 'fr' ? 'Vertical' : 'Vertical'}
+                      </button>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Couleurs:' : 'Colors:'}</span>
+                      <input type="color" value={currentLayer.gradientColor1 || '#ff00ff'} onChange={(e) => updateLayer(selectedLayer, { gradientColor1: e.target.value })} className="w-6 h-6 rounded cursor-pointer" />
+                      <div className="flex-1 h-4 rounded" style={{ background: `linear-gradient(${currentLayer.gradientDirection === 'vertical' ? '180deg' : '90deg'}, ${currentLayer.gradientColor1 || '#ff00ff'}, ${currentLayer.gradientColor2 || '#00ffff'})` }} />
+                      <input type="color" value={currentLayer.gradientColor2 || '#00ffff'} onChange={(e) => updateLayer(selectedLayer, { gradientColor2: e.target.value })} className="w-6 h-6 rounded cursor-pointer" />
+                    </div>
+                    <div className="grid grid-cols-4 gap-1 mt-2">
+                      {[
+                        { c1: '#ff00ff', c2: '#00ffff' },
+                        { c1: '#ff6b6b', c2: '#feca57' },
+                        { c1: '#667eea', c2: '#764ba2' },
+                        { c1: '#f093fb', c2: '#f5576c' },
+                        { c1: '#4facfe', c2: '#00f2fe' },
+                        { c1: '#43e97b', c2: '#38f9d7' },
+                        { c1: '#fa709a', c2: '#fee140' },
+                        { c1: '#a18cd1', c2: '#fbc2eb' },
+                      ].map((preset, idx) => (
+                        <button 
+                          key={idx} 
+                          onClick={() => updateLayer(selectedLayer, { gradientColor1: preset.c1, gradientColor2: preset.c2 })}
+                          className="h-5 rounded border border-white/10 hover:border-pink-400 transition-colors"
+                          style={{ background: `linear-gradient(90deg, ${preset.c1}, ${preset.c2})` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {currentLayer.stroke && (
                   <div className="flex gap-2 items-center">
                     <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Contour:' : 'Stroke:'}</span>
