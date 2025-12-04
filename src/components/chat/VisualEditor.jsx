@@ -259,6 +259,27 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         // Load saved layers from visual
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
           setLayers(visual.editor_layers);
+          
+          // CRITICAL: Preload all layer images immediately
+          visual.editor_layers.forEach(layer => {
+            if (layer.type === 'image' && layer.imageUrl) {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                setLoadedImages(prev => ({ ...prev, [layer.imageUrl]: img }));
+              };
+              img.src = layer.imageUrl;
+            }
+            if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue) {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                setLoadedImages(prev => ({ ...prev, [layer.bgValue]: img }));
+              };
+              img.src = layer.bgValue;
+            }
+          });
+          
           // Restore background state if there's a background layer
           const bgLayer = visual.editor_layers.find(l => l.type === 'background');
           if (bgLayer) {
