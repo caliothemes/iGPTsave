@@ -604,12 +604,15 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                           - Pour les visuels d'impression (carte de visite, flyer, affiche, etc.), TOUJOURS mentionner dans ta réponse que le design est vide/abstrait et que l'utilisateur peut ajouter son texte personnalisé via l'Éditeur Magique (bouton "Personnaliser").
                           - Exemple: "Voici un design élégant pour votre carte de visite. Le visuel est volontairement sans texte - vous pouvez ajouter vos informations (nom, téléphone, email...) en cliquant sur **Personnaliser** pour accéder à l'Éditeur Magique ✨"
 
+                          DIMENSIONS OBLIGATOIRES POUR CETTE CRÉATION: ${categoryDimensions}
+                          TYPE DE VISUEL: ${categoryVisualType}
+
                           Réponds en JSON:
                           - needs_image: boolean (true si création visuelle demandée)
                           - response: string (réponse courte, professionnelle, en français - INCLURE la mention de l'Éditeur Magique pour les visuels impression)
-                          - image_prompt: string (prompt TRÈS détaillé en anglais, 100+ mots, RESPECTE les règles du type de visuel)
-                          - visual_type: string (logo, carte_visite, flyer, post_instagram, story_instagram, post_facebook, post_linkedin, affiche, banner, autre)
-                          - dimensions: string (UTILISE les dimensions ci-dessus selon le type détecté, ex: 1050x600 pour carte de visite)
+                          - image_prompt: string (prompt TRÈS détaillé en anglais, 100+ mots, RESPECTE les règles du type de visuel ET de la catégorie sélectionnée)
+                          - visual_type: string (UTILISE: ${categoryVisualType})
+                          - dimensions: string (UTILISE: ${categoryDimensions})
                           - title: string (titre court et accrocheur)
                           - suggested_colors: array de 5 codes hex couleurs recommandées`,
         response_json_schema: {
