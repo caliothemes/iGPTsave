@@ -1439,29 +1439,29 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
 
               exportCtx.fillText(layer.text, layer.x, layer.y);
 
-              // Reflection effect (water reflection) for export
+              // Reflection effect (water reflection below text) for export
               if (layer.reflection) {
                 exportCtx.save();
 
                 const textHeight = layer.fontSize;
-                const reflectionGap = 4;
+                const reflectionGap = 8;
                 const reflectY = layer.y + reflectionGap;
 
-                exportCtx.translate(0, reflectY * 2 + textHeight);
-                exportCtx.scale(1, -1);
-
                 exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+
+                exportCtx.translate(0, reflectY + textHeight / 2);
+                exportCtx.scale(1, -1);
+                exportCtx.translate(0, -(reflectY + textHeight / 2));
+
                 exportCtx.fillStyle = layer.color;
 
                 if (layer.stroke) {
                   exportCtx.strokeStyle = layer.strokeColor || '#000000';
                   exportCtx.lineWidth = layer.strokeWidth || 2;
-                  exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100 * 0.5;
-                  exportCtx.strokeText(layer.text, layer.x, reflectY);
+                  exportCtx.strokeText(layer.text, layer.x, reflectY + textHeight);
                 }
 
-                exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
-                exportCtx.fillText(layer.text, layer.x, reflectY);
+                exportCtx.fillText(layer.text, layer.x, reflectY + textHeight);
 
                 exportCtx.restore();
               }
