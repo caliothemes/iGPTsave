@@ -112,7 +112,7 @@ export default function Portfolio() {
   }
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative" onContextMenu={(e) => e.preventDefault()}>
       <AnimatedBackground />
       <GlobalHeader page="Portfolio" />
 
