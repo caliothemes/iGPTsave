@@ -2041,13 +2041,35 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
               </div>
               {/* Curved Text Options */}
               {currentLayer.curvedText && (
-                <div className="flex gap-2 items-center">
-                  <Circle className="h-3 w-3 text-white/50" />
-                  <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Rayon' : 'Radius'}</span>
-                  <div className="flex-1">
-                    <Slider value={[currentLayer.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={50} max={300} step={5} />
+                <div className="space-y-2 p-2 bg-violet-500/10 rounded-lg border border-violet-500/20">
+                  <div className="flex gap-2 items-center">
+                    <Circle className="h-3 w-3 text-violet-400" />
+                    <span className="text-white/60 text-xs font-medium">{language === 'fr' ? 'Texte en cercle' : 'Curved text'}</span>
                   </div>
-                  <span className="text-white/50 text-xs w-12">{currentLayer.curveRadius || 100}</span>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-14">{language === 'fr' ? 'Rayon' : 'Radius'}</span>
+                    <div className="flex-1">
+                      <Slider value={[currentLayer.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={40} max={400} step={5} />
+                    </div>
+                    <span className="text-white/50 text-xs w-10">{currentLayer.curveRadius || 100}</span>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/40 text-xs w-14">{language === 'fr' ? 'Direction' : 'Direction'}</span>
+                    <div className="flex gap-1 flex-1">
+                      <button 
+                        onClick={() => updateLayer(selectedLayer, { curveDirection: 'top' })} 
+                        className={cn("flex-1 p-1.5 rounded text-xs", (currentLayer.curveDirection || 'top') === 'top' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}
+                      >
+                        ⌒ {language === 'fr' ? 'Haut' : 'Top'}
+                      </button>
+                      <button 
+                        onClick={() => updateLayer(selectedLayer, { curveDirection: 'bottom' })} 
+                        className={cn("flex-1 p-1.5 rounded text-xs", currentLayer.curveDirection === 'bottom' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}
+                      >
+                        ⌣ {language === 'fr' ? 'Bas' : 'Bottom'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
               {/* Text Effects */}
