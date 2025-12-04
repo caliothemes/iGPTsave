@@ -753,6 +753,61 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
 
             ctx.fillText(layer.text, layer.x, layer.y);
 
+            // Sparkle effect (stars and dots around text)
+            if (layer.sparkle) {
+              const intensity = layer.sparkleIntensity || 50;
+              const numSparkles = Math.floor(intensity / 5);
+              const metrics = ctx.measureText(layer.text);
+              const textWidth = metrics.width;
+              const textHeight = layer.fontSize;
+              const textX = layer.x - (layer.align === 'center' ? textWidth/2 : layer.align === 'right' ? textWidth : 0);
+              
+              // Use consistent random seed based on text for stable sparkle positions
+              const seed = layer.text.length + layer.fontSize;
+              const seededRandom = (i) => {
+                const x = Math.sin(seed * 9999 + i * 12345) * 10000;
+                return x - Math.floor(x);
+              };
+              
+              for (let i = 0; i < numSparkles; i++) {
+                const angle = seededRandom(i) * Math.PI * 2;
+                const distance = 10 + seededRandom(i + 100) * (30 + intensity * 0.3);
+                const sparkleX = textX + textWidth/2 + Math.cos(angle) * distance + (seededRandom(i + 200) - 0.5) * textWidth;
+                const sparkleY = layer.y - textHeight/2 + Math.sin(angle) * distance + (seededRandom(i + 300) - 0.5) * textHeight;
+                const size = 1 + seededRandom(i + 400) * 3;
+                const opacity = 0.4 + seededRandom(i + 500) * 0.6;
+                
+                ctx.save();
+                ctx.globalAlpha = opacity * (layer.opacity / 100);
+                ctx.fillStyle = '#FFFFFF';
+                
+                // Draw star or dot
+                if (seededRandom(i + 600) > 0.5) {
+                  // 4-pointed star
+                  ctx.beginPath();
+                  const starSize = size * 1.5;
+                  ctx.moveTo(sparkleX, sparkleY - starSize);
+                  ctx.lineTo(sparkleX + starSize * 0.3, sparkleY - starSize * 0.3);
+                  ctx.lineTo(sparkleX + starSize, sparkleY);
+                  ctx.lineTo(sparkleX + starSize * 0.3, sparkleY + starSize * 0.3);
+                  ctx.lineTo(sparkleX, sparkleY + starSize);
+                  ctx.lineTo(sparkleX - starSize * 0.3, sparkleY + starSize * 0.3);
+                  ctx.lineTo(sparkleX - starSize, sparkleY);
+                  ctx.lineTo(sparkleX - starSize * 0.3, sparkleY - starSize * 0.3);
+                  ctx.closePath();
+                  ctx.fill();
+                } else {
+                  // Simple dot with glow
+                  ctx.shadowColor = '#FFFFFF';
+                  ctx.shadowBlur = size * 2;
+                  ctx.beginPath();
+                  ctx.arc(sparkleX, sparkleY, size, 0, Math.PI * 2);
+                  ctx.fill();
+                }
+                ctx.restore();
+              }
+            }
+
             // Reflection effect (water reflection below text with fade)
             if (layer.reflection) {
               ctx.save();
