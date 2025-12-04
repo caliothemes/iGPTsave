@@ -1268,7 +1268,7 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
               )}
 
                                 {/* Selected Options Display */}
-                                {(selectedFormat || selectedStyle || selectedPalette) && (
+                                {(selectedCategory || selectedFormat || selectedStyle || selectedPalette) && (
                 <div className="mb-2 flex items-center gap-2 text-xs flex-wrap">
                   {selectedFormat && (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
