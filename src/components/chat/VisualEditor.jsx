@@ -1699,6 +1699,24 @@ Réponds en JSON avec:
                 exportCtx.fillStyle = layer.color;
               }
               
+              // Text Gradient Effect (export)
+              if (layer.textGradient) {
+                const metrics = exportCtx.measureText(layer.text);
+                const textWidth = metrics.width;
+                const textHeight = layer.fontSize;
+                const textX = layer.x - (layer.align === 'center' ? textWidth/2 : layer.align === 'right' ? textWidth : 0);
+                
+                let gradient;
+                if (layer.gradientDirection === 'vertical') {
+                  gradient = exportCtx.createLinearGradient(textX, layer.y - textHeight, textX, layer.y);
+                } else {
+                  gradient = exportCtx.createLinearGradient(textX, layer.y, textX + textWidth, layer.y);
+                }
+                gradient.addColorStop(0, layer.gradientColor1 || '#ff00ff');
+                gradient.addColorStop(1, layer.gradientColor2 || '#00ffff');
+                exportCtx.fillStyle = gradient;
+              }
+              
               if (layer.halo) {
                 exportCtx.save();
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
