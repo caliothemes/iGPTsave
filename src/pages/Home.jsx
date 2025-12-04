@@ -681,6 +681,12 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
 
   const handleRegenerate = async (visual) => {
     setIsGenerating(true);
+    
+    // Deduct 1 credit for regeneration
+    if (isAuthenticated) {
+      await deductCredit();
+    }
+    
     try {
       // Use the original prompt if available, otherwise create a detailed one
       let regeneratePrompt = visual.image_prompt;
