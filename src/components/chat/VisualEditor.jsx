@@ -2557,13 +2557,16 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
             </div>
           )}
 
-          <div className="flex gap-2 items-center">
-            <label className="text-white/50 text-xs">{language === 'fr' ? 'Opacité' : 'Opacity'}</label>
-            <div className="flex-1">
-              <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
+          {/* Opacity for non-text layers only (text has its own above effects) */}
+          {currentLayer.type !== 'text' && (
+            <div className="flex gap-2 items-center">
+              <label className="text-white/50 text-xs">{language === 'fr' ? 'Opacité' : 'Opacity'}</label>
+              <div className="flex-1">
+                <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
+              </div>
+              <span className="text-white/50 text-xs w-8">{currentLayer.opacity}%</span>
             </div>
-            <span className="text-white/50 text-xs w-8">{currentLayer.opacity}%</span>
-          </div>
+          )}
         </div>
       )}
 
