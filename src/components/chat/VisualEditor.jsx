@@ -2488,6 +2488,9 @@ Réponds en JSON avec:
                   <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
                     {language === 'fr' ? 'Reflet' : 'Reflect'}
                   </button>
+                  <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/5 text-white/60")}>
+                    ✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}
+                  </button>
                   </div>
                 {currentLayer.stroke && (
                   <div className="flex gap-2 items-center">
@@ -2545,6 +2548,13 @@ Réponds en JSON avec:
                       <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Reflet:' : 'Reflect:'}</span>
                       <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
                       <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
+                    </div>
+                  )}
+                {currentLayer.sparkle && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">✨ {language === 'fr' ? 'Intensité:' : 'Intensity:'}</span>
+                      <Slider value={[currentLayer.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(selectedLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.sparkleIntensity || 50}%</span>
                     </div>
                   )}
                   </div>
