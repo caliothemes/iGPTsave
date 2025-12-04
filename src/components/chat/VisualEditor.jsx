@@ -1444,11 +1444,38 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 exportCtx.lineWidth = layer.strokeWidth || 2;
                 exportCtx.strokeText(layer.text, layer.x, layer.y);
               }
-              
+
               exportCtx.fillText(layer.text, layer.x, layer.y);
-            }
-          }
-          exportCtx.restore();
+
+              // Reflection effect (water reflection) for export
+              if (layer.reflection) {
+                exportCtx.save();
+
+                const textHeight = layer.fontSize;
+                const reflectionGap = 4;
+                const reflectY = layer.y + reflectionGap;
+
+                exportCtx.translate(0, reflectY * 2 + textHeight);
+                exportCtx.scale(1, -1);
+
+                exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+                exportCtx.fillStyle = layer.color;
+
+                if (layer.stroke) {
+                  exportCtx.strokeStyle = layer.strokeColor || '#000000';
+                  exportCtx.lineWidth = layer.strokeWidth || 2;
+                  exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100 * 0.5;
+                  exportCtx.strokeText(layer.text, layer.x, reflectY);
+                }
+
+                exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+                exportCtx.fillText(layer.text, layer.x, reflectY);
+
+                exportCtx.restore();
+              }
+              }
+              }
+              exportCtx.restore();
         }
 
         const dataUrl = exportCanvas.toDataURL('image/png');
