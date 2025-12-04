@@ -1933,11 +1933,21 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </div>
                 <span className="text-white/50 text-xs w-12">{currentLayer.letterSpacing || 0}px</span>
               </div>
+              {/* Rotation */}
+              <div className="flex gap-2 items-center">
+                <RotateCw className="h-3 w-3 text-white/50" />
+                <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Rotation' : 'Rotate'}</span>
+                <div className="flex-1">
+                  <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
+                </div>
+                <span className="text-white/50 text-xs w-12">{currentLayer.rotation || 0}°</span>
+              </div>
               <div className="flex gap-1 flex-wrap">
                 <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("p-1.5 rounded text-sm", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Italic className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-1.5 rounded", currentLayer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignLeft className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { align: 'center' })} className={cn("p-1.5 rounded", currentLayer.align === 'center' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignCenter className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { align: 'right' })} className={cn("p-1.5 rounded", currentLayer.align === 'right' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignRight className="h-3 w-3" /></button>
+                <button onClick={() => updateLayer(selectedLayer, { curvedText: !currentLayer.curvedText })} className={cn("p-1.5 rounded", currentLayer.curvedText ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")} title={language === 'fr' ? 'Texte en cercle' : 'Curved text'}><Circle className="h-3 w-3" /></button>
                 <div className="flex gap-1 ml-auto">
                   {PRESET_COLORS.slice(0, 6).map(color => (
                     <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-5 h-5 rounded-full border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
@@ -1945,6 +1955,17 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   <input type="color" value={currentLayer.color} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
                 </div>
               </div>
+              {/* Curved Text Options */}
+              {currentLayer.curvedText && (
+                <div className="flex gap-2 items-center">
+                  <Circle className="h-3 w-3 text-white/50" />
+                  <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Rayon' : 'Radius'}</span>
+                  <div className="flex-1">
+                    <Slider value={[currentLayer.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={50} max={300} step={5} />
+                  </div>
+                  <span className="text-white/50 text-xs w-12">{currentLayer.curveRadius || 100}</span>
+                </div>
+              )}
               {/* Text Effects */}
               <div className="pt-2 border-t border-white/10 space-y-2">
                 <p className="text-white/40 text-xs">{language === 'fr' ? 'Effets:' : 'Effects:'}</p>
@@ -1974,6 +1995,25 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                     <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
                     <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={10} step={1} className="flex-1" />
                     <span className="text-white/40 text-xs w-6">{currentLayer.strokeWidth || 2}</span>
+                  </div>
+                )}
+                {currentLayer.shadow && (
+                  <div className="space-y-2">
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Couleur:' : 'Color:'}</span>
+                      <input type="color" value={currentLayer.shadowColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { shadowColor: e.target.value })} className="w-5 h-5 rounded cursor-pointer" />
+                      <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Flou:' : 'Blur:'}</span>
+                      <Slider value={[currentLayer.shadowBlur || 6]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowBlur: v })} min={1} max={30} step={1} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.shadowBlur || 6}</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">X:</span>
+                      <Slider value={[currentLayer.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.shadowOffsetX || 3}</span>
+                      <span className="text-white/40 text-xs w-6">Y:</span>
+                      <Slider value={[currentLayer.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.shadowOffsetY || 3}</span>
+                    </div>
                   </div>
                 )}
                 {currentLayer.glow && (
