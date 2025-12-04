@@ -2392,15 +2392,24 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                   </div>
                 )}
                 {currentLayer.reflection && (
-                  <div className="flex gap-2 items-center">
-                    <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Reflet:' : 'Reflect:'}</span>
-                    <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
-                    <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Reflet:' : 'Reflect:'}</span>
+                      <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
+                    </div>
+                  )}
                   </div>
-                )}
-                </div>
-                </div>
-                )}
+
+                  {/* Opacity - after effects */}
+                  <div className="flex gap-2 items-center pt-2 border-t border-white/10">
+                    <label className="text-white/50 text-xs">{language === 'fr' ? 'Opacité' : 'Opacity'}</label>
+                    <div className="flex-1">
+                      <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
+                    </div>
+                    <span className="text-white/50 text-xs w-8">{currentLayer.opacity}%</span>
+                  </div>
+                  </div>
+                  )}
 
           {currentLayer.type === 'image' && (
               <div className="space-y-2">
