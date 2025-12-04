@@ -260,26 +260,6 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
           setLayers(visual.editor_layers);
           
-          // CRITICAL: Preload all layer images immediately
-          visual.editor_layers.forEach(layer => {
-            if (layer.type === 'image' && layer.imageUrl) {
-              const img = new Image();
-              img.crossOrigin = 'anonymous';
-              img.onload = () => {
-                setLoadedImages(prev => ({ ...prev, [layer.imageUrl]: img }));
-              };
-              img.src = layer.imageUrl;
-            }
-            if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue) {
-              const img = new Image();
-              img.crossOrigin = 'anonymous';
-              img.onload = () => {
-                setLoadedImages(prev => ({ ...prev, [layer.bgValue]: img }));
-              };
-              img.src = layer.bgValue;
-            }
-          });
-          
           // Restore background state if there's a background layer
           const bgLayer = visual.editor_layers.find(l => l.type === 'background');
           if (bgLayer) {
@@ -290,10 +270,8 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
               setBgGradient(bgLayer.bgValue);
             }
           }
-        } else {
-          // No saved layers - create the base image as a movable layer
-          // This will be done after the image loads in the other useEffect
         }
+        // Note: Image preloading is now handled in the other useEffect that sets imageLoaded
       } catch (e) {
         console.error(e);
       }
