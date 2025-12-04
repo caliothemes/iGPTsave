@@ -2268,6 +2268,14 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
                 </div>
                 <span className="text-white/50 text-xs w-12">{currentLayer.rotation || 0}°</span>
               </div>
+              {/* Opacity - before effects */}
+              <div className="flex gap-2 items-center">
+                <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Opacité' : 'Opacity'}</span>
+                <div className="flex-1">
+                  <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
+                </div>
+                <span className="text-white/50 text-xs w-12">{currentLayer.opacity}%</span>
+              </div>
               <div className="flex gap-1 flex-wrap">
                 <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("p-1.5 rounded text-sm", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Italic className="h-3 w-3" /></button>
                 <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-1.5 rounded", currentLayer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignLeft className="h-3 w-3" /></button>
