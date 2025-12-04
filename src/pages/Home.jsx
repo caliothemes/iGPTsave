@@ -16,6 +16,7 @@ import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
 import FormatSelector from '@/components/chat/FormatSelector';
 import StyleSelector, { STYLES, COLOR_PALETTES } from '@/components/chat/StyleSelector';
+import CategorySelector, { getCategoryPromptConfig } from '@/components/chat/CategorySelector';
 import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
@@ -56,6 +57,7 @@ export default function Home() {
     return stored ? parseInt(stored, 10) : 0;
   });
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -322,6 +324,7 @@ export default function Home() {
           content: newConvMsg
         }]);
         setSelectedVisual(null);
+        setSelectedCategory(null); // Reset category on new chat
       };
 
   const handleSelectConversation = (conv) => {
