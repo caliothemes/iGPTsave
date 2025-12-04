@@ -1097,7 +1097,52 @@ Réponds en JSON avec un array "texts" contenant des objets avec:
     const scaleY = canvasSize.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-    updateLayer(dragging, { x: x - dragOffset.x, y: y - dragOffset.y });
+    
+    let newX = x - dragOffset.x;
+    let newY = y - dragOffset.y;
+    
+    const layer = layers[dragging];
+    const centerX = canvasSize.width / 2;
+    const centerY = canvasSize.height / 2;
+    const snapThreshold = 8;
+    
+    // Calculate layer center
+    let layerCenterX, layerCenterY;
+    if (layer.type === 'text') {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
+      const metrics = ctx.measureText(layer.text);
+      const textWidth = metrics.width;
+      layerCenterX = layer.align === 'center' ? newX : layer.align === 'right' ? newX - textWidth / 2 : newX + textWidth / 2;
+      layerCenterY = newY - layer.fontSize / 2;
+    } else {
+      layerCenterX = newX + (layer.width || 0) / 2;
+      layerCenterY = newY + (layer.height || 0) / 2;
+    }
+    
+    // Check for center alignment and snap
+    const isNearVerticalCenter = Math.abs(layerCenterX - centerX) < snapThreshold;
+    const isNearHorizontalCenter = Math.abs(layerCenterY - centerY) < snapThreshold;
+    
+    // Snap to center
+    if (isNearVerticalCenter) {
+      if (layer.type === 'text') {
+        newX = layer.align === 'center' ? centerX : layer.align === 'right' ? centerX + (canvasRef.current.getContext('2d').measureText(layer.text).width / 2) : centerX - (canvasRef.current.getContext('2d').measureText(layer.text).width / 2);
+      } else {
+        newX = centerX - (layer.width || 0) / 2;
+      }
+    }
+    if (isNearHorizontalCenter) {
+      if (layer.type === 'text') {
+        newY = centerY + layer.fontSize / 2;
+      } else {
+        newY = centerY - (layer.height || 0) / 2;
+      }
+    }
+    
+    setGuides({ showVertical: isNearVerticalCenter, showHorizontal: isNearHorizontalCenter });
+    updateLayer(dragging, { x: newX, y: newY });
   };
 
   const handleCanvasMouseUp = () => setDragging(null);
