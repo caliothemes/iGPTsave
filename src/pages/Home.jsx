@@ -1270,6 +1270,16 @@ NE CRÉE PAS un nouveau visuel différent, MODIFIE le visuel existant en gardant
                                 {/* Selected Options Display */}
                                 {(selectedCategory || selectedFormat || selectedStyle || selectedPalette) && (
                 <div className="mb-2 flex items-center gap-2 text-xs flex-wrap">
+                  {selectedCategory && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300">
+                      {selectedCategory.category === 'logo' && (language === 'fr' ? 'Logo HD' : 'HD Logo')}
+                      {selectedCategory.category === 'print' && (language === 'fr' ? 'Print' : 'Print')}
+                      {selectedCategory.category === 'realistic' && (language === 'fr' ? 'Image réaliste' : 'Realistic')}
+                      {selectedCategory.category === 'social' && (language === 'fr' ? 'Réseaux sociaux' : 'Social')}
+                      {selectedCategory.subOption && ` - ${selectedCategory.subOption}`}
+                      <button onClick={() => setSelectedCategory(null)} className="hover:text-white">✕</button>
+                    </span>
+                  )}
                   {selectedFormat && (
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
                       {selectedFormat.name}
