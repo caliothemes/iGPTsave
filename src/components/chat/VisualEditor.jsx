@@ -604,31 +604,74 @@ export default function VisualEditor({ visual, onSave, onCancel }) {
             const radius = layer.curveRadius || 100;
             const text = layer.text;
             const centerX = layer.x;
-            const centerY = layer.y;
+            const centerY = layer.y + radius; // Position center below text position
+            const curveDirection = layer.curveDirection || 'top'; // 'top' or 'bottom'
             
-            // Calculate total angle for text
-            ctx.font = fontStyle;
-            const totalWidth = ctx.measureText(text).width;
-            const anglePerChar = totalWidth / (radius * text.length) * 0.8;
-            const startAngle = -Math.PI / 2 - (anglePerChar * text.length) / 2;
+            // Reset text align for curved text
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Calculate the total arc length needed for the text
+            let totalWidth = 0;
+            const charWidths = [];
+            for (let i = 0; i < text.length; i++) {
+              const w = ctx.measureText(text[i]).width;
+              charWidths.push(w);
+              totalWidth += w;
+            }
+            
+            // Calculate angle per character based on arc
+            const totalAngle = totalWidth / radius;
+            const startAngle = curveDirection === 'top' 
+              ? -Math.PI / 2 - totalAngle / 2
+              : Math.PI / 2 - totalAngle / 2;
+            
+            let currentAngle = startAngle;
             
             for (let i = 0; i < text.length; i++) {
               const char = text[i];
-              const angle = startAngle + anglePerChar * i;
-              const charX = centerX + Math.cos(angle) * radius;
-              const charY = centerY + Math.sin(angle) * radius;
+              const charWidth = charWidths[i];
+              const halfCharAngle = (charWidth / 2) / radius;
+              
+              currentAngle += halfCharAngle;
+              
+              const charX = centerX + Math.cos(currentAngle) * radius;
+              const charY = centerY + Math.sin(currentAngle) * radius;
               
               ctx.save();
               ctx.translate(charX, charY);
-              ctx.rotate(angle + Math.PI / 2);
+              
+              // Rotate character to follow the curve
+              if (curveDirection === 'top') {
+                ctx.rotate(currentAngle + Math.PI / 2);
+              } else {
+                ctx.rotate(currentAngle - Math.PI / 2);
+              }
+              
+              // Apply effects to curved text
+              if (layer.shadow && !layer.glow && !layer.neon) {
+                ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = layer.shadowBlur || 6;
+                ctx.shadowOffsetX = layer.shadowOffsetX || 3;
+                ctx.shadowOffsetY = layer.shadowOffsetY || 3;
+              }
+              
+              if (layer.glow) {
+                ctx.shadowColor = layer.glowColor || '#ffffff';
+                ctx.shadowBlur = layer.glowSize || 10;
+              }
               
               if (layer.stroke) {
                 ctx.strokeStyle = layer.strokeColor || '#000000';
                 ctx.lineWidth = layer.strokeWidth || 2;
                 ctx.strokeText(char, 0, 0);
               }
+              
+              ctx.fillStyle = layer.color;
               ctx.fillText(char, 0, 0);
               ctx.restore();
+              
+              currentAngle += halfCharAngle;
             }
           } else {
             // Normal text rendering
