@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic, Image, Palette, SlidersHorizontal, Upload, ChevronDown } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -22,10 +22,11 @@ import Logo from '@/components/Logo';
 import { useLanguage } from '@/components/LanguageContext';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
-import CategorySelector, { CATEGORIES } from '@/components/chat/CategorySelector';
+import CategorySelector from '@/components/chat/CategorySelector';
 import FormatSelector from '@/components/chat/FormatSelector';
 import StyleSelector from '@/components/chat/StyleSelector';
 import PresentationModal from '@/components/PresentationModal';
+import VisualEditor from '@/components/chat/VisualEditor';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -51,6 +52,10 @@ export default function Home() {
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [selectedPalette, setSelectedPalette] = useState(null);
   
+  // Editor
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingVisual, setEditingVisual] = useState(null);
+  
   // Dynamic settings from admin
   const [settings, setSettings] = useState({});
   
@@ -60,7 +65,6 @@ export default function Home() {
   useEffect(() => {
     const init = async () => {
       try {
-        // Load settings
         const allSettings = await base44.entities.AppSettings.list();
         const settingsMap = {};
         allSettings.forEach(s => {
@@ -143,7 +147,6 @@ export default function Home() {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Handle file upload - will implement later
       console.log('File selected:', file.name);
     }
   };
@@ -281,6 +284,11 @@ export default function Home() {
     setMessages([]);
   };
 
+  const handleOpenEditor = (visual) => {
+    setEditingVisual(visual);
+    setShowEditor(true);
+  };
+
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('Home'));
   const handleLogout = () => base44.auth.logout(createPageUrl('Home'));
 
@@ -290,10 +298,31 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
         <AnimatedBackground />
-        <Logo size="large" animate />
+        <Logo size="large" animate showText={false} />
       </div>
+    );
+  }
+
+  // Editor view
+  if (showEditor && editingVisual) {
+    return (
+      <VisualEditor
+        visual={editingVisual}
+        onClose={() => {
+          setShowEditor(false);
+          setEditingVisual(null);
+        }}
+        onSave={async (updatedVisual) => {
+          if (user && updatedVisual.id) {
+            await base44.entities.Visual.update(updatedVisual.id, updatedVisual);
+          }
+          setCurrentVisual(updatedVisual);
+          setShowEditor(false);
+          setEditingVisual(null);
+        }}
+      />
     );
   }
 
@@ -340,27 +369,27 @@ export default function Home() {
       )}>
         {showInitialView ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 pt-16">
-            {/* Logo - Clickable to open modal - with more top margin */}
+            {/* Logo - Clickable to open modal - NO TEXT */}
             <div 
-              className="cursor-pointer mb-8 mt-8"
+              className="cursor-pointer mb-10 mt-12"
               onClick={() => setShowPresentationModal(true)}
             >
-              <Logo size="large" showText animate />
+              <Logo size="large" showText={false} animate />
             </div>
 
-            {/* Dynamic Slogans with gradient */}
-            <h1 className="text-2xl md:text-3xl font-light text-center mb-2">
+            {/* Dynamic Slogans - smaller title, bigger subtitle */}
+            <h1 className="text-xl md:text-2xl font-light text-center mb-2">
               <span className="bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text text-transparent">
                 {getHomeTitle()}
               </span>
             </h1>
-            <p className="text-sm mb-12">
-              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <p className="text-base md:text-lg mb-12">
+              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent font-medium">
                 {getHomeSubtitle()}
               </span>
             </p>
 
-            {/* Welcome Message Bubble - Styled like chat */}
+            {/* Welcome Message Bubble */}
             <div className="w-full max-w-2xl mb-8">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20">
@@ -430,7 +459,7 @@ export default function Home() {
                       showValidation={true}
                       onValidate={(action) => {
                         if (action === 'edit') {
-                          window.location.href = createPageUrl('MyVisuals') + `?edit=${currentVisual.id}`;
+                          handleOpenEditor(currentVisual);
                         }
                       }}
                     />
@@ -445,8 +474,11 @@ export default function Home() {
 
         {/* Input Area */}
         <div className="fixed bottom-0 left-0 right-0 z-20">
+          {/* Black transparent overlay for footer */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+          
           <div className={cn(
-            "max-w-2xl mx-auto px-4 pb-4 transition-all duration-300",
+            "relative max-w-2xl mx-auto px-4 pb-4 transition-all duration-300",
             sidebarOpen && "ml-32"
           )}>
             {/* Format Selector */}
@@ -489,6 +521,42 @@ export default function Home() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Selected Tags */}
+            {(selectedFormat || selectedStyle || selectedPalette) && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {selectedFormat && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-300 text-xs border border-blue-500/30">
+                    <SlidersHorizontal className="h-3 w-3" />
+                    {selectedFormat.name}
+                    <button onClick={() => setSelectedFormat(null)} className="ml-1 hover:text-white">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                {selectedStyle && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-500/20 text-violet-300 text-xs border border-violet-500/30">
+                    {selectedStyle.name[language]}
+                    <button onClick={() => setSelectedStyle(null)} className="ml-1 hover:text-white">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                {selectedPalette && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/20 text-pink-300 text-xs border border-pink-500/30">
+                    <div className="flex gap-0.5">
+                      {selectedPalette.colors.slice(0, 3).map((c, i) => (
+                        <div key={i} className="w-2 h-2 rounded-full" style={{ backgroundColor: c }} />
+                      ))}
+                    </div>
+                    {selectedPalette.name[language]}
+                    <button onClick={() => setSelectedPalette(null)} className="ml-1 hover:text-white">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
