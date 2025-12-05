@@ -1750,28 +1750,34 @@ Réponds en JSON avec:
                 currentAngle += halfCharAngle;
               }
             } else {
-              // Normal text rendering
+              // Normal text rendering (with multi-line support for export)
+              const linesExport = wrapTextExport(layer.text, layer.maxWidth || 0);
+              const lineHeightExport = layer.fontSize * 1.2;
+              const totalHeightExport = linesExport.length * lineHeightExport;
+              const startYExport = layer.y - (linesExport.length - 1) * lineHeightExport / 2;
+              
               if (layer.effect3d) {
                 const depth = 6;
                 for (let i = depth; i > 0; i--) {
                   exportCtx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
-                  exportCtx.fillText(layer.text, layer.x + i, layer.y + i);
+                  linesExport.forEach((line, lineIdx) => {
+                    exportCtx.fillText(line, layer.x + i, startYExport + lineIdx * lineHeightExport + i);
+                  });
                 }
                 exportCtx.fillStyle = layer.color;
               }
               
               // Text Gradient Effect (export)
               if (layer.textGradient) {
-                const metrics = exportCtx.measureText(layer.text);
-                const textWidth = metrics.width;
-                const textHeight = layer.fontSize;
+                const metrics = exportCtx.measureText(linesExport[0] || layer.text);
+                const textWidth = layer.maxWidth || metrics.width;
                 const textX = layer.x - (layer.align === 'center' ? textWidth/2 : layer.align === 'right' ? textWidth : 0);
                 
                 let gradient;
                 if (layer.gradientDirection === 'vertical') {
-                  gradient = exportCtx.createLinearGradient(textX, layer.y - textHeight, textX, layer.y);
+                  gradient = exportCtx.createLinearGradient(textX, startYExport - layer.fontSize, textX, startYExport + totalHeightExport);
                 } else {
-                  gradient = exportCtx.createLinearGradient(textX, layer.y, textX + textWidth, layer.y);
+                  gradient = exportCtx.createLinearGradient(textX, startYExport, textX + textWidth, startYExport);
                 }
                 gradient.addColorStop(0, layer.gradientColor1 || '#ff00ff');
                 gradient.addColorStop(1, layer.gradientColor2 || '#00ffff');
@@ -1783,8 +1789,10 @@ Réponds en JSON avec:
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
                 exportCtx.shadowBlur = layer.haloSize || 15;
                 exportCtx.fillStyle = layer.haloColor || '#FFD700';
-                exportCtx.fillText(layer.text, layer.x, layer.y);
-                exportCtx.fillText(layer.text, layer.x, layer.y);
+                linesExport.forEach((line, lineIdx) => {
+                  exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
+                  exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
+                });
                 exportCtx.restore();
                 exportCtx.fillStyle = layer.color;
               }
@@ -1796,9 +1804,13 @@ Réponds en JSON avec:
                 exportCtx.shadowColor = neonColor;
                 exportCtx.shadowBlur = intensity;
                 exportCtx.fillStyle = neonColor;
-                exportCtx.fillText(layer.text, layer.x, layer.y);
+                linesExport.forEach((line, lineIdx) => {
+                  exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
+                });
                 exportCtx.shadowBlur = intensity * 2;
-                exportCtx.fillText(layer.text, layer.x, layer.y);
+                linesExport.forEach((line, lineIdx) => {
+                  exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
+                });
                 exportCtx.restore();
                 exportCtx.fillStyle = '#ffffff';
               }
@@ -1818,10 +1830,14 @@ Réponds en JSON avec:
               if (layer.stroke) {
                 exportCtx.strokeStyle = layer.strokeColor || '#000000';
                 exportCtx.lineWidth = layer.strokeWidth || 2;
-                exportCtx.strokeText(layer.text, layer.x, layer.y);
+                linesExport.forEach((line, lineIdx) => {
+                  exportCtx.strokeText(line, layer.x, startYExport + lineIdx * lineHeightExport);
+                });
               }
 
-              exportCtx.fillText(layer.text, layer.x, layer.y);
+              linesExport.forEach((line, lineIdx) => {
+                exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
+              });
 
               // Sparkle effect for export
               if (layer.sparkle) {
