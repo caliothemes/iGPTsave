@@ -50,9 +50,9 @@ const CATEGORIES = [
         id: 'sticker', 
         name: { fr: 'Sticker', en: 'Sticker' },
         orientations: [
-          { id: 'sticker_rond', name: { fr: 'Rond', en: 'Round' }, prompt: { fr: 'Crée un sticker rond', en: 'Create a round sticker' }, dimensions: '1000x1000' },
-          { id: 'sticker_carre', name: { fr: 'Carré', en: 'Square' }, prompt: { fr: 'Crée un sticker carré', en: 'Create a square sticker' }, dimensions: '1000x1000' },
-        ]
+                  { id: 'sticker_rond', name: { fr: 'Rond', en: 'Round' }, prompt: { fr: 'Crée un sticker rond sans texte', en: 'Create a round sticker without text' }, dimensions: '1000x1000' },
+                  { id: 'sticker_carre', name: { fr: 'Carré', en: 'Square' }, prompt: { fr: 'Crée un sticker carré sans texte', en: 'Create a square sticker without text' }, dimensions: '1000x1000' },
+                ]
       },
       { 
         id: 'invitation', 
