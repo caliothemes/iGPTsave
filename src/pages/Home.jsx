@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, Sparkles, SlidersHorizontal, Palette, X } from 'lucide-react';
+import { Send, Loader2, Plus, Mic } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 import AnimatedBackground from '@/components/AnimatedBackground';
 import GlobalHeader from '@/components/GlobalHeader';
@@ -14,8 +14,8 @@ import Logo from '@/components/Logo';
 import { useLanguage } from '@/components/LanguageContext';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
-import FormatSelector from '@/components/chat/FormatSelector';
-import StyleSelector, { STYLES, COLOR_PALETTES } from '@/components/chat/StyleSelector';
+import CategorySelector, { CATEGORIES } from '@/components/chat/CategorySelector';
+import PresentationModal from '@/components/PresentationModal';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -31,16 +31,10 @@ export default function Home() {
   const [inputValue, setInputValue] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentVisual, setCurrentVisual] = useState(null);
-  
-  // Format & Style selectors
-  const [showFormatSelector, setShowFormatSelector] = useState(false);
-  const [showStyleSelector, setShowStyleSelector] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState(null);
-  const [selectedStyle, setSelectedStyle] = useState(null);
-  const [selectedPalette, setSelectedPalette] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showPresentationModal, setShowPresentationModal] = useState(false);
   
   const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -79,17 +73,23 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, currentVisual]);
 
-  useEffect(() => {
-    if (!isLoading && messages.length === 0) {
-      const welcomeMsg = user 
-        ? t('welcomeUser', { name: user.full_name?.split(' ')[0] || 'User' }) + '\n\n' + t('assistantIntro')
-        : t('welcome') + '\n\n' + t('guestIntro');
-      setMessages([{ role: 'assistant', content: welcomeMsg }]);
-    }
-  }, [isLoading, user, t, messages.length]);
+  const getUserName = () => {
+    if (!user) return '';
+    return user.full_name?.split(' ')[0] || user.email?.split('@')[0] || '';
+  };
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    // Set the prompt based on selection
+    const prompt = category.selectedSubmenu 
+      ? category.selectedSubmenu.prompt[language]
+      : category.prompt[language];
+    setInputValue(prompt + ' ');
+  };
 
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
+    if (!selectedCategory) return; // Must select category first
     
     const userMessage = inputValue.trim();
     setInputValue('');
@@ -97,32 +97,11 @@ export default function Home() {
     setIsGenerating(true);
     setCurrentVisual(null);
     
-    // Close selectors
-    setShowFormatSelector(false);
-    setShowStyleSelector(false);
-    
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
     
     try {
-      // Build enhanced prompt
-      let enhancedPrompt = userMessage;
-      
-      if (selectedStyle) {
-        enhancedPrompt += `, ${selectedStyle.prompt}`;
-      }
-      
-      if (selectedPalette) {
-        enhancedPrompt += `, color palette: ${selectedPalette.colors.join(', ')}`;
-      }
-      
-      if (selectedFormat) {
-        enhancedPrompt += `, dimensions ${selectedFormat.dimensions}`;
-      }
-      
-      enhancedPrompt += ', high quality, professional design';
-      
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: enhancedPrompt
+        prompt: userMessage + ', high quality, professional design'
       });
 
       if (result.url) {
@@ -131,11 +110,8 @@ export default function Home() {
           image_url: result.url,
           title: userMessage.slice(0, 50),
           original_prompt: userMessage,
-          image_prompt: enhancedPrompt,
-          dimensions: selectedFormat?.dimensions || '1080x1080',
-          format_name: selectedFormat?.name,
-          style: selectedStyle?.name?.[language],
-          color_palette: selectedPalette?.colors
+          dimensions: '1080x1080',
+          visual_type: selectedCategory?.id
         };
 
         let savedVisual = visualData;
@@ -172,7 +148,7 @@ export default function Home() {
     
     try {
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: visual.image_prompt || visual.original_prompt + ', high quality, professional design'
+        prompt: visual.original_prompt + ', high quality, professional design'
       });
 
       if (result.url) {
@@ -205,8 +181,7 @@ export default function Home() {
     setIsGenerating(false);
   };
 
-  const handleDownload = async (format) => {
-    // Deduct credit if user has credits
+  const handleDownload = async () => {
     if (credits && user) {
       if (credits.free_downloads > 0) {
         await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
@@ -221,14 +196,8 @@ export default function Home() {
   const handleNewChat = () => {
     setCurrentVisual(null);
     setCurrentConversation(null);
-    setSelectedFormat(null);
-    setSelectedStyle(null);
-    setSelectedPalette(null);
+    setSelectedCategory(null);
     setMessages([]);
-    const welcomeMsg = user 
-      ? t('welcomeUser', { name: user.full_name?.split(' ')[0] || 'User' }) + '\n\n' + t('newConversation')
-      : t('welcome') + '\n\n' + t('guestIntro');
-    setMessages([{ role: 'assistant', content: welcomeMsg }]);
   };
 
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('Home'));
@@ -236,6 +205,9 @@ export default function Home() {
 
   const canDownload = user && credits && ((credits.free_downloads || 0) + (credits.paid_credits || 0) > 0 || credits.subscription_type === 'unlimited');
   const hasWatermark = !user || !canDownload;
+
+  // Show initial view (no messages yet)
+  const showInitialView = messages.length === 0 && !currentVisual;
 
   if (isLoading) {
     return (
@@ -270,210 +242,157 @@ export default function Home() {
         onLogout={handleLogout}
       />
 
+      <PresentationModal 
+        isOpen={showPresentationModal} 
+        onClose={() => setShowPresentationModal(false)} 
+      />
+
       <main className={cn(
         "flex-1 flex flex-col transition-all duration-300 relative z-10",
         sidebarOpen ? "ml-64" : "ml-0"
       )}>
-        <div className="flex-1 overflow-y-auto px-4 py-6 pb-48">
-          <div className="max-w-3xl mx-auto space-y-4">
-            {/* Hero when no messages */}
-            {messages.length <= 1 && !currentVisual && (
-              <div className="text-center py-8">
-                <Logo size="large" showText animate />
-                <p className="text-white/60 mt-4 max-w-md mx-auto">
-                  {t('heroSubtitle')}
-                </p>
-              </div>
-            )}
+        {showInitialView ? (
+          /* Initial View - Like in screenshots */
+          <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32">
+            {/* Logo - Clickable to open modal */}
+            <div 
+              className="cursor-pointer mb-6"
+              onClick={() => setShowPresentationModal(true)}
+            >
+              <Logo size="large" showText animate />
+            </div>
 
-            {/* Messages */}
-            <AnimatePresence>
-              {messages.map((msg, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <MessageBubble message={msg} isStreaming={msg.isStreaming} user={user} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {/* Slogan */}
+            <h1 className="text-2xl md:text-3xl text-white/90 font-light text-center mb-2">
+              {language === 'fr' 
+                ? 'Imaginez et décrivez votre visuel, iGPT le crée'
+                : 'Imagine and describe your visual, iGPT creates it'}
+            </h1>
+            <p className="text-white/50 text-sm mb-10">
+              TEXT-TO-DESIGN - {language === 'fr' ? 'Laissez iGPT créer pour vous.' : 'Let iGPT create for you.'}
+            </p>
 
-            {/* Visual Card */}
-            {currentVisual && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex justify-center"
-              >
-                <div className="w-full max-w-md">
-                  <VisualCard
-                    visual={currentVisual}
-                    onRegenerate={handleRegenerate}
-                    onDownload={handleDownload}
-                    onToggleFavorite={async (v) => {
-                      if (user && v.id) {
-                        await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
-                        setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
-                      }
-                    }}
-                    isRegenerating={isGenerating}
-                    canDownload={canDownload}
-                    hasWatermark={hasWatermark}
-                    showValidation={true}
-                    onValidate={(action) => {
-                      if (action === 'edit') {
-                        window.location.href = createPageUrl('MyVisuals') + `?edit=${currentVisual.id}`;
-                      }
-                    }}
-                  />
+            {/* Welcome Message Bubble */}
+            <div className="w-full max-w-2xl mb-8">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-to-r from-violet-500 to-blue-500">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
+                      alt="iGPT" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
                 </div>
-              </motion.div>
-            )}
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-4 max-w-lg">
+                  <p className="text-white/80 text-sm">
+                    {language === 'fr' 
+                      ? `Bonjour ${getUserName() || ''}, décrivez-moi le visuel que vous avez imaginé, nous allons le créer ensemble... Commencez par choisir un format.`
+                      : `Hello ${getUserName() || ''}, describe the visual you've imagined, we'll create it together... Start by choosing a format.`}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            <div ref={messagesEndRef} />
+            {/* Category Selection Label */}
+            <p className="text-white/50 text-sm mb-4">
+              {language === 'fr' ? 'Choisissez le type de création pour commencer' : 'Choose the type of creation to start'}
+            </p>
+
+            {/* Category Selector */}
+            <CategorySelector 
+              onSelect={handleCategorySelect}
+              selectedCategory={selectedCategory}
+            />
           </div>
-        </div>
+        ) : (
+          /* Chat View */
+          <div className="flex-1 overflow-y-auto px-4 py-6 pb-48">
+            <div className="max-w-3xl mx-auto space-y-4">
+              <AnimatePresence>
+                {messages.map((msg, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <MessageBubble message={msg} isStreaming={msg.isStreaming} user={user} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
 
-        {/* Input Area */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/95 via-gray-900/80 to-transparent p-4 z-20">
+              {currentVisual && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex justify-center"
+                >
+                  <div className="w-full max-w-md">
+                    <VisualCard
+                      visual={currentVisual}
+                      onRegenerate={handleRegenerate}
+                      onDownload={handleDownload}
+                      onToggleFavorite={async (v) => {
+                        if (user && v.id) {
+                          await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
+                          setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
+                        }
+                      }}
+                      isRegenerating={isGenerating}
+                      canDownload={canDownload}
+                      hasWatermark={hasWatermark}
+                      showValidation={true}
+                      onValidate={(action) => {
+                        if (action === 'edit') {
+                          window.location.href = createPageUrl('MyVisuals') + `?edit=${currentVisual.id}`;
+                        }
+                      }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+        )}
+
+        {/* Input Area - Fixed at bottom */}
+        <div className="fixed bottom-0 left-0 right-0 z-20">
           <div className={cn(
-            "max-w-3xl mx-auto transition-all duration-300",
+            "max-w-2xl mx-auto px-4 pb-4 transition-all duration-300",
             sidebarOpen && "ml-32"
           )}>
-            {/* Format Selector */}
-            <AnimatePresence>
-              {showFormatSelector && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="mb-3"
-                >
-                  <FormatSelector 
-                    selectedFormat={selectedFormat}
-                    onSelect={(format) => {
-                      setSelectedFormat(format);
-                      setShowFormatSelector(false);
-                    }}
-                    onClose={() => setShowFormatSelector(false)}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Style Selector */}
-            <AnimatePresence>
-              {showStyleSelector && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="mb-3"
-                >
-                  <StyleSelector
-                    selectedStyle={selectedStyle}
-                    selectedPalette={selectedPalette}
-                    onStyleChange={setSelectedStyle}
-                    onPaletteChange={setSelectedPalette}
-                    onClose={() => setShowStyleSelector(false)}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Selected Options Display */}
-            {(selectedFormat || selectedStyle || selectedPalette) && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {selectedFormat && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-300 text-xs border border-blue-500/30">
-                    <SlidersHorizontal className="h-3 w-3" />
-                    {selectedFormat.name}
-                    <button onClick={() => setSelectedFormat(null)} className="ml-1 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-                {selectedStyle && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-500/20 text-violet-300 text-xs border border-violet-500/30">
-                    <Sparkles className="h-3 w-3" />
-                    {selectedStyle.name[language]}
-                    <button onClick={() => setSelectedStyle(null)} className="ml-1 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-                {selectedPalette && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/20 text-pink-300 text-xs border border-pink-500/30">
-                    <div className="flex gap-0.5">
-                      {selectedPalette.colors.slice(0, 3).map((c, i) => (
-                        <div key={i} className="w-2 h-2 rounded-full" style={{ backgroundColor: c }} />
-                      ))}
-                    </div>
-                    {selectedPalette.name[language]}
-                    <button onClick={() => setSelectedPalette(null)} className="ml-1 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* Main Input */}
-            <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-              {/* Option Buttons */}
-              <div className="flex items-center gap-1 px-3 pt-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setShowFormatSelector(!showFormatSelector); setShowStyleSelector(false); }}
-                  className={cn(
-                    "h-8 px-3 rounded-lg text-xs",
-                    showFormatSelector || selectedFormat
-                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                      : "text-white/50 hover:text-white hover:bg-white/10"
-                  )}
-                >
-                  <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
-                  {language === 'fr' ? 'Format' : 'Format'}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setShowStyleSelector(!showStyleSelector); setShowFormatSelector(false); }}
-                  className={cn(
-                    "h-8 px-3 rounded-lg text-xs",
-                    showStyleSelector || selectedStyle || selectedPalette
-                      ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
-                      : "text-white/50 hover:text-white hover:bg-white/10"
-                  )}
-                >
-                  <Palette className="h-3.5 w-3.5 mr-1.5" />
-                  {language === 'fr' ? 'Style & Couleurs' : 'Style & Colors'}
-                </Button>
-              </div>
-
-              <Textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
+            {/* Input Bar */}
+            <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3">
+                <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
+                  <Plus className="h-5 w-5" />
+                </button>
+                
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                  placeholder={selectedCategory 
+                    ? (language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...')
+                    : (language === 'fr' ? 'Sélectionnez d\'abord un type ci-dessus...' : 'Select a type above first...')
                   }
-                }}
-                placeholder={t('inputPlaceholder')}
-                className="w-full bg-transparent border-0 text-white placeholder:text-white/40 resize-none min-h-[56px] max-h-32 pr-20 focus-visible:ring-0"
-                disabled={isGenerating}
-              />
-              
-              <div className="absolute right-2 bottom-2">
+                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm"
+                  disabled={isGenerating || !selectedCategory}
+                />
+
+                <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
+                  <Mic className="h-5 w-5" />
+                </button>
+
                 <Button
                   onClick={handleSend}
-                  disabled={!inputValue.trim() || isGenerating}
-                  className="h-10 px-4 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 rounded-xl"
+                  disabled={!inputValue.trim() || isGenerating || !selectedCategory}
+                  size="icon"
+                  className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
                 >
                   {isGenerating ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -482,6 +401,21 @@ export default function Home() {
                   )}
                 </Button>
               </div>
+            </div>
+
+            {/* Footer Links */}
+            <div className="flex items-center justify-center gap-4 mt-3 text-xs text-white/40">
+              <Link to={createPageUrl('Pricing')} className="hover:text-white/60 transition-colors">
+                {language === 'fr' ? 'Tarifs' : 'Pricing'}
+              </Link>
+              <span>•</span>
+              <Link to={createPageUrl('Portfolio')} className="hover:text-white/60 transition-colors">
+                Portfolio
+              </Link>
+              <span>•</span>
+              <Link to={createPageUrl('Legal')} className="hover:text-white/60 transition-colors">
+                {language === 'fr' ? 'Mentions légales' : 'Legal'}
+              </Link>
             </div>
           </div>
         </div>
