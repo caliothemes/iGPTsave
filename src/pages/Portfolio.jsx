@@ -161,25 +161,37 @@ export default function Portfolio() {
               gap: 8px;
             }
             .masonry-portfolio > div {
-              flex: 0 0 calc(25% - 6px);
-              max-width: calc(25% - 6px);
+              flex: 0 0 calc(16.666% - 7px);
+              max-width: calc(16.666% - 7px);
+            }
+            .masonry-portfolio img {
+              width: 100%;
+              height: auto;
+              object-fit: cover;
+              display: block;
+            }
+            @media (max-width: 1400px) {
+              .masonry-portfolio > div {
+                flex: 0 0 calc(20% - 6.5px);
+                max-width: calc(20% - 6.5px);
+              }
             }
             @media (max-width: 1024px) {
+              .masonry-portfolio > div {
+                flex: 0 0 calc(25% - 6px);
+                max-width: calc(25% - 6px);
+              }
+            }
+            @media (max-width: 768px) {
               .masonry-portfolio > div {
                 flex: 0 0 calc(33.333% - 6px);
                 max-width: calc(33.333% - 6px);
               }
             }
-            @media (max-width: 768px) {
+            @media (max-width: 480px) {
               .masonry-portfolio > div {
                 flex: 0 0 calc(50% - 4px);
                 max-width: calc(50% - 4px);
-              }
-            }
-            @media (max-width: 480px) {
-              .masonry-portfolio > div {
-                flex: 0 0 100%;
-                max-width: 100%;
               }
             }
           `}</style>
