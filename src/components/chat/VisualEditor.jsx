@@ -160,7 +160,7 @@ const DEFAULT_ILLUSTRATIONS = [
   { id: 'laurel', name: { fr: 'Laurier', en: 'Laurel' }, prompt: 'laurel wreath illustration, victory olive branches, classical greek laurel, transparent background PNG' },
 ];
 
-export default function VisualEditor({ visual, onSave, onCancel }) {
+export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const { language } = useLanguage();
   const canvasRef = useRef(null);
   const imageUploadRef = useRef(null);
@@ -1924,7 +1924,7 @@ Réponds en JSON avec:
                             <span className="hidden sm:inline">{language === 'fr' ? 'Mes textes' : 'My texts'}</span> ({savedTexts.length})
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm" onClick={onCancel} className="text-white/60 hover:text-white hover:bg-white/10 text-xs px-2">
+                        <Button variant="ghost" size="sm" onClick={() => (onClose || onCancel)?.()} className="text-white/60 hover:text-white hover:bg-white/10 text-xs px-2">
                           <X className="h-4 w-4" />
                         </Button>
           <Button size="sm" onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs px-3">
