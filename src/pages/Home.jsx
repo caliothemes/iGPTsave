@@ -2,10 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Image, Palette, SlidersHorizontal, Upload, ChevronDown } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
 import AnimatedBackground from '@/components/AnimatedBackground';
 import GlobalHeader from '@/components/GlobalHeader';
@@ -15,6 +23,8 @@ import { useLanguage } from '@/components/LanguageContext';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
 import CategorySelector, { CATEGORIES } from '@/components/chat/CategorySelector';
+import FormatSelector from '@/components/chat/FormatSelector';
+import StyleSelector from '@/components/chat/StyleSelector';
 import PresentationModal from '@/components/PresentationModal';
 
 export default function Home() {
@@ -34,11 +44,30 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
   
+  // Format & Style selectors
+  const [showFormatSelector, setShowFormatSelector] = useState(false);
+  const [showStyleSelector, setShowStyleSelector] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState(null);
+  const [selectedStyle, setSelectedStyle] = useState(null);
+  const [selectedPalette, setSelectedPalette] = useState(null);
+  
+  // Dynamic settings from admin
+  const [settings, setSettings] = useState({});
+  
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
       try {
+        // Load settings
+        const allSettings = await base44.entities.AppSettings.list();
+        const settingsMap = {};
+        allSettings.forEach(s => {
+          settingsMap[s.key] = s.value;
+        });
+        setSettings(settingsMap);
+        
         const isAuth = await base44.auth.isAuthenticated();
         if (isAuth) {
           const currentUser = await base44.auth.me();
@@ -78,18 +107,50 @@ export default function Home() {
     return user.full_name?.split(' ')[0] || user.email?.split('@')[0] || '';
   };
 
+  const getHomeTitle = () => {
+    return language === 'fr' 
+      ? (settings.home_title_fr || 'Imaginez et décrivez votre visuel, iGPT le crée')
+      : (settings.home_title_en || 'Imagine and describe your visual, iGPT creates it');
+  };
+
+  const getHomeSubtitle = () => {
+    return language === 'fr'
+      ? (settings.home_subtitle_fr || 'TEXT-TO-DESIGN - Laissez iGPT créer pour vous.')
+      : (settings.home_subtitle_en || 'TEXT-TO-DESIGN - Let iGPT create for you.');
+  };
+
+  const getWelcomeMessage = () => {
+    if (user) {
+      const msg = language === 'fr' 
+        ? (settings.welcome_message_fr || 'Bonjour {name}, décrivez-moi le visuel que vous avez imaginé, nous allons le créer ensemble... Commencez par choisir un format.')
+        : (settings.welcome_message_en || "Hello {name}, describe the visual you've envisioned, we'll create it together... Start by choosing a format.");
+      return msg.replace('{name}', getUserName());
+    } else {
+      return language === 'fr'
+        ? (settings.guest_message_fr || 'Bienvenue sur iGPT, décrivez-moi le visuel que vous avez imaginé, nous allons le créer ensemble... Commencez par choisir un format.')
+        : (settings.guest_message_en || "Welcome to iGPT, describe the visual you've envisioned, we'll create it together... Start by choosing a format.");
+    }
+  };
+
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
-    // Set the prompt based on selection
     const prompt = category.selectedSubmenu 
       ? category.selectedSubmenu.prompt[language]
       : category.prompt[language];
     setInputValue(prompt + ' ');
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Handle file upload - will implement later
+      console.log('File selected:', file.name);
+    }
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
-    if (!selectedCategory) return; // Must select category first
+    if (!selectedCategory) return;
     
     const userMessage = inputValue.trim();
     setInputValue('');
@@ -100,8 +161,22 @@ export default function Home() {
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
     
     try {
+      let enhancedPrompt = userMessage;
+      
+      if (selectedStyle) {
+        enhancedPrompt += `, ${selectedStyle.prompt}`;
+      }
+      if (selectedPalette) {
+        enhancedPrompt += `, color palette: ${selectedPalette.colors.join(', ')}`;
+      }
+      if (selectedFormat) {
+        enhancedPrompt += `, dimensions ${selectedFormat.dimensions}`;
+      }
+      
+      enhancedPrompt += ', high quality, professional design';
+      
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: userMessage + ', high quality, professional design'
+        prompt: enhancedPrompt
       });
 
       if (result.url) {
@@ -110,8 +185,11 @@ export default function Home() {
           image_url: result.url,
           title: userMessage.slice(0, 50),
           original_prompt: userMessage,
-          dimensions: '1080x1080',
-          visual_type: selectedCategory?.id
+          image_prompt: enhancedPrompt,
+          dimensions: selectedFormat?.dimensions || '1080x1080',
+          visual_type: selectedCategory?.id,
+          style: selectedStyle?.name?.[language],
+          color_palette: selectedPalette?.colors
         };
 
         let savedVisual = visualData;
@@ -148,7 +226,7 @@ export default function Home() {
     
     try {
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: visual.original_prompt + ', high quality, professional design'
+        prompt: visual.image_prompt || visual.original_prompt + ', high quality, professional design'
       });
 
       if (result.url) {
@@ -197,6 +275,9 @@ export default function Home() {
     setCurrentVisual(null);
     setCurrentConversation(null);
     setSelectedCategory(null);
+    setSelectedFormat(null);
+    setSelectedStyle(null);
+    setSelectedPalette(null);
     setMessages([]);
   };
 
@@ -205,8 +286,6 @@ export default function Home() {
 
   const canDownload = user && credits && ((credits.free_downloads || 0) + (credits.paid_credits || 0) > 0 || credits.subscription_type === 'unlimited');
   const hasWatermark = !user || !canDownload;
-
-  // Show initial view (no messages yet)
   const showInitialView = messages.length === 0 && !currentVisual;
 
   if (isLoading) {
@@ -219,7 +298,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0f]">
       <AnimatedBackground />
       <GlobalHeader page="Home" />
       
@@ -247,35 +326,44 @@ export default function Home() {
         onClose={() => setShowPresentationModal(false)} 
       />
 
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept="image/*"
+        className="hidden"
+      />
+
       <main className={cn(
         "flex-1 flex flex-col transition-all duration-300 relative z-10",
         sidebarOpen ? "ml-64" : "ml-0"
       )}>
         {showInitialView ? (
-          /* Initial View - Like in screenshots */
-          <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32">
-            {/* Logo - Clickable to open modal */}
+          <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 pt-16">
+            {/* Logo - Clickable to open modal - with more top margin */}
             <div 
-              className="cursor-pointer mb-6"
+              className="cursor-pointer mb-8 mt-8"
               onClick={() => setShowPresentationModal(true)}
             >
               <Logo size="large" showText animate />
             </div>
 
-            {/* Slogan */}
-            <h1 className="text-2xl md:text-3xl text-white/90 font-light text-center mb-2">
-              {language === 'fr' 
-                ? 'Imaginez et décrivez votre visuel, iGPT le crée'
-                : 'Imagine and describe your visual, iGPT creates it'}
+            {/* Dynamic Slogans with gradient */}
+            <h1 className="text-2xl md:text-3xl font-light text-center mb-2">
+              <span className="bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text text-transparent">
+                {getHomeTitle()}
+              </span>
             </h1>
-            <p className="text-white/50 text-sm mb-10">
-              TEXT-TO-DESIGN - {language === 'fr' ? 'Laissez iGPT créer pour vous.' : 'Let iGPT create for you.'}
+            <p className="text-sm mb-12">
+              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                {getHomeSubtitle()}
+              </span>
             </p>
 
-            {/* Welcome Message Bubble */}
+            {/* Welcome Message Bubble - Styled like chat */}
             <div className="w-full max-w-2xl mb-8">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-to-r from-violet-500 to-blue-500">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20">
                   <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
                     <img 
                       src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
@@ -284,11 +372,9 @@ export default function Home() {
                     />
                   </div>
                 </div>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-4 max-w-lg">
-                  <p className="text-white/80 text-sm">
-                    {language === 'fr' 
-                      ? `Bonjour ${getUserName() || ''}, décrivez-moi le visuel que vous avez imaginé, nous allons le créer ensemble... Commencez par choisir un format.`
-                      : `Hello ${getUserName() || ''}, describe the visual you've imagined, we'll create it together... Start by choosing a format.`}
+                <div className="bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 rounded-2xl px-5 py-4 max-w-lg shadow-lg shadow-violet-500/5">
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {getWelcomeMessage()}
                   </p>
                 </div>
               </div>
@@ -306,7 +392,6 @@ export default function Home() {
             />
           </div>
         ) : (
-          /* Chat View */
           <div className="flex-1 overflow-y-auto px-4 py-6 pb-48">
             <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
@@ -358,18 +443,91 @@ export default function Home() {
           </div>
         )}
 
-        {/* Input Area - Fixed at bottom */}
+        {/* Input Area */}
         <div className="fixed bottom-0 left-0 right-0 z-20">
           <div className={cn(
             "max-w-2xl mx-auto px-4 pb-4 transition-all duration-300",
             sidebarOpen && "ml-32"
           )}>
+            {/* Format Selector */}
+            <AnimatePresence>
+              {showFormatSelector && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="mb-3"
+                >
+                  <FormatSelector 
+                    selectedFormat={selectedFormat}
+                    onSelect={(format) => {
+                      setSelectedFormat(format);
+                      setShowFormatSelector(false);
+                    }}
+                    onClose={() => setShowFormatSelector(false)}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Style Selector */}
+            <AnimatePresence>
+              {showStyleSelector && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="mb-3"
+                >
+                  <StyleSelector
+                    selectedStyle={selectedStyle}
+                    selectedPalette={selectedPalette}
+                    onStyleChange={setSelectedStyle}
+                    onPaletteChange={setSelectedPalette}
+                    onClose={() => setShowStyleSelector(false)}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3">
-                <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
-                  <Plus className="h-5 w-5" />
-                </button>
+                {/* Plus Dropdown Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
+                      <Plus className="h-5 w-5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56 bg-gray-900/95 backdrop-blur-xl border border-white/10">
+                    <DropdownMenuLabel className="text-white/50 text-xs">
+                      {language === 'fr' ? 'Options' : 'Options'}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuItem 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      {language === 'fr' ? 'Importer une image' : 'Upload image'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => { setShowFormatSelector(!showFormatSelector); setShowStyleSelector(false); }}
+                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      <SlidersHorizontal className="h-4 w-4 mr-2" />
+                      {language === 'fr' ? 'Format & Dimensions' : 'Format & Dimensions'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => { setShowStyleSelector(!showStyleSelector); setShowFormatSelector(false); }}
+                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      <Palette className="h-4 w-4 mr-2" />
+                      {language === 'fr' ? 'Style & Couleurs' : 'Style & Colors'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 
                 <input
                   type="text"
@@ -420,6 +578,19 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {/* CSS for animated gradient border */}
+      <style>{`
+        .bg-gradient-conic-animated {
+          background: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6);
+          background-size: 300% 100%;
+          animation: gradient-rotate 3s linear infinite;
+        }
+        @keyframes gradient-rotate {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 300% 50%; }
+        }
+      `}</style>
     </div>
   );
 }
