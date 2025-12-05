@@ -1,4 +1,3 @@
-import Home from './pages/Home';
 import Pricing from './pages/Pricing';
 import Admin from './pages/Admin';
 import Legal from './pages/Legal';
@@ -13,11 +12,11 @@ import AdminPricing from './pages/AdminPricing';
 import PaymentSuccess from './pages/PaymentSuccess';
 import AdminPresentation from './pages/AdminPresentation';
 import Portfolio from './pages/Portfolio';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
     "Pricing": Pricing,
     "Admin": Admin,
     "Legal": Legal,
@@ -32,10 +31,11 @@ export const PAGES = {
     "PaymentSuccess": PaymentSuccess,
     "AdminPresentation": AdminPresentation,
     "Portfolio": Portfolio,
+    "Home": Home,
 }
 
 export const pagesConfig = {
-    mainPage: "Home",
+    mainPage: "Pricing",
     Pages: PAGES,
     Layout: __Layout,
 };
