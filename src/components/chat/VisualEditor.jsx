@@ -796,29 +796,36 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               currentAngle += halfCharAngle;
             }
           } else {
-            // Normal text rendering
+            // Normal text rendering (with multi-line support)
+            const lines = wrapText(layer.text, layer.maxWidth || 0);
+            const lineHeight = layer.fontSize * 1.2;
+            const totalHeight = lines.length * lineHeight;
+            const startY = layer.y - (lines.length - 1) * lineHeight / 2;
+            
             // 3D Effect (draw multiple offset layers)
             if (layer.effect3d) {
               const depth = 6;
               for (let i = depth; i > 0; i--) {
                 ctx.fillStyle = `rgba(0,0,0,${0.3 - i * 0.04})`;
-                ctx.fillText(layer.text, layer.x + i, layer.y + i);
+                lines.forEach((line, lineIdx) => {
+                  ctx.fillText(line, layer.x + i, startY + lineIdx * lineHeight + i);
+                });
               }
               ctx.fillStyle = layer.color;
             }
             
             // Text Gradient Effect
             if (layer.textGradient) {
-              const metrics = ctx.measureText(layer.text);
-              const textWidth = metrics.width;
-              const textHeight = layer.fontSize;
+              const metrics = ctx.measureText(lines[0] || layer.text);
+              const textWidth = layer.maxWidth || metrics.width;
+              const textHeight = totalHeight;
               const textX = layer.x - (layer.align === 'center' ? textWidth/2 : layer.align === 'right' ? textWidth : 0);
               
               let gradient;
               if (layer.gradientDirection === 'vertical') {
-                gradient = ctx.createLinearGradient(textX, layer.y - textHeight, textX, layer.y);
+                gradient = ctx.createLinearGradient(textX, startY - layer.fontSize, textX, startY + totalHeight);
               } else {
-                gradient = ctx.createLinearGradient(textX, layer.y, textX + textWidth, layer.y);
+                gradient = ctx.createLinearGradient(textX, startY, textX + textWidth, startY);
               }
               gradient.addColorStop(0, layer.gradientColor1 || '#ff00ff');
               gradient.addColorStop(1, layer.gradientColor2 || '#00ffff');
@@ -833,8 +840,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               ctx.shadowOffsetX = 0;
               ctx.shadowOffsetY = 0;
               ctx.fillStyle = layer.haloColor || '#FFD700';
-              ctx.fillText(layer.text, layer.x, layer.y);
-              ctx.fillText(layer.text, layer.x, layer.y);
+              lines.forEach((line, lineIdx) => {
+                ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
+                ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
+              });
               ctx.restore();
               ctx.fillStyle = layer.color;
             }
@@ -847,9 +856,13 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               ctx.shadowColor = neonColor;
               ctx.shadowBlur = intensity;
               ctx.fillStyle = neonColor;
-              ctx.fillText(layer.text, layer.x, layer.y);
+              lines.forEach((line, lineIdx) => {
+                ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
+              });
               ctx.shadowBlur = intensity * 2;
-              ctx.fillText(layer.text, layer.x, layer.y);
+              lines.forEach((line, lineIdx) => {
+                ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
+              });
               ctx.restore();
               ctx.fillStyle = '#ffffff';
             }
@@ -874,10 +887,14 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             if (layer.stroke) {
               ctx.strokeStyle = layer.strokeColor || '#000000';
               ctx.lineWidth = layer.strokeWidth || 2;
-              ctx.strokeText(layer.text, layer.x, layer.y);
+              lines.forEach((line, lineIdx) => {
+                ctx.strokeText(line, layer.x, startY + lineIdx * lineHeight);
+              });
             }
 
-            ctx.fillText(layer.text, layer.x, layer.y);
+            lines.forEach((line, lineIdx) => {
+              ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
+            });
 
             // Sparkle effect (stars and dots around text)
             if (layer.sparkle) {
