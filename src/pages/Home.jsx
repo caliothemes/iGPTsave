@@ -289,13 +289,15 @@ export default function Home() {
     setShowEditor(true);
   };
 
-  const handleEditorSave = async (updatedVisual) => {
-    if (user && updatedVisual.id) {
-      await base44.entities.Visual.update(updatedVisual.id, {
-        image_url: updatedVisual.image_url,
-        editor_layers: updatedVisual.editor_layers
-      });
-    }
+  const handleEditorSave = async (newImageUrl, layers, originalImageUrl) => {
+    // Editor returns: newImageUrl (string), layers (array), originalImageUrl (string)
+    const updatedVisual = {
+      ...editingVisual,
+      image_url: newImageUrl,
+      editor_layers: layers,
+      original_image_url: originalImageUrl
+    };
+    
     setCurrentVisual(updatedVisual);
     setSessionVisuals(prev => prev.map(v => v.id === updatedVisual.id ? updatedVisual : v));
     setShowEditor(false);
