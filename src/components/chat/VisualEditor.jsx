@@ -2691,6 +2691,13 @@ Réponds en JSON avec:
                       <span className="text-white/50 text-xs w-12">{currentLayer.rotation || 0}°</span>
                     </div>
                     <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Largeur' : 'Width'}</span>
+                      <div className="flex-1">
+                        <Slider value={[currentLayer.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={5} />
+                      </div>
+                      <span className="text-white/50 text-xs w-12">{currentLayer.maxWidth || (language === 'fr' ? 'Auto' : 'Auto')}</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
                       <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Opacité' : 'Opacity'}</span>
                       <div className="flex-1">
                         <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
