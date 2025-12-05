@@ -24,6 +24,8 @@ const CATEGORIES = [
       { id: 'print_portrait', name: { fr: 'Portrait (3:4)', en: 'Portrait (3:4)' }, prompt: { fr: 'Crée un visuel print format portrait', en: 'Create a print visual in portrait format' }, dimensions: '2100x2800' },
       { id: 'print_paysage', name: { fr: 'Paysage (4:3)', en: 'Landscape (4:3)' }, prompt: { fr: 'Crée un visuel print format paysage', en: 'Create a print visual in landscape format' }, dimensions: '2800x2100' },
       { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un visuel print format carré', en: 'Create a print visual in square format' }, dimensions: '2400x2400' },
+      { id: 'print_allonge_v', name: { fr: 'Allongé vertical (9:16)', en: 'Tall vertical (9:16)' }, prompt: { fr: 'Crée un visuel print format allongé vertical', en: 'Create a tall vertical print visual' }, dimensions: '1080x1920' },
+      { id: 'print_allonge_h', name: { fr: 'Allongé horizontal (16:9)', en: 'Wide horizontal (16:9)' }, prompt: { fr: 'Crée un visuel print format allongé horizontal', en: 'Create a wide horizontal print visual' }, dimensions: '1920x1080' },
     ]
   },
   {
