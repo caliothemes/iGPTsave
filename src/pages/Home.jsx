@@ -384,6 +384,7 @@ export default function Home() {
         onSelectVisual={(v) => setCurrentVisual(v)}
         onLogin={handleLogin}
         onLogout={handleLogout}
+        sidebarTitle={settings.sidebar_title}
       />
 
       <PresentationModal 
