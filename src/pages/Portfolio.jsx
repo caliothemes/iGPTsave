@@ -154,6 +154,35 @@ export default function Portfolio() {
 
         {/* Masonry Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
+          <style>{`
+            .masonry-portfolio {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+            }
+            .masonry-portfolio > div {
+              flex: 0 0 calc(25% - 6px);
+              max-width: calc(25% - 6px);
+            }
+            @media (max-width: 1024px) {
+              .masonry-portfolio > div {
+                flex: 0 0 calc(33.333% - 6px);
+                max-width: calc(33.333% - 6px);
+              }
+            }
+            @media (max-width: 768px) {
+              .masonry-portfolio > div {
+                flex: 0 0 calc(50% - 4px);
+                max-width: calc(50% - 4px);
+              }
+            }
+            @media (max-width: 480px) {
+              .masonry-portfolio > div {
+                flex: 0 0 100%;
+                max-width: 100%;
+              }
+            }
+          `}</style>
           {visuals.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-white/40 text-lg">
