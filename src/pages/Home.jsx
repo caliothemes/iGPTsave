@@ -172,9 +172,8 @@ export default function Home() {
       if (selectedPalette) {
         enhancedPrompt += `, color palette: ${selectedPalette.colors.join(', ')}`;
       }
-      if (selectedFormat) {
-        enhancedPrompt += `, dimensions ${selectedFormat.dimensions}`;
-      }
+      // Get dimensions from category submenu or selectedFormat
+      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
       
       enhancedPrompt += ', high quality, professional design';
       
@@ -189,7 +188,7 @@ export default function Home() {
           title: userMessage.slice(0, 50),
           original_prompt: userMessage,
           image_prompt: enhancedPrompt,
-          dimensions: selectedFormat?.dimensions || '1080x1080',
+          dimensions: dimensions,
           visual_type: selectedCategory?.id,
           style: selectedStyle?.name?.[language],
           color_palette: selectedPalette?.colors
