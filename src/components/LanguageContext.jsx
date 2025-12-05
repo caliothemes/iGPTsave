@@ -2,11 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const translations = {
   fr: {
-    // Home
-    welcome: "Bienvenue sur **iGPT** ! 👋",
+    welcome: "Bienvenue sur iGPT ! 👋",
     welcomeUser: "Bonjour {name} ! 👋",
-    assistantIntro: "Je suis **iGPT**. Décrivez-moi le visuel que vous souhaitez créer et je m'en occupe !",
-    guestIntro: "Décrivez-moi ce que vous souhaitez créer.\n\n*Connectez-vous pour sauvegarder vos créations et bénéficiez de 25 messages gratuits / mois.*",
+    assistantIntro: "Je suis iGPT. Décrivez-moi le visuel que vous souhaitez créer et je m'en occupe !",
+    guestIntro: "Décrivez-moi ce que vous souhaitez créer.",
     newConversation: "Nouvelle conversation ! Que souhaitez-vous créer ?",
     heroTitle: "Votre assistant IA pour créer des visuels professionnels",
     heroSubtitle: "Logos, cartes de visite, flyers, posts pour réseaux sociaux... Décrivez votre besoin et laissez l'IA créer pour vous.",
@@ -17,8 +16,6 @@ const translations = {
     error: "❌ Erreur. Réessayez.",
     newVersion: "✨ Nouvelle version générée !",
     thinking: "Réflexion...",
-    
-    // Sidebar
     home: "Accueil",
     newCreation: "Nouvelle création",
     history: "Historique",
@@ -31,8 +28,6 @@ const translations = {
     free: "Gratuit",
     logout: "Déconnexion",
     login: "Connexion",
-    
-    // Format selector
     digital: "Digital",
     print: "Impression",
     postInstagram: "Post Instagram",
@@ -44,14 +39,10 @@ const translations = {
     flyerA5: "Flyer A5",
     posterA3: "Affiche A3",
     logoHD: "Logo HD",
-    
-    // Visual card
     regenerate: "Régénérer",
     download: "Télécharger",
     downloaded: "Téléchargé",
     noCredits: "Plus de crédits disponibles",
-    
-    // Pricing
     back: "Retour",
     chooseFormula: "Choisissez votre formule",
     unlockPotential: "Débloquez tout le potentiel de iGPT avec nos offres flexibles",
@@ -74,13 +65,9 @@ const translations = {
     vipSupport: "Support VIP",
     apiAccess: "API Access",
     securePayment: "Paiement sécurisé • Annulation à tout moment • Support 24/7",
-    
-    // Footer
     pricing: "Tarifs",
     legal: "Mentions légales",
     freeDownloads: "5 téléchargements gratuits",
-    
-    // Admin
     administration: "Administration",
     stats: "Statistiques",
     users: "Utilisateurs",
@@ -108,15 +95,13 @@ const translations = {
     legalNotice: "Mentions légales",
     editLegal: "Modifiez le contenu des mentions légales",
     legalPlaceholder: "Contenu des mentions légales...",
-    
-    // Legal page
     legalTitle: "Mentions Légales",
     editor: "Éditeur du site",
     editorDesc: "Service de création de visuels assisté par intelligence artificielle",
     hosting: "Hébergement",
     hostingDesc: "Le site est hébergé par Base44\nInfrastructure cloud sécurisée",
     intellectualProperty: "Propriété intellectuelle",
-    ipDesc: "Les visuels générés par VisualGPT sont la propriété de l'utilisateur qui les a créés, sous réserve du respect des conditions d'utilisation.",
+    ipDesc: "Les visuels générés par VisualGPT sont la propriété de l'utilisateur qui les a créés.",
     dataProtection: "Protection des données personnelles",
     dataDesc: "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles.",
     termsOfUse: "Conditions d'utilisation",
@@ -126,11 +111,10 @@ const translations = {
     lastUpdate: "Dernière mise à jour",
   },
   en: {
-    // Home
-    welcome: "Welcome to **iGPT**! 👋",
+    welcome: "Welcome to iGPT! 👋",
     welcomeUser: "Hello {name}! 👋",
-    assistantIntro: "I'm **iGPT**. Describe the visual you want to create and I'll handle it!",
-    guestIntro: "Describe what you want to create.\n\n*Sign in to save your creations and get 25 free messages / month.*",
+    assistantIntro: "I'm iGPT. Describe the visual you want to create and I'll handle it!",
+    guestIntro: "Describe what you want to create.",
     newConversation: "New conversation! What would you like to create?",
     heroTitle: "Your AI assistant for creating professional visuals",
     heroSubtitle: "Logos, business cards, flyers, social media posts... Describe your need and let AI create for you.",
@@ -141,8 +125,6 @@ const translations = {
     error: "❌ Error. Please retry.",
     newVersion: "✨ New version generated!",
     thinking: "Thinking...",
-    
-    // Sidebar
     home: "Home",
     newCreation: "New creation",
     history: "History",
@@ -155,8 +137,6 @@ const translations = {
     free: "Free",
     logout: "Logout",
     login: "Login",
-    
-    // Format selector
     digital: "Digital",
     print: "Print",
     postInstagram: "Instagram Post",
@@ -168,14 +148,10 @@ const translations = {
     flyerA5: "A5 Flyer",
     posterA3: "A3 Poster",
     logoHD: "HD Logo",
-    
-    // Visual card
     regenerate: "Regenerate",
     download: "Download",
     downloaded: "Downloaded",
     noCredits: "No credits available",
-    
-    // Pricing
     back: "Back",
     chooseFormula: "Choose your plan",
     unlockPotential: "Unlock the full potential of iGPT with our flexible offers",
@@ -198,13 +174,9 @@ const translations = {
     vipSupport: "VIP support",
     apiAccess: "API Access",
     securePayment: "Secure payment • Cancel anytime • 24/7 support",
-    
-    // Footer
     pricing: "Pricing",
     legal: "Legal notice",
     freeDownloads: "5 free downloads",
-    
-    // Admin
     administration: "Administration",
     stats: "Statistics",
     users: "Users",
@@ -232,15 +204,13 @@ const translations = {
     legalNotice: "Legal notice",
     editLegal: "Edit legal notice content",
     legalPlaceholder: "Legal notice content...",
-    
-    // Legal page
     legalTitle: "Legal Notice",
     editor: "Site editor",
     editorDesc: "AI-assisted visual creation service",
     hosting: "Hosting",
     hostingDesc: "The site is hosted by Base44\nSecure cloud infrastructure",
     intellectualProperty: "Intellectual property",
-    ipDesc: "Visuals generated by VisualGPT are the property of the user who created them, subject to compliance with terms of use.",
+    ipDesc: "Visuals generated by VisualGPT are the property of the user who created them.",
     dataProtection: "Personal data protection",
     dataDesc: "In accordance with GDPR, you have the right to access, rectify and delete your personal data.",
     termsOfUse: "Terms of use",
@@ -254,19 +224,19 @@ const translations = {
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('visualgpt_lang') || 'fr';
-    }
-    return 'fr';
-  });
+  const [language, setLanguage] = useState('fr');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('visualgpt_lang');
+    if (saved) setLanguage(saved);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('visualgpt_lang', language);
   }, [language]);
 
   const t = (key, params = {}) => {
-    let text = translations[language][key] || translations['fr'][key] || key;
+    let text = translations[language]?.[key] || translations['fr']?.[key] || key;
     Object.keys(params).forEach(param => {
       text = text.replace(`{${param}}`, params[param]);
     });
@@ -280,4 +250,10 @@ export function LanguageProvider({ children }) {
   );
 }
 
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    return { language: 'fr', setLanguage: () => {}, t: (key) => key };
+  }
+  return context;
+};
