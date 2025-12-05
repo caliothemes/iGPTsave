@@ -222,7 +222,7 @@ export default function Portfolio() {
                       alt={visual.title || 'Création iGPT'}
                       className="w-full h-full block pointer-events-none select-none"
                       loading="lazy"
-                      style={{ objectFit: 'cover' }}
+                      style={{ objectFit: 'contain' }}
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}
                     />
