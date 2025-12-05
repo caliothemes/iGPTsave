@@ -1652,6 +1652,27 @@ Réponds en JSON avec:
             exportCtx.fillStyle = layer.color;
             exportCtx.textAlign = layer.align || 'left';
             
+            // Helper function to wrap text for export
+            const wrapTextExport = (text, maxWidth) => {
+              if (!maxWidth || maxWidth <= 0) return [text];
+              const words = text.split(' ');
+              const lines = [];
+              let currentLine = '';
+              
+              for (const word of words) {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                const metrics = exportCtx.measureText(testLine);
+                if (metrics.width > maxWidth && currentLine) {
+                  lines.push(currentLine);
+                  currentLine = word;
+                } else {
+                  currentLine = testLine;
+                }
+              }
+              if (currentLine) lines.push(currentLine);
+              return lines;
+            };
+            
             // Apply rotation if set
             if (layer.rotation && !layer.curvedText) {
               exportCtx.translate(layer.x, layer.y);
