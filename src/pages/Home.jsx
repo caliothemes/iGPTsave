@@ -165,7 +165,12 @@ export default function Home() {
     
     try {
       let enhancedPrompt = userMessage;
-      
+
+      // Add logo-specific constraints
+      if (selectedCategory?.id === 'logo') {
+        enhancedPrompt += ', WITHOUT ANY TEXT, WITHOUT LETTERS, WITHOUT WORDS, only a visual graphic symbol';
+      }
+
       if (selectedStyle) {
         enhancedPrompt += `, ${selectedStyle.prompt}`;
       }
@@ -174,7 +179,7 @@ export default function Home() {
       }
       // Get dimensions from category submenu or selectedFormat
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
-      
+
       enhancedPrompt += ', high quality, professional design';
       
       const result = await base44.integrations.Core.GenerateImage({

@@ -12,7 +12,7 @@ const CATEGORIES = [
     name: { fr: 'Logo HD', en: 'HD Logo' },
     description: { fr: 'Logos vectoriels, icônes, symboles', en: 'Vector logos, icons, symbols' },
     hasSubmenu: false,
-    prompt: { fr: 'Crée un logo SANS AUCUN TEXTE, SANS LETTRES, SANS MOTS. Uniquement un symbole graphique visuel', en: 'Create a logo WITHOUT ANY TEXT, WITHOUT LETTERS, WITHOUT WORDS. Only a visual graphic symbol' }
+    prompt: { fr: 'Crée un logo', en: 'Create a logo' }
   },
   {
     id: 'print',
