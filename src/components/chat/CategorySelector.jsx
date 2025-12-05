@@ -34,9 +34,9 @@ const CATEGORIES = [
         id: 'flyer', 
         name: { fr: 'Flyer', en: 'Flyer' },
         orientations: [
-          { id: 'flyer_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un flyer vertical', en: 'Create a vertical flyer' }, dimensions: '2100x2970' },
-          { id: 'flyer_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un flyer horizontal', en: 'Create a horizontal flyer' }, dimensions: '2970x2100' },
-        ]
+                  { id: 'flyer_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un flyer vertical sans texte', en: 'Create a vertical flyer without text' }, dimensions: '2100x2970' },
+                  { id: 'flyer_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un flyer horizontal sans texte', en: 'Create a horizontal flyer without text' }, dimensions: '2970x2100' },
+                ]
       },
       { 
         id: 'affiche', 
