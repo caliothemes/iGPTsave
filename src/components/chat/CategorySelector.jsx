@@ -77,8 +77,13 @@ const CATEGORIES = [
     icon: Image,
     name: { fr: 'Image réaliste', en: 'Realistic Image' },
     description: { fr: 'Photos IA, portraits, paysages', en: 'AI photos, portraits, landscapes' },
-    hasSubmenu: false,
-    prompt: { fr: 'Crée une image réaliste', en: 'Create a realistic image' }
+    hasSubmenu: true,
+    submenu: [
+      { id: 'image_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une image réaliste format carré', en: 'Create a realistic image in square format' }, dimensions: '1080x1080' },
+      { id: 'image_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée une image réaliste format story', en: 'Create a realistic image in story format' }, dimensions: '1080x1920' },
+      { id: 'image_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée une image réaliste format portrait', en: 'Create a realistic image in portrait format' }, dimensions: '1080x1350' },
+      { id: 'image_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée une image réaliste format paysage', en: 'Create a realistic image in landscape format' }, dimensions: '1920x1080' },
+    ]
   },
   {
     id: 'social',
