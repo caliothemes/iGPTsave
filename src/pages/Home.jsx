@@ -416,11 +416,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Category Selection Label */}
-            <p className="text-white/50 text-sm mb-4">
-              {language === 'fr' ? 'Choisissez le type de création pour commencer' : 'Choose the type of creation to start'}
-            </p>
-
             {/* Category Selector */}
             <CategorySelector 
               onSelect={handleCategorySelect}
