@@ -197,8 +197,7 @@ export default function Portfolio() {
                   <div
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
-                    className="break-inside-avoid group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 mb-2"
-                    style={{ display: 'inline-block', width: '100%' }}
+                    className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300"
                   >
                     <img
                       src={visual.image_url}
