@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import { 
-  Gem, Printer, Image, Share2, ChevronDown
+  Gem, Printer, Image, Share2, ChevronDown, ChevronRight
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -18,14 +18,58 @@ const CATEGORIES = [
     id: 'print',
     icon: Printer,
     name: { fr: 'Print', en: 'Print' },
-    description: { fr: 'Portrait, paysage, carré', en: 'Portrait, landscape, square' },
+    description: { fr: 'Carte de visite, flyer, affiche...', en: 'Business card, flyer, poster...' },
     hasSubmenu: true,
+    hasNestedSubmenu: true,
     submenu: [
-      { id: 'print_portrait', name: { fr: 'Portrait (3:4)', en: 'Portrait (3:4)' }, prompt: { fr: 'Crée un visuel print format portrait', en: 'Create a print visual in portrait format' }, dimensions: '2100x2800' },
-      { id: 'print_paysage', name: { fr: 'Paysage (4:3)', en: 'Landscape (4:3)' }, prompt: { fr: 'Crée un visuel print format paysage', en: 'Create a print visual in landscape format' }, dimensions: '2800x2100' },
-      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un visuel print format carré', en: 'Create a print visual in square format' }, dimensions: '2400x2400' },
-      { id: 'print_allonge_v', name: { fr: 'Allongé vertical (9:16)', en: 'Tall vertical (9:16)' }, prompt: { fr: 'Crée un visuel print format allongé vertical', en: 'Create a tall vertical print visual' }, dimensions: '1080x1920' },
-      { id: 'print_allonge_h', name: { fr: 'Allongé horizontal (16:9)', en: 'Wide horizontal (16:9)' }, prompt: { fr: 'Crée un visuel print format allongé horizontal', en: 'Create a wide horizontal print visual' }, dimensions: '1920x1080' },
+      { 
+        id: 'carte_visite', 
+        name: { fr: 'Carte de visite', en: 'Business Card' },
+        orientations: [
+          { id: 'carte_visite_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une carte de visite horizontale', en: 'Create a horizontal business card' }, dimensions: '1050x600' },
+          { id: 'carte_visite_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une carte de visite verticale', en: 'Create a vertical business card' }, dimensions: '600x1050' },
+        ]
+      },
+      { 
+        id: 'flyer', 
+        name: { fr: 'Flyer', en: 'Flyer' },
+        orientations: [
+          { id: 'flyer_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un flyer vertical', en: 'Create a vertical flyer' }, dimensions: '2100x2970' },
+          { id: 'flyer_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un flyer horizontal', en: 'Create a horizontal flyer' }, dimensions: '2970x2100' },
+        ]
+      },
+      { 
+        id: 'affiche', 
+        name: { fr: 'Affiche', en: 'Poster' },
+        orientations: [
+          { id: 'affiche_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une affiche verticale', en: 'Create a vertical poster' }, dimensions: '2480x3508' },
+          { id: 'affiche_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une affiche horizontale', en: 'Create a horizontal poster' }, dimensions: '3508x2480' },
+        ]
+      },
+      { 
+        id: 'sticker', 
+        name: { fr: 'Sticker', en: 'Sticker' },
+        orientations: [
+          { id: 'sticker_rond', name: { fr: 'Rond', en: 'Round' }, prompt: { fr: 'Crée un sticker rond', en: 'Create a round sticker' }, dimensions: '1000x1000' },
+          { id: 'sticker_carre', name: { fr: 'Carré', en: 'Square' }, prompt: { fr: 'Crée un sticker carré', en: 'Create a square sticker' }, dimensions: '1000x1000' },
+        ]
+      },
+      { 
+        id: 'invitation', 
+        name: { fr: 'Invitation', en: 'Invitation' },
+        orientations: [
+          { id: 'invitation_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une invitation verticale', en: 'Create a vertical invitation' }, dimensions: '1400x2100' },
+          { id: 'invitation_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une invitation horizontale', en: 'Create a horizontal invitation' }, dimensions: '2100x1400' },
+        ]
+      },
+      { 
+        id: 'menu', 
+        name: { fr: 'Menu', en: 'Menu' },
+        orientations: [
+          { id: 'menu_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un menu vertical', en: 'Create a vertical menu' }, dimensions: '2100x2970' },
+          { id: 'menu_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un menu horizontal', en: 'Create a horizontal menu' }, dimensions: '2970x2100' },
+        ]
+      },
     ]
   },
   {
@@ -54,19 +98,33 @@ const CATEGORIES = [
 export default function CategorySelector({ onSelect, selectedCategory }) {
   const { language } = useLanguage();
   const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [openNestedSubmenu, setOpenNestedSubmenu] = useState(null);
 
   const handleCategoryClick = (category) => {
     if (category.hasSubmenu) {
       setOpenSubmenu(openSubmenu === category.id ? null : category.id);
+      setOpenNestedSubmenu(null);
     } else {
       onSelect(category);
       setOpenSubmenu(null);
+      setOpenNestedSubmenu(null);
     }
   };
 
   const handleSubmenuClick = (category, submenuItem) => {
-    onSelect({ ...category, selectedSubmenu: submenuItem });
+    if (submenuItem.orientations) {
+      setOpenNestedSubmenu(openNestedSubmenu === submenuItem.id ? null : submenuItem.id);
+    } else {
+      onSelect({ ...category, selectedSubmenu: submenuItem });
+      setOpenSubmenu(null);
+      setOpenNestedSubmenu(null);
+    }
+  };
+
+  const handleOrientationClick = (category, submenuItem, orientation) => {
+    onSelect({ ...category, selectedSubmenu: { ...submenuItem, ...orientation } });
     setOpenSubmenu(null);
+    setOpenNestedSubmenu(null);
   };
 
   return (
@@ -107,13 +165,35 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
             {category.hasSubmenu && isOpen && (
               <div className="absolute bottom-full left-0 right-0 mb-1 z-50 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-xl">
                 {category.submenu.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleSubmenuClick(category, item)}
-                    className="w-full px-4 py-2.5 text-left text-white/80 text-sm hover:bg-white/10 transition-colors"
-                  >
-                    {item.name[language]}
-                  </button>
+                  <div key={item.id} className="relative">
+                    <button
+                      onClick={() => handleSubmenuClick(category, item)}
+                      className="w-full px-4 py-2.5 text-left text-white/80 text-sm hover:bg-white/10 transition-colors flex items-center justify-between"
+                    >
+                      {item.name[language]}
+                      {item.orientations && (
+                        <ChevronRight className={cn(
+                          "h-4 w-4 text-white/40 transition-transform",
+                          openNestedSubmenu === item.id && "rotate-90"
+                        )} />
+                      )}
+                    </button>
+                    
+                    {/* Nested orientation submenu */}
+                    {item.orientations && openNestedSubmenu === item.id && (
+                      <div className="bg-gray-800/90 border-t border-white/5">
+                        {item.orientations.map((orientation) => (
+                          <button
+                            key={orientation.id}
+                            onClick={() => handleOrientationClick(category, item, orientation)}
+                            className="w-full px-6 py-2 text-left text-white/70 text-xs hover:bg-white/10 transition-colors"
+                          >
+                            {orientation.name[language]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
