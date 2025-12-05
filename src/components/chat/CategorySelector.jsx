@@ -66,9 +66,9 @@ const CATEGORIES = [
         id: 'menu', 
         name: { fr: 'Menu', en: 'Menu' },
         orientations: [
-          { id: 'menu_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un menu vertical', en: 'Create a vertical menu' }, dimensions: '2100x2970' },
-          { id: 'menu_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un menu horizontal', en: 'Create a horizontal menu' }, dimensions: '2970x2100' },
-        ]
+                  { id: 'menu_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un menu vertical sans texte', en: 'Create a vertical menu without text' }, dimensions: '2100x2970' },
+                  { id: 'menu_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un menu horizontal sans texte', en: 'Create a horizontal menu without text' }, dimensions: '2970x2100' },
+                ]
       },
     ]
   },
