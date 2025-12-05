@@ -156,36 +156,33 @@ export default function Portfolio() {
         <div className="px-2 pb-32 flex-1 w-full">
           <style>{`
             .masonry-portfolio {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 8px;
+              column-count: 6;
+              column-gap: 8px;
             }
             .masonry-portfolio > div {
-              flex: 0 0 calc(16.666% - 7px);
-              max-width: calc(16.666% - 7px);
+              break-inside: avoid;
+              margin-bottom: 8px;
+              display: inline-block;
+              width: 100%;
             }
             @media (max-width: 1400px) {
-              .masonry-portfolio > div {
-                flex: 0 0 calc(20% - 6.5px);
-                max-width: calc(20% - 6.5px);
+              .masonry-portfolio {
+                column-count: 5;
               }
             }
             @media (max-width: 1024px) {
-              .masonry-portfolio > div {
-                flex: 0 0 calc(25% - 6px);
-                max-width: calc(25% - 6px);
+              .masonry-portfolio {
+                column-count: 4;
               }
             }
             @media (max-width: 768px) {
-              .masonry-portfolio > div {
-                flex: 0 0 calc(33.333% - 6px);
-                max-width: calc(33.333% - 6px);
+              .masonry-portfolio {
+                column-count: 3;
               }
             }
             @media (max-width: 480px) {
-              .masonry-portfolio > div {
-                flex: 0 0 calc(50% - 4px);
-                max-width: calc(50% - 4px);
+              .masonry-portfolio {
+                column-count: 2;
               }
             }
           `}</style>
