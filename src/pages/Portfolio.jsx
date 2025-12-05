@@ -204,19 +204,12 @@ export default function Portfolio() {
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
                     className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300"
-                    style={{
-                      aspectRatio: visual.dimensions ? (() => {
-                        const [w, h] = visual.dimensions.split('x').map(Number);
-                        return w && h ? `${w}/${h}` : '1/1';
-                      })() : '1/1'
-                    }}
                   >
                     <img
                       src={visual.image_url}
                       alt={visual.title || 'Création iGPT'}
-                      className="w-full h-full block pointer-events-none select-none"
+                      className="w-full h-auto block pointer-events-none select-none"
                       loading="lazy"
-                      style={{ objectFit: 'contain' }}
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}
                     />
