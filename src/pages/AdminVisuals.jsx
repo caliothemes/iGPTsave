@@ -151,9 +151,10 @@ export default function AdminVisuals() {
                     src={visual.image_url} 
                     alt={visual.title}
                     className="w-full h-auto block"
+                    style={{ display: 'block' }}
                   />
                 ) : (
-                  <div className="aspect-square w-full flex items-center justify-center bg-white/5">
+                  <div className="w-full flex items-center justify-center bg-white/5" style={{ aspectRatio: '1' }}>
                     <Image className="h-8 w-8 text-white/20" />
                   </div>
                 )}
