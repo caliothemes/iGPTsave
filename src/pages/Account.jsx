@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Camera, User, Mail, Crown, Zap, Save, Receipt, Download, FileText } from 'lucide-react';
+import { Loader2, Camera, User, Mail, Crown, Zap, Save, Receipt, Download, FileText, Image } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import { useLanguage } from '@/components/LanguageContext';
 import moment from 'moment';
