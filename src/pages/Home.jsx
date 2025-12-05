@@ -289,6 +289,19 @@ export default function Home() {
     setShowEditor(true);
   };
 
+  const handleEditorSave = async (updatedVisual) => {
+    if (user && updatedVisual.id) {
+      await base44.entities.Visual.update(updatedVisual.id, {
+        image_url: updatedVisual.image_url,
+        editor_layers: updatedVisual.editor_layers
+      });
+    }
+    setCurrentVisual(updatedVisual);
+    setSessionVisuals(prev => prev.map(v => v.id === updatedVisual.id ? updatedVisual : v));
+    setShowEditor(false);
+    setEditingVisual(null);
+  };
+
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('Home'));
   const handleLogout = () => base44.auth.logout(createPageUrl('Home'));
 
@@ -314,14 +327,7 @@ export default function Home() {
           setShowEditor(false);
           setEditingVisual(null);
         }}
-        onSave={async (updatedVisual) => {
-          if (user && updatedVisual.id) {
-            await base44.entities.Visual.update(updatedVisual.id, updatedVisual);
-          }
-          setCurrentVisual(updatedVisual);
-          setShowEditor(false);
-          setEditingVisual(null);
-        }}
+        onSave={handleEditorSave}
       />
     );
   }
@@ -473,14 +479,14 @@ export default function Home() {
         )}
 
         {/* Input Area */}
-        <div className="fixed bottom-0 left-0 right-0 z-20">
+        <div className={cn(
+          "fixed bottom-0 right-0 z-20 transition-all duration-300",
+          sidebarOpen ? "left-64" : "left-0"
+        )}>
           {/* Black transparent overlay for footer */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
           
-          <div className={cn(
-            "relative max-w-2xl mx-auto px-4 pb-4 transition-all duration-300",
-            sidebarOpen && "ml-32"
-          )}>
+          <div className="relative max-w-2xl mx-auto px-4 pb-4">
             {/* Format Selector */}
             <AnimatePresence>
               {showFormatSelector && (
