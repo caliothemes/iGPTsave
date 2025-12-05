@@ -164,12 +164,6 @@ export default function Portfolio() {
               flex: 0 0 calc(16.666% - 7px);
               max-width: calc(16.666% - 7px);
             }
-            .masonry-portfolio img {
-              width: 100%;
-              height: auto;
-              object-fit: cover;
-              display: block;
-            }
             @media (max-width: 1400px) {
               .masonry-portfolio > div {
                 flex: 0 0 calc(20% - 6.5px);
