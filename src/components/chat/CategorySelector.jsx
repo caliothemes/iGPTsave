@@ -26,9 +26,9 @@ const CATEGORIES = [
         id: 'carte_visite', 
         name: { fr: 'Carte de visite', en: 'Business Card' },
         orientations: [
-          { id: 'carte_visite_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une carte de visite horizontale', en: 'Create a horizontal business card' }, dimensions: '1050x600' },
-          { id: 'carte_visite_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une carte de visite verticale', en: 'Create a vertical business card' }, dimensions: '600x1050' },
-        ]
+                  { id: 'carte_visite_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une carte de visite horizontale sans texte', en: 'Create a horizontal business card without text' }, dimensions: '1050x600' },
+                  { id: 'carte_visite_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une carte de visite verticale sans texte', en: 'Create a vertical business card without text' }, dimensions: '600x1050' },
+                ]
       },
       { 
         id: 'flyer', 
