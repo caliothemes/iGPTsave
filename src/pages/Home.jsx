@@ -61,6 +61,7 @@ export default function Home() {
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -142,6 +143,7 @@ export default function Home() {
       ? category.selectedSubmenu.prompt[language]
       : category.prompt[language];
     setInputValue(prompt + ' ');
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const handleFileUpload = (e) => {
@@ -166,9 +168,9 @@ export default function Home() {
     try {
       let enhancedPrompt = userMessage;
 
-      // Add logo-specific constraints
-      if (selectedCategory?.id === 'logo') {
-        enhancedPrompt = 'NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY. ' + enhancedPrompt + '. Create only a pure visual symbol or icon without any text elements';
+      // Add constraints for formats without text
+      if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
+        enhancedPrompt = 'NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY. ' + enhancedPrompt + '. Create only a pure visual design without any text elements';
       }
 
       if (selectedStyle) {
@@ -627,6 +629,7 @@ export default function Home() {
                 </DropdownMenu>
                 
                 <input
+                  ref={inputRef}
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
