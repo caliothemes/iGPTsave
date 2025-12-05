@@ -58,9 +58,9 @@ const CATEGORIES = [
         id: 'invitation', 
         name: { fr: 'Invitation', en: 'Invitation' },
         orientations: [
-          { id: 'invitation_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une invitation verticale', en: 'Create a vertical invitation' }, dimensions: '1400x2100' },
-          { id: 'invitation_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une invitation horizontale', en: 'Create a horizontal invitation' }, dimensions: '2100x1400' },
-        ]
+                  { id: 'invitation_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une invitation verticale sans texte', en: 'Create a vertical invitation without text' }, dimensions: '1400x2100' },
+                  { id: 'invitation_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une invitation horizontale sans texte', en: 'Create a horizontal invitation without text' }, dimensions: '2100x1400' },
+                ]
       },
       { 
         id: 'menu', 
