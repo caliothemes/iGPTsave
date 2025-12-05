@@ -18,13 +18,12 @@ const CATEGORIES = [
     id: 'print',
     icon: Printer,
     name: { fr: 'Print', en: 'Print' },
-    description: { fr: 'Carte de visite, affiches, flyers', en: 'Business cards, posters, flyers' },
+    description: { fr: 'Portrait, paysage, carré', en: 'Portrait, landscape, square' },
     hasSubmenu: true,
     submenu: [
-      { id: 'carte_visite', name: { fr: 'Carte de visite', en: 'Business Card' }, prompt: { fr: 'Crée une carte de visite', en: 'Create a business card' } },
-      { id: 'flyer', name: { fr: 'Flyer', en: 'Flyer' }, prompt: { fr: 'Crée un flyer', en: 'Create a flyer' } },
-      { id: 'affiche', name: { fr: 'Affiche', en: 'Poster' }, prompt: { fr: 'Crée une affiche', en: 'Create a poster' } },
-      { id: 'invitation', name: { fr: 'Invitation', en: 'Invitation' }, prompt: { fr: 'Crée une invitation', en: 'Create an invitation' } },
+      { id: 'print_portrait', name: { fr: 'Portrait (3:4)', en: 'Portrait (3:4)' }, prompt: { fr: 'Crée un visuel print format portrait', en: 'Create a print visual in portrait format' }, dimensions: '2100x2800' },
+      { id: 'print_paysage', name: { fr: 'Paysage (4:3)', en: 'Landscape (4:3)' }, prompt: { fr: 'Crée un visuel print format paysage', en: 'Create a print visual in landscape format' }, dimensions: '2800x2100' },
+      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un visuel print format carré', en: 'Create a print visual in square format' }, dimensions: '2400x2400' },
     ]
   },
   {
@@ -39,13 +38,13 @@ const CATEGORIES = [
     id: 'social',
     icon: Share2,
     name: { fr: 'Réseaux sociaux', en: 'Social Media' },
-    description: { fr: 'Posts Instagram, Facebook, LinkedIn', en: 'Instagram, Facebook, LinkedIn posts' },
+    description: { fr: 'Carré, Story, Bannière', en: 'Square, Story, Banner' },
     hasSubmenu: true,
     submenu: [
-      { id: 'instagram', name: { fr: 'Post Instagram', en: 'Instagram Post' }, prompt: { fr: 'Crée un post Instagram', en: 'Create an Instagram post' } },
-      { id: 'story', name: { fr: 'Story Instagram', en: 'Instagram Story' }, prompt: { fr: 'Crée une story Instagram', en: 'Create an Instagram story' } },
-      { id: 'facebook', name: { fr: 'Post Facebook', en: 'Facebook Post' }, prompt: { fr: 'Crée un post Facebook', en: 'Create a Facebook post' } },
-      { id: 'linkedin', name: { fr: 'Post LinkedIn', en: 'LinkedIn Post' }, prompt: { fr: 'Crée un post LinkedIn', en: 'Create a LinkedIn post' } },
+      { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un post pour les réseaux sociaux format carré', en: 'Create a social media post in square format' }, dimensions: '1080x1080' },
+      { id: 'social_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée une story pour les réseaux sociaux', en: 'Create a social media story' }, dimensions: '1080x1920' },
+      { id: 'social_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un post portrait pour les réseaux sociaux', en: 'Create a portrait social media post' }, dimensions: '1080x1350' },
+      { id: 'social_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée une bannière pour les réseaux sociaux', en: 'Create a social media banner' }, dimensions: '1920x1080' },
     ]
   },
 ];
@@ -104,7 +103,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
 
             {/* Submenu */}
             {category.hasSubmenu && isOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-xl">
+              <div className="absolute bottom-full left-0 right-0 mb-1 z-50 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-xl">
                 {category.submenu.map((item) => (
                   <button
                     key={item.id}
