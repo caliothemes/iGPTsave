@@ -168,7 +168,7 @@ export default function Home() {
 
       // Add logo-specific constraints
       if (selectedCategory?.id === 'logo') {
-        enhancedPrompt += ', WITHOUT ANY TEXT, WITHOUT LETTERS, WITHOUT WORDS, only a visual graphic symbol';
+        enhancedPrompt = 'NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY. ' + enhancedPrompt + '. Create only a pure visual symbol or icon without any text elements';
       }
 
       if (selectedStyle) {
@@ -230,23 +230,45 @@ export default function Home() {
   const handleRegenerate = async (visual) => {
     setIsGenerating(true);
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
-    
+
     try {
+      // Deduct credit before generation
+      if (credits && user) {
+        if (credits.free_downloads > 0) {
+          await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+          setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
+        } else if (credits.paid_credits > 0) {
+          await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+          setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
+        }
+      }
+
       const result = await base44.integrations.Core.GenerateImage({
         prompt: visual.image_prompt || visual.original_prompt + ', high quality, professional design'
       });
 
       if (result.url) {
-        const newVisual = {
-          ...visual,
+        // Create new visual instead of updating
+        const visualData = {
+          user_email: user?.email || 'anonymous',
           image_url: result.url,
-          version: (visual.version || 1) + 1
+          title: visual.title,
+          original_prompt: visual.original_prompt,
+          image_prompt: visual.image_prompt,
+          dimensions: visual.dimensions,
+          visual_type: visual.visual_type,
+          style: visual.style,
+          color_palette: visual.color_palette,
+          version: (visual.version || 1) + 1,
+          parent_visual_id: visual.id
         };
-        
-        if (user && visual.id) {
-          await base44.entities.Visual.update(visual.id, { image_url: result.url, version: newVisual.version });
+
+        let newVisual = visualData;
+        if (user) {
+          newVisual = await base44.entities.Visual.create(visualData);
+          setSessionVisuals(prev => [newVisual, ...prev]);
         }
-        
+
         setCurrentVisual(newVisual);
         setMessages(prev => {
           const newMsgs = [...prev];
@@ -262,7 +284,7 @@ export default function Home() {
         return newMsgs;
       });
     }
-    
+
     setIsGenerating(false);
   };
 
