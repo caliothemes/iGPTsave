@@ -42,9 +42,9 @@ const CATEGORIES = [
         id: 'affiche', 
         name: { fr: 'Affiche', en: 'Poster' },
         orientations: [
-          { id: 'affiche_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une affiche verticale', en: 'Create a vertical poster' }, dimensions: '2480x3508' },
-          { id: 'affiche_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une affiche horizontale', en: 'Create a horizontal poster' }, dimensions: '3508x2480' },
-        ]
+                  { id: 'affiche_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une affiche verticale sans texte', en: 'Create a vertical poster without text' }, dimensions: '2480x3508' },
+                  { id: 'affiche_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une affiche horizontale sans texte', en: 'Create a horizontal poster without text' }, dimensions: '3508x2480' },
+                ]
       },
       { 
         id: 'sticker', 
