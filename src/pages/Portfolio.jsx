@@ -190,15 +190,7 @@ export default function Portfolio() {
               </p>
             </div>
           ) : (
-            <div 
-              style={{
-                columnCount: 'auto',
-                columnWidth: '220px',
-                columnGap: '8px',
-                columnFill: 'balance'
-              }}
-              className="masonry-portfolio"
-            >
+            <div className="masonry-portfolio">
               {visuals.map((visual, index) => {
                 const isLast = index === visuals.length - 1;
                 return (
