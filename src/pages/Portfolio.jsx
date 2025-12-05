@@ -165,8 +165,10 @@ export default function Portfolio() {
               style={{
                 columnCount: 'auto',
                 columnWidth: '220px',
-                columnGap: '8px'
+                columnGap: '8px',
+                columnFill: 'balance'
               }}
+              className="masonry-portfolio"
             >
               {visuals.map((visual, index) => {
                 const isLast = index === visuals.length - 1;
