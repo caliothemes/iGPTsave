@@ -700,6 +700,27 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             ctx.translate(-layer.x, -layer.y);
           }
           
+          // Helper function to wrap text
+          const wrapText = (text, maxWidth) => {
+            if (!maxWidth || maxWidth <= 0) return [text];
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+            
+            for (const word of words) {
+              const testLine = currentLine ? `${currentLine} ${word}` : word;
+              const metrics = ctx.measureText(testLine);
+              if (metrics.width > maxWidth && currentLine) {
+                lines.push(currentLine);
+                currentLine = word;
+              } else {
+                currentLine = testLine;
+              }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines;
+          };
+          
           // Draw curved text if enabled
           if (layer.curvedText) {
             const radius = layer.curveRadius || 100;
