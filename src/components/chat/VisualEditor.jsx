@@ -1012,7 +1012,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
       shadow: true,
       stroke: false,
       strokeColor: '#000000',
-      strokeWidth: 2
+      strokeWidth: 2,
+      maxWidth: 0 // 0 = auto (no wrap), >0 = wrap text at this width
     };
     setLayers([...layers, newLayer]);
     setSelectedLayer(layers.length);
