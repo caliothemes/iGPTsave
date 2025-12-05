@@ -16,6 +16,7 @@ export default function Account() {
   const [transactions, setTransactions] = useState([]);
   const [loadingTransactions, setLoadingTransactions] = useState(true);
   const [companySettings, setCompanySettings] = useState({});
+  const [userVisuals, setUserVisuals] = useState([]);
 
   const t = {
     fr: {
@@ -84,11 +85,13 @@ export default function Account() {
 
   const loadTransactions = async (userEmail) => {
     setLoadingTransactions(true);
-    const [userTransactions, appSettings] = await Promise.all([
+    const [userTransactions, appSettings, visuals] = await Promise.all([
       base44.entities.Transaction.filter({ user_email: userEmail }, '-created_date', 50),
-      base44.entities.AppSettings.list()
+      base44.entities.AppSettings.list(),
+      base44.entities.Visual.filter({ user_email: userEmail }, '-created_date', 10)
     ]);
     setTransactions(userTransactions);
+    setUserVisuals(visuals);
     
     const settingsMap = {};
     appSettings.forEach(s => { settingsMap[s.key] = s.value; });
@@ -372,8 +375,10 @@ export default function Account() {
               <p className="text-white/60">{t.subtitle}</p>
             </div>
 
-            {/* Profile Card */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+            {/* Profile & Subscription - Side by side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Profile Card */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
               <h2 className="text-lg font-semibold text-white mb-6">{t.profile}</h2>
               
               <div className="flex items-center gap-6 mb-8">
@@ -416,11 +421,11 @@ export default function Account() {
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                   {t.save}
                 </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Subscription Card */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+              {/* Subscription Card */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
               <h2 className="text-lg font-semibold text-white mb-6">{t.subscription}</h2>
               <div className="flex items-center justify-between mb-6">
                 {getSubscriptionBadge(credits)}
@@ -436,8 +441,47 @@ export default function Account() {
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <p className="text-white/50 text-sm mb-1">{t.paidCredits}</p>
                   <p className="text-2xl font-bold text-white">{credits?.subscription_type === 'unlimited' ? '∞' : (credits?.paid_credits || 0)}</p>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* My Visuals Card */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Image className="h-5 w-5 text-violet-400" />
+                  {language === 'fr' ? 'Mes visuels' : 'My visuals'}
+                </h2>
+                <a 
+                  href={createPageUrl('MyVisuals')}
+                  className="text-violet-400 hover:text-violet-300 text-sm font-medium transition-colors"
+                >
+                  {language === 'fr' ? 'Voir tous mes visuels' : 'See all my visuals'} →
+                </a>
+              </div>
+              
+              {userVisuals.length === 0 ? (
+                <div className="text-center py-8 text-white/40">
+                  {language === 'fr' ? 'Aucun visuel créé' : 'No visuals created'}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {userVisuals.map((visual) => (
+                    <a
+                      key={visual.id}
+                      href={createPageUrl('MyVisuals')}
+                      className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-all group"
+                    >
+                      <img 
+                        src={visual.image_url} 
+                        alt={visual.title || 'Visual'} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Payments History Card */}
