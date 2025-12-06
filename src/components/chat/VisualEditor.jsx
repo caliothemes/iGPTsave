@@ -2766,7 +2766,7 @@ Réponds en JSON avec:
               {/* Canvas - Responsive with Vertical Toolbars */}
               <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
         {/* Left Toolbar - Main Tools */}
-        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
+        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10 items-start">
           <button
             onClick={() => setActiveTab('background')}
             className={cn(
@@ -2792,36 +2792,38 @@ Réponds en JSON avec:
               </span>
             )}
           </button>
-          <button
-            onClick={() => setTextToolExpanded(!textToolExpanded)}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              textToolExpanded ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setTextToolExpanded(!textToolExpanded)}
+              className={cn(
+                "p-2.5 rounded-lg transition-all",
+                textToolExpanded ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+              )}
+              title={language === 'fr' ? 'Texte' : 'Text'}
+            >
+              <Type className="h-5 w-5" />
+            </button>
+            
+            {/* Sous-options texte - horizontales */}
+            {textToolExpanded && (
+              <>
+                <button
+                  onClick={() => addTextLayer()}
+                  className="p-2.5 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 transition-all"
+                  title={language === 'fr' ? 'Ajouter un texte' : 'Add text'}
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setShowTextGenerator(true)}
+                  className="p-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-all"
+                  title={language === 'fr' ? 'Générer texte IA' : 'Generate AI text'}
+                >
+                  <MessageSquare className="h-5 w-5" />
+                </button>
+              </>
             )}
-            title={language === 'fr' ? 'Texte' : 'Text'}
-          >
-            <Type className="h-5 w-5" />
-          </button>
-          
-          {/* Sous-options texte */}
-          {textToolExpanded && (
-            <>
-              <button
-                onClick={() => addTextLayer()}
-                className="p-2.5 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 transition-all"
-                title={language === 'fr' ? 'Ajouter un texte' : 'Add text'}
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => setShowTextGenerator(true)}
-                className="p-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-all"
-                title={language === 'fr' ? 'Générer texte IA' : 'Generate AI text'}
-              >
-                <MessageSquare className="h-5 w-5" />
-              </button>
-            </>
-          )}
+          </div>
           <button
             onClick={() => setActiveTab('shapes')}
             className={cn(
