@@ -3147,9 +3147,9 @@ Réponds en JSON avec:
           </div>
         )}
         </div>
-        </div>
+      </div>
 
-        {/* Bottom Panel - Layer Properties */}
+      {/* Bottom Panel - Layer Properties */}
       {currentLayer && (
         <div className="bg-white/5 rounded-xl p-3 space-y-3">
           <div className="flex items-center justify-between">
