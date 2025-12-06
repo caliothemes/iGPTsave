@@ -190,7 +190,8 @@ export default function Home() {
         if (selectedCategory?.id === 'logo') {
           enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
         } else {
-          enhancedPrompt = `background design ${userMessage}, abstract visual pattern, decorative graphic, ornamental composition, artistic backdrop`;
+          // Pour print et social: adapter le design au contexte métier sans forcer des motifs tribaux
+          enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
         }
         enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
       } else {
