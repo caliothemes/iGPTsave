@@ -206,15 +206,17 @@ export default function VisualCard({
             )}
 
             {/* Regenerate Button */}
-            <Button
-              size="sm"
-              onClick={() => onRegenerate(visual)}
-              disabled={isRegenerating}
-              className="flex-1 bg-gradient-to-r from-blue-600/80 to-cyan-600/80 hover:from-blue-700 hover:to-cyan-700 text-white border-0"
-            >
-              <RefreshCw className={cn("h-4 w-4 mr-1.5", isRegenerating && "animate-spin")} />
-              <span className="text-xs">{t('regenerate')}</span>
-            </Button>
+            {onRegenerate && (
+              <Button
+                size="sm"
+                onClick={() => onRegenerate(visual)}
+                disabled={isRegenerating}
+                className="flex-1 bg-gradient-to-r from-blue-600/80 to-cyan-600/80 hover:from-blue-700 hover:to-cyan-700 text-white border-0"
+              >
+                <RefreshCw className={cn("h-4 w-4 mr-1.5", isRegenerating && "animate-spin")} />
+                <span className="text-xs">{t('regenerate')}</span>
+              </Button>
+            )}
 
             {/* Download Button (icon only) */}
             {showValidation && (
