@@ -218,6 +218,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [removingBgFromLayer, setRemovingBgFromLayer] = useState(false);
   const [showServiceUnavailable, setShowServiceUnavailable] = useState(false);
   const [serviceErrorType, setServiceErrorType] = useState(null);
+  
+  // Eraser tool
+  const [isErasing, setIsErasing] = useState(false);
+  const [eraserSize, setEraserSize] = useState(30);
+  const [erasedStrokes, setErasedStrokes] = useState([]);
+  const [currentStroke, setCurrentStroke] = useState([]);
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -534,10 +540,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   };
 
   // Render canvas
-      useEffect(() => {
-        if (!imageLoaded || !canvasRef.current) return;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
+  useEffect(() => {
+    if (!imageLoaded || !canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         // Load all image layers first
         const imageLayersToLoad = layers.filter(l => l.type === 'image' && l.imageUrl && !loadedImages[l.imageUrl]);
@@ -567,6 +573,39 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
         // Draw canvas
         const drawCanvas = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          // Apply eraser strokes (using destination-out composite)
+          if (erasedStrokes.length > 0 || currentStroke.length > 0) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = eraserSize;
+            
+            // Draw all finished strokes
+            erasedStrokes.forEach(stroke => {
+              if (stroke.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(stroke[0].x, stroke[0].y);
+                for (let i = 1; i < stroke.length; i++) {
+                  ctx.lineTo(stroke[i].x, stroke[i].y);
+                }
+                ctx.stroke();
+              }
+            });
+            
+            // Draw current stroke
+            if (currentStroke.length > 1) {
+              ctx.beginPath();
+              ctx.moveTo(currentStroke[0].x, currentStroke[0].y);
+              for (let i = 1; i < currentStroke.length; i++) {
+                ctx.lineTo(currentStroke[i].x, currentStroke[i].y);
+              }
+              ctx.stroke();
+            }
+            
+            ctx.restore();
+          }
 
           // Draw all layers in order (first = bottom, last = top)
           layers.forEach((layer, idx) => {
@@ -1003,6 +1042,42 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             }
             
             ctx.restore();
+          });
+          
+          // Apply eraser effect (destination-out to erase pixels)
+          if (erasedStrokes.length > 0 || currentStroke.length > 0) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = eraserSize;
+            
+            erasedStrokes.forEach(stroke => {
+              if (stroke.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(stroke[0].x, stroke[0].y);
+                for (let i = 1; i < stroke.length; i++) {
+                  ctx.lineTo(stroke[i].x, stroke[i].y);
+                }
+                ctx.stroke();
+              }
+            });
+            
+            if (currentStroke.length > 1) {
+              ctx.beginPath();
+              ctx.moveTo(currentStroke[0].x, currentStroke[0].y);
+              for (let i = 1; i < currentStroke.length; i++) {
+                ctx.lineTo(currentStroke[i].x, currentStroke[i].y);
+              }
+              ctx.stroke();
+            }
+            
+            ctx.restore();
+          }
+          
+          // Draw selection indicators
+          layers.forEach((layer, idx) => {
+            ctx.save();
             
             // Draw selection indicator
             if (selectedLayer === idx) {
@@ -1023,7 +1098,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
         };
 
         drawCanvas();
-      }, [imageLoaded, layers, selectedLayer, loadedImages, bgType, bgColor, bgGradient]);
+      }, [imageLoaded, layers, selectedLayer, loadedImages, bgType, bgColor, bgGradient, erasedStrokes, currentStroke, eraserSize]);
 
   const [helpMessage, setHelpMessage] = useState(null);
 
@@ -1437,6 +1512,13 @@ Réponds en JSON avec:
     const scaleY = canvasSize.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
+    
+    // Eraser mode
+    if (isErasing) {
+      setCurrentStroke([{ x, y }]);
+      return;
+    }
+    
     for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
       let hit = false;
@@ -1455,12 +1537,19 @@ Réponds en JSON avec:
   };
 
   const handleCanvasMouseMove = (e) => {
-    if (dragging === null) return;
     const rect = canvasRef.current.getBoundingClientRect();
     const scaleX = canvasSize.width / rect.width;
     const scaleY = canvasSize.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
+    
+    // Eraser mode - draw stroke
+    if (isErasing && currentStroke.length > 0) {
+      setCurrentStroke(prev => [...prev, { x, y }]);
+      return;
+    }
+    
+    if (dragging === null) return;
     
     let newX = x - dragOffset.x;
     let newY = y - dragOffset.y;
@@ -1510,8 +1599,21 @@ Réponds en JSON avec:
   };
 
   const handleCanvasMouseUp = () => {
+    // Eraser mode - finish stroke
+    if (isErasing && currentStroke.length > 0) {
+      setErasedStrokes(prev => [...prev, currentStroke]);
+      setCurrentStroke([]);
+      return;
+    }
+    
     setDragging(null);
     setGuides({ showVertical: false, showHorizontal: false });
+  };
+  
+  const undoEraser = () => {
+    if (erasedStrokes.length > 0) {
+      setErasedStrokes(prev => prev.slice(0, -1));
+    }
   };
 
   const handleSave = async () => {
@@ -2582,14 +2684,105 @@ Réponds en JSON avec:
                 </div>
               )}
 
-              {/* Canvas - Responsive */}
-              <div className="flex items-center justify-center bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
-        <div className="relative">
+              {/* Canvas - Responsive with Vertical Toolbar */}
+              <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
+        {/* Vertical Toolbar */}
+        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
+          <button
+            onClick={() => setActiveTab('background')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'background' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Fond' : 'Background'}
+          >
+            <PaintBucket className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('textures')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'textures' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Textures' : 'Textures'}
+          >
+            <TextureIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('illustrations')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'illustrations' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Illustrations' : 'Illustrations'}
+          >
+            <IllustrationIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('text')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'text' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Texte' : 'Text'}
+          >
+            <Type className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('layers')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all relative",
+              activeTab === 'layers' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Calques' : 'Layers'}
+          >
+            <Layers className="h-5 w-5" />
+            {layers.length > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-emerald-500 rounded-full text-[10px] text-white font-medium flex items-center justify-center">
+                {layers.length}
+              </span>
+            )}
+          </button>
+          
+          {/* Separator */}
+          <div className="h-px bg-white/10 my-1" />
+          
+          {/* Eraser Tool */}
+          <div className="flex flex-col gap-1">
+            <button
+              onClick={() => setIsErasing(!isErasing)}
+              className={cn(
+                "p-2.5 rounded-lg transition-all relative",
+                isErasing ? "bg-yellow-500/40 text-yellow-300 ring-2 ring-yellow-400/50" : "bg-white/10 text-white/60 hover:text-yellow-400 hover:bg-yellow-500/20"
+              )}
+              title={language === 'fr' ? 'Gomme' : 'Eraser'}
+            >
+              <Eraser className="h-5 w-5" />
+            </button>
+            
+            {/* Undo eraser */}
+            {erasedStrokes.length > 0 && (
+              <button
+                onClick={undoEraser}
+                className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-in fade-in"
+                title={language === 'fr' ? 'Annuler gomme' : 'Undo erase'}
+              >
+                <RotateCw className="h-4 w-4 scale-x-[-1]" />
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {/* Canvas Container */}
+        <div className="relative flex-1 flex items-center justify-center">
           <canvas 
             ref={canvasRef} 
             width={canvasSize.width} 
             height={canvasSize.height} 
-            className="rounded-lg cursor-move shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain"
+            className={cn(
+              "rounded-lg shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain",
+              isErasing ? "cursor-none" : "cursor-move"
+            )}
             style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
             onMouseDown={handleCanvasMouseDown} 
             onMouseMove={handleCanvasMouseMove} 
@@ -2618,8 +2811,43 @@ Réponds en JSON avec:
               style={{ top: '50%', transform: 'translateY(-50%)' }}
             />
           )}
+          
+          {/* Eraser cursor preview */}
+          {isErasing && (
+            <div 
+              className="fixed w-8 h-8 rounded-full border-2 border-yellow-400 bg-yellow-400/20 pointer-events-none z-50"
+              style={{ 
+                left: `${e.clientX}px`, 
+                top: `${e.clientY}px`,
+                width: `${eraserSize}px`,
+                height: `${eraserSize}px`,
+                transform: 'translate(-50%, -50%)'
+              }}
+            />
+          )}
         </div>
+        
+        {/* Eraser Size Control - appears when erasing */}
+        {isErasing && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-yellow-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2">
+            <div className="flex items-center gap-3">
+              <Eraser className="h-4 w-4 text-yellow-400" />
+              <div className="flex flex-col gap-1 min-w-[120px]">
+                <span className="text-white/60 text-xs">{language === 'fr' ? 'Taille gomme' : 'Eraser size'}</span>
+                <Slider 
+                  value={[eraserSize]} 
+                  onValueChange={([v]) => setEraserSize(v)} 
+                  min={10} 
+                  max={100} 
+                  step={5} 
+                />
+              </div>
+              <span className="text-yellow-400 text-xs font-medium w-8">{eraserSize}</span>
+            </div>
+          </div>
+        )}
       </div>
+    </div>
 
       {/* Bottom Panel - Layer Properties */}
       {currentLayer && (
