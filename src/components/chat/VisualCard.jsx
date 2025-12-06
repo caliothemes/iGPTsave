@@ -23,6 +23,7 @@ export default function VisualCard({
   onToggleFavorite,
   onVariation,
   onEdit,
+  onPromptClick,
   // onAnimate, // Temporarily hidden
   isRegenerating,
   canDownload,
@@ -168,7 +169,7 @@ export default function VisualCard({
           {visual.color_palette && visual.color_palette.length > 0 && (
             <button
               onClick={() => setShowColorModal(true)}
-              className="w-full flex gap-0.5 h-1.5 rounded-full overflow-hidden hover:h-2 transition-all cursor-pointer"
+              className="w-full flex gap-0.5 h-2 rounded-full overflow-hidden hover:h-2.5 transition-all cursor-pointer shadow-lg"
             >
               {visual.color_palette.map((color, idx) => (
                 <div
@@ -180,8 +181,17 @@ export default function VisualCard({
             </button>
           )}
 
-          {visual.title && (
-            <h3 className="text-white font-medium truncate">{visual.title}</h3>
+          {/* Original Prompt - Clickable */}
+          {visual.original_prompt && (
+            <button
+              onClick={() => onPromptClick?.(visual.original_prompt)}
+              className="w-full text-left p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all group"
+              title={language === 'fr' ? 'Cliquer pour réutiliser ce prompt' : 'Click to reuse this prompt'}
+            >
+              <p className="text-white/60 text-xs line-clamp-4 group-hover:text-white/80 transition-colors">
+                {visual.original_prompt}
+              </p>
+            </button>
           )}
           
           <div className="flex items-center gap-2 text-xs flex-wrap">

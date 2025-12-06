@@ -500,6 +500,10 @@ export default function Home() {
                           setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
                         }
                       }}
+                      onPromptClick={(prompt) => {
+                        setInputValue(prompt);
+                        inputRef.current?.focus();
+                      }}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}
