@@ -183,14 +183,10 @@ export default function Home() {
     try {
       let enhancedPrompt = '';
 
-      // Add EXTREMELY STRICT constraints for formats without text
-      if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
-        enhancedPrompt = 'text-free, no text, no letters, no words, no typography, no labels, no writing, without text, sans texte, sin texto, textless, ';
-        enhancedPrompt += userMessage;
-        enhancedPrompt += ', no text at all, pure visual only, abstract design, graphic elements only, shapes and colors only, icon style, symbolic design';
-      } else {
-        enhancedPrompt = userMessage;
-      }
+      // ULTRA STRICT - NO TEXT EVER - ALL VISUALS
+      enhancedPrompt = 'ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, NO WRITING, NO FONT, NO LABELS, TEXTLESS, TEXT-FREE, PURE VISUAL, ';
+      enhancedPrompt += userMessage;
+      enhancedPrompt += ', IMPORTANT: no text at all, no letters anywhere, no words, pure graphic design, shapes and colors only, icon style, symbolic design, abstract visual';
 
       if (selectedStyle) {
         enhancedPrompt += `, ${selectedStyle.prompt}`;
@@ -201,12 +197,7 @@ export default function Home() {
       // Get dimensions from category submenu or selectedFormat
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      enhancedPrompt += ', high quality, professional design';
-
-      // Negative prompts for NO TEXT
-      if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
-        enhancedPrompt += ', no text, no letters, no words, no font, no typography, textless, without any text';
-      }
+      enhancedPrompt += ', high quality, professional design, CRITICAL: no text, no letters, no words, no font, no typography, textless, without any text, sans texte, sin texto, kein Text';
       
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
