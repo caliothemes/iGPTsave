@@ -2232,6 +2232,39 @@ Réponds en JSON avec:
           </TabsContent>
 
           <TabsContent value="background" className="mt-0 space-y-2">
+            {/* Remove Background Button */}
+            <Button
+              onClick={async () => {
+                setRemovingBg(true);
+                try {
+                  const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
+                  if (response.data?.success && response.data?.image_url) {
+                    const baseLayerIdx = layers.findIndex(l => l.isBaseImage);
+                    if (baseLayerIdx !== -1) {
+                      updateLayer(baseLayerIdx, { imageUrl: response.data.image_url });
+                    }
+                    setOriginalImageUrl(response.data.image_url);
+                    showHelp(language === 'fr' ? '✅ Fond supprimé ! (1 crédit utilisé)' : '✅ Background removed! (1 credit used)');
+                  } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                    setServiceErrorType(response.data?.error);
+                    setShowServiceUnavailable(true);
+                  } else {
+                    showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
+                  }
+                } catch (err) {
+                  console.error(err);
+                  showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+                }
+                setRemovingBg(false);
+              }}
+              disabled={removingBg}
+              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 flex items-center justify-center"
+              size="sm"
+            >
+              {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+              {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
+            </Button>
+
             {/* Accordion: Couleurs */}
             <div className="border border-white/10 rounded-lg overflow-hidden">
               <button onClick={() => toggleBgAccordion('colors')} className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors">
@@ -2376,46 +2409,6 @@ Réponds en JSON avec:
                 </div>
               )}
             </div>
-
-            {/* Remove Background Button */}
-            <Button
-              onClick={async () => {
-                setRemovingBg(true);
-                try {
-                  const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
-                  if (response.data?.success && response.data?.image_url) {
-                    // Find and update the base image layer
-                    const baseLayerIdx = layers.findIndex(l => l.isBaseImage);
-                    if (baseLayerIdx !== -1) {
-                      updateLayer(baseLayerIdx, { imageUrl: response.data.image_url });
-                    }
-                    setOriginalImageUrl(response.data.image_url);
-                    showHelp(language === 'fr' ? '✅ Fond supprimé ! (1 crédit utilisé)' : '✅ Background removed! (1 credit used)');
-                  } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
-                    setServiceErrorType(response.data?.error);
-                    setShowServiceUnavailable(true);
-                  } else {
-                    showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
-                  }
-                } catch (err) {
-                  console.error(err);
-                  showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
-                }
-                setRemovingBg(false);
-              }}
-              disabled={removingBg}
-              className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 py-4 px-4 flex flex-col items-center gap-1.5 h-auto"
-            >
-              <div className="flex items-center">
-                {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
-                {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
-              </div>
-              <span className="text-[10px] text-white/70 font-normal leading-relaxed text-center">
-                {language === 'fr' 
-                  ? 'Recommandé pour personnaliser librement le fond' 
-                  : 'Recommended to freely customize the background'}
-              </span>
-            </Button>
           </TabsContent>
 
           <TabsContent value="shapes" className="mt-0 space-y-2">
