@@ -185,9 +185,9 @@ export default function Home() {
 
       // Add EXTREMELY STRICT constraints for formats without text
       if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
-        enhancedPrompt = 'CRITICAL INSTRUCTION: DO NOT include ANY text, letters, words, typography, labels, captions, titles, or written content of ANY kind. NO ALPHABET CHARACTERS. NO NUMBERS as text. PURE VISUAL ELEMENTS ONLY (shapes, colors, symbols, icons, abstract designs). ';
+        enhancedPrompt = 'text-free, no text, no letters, no words, no typography, no labels, no writing, without text, sans texte, sin texto, textless, ';
         enhancedPrompt += userMessage;
-        enhancedPrompt += '. IMPORTANT: Generate ONLY visual elements without ANY form of text, writing, letters, or typography';
+        enhancedPrompt += ', no text at all, pure visual only, abstract design, graphic elements only, shapes and colors only, icon style, symbolic design';
       } else {
         enhancedPrompt = userMessage;
       }
@@ -203,9 +203,9 @@ export default function Home() {
 
       enhancedPrompt += ', high quality, professional design';
 
-      // Triple reinforcement for NO TEXT
+      // Negative prompts for NO TEXT
       if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
-        enhancedPrompt += '. ABSOLUTELY NO TEXT OR LETTERS. ZERO TYPOGRAPHY. PURE GRAPHICS ONLY. text-free design, no writing whatsoever';
+        enhancedPrompt += ', no text, no letters, no words, no font, no typography, textless, without any text';
       }
       
       const result = await base44.integrations.Core.GenerateImage({
