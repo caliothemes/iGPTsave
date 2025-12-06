@@ -225,6 +225,14 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [erasedStrokes, setErasedStrokes] = useState([]);
   const [currentStroke, setCurrentStroke] = useState([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  
+  // Brush tool
+  const [isBrushing, setIsBrushing] = useState(false);
+  const [brushSize, setBrushSize] = useState(20);
+  const [brushColor, setBrushColor] = useState('#FFFFFF');
+  const [brushHardness, setBrushHardness] = useState(80);
+  const [brushStrokes, setBrushStrokes] = useState([]);
+  const [currentBrushStroke, setCurrentBrushStroke] = useState([]);
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -1045,6 +1053,52 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             ctx.restore();
           });
           
+          // Apply brush strokes
+          if (brushStrokes.length > 0 || currentBrushStroke.length > 0) {
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            brushStrokes.forEach(stroke => {
+              if (stroke.points.length > 1) {
+                ctx.lineWidth = stroke.size;
+                ctx.strokeStyle = stroke.color;
+                
+                // Apply hardness by using shadow blur (soft edges)
+                if (stroke.hardness < 100) {
+                  ctx.shadowColor = stroke.color;
+                  ctx.shadowBlur = (100 - stroke.hardness) / 10;
+                }
+                
+                ctx.beginPath();
+                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                for (let i = 1; i < stroke.points.length; i++) {
+                  ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                }
+                ctx.stroke();
+              }
+            });
+            
+            if (currentBrushStroke.length > 1) {
+              ctx.lineWidth = brushSize;
+              ctx.strokeStyle = brushColor;
+              
+              if (brushHardness < 100) {
+                ctx.shadowColor = brushColor;
+                ctx.shadowBlur = (100 - brushHardness) / 10;
+              }
+              
+              ctx.beginPath();
+              ctx.moveTo(currentBrushStroke[0].x, currentBrushStroke[0].y);
+              for (let i = 1; i < currentBrushStroke.length; i++) {
+                ctx.lineTo(currentBrushStroke[i].x, currentBrushStroke[i].y);
+              }
+              ctx.stroke();
+            }
+            
+            ctx.restore();
+          }
+          
           // Apply eraser effect (destination-out to erase pixels)
           if (erasedStrokes.length > 0 || currentStroke.length > 0) {
             ctx.save();
@@ -1099,7 +1153,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
         };
 
         drawCanvas();
-      }, [imageLoaded, layers, selectedLayer, loadedImages, bgType, bgColor, bgGradient, erasedStrokes, currentStroke, eraserSize]);
+      }, [imageLoaded, layers, selectedLayer, loadedImages, bgType, bgColor, bgGradient, erasedStrokes, currentStroke, eraserSize, brushStrokes, currentBrushStroke, brushSize, brushColor, brushHardness]);
 
   const [helpMessage, setHelpMessage] = useState(null);
 
@@ -1520,6 +1574,12 @@ Réponds en JSON avec:
       return;
     }
     
+    // Brush mode
+    if (isBrushing) {
+      setCurrentBrushStroke([{ x, y }]);
+      return;
+    }
+    
     for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
       let hit = false;
@@ -1544,14 +1604,20 @@ Réponds en JSON avec:
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
     
-    // Track mouse position for eraser cursor
-    if (isErasing) {
+    // Track mouse position for eraser/brush cursor
+    if (isErasing || isBrushing) {
       setMousePos({ x: e.clientX, y: e.clientY });
     }
     
     // Eraser mode - draw stroke
     if (isErasing && currentStroke.length > 0) {
       setCurrentStroke(prev => [...prev, { x, y }]);
+      return;
+    }
+    
+    // Brush mode - draw stroke
+    if (isBrushing && currentBrushStroke.length > 0) {
+      setCurrentBrushStroke(prev => [...prev, { x, y }]);
       return;
     }
     
@@ -1612,6 +1678,13 @@ Réponds en JSON avec:
       return;
     }
     
+    // Brush mode - finish stroke
+    if (isBrushing && currentBrushStroke.length > 0) {
+      setBrushStrokes(prev => [...prev, { points: currentBrushStroke, color: brushColor, size: brushSize, hardness: brushHardness }]);
+      setCurrentBrushStroke([]);
+      return;
+    }
+    
     setDragging(null);
     setGuides({ showVertical: false, showHorizontal: false });
   };
@@ -1619,6 +1692,12 @@ Réponds en JSON avec:
   const undoEraser = () => {
     if (erasedStrokes.length > 0) {
       setErasedStrokes(prev => prev.slice(0, -1));
+    }
+  };
+  
+  const undoBrush = () => {
+    if (brushStrokes.length > 0) {
+      setBrushStrokes(prev => prev.slice(0, -1));
     }
   };
 
@@ -2690,9 +2769,9 @@ Réponds en JSON avec:
                 </div>
               )}
 
-              {/* Canvas - Responsive with Vertical Toolbar */}
+              {/* Canvas - Responsive with Vertical Toolbars */}
               <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
-        {/* Vertical Toolbar */}
+        {/* Left Toolbar - Main Tools */}
         <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
           <button
             onClick={() => setActiveTab('background')}
@@ -2703,36 +2782,6 @@ Réponds en JSON avec:
             title={language === 'fr' ? 'Fond' : 'Background'}
           >
             <PaintBucket className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setActiveTab('textures')}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              activeTab === 'textures' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
-            )}
-            title={language === 'fr' ? 'Textures' : 'Textures'}
-          >
-            <TextureIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setActiveTab('illustrations')}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              activeTab === 'illustrations' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
-            )}
-            title={language === 'fr' ? 'Illustrations' : 'Illustrations'}
-          >
-            <IllustrationIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setActiveTab('text')}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              activeTab === 'text' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
-            )}
-            title={language === 'fr' ? 'Texte' : 'Text'}
-          >
-            <Type className="h-5 w-5" />
           </button>
           <button
             onClick={() => setActiveTab('layers')}
@@ -2749,34 +2798,66 @@ Réponds en JSON avec:
               </span>
             )}
           </button>
-          
-          {/* Separator */}
-          <div className="h-px bg-white/10 my-1" />
-          
-          {/* Eraser Tool */}
-          <div className="flex flex-col gap-1">
-            <button
-              onClick={() => setIsErasing(!isErasing)}
-              className={cn(
-                "p-2.5 rounded-lg transition-all relative",
-                isErasing ? "bg-yellow-500/40 text-yellow-300 ring-2 ring-yellow-400/50" : "bg-white/10 text-white/60 hover:text-yellow-400 hover:bg-yellow-500/20"
-              )}
-              title={language === 'fr' ? 'Gomme' : 'Eraser'}
-            >
-              <Eraser className="h-5 w-5" />
-            </button>
-            
-            {/* Undo eraser */}
-            {erasedStrokes.length > 0 && (
-              <button
-                onClick={undoEraser}
-                className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-in fade-in"
-                title={language === 'fr' ? 'Annuler gomme' : 'Undo erase'}
-              >
-                <RotateCw className="h-4 w-4 scale-x-[-1]" />
-              </button>
+          <button
+            onClick={() => setActiveTab('text')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'text' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
             )}
-          </div>
+            title={language === 'fr' ? 'Texte' : 'Text'}
+          >
+            <Type className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('shapes')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'shapes' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Formes' : 'Shapes'}
+          >
+            <Square className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('textures')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'textures' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Textures' : 'Textures'}
+          >
+            <TextureIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('gradients')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'gradients' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Dégradés' : 'Gradients'}
+          >
+            <GradientIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('images')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'images' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Importer' : 'Upload'}
+          >
+            <Upload className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => setActiveTab('illustrations')}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              activeTab === 'illustrations' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+            )}
+            title={language === 'fr' ? 'Illustrations' : 'Illustrations'}
+          >
+            <IllustrationIcon className="h-5 w-5" />
+          </button>
         </div>
         
         {/* Canvas Container */}
@@ -2787,7 +2868,7 @@ Réponds en JSON avec:
             height={canvasSize.height} 
             className={cn(
               "rounded-lg shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain",
-              isErasing ? "cursor-none" : "cursor-move"
+              (isErasing || isBrushing) ? "cursor-none" : "cursor-move"
             )}
             style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
             onMouseDown={handleCanvasMouseDown} 
@@ -2831,13 +2912,86 @@ Réponds en JSON avec:
               }}
             />
           )}
+          
+          {/* Brush cursor preview */}
+          {isBrushing && mousePos.x > 0 && (
+            <div 
+              className="fixed rounded-full border-2 pointer-events-none z-50"
+              style={{ 
+                left: `${mousePos.x}px`, 
+                top: `${mousePos.y}px`,
+                width: `${brushSize}px`,
+                height: `${brushSize}px`,
+                borderColor: brushColor,
+                backgroundColor: `${brushColor}40`,
+                transform: 'translate(-50%, -50%)',
+                boxShadow: brushHardness < 100 ? `0 0 ${(100 - brushHardness) / 5}px ${brushColor}` : 'none'
+              }}
+            />
+          )}
         </div>
+        
+        {/* Right Toolbar - Drawing Tools */}
+        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
+          <button
+            onClick={() => {
+              setIsErasing(!isErasing);
+              if (isBrushing) setIsBrushing(false);
+            }}
+            className={cn(
+              "p-2.5 rounded-lg transition-all relative",
+              isErasing ? "bg-yellow-500/40 text-yellow-300 ring-2 ring-yellow-400/50" : "bg-white/10 text-white/60 hover:text-yellow-400 hover:bg-yellow-500/20"
+            )}
+            title={language === 'fr' ? 'Gomme' : 'Eraser'}
+          >
+            <Scissors className="h-5 w-5" />
+          </button>
+          
+          <button
+            onClick={() => {
+              setIsBrushing(!isBrushing);
+              if (isErasing) setIsErasing(false);
+            }}
+            className={cn(
+              "p-2.5 rounded-lg transition-all relative",
+              isBrushing ? "bg-blue-500/40 text-blue-300 ring-2 ring-blue-400/50" : "bg-white/10 text-white/60 hover:text-blue-400 hover:bg-blue-500/20"
+            )}
+            title={language === 'fr' ? 'Pinceau' : 'Brush'}
+          >
+            <Brush className="h-5 w-5" />
+          </button>
+          
+          {/* Separator */}
+          <div className="h-px bg-white/10 my-1" />
+          
+          {/* Undo buttons */}
+          {erasedStrokes.length > 0 && isErasing && (
+            <button
+              onClick={undoEraser}
+              className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-in fade-in"
+              title={language === 'fr' ? 'Annuler gomme' : 'Undo erase'}
+            >
+              <RotateCw className="h-4 w-4 scale-x-[-1]" />
+            </button>
+          )}
+          
+          {brushStrokes.length > 0 && isBrushing && (
+            <button
+              onClick={undoBrush}
+              className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-in fade-in"
+              title={language === 'fr' ? 'Annuler pinceau' : 'Undo brush'}
+            >
+              <RotateCw className="h-4 w-4 scale-x-[-1]" />
+            </button>
+          )}
+        </div>
+      </div>
         
         {/* Eraser Size Control - appears when erasing */}
         {isErasing && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-yellow-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2">
             <div className="flex items-center gap-3">
-              <Eraser className="h-4 w-4 text-yellow-400" />
+              <Scissors className="h-4 w-4 text-yellow-400" />
               <div className="flex flex-col gap-1 min-w-[120px]">
                 <span className="text-white/60 text-xs">{language === 'fr' ? 'Taille gomme' : 'Eraser size'}</span>
                 <Slider 
@@ -2849,6 +3003,67 @@ Réponds en JSON avec:
                 />
               </div>
               <span className="text-yellow-400 text-xs font-medium w-8">{eraserSize}</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Brush Controls - appears when brushing */}
+        {isBrushing && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-blue-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2 min-w-[280px]">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Brush className="h-4 w-4 text-blue-400" />
+                <span className="text-white/80 text-sm font-medium">{language === 'fr' ? 'Pinceau' : 'Brush'}</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-white/60 text-xs w-16">{language === 'fr' ? 'Couleur:' : 'Color:'}</span>
+                <input 
+                  type="color" 
+                  value={brushColor} 
+                  onChange={(e) => setBrushColor(e.target.value)} 
+                  className="w-8 h-8 rounded cursor-pointer border border-white/20"
+                />
+                <div className="flex gap-1">
+                  {['#FFFFFF', '#000000', '#FF6B6B', '#4ECDC4', '#FFD700', '#9B59B6'].map(color => (
+                    <button
+                      key={color}
+                      onClick={() => setBrushColor(color)}
+                      className={cn(
+                        "w-6 h-6 rounded-full border-2 transition-all hover:scale-110",
+                        brushColor === color ? "border-blue-400 ring-2 ring-blue-400/50" : "border-white/20"
+                      )}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-white/60 text-xs w-16">{language === 'fr' ? 'Taille:' : 'Size:'}</span>
+                <Slider 
+                  value={[brushSize]} 
+                  onValueChange={([v]) => setBrushSize(v)} 
+                  min={5} 
+                  max={80} 
+                  step={1} 
+                  className="flex-1"
+                />
+                <span className="text-blue-400 text-xs font-medium w-8">{brushSize}</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-white/60 text-xs w-16">{language === 'fr' ? 'Dureté:' : 'Hardness:'}</span>
+                <Slider 
+                  value={[brushHardness]} 
+                  onValueChange={([v]) => setBrushHardness(v)} 
+                  min={0} 
+                  max={100} 
+                  step={5} 
+                  className="flex-1"
+                />
+                <span className="text-blue-400 text-xs font-medium w-8">{brushHardness}%</span>
+              </div>
             </div>
           </div>
         )}
