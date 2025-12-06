@@ -453,7 +453,7 @@ export default function Admin() {
             Statistiques de visiteurs
           </h3>
           <p className="text-white/40 text-sm mb-4">Nombre de visites sur l'application (toutes les visites, connectés ou non)</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="p-3 rounded-xl bg-cyan-600/20 border border-cyan-500/30">
               <p className="text-cyan-300 text-xs mb-1">Total visites</p>
               <p className="text-xl font-bold text-white">{visitorStats.total}</p>
@@ -499,7 +499,7 @@ export default function Admin() {
             Statistiques de visites actives
           </h3>
           <p className="text-white/40 text-sm mb-4">Utilisateurs ayant interagi avec l'application (conversations, visuels créés)</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/30">
               <div className="flex items-center gap-2 mb-1">
                 <Activity className="h-3 w-3 text-green-400" />
@@ -565,7 +565,7 @@ export default function Admin() {
             <UserPlus className="h-5 w-5 text-emerald-400" />
             Inscriptions, Abonnements & Revenus
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="p-3 rounded-xl bg-emerald-600/20 border border-emerald-500/30">
               <p className="text-emerald-300 text-xs mb-1">Total utilisateurs</p>
               <p className="text-xl font-bold text-white">{userStats.totalUsers}</p>
@@ -599,7 +599,7 @@ export default function Admin() {
               <p className="text-xl font-bold text-white">{userStats.elitePlusSubs}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
             <div className="p-3 rounded-xl bg-green-600/20 border border-green-500/30">
               <p className="text-green-300 text-xs mb-1">Revenus totaux</p>
               <p className="text-xl font-bold text-white">{stats.totalRevenue.toFixed(2)}€</p>
@@ -633,7 +633,7 @@ export default function Admin() {
             <MessageSquare className="h-5 w-5 text-blue-400" />
             Conversations & Visuels
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500/30">
               <p className="text-blue-300 text-xs mb-1">Total convs</p>
               <p className="text-xl font-bold text-white">{conversationStats.total}</p>
