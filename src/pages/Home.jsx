@@ -504,6 +504,7 @@ export default function Home() {
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}
                       showValidation={true}
+                      showActions={true}
                       onValidate={(action) => {
                         if (action === 'edit') {
                           handleOpenEditor(currentVisual);
