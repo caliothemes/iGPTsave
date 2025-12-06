@@ -2847,7 +2847,6 @@ Réponds en JSON avec:
           </div>
         )}
       </div>
-    </div>
 
       {/* Bottom Panel - Layer Properties */}
       {currentLayer && (
