@@ -184,23 +184,28 @@ export default function Home() {
       let enhancedPrompt = '';
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      // RADICAL APPROACH: Don't even mention "logo" for logo generation
-      if (selectedCategory?.id === 'logo') {
-        // Describe as pure icon/symbol without mentioning logo
-        enhancedPrompt = `icon symbol representing ${userMessage}, minimalist geometric shape, simple pictogram, abstract emblem, clean graphic mark, monochromatic symbol design, vector icon style, flat design symbol`;
+      // NO TEXT for logo, print, social - ONLY IMAGE/ICON category can have text
+      if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
+        // Force pure visual design without any text
+        if (selectedCategory?.id === 'logo') {
+          enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
+        } else {
+          enhancedPrompt = `background design ${userMessage}, abstract visual pattern, decorative graphic, ornamental composition, artistic backdrop`;
+        }
+        enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
       } else {
-        enhancedPrompt = `visual design for ${userMessage}, pure imagery, graphic illustration, abstract composition`;
+        // Image category can have everything
+        enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
       }
 
       if (selectedStyle) {
         enhancedPrompt += `, ${selectedStyle.prompt}`;
       }
       if (selectedPalette) {
-        enhancedPrompt += `, color palette: ${selectedPalette.colors.join(', ')}`;
+        enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
       }
 
-      // Add quality descriptors ONLY - no more "no text" mentions (reverse psychology)
-      enhancedPrompt += ', high quality professional design, clean minimalist aesthetic, simple shapes, visual only';
+      enhancedPrompt += ', professional quality, 4K resolution';
       
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
