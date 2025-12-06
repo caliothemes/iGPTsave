@@ -188,6 +188,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [bgShapeColor, setBgShapeColor] = useState('#FFFFFF');
   const [guides, setGuides] = useState({ showVertical: false, showHorizontal: false }); // Center guides
   const [textAccordion, setTextAccordion] = useState('properties'); // 'properties' or 'effects'
+  const [textToolExpanded, setTextToolExpanded] = useState(false); // Expansion de l'outil texte
   
   // Store original image URL separately (never changes)
   const [originalImageUrl, setOriginalImageUrl] = useState(visual.original_image_url || visual.image_url);
@@ -2792,15 +2793,35 @@ Réponds en JSON avec:
             )}
           </button>
           <button
-            onClick={() => setActiveTab('text')}
+            onClick={() => setTextToolExpanded(!textToolExpanded)}
             className={cn(
               "p-2.5 rounded-lg transition-all",
-              activeTab === 'text' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+              textToolExpanded ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
             )}
             title={language === 'fr' ? 'Texte' : 'Text'}
           >
             <Type className="h-5 w-5" />
           </button>
+          
+          {/* Sous-options texte */}
+          {textToolExpanded && (
+            <>
+              <button
+                onClick={() => addTextLayer()}
+                className="p-2.5 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 transition-all"
+                title={language === 'fr' ? 'Ajouter un texte' : 'Add text'}
+              >
+                <Plus className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setShowTextGenerator(true)}
+                className="p-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-all"
+                title={language === 'fr' ? 'Générer texte IA' : 'Generate AI text'}
+              >
+                <MessageSquare className="h-5 w-5" />
+              </button>
+            </>
+          )}
           <button
             onClick={() => setActiveTab('shapes')}
             className={cn(
