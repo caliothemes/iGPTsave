@@ -3068,7 +3068,7 @@ Réponds en JSON avec:
           </div>
         )}
       </div>
-
+      
       {/* Bottom Panel - Layer Properties */}
       {currentLayer && (
         <div className="bg-white/5 rounded-xl p-3 space-y-3">
