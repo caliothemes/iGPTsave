@@ -183,9 +183,9 @@ export default function Home() {
     try {
       let enhancedPrompt = userMessage;
 
-      // Add constraints for formats without text
+      // Add STRICT constraints for formats without text
       if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
-        enhancedPrompt = 'NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY. ' + enhancedPrompt + '. Create only a pure visual design without any text elements';
+        enhancedPrompt = 'ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, NO WRITING, NO LABELS whatsoever. PURE VISUAL ONLY. ' + enhancedPrompt + '. Create ONLY pure visual design without ANY text elements, letters, or written content';
       }
 
       if (selectedStyle) {
@@ -198,6 +198,11 @@ export default function Home() {
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
       enhancedPrompt += ', high quality, professional design';
+
+      // Reinforce NO TEXT at the end for these categories
+      if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'print' || selectedCategory?.id === 'social') {
+        enhancedPrompt += '. CRITICAL: Generate image with NO TEXT AT ALL';
+      }
       
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
