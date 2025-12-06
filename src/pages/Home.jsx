@@ -27,6 +27,7 @@ import FormatSelector from '@/components/chat/FormatSelector';
 import StyleSelector from '@/components/chat/StyleSelector';
 import PresentationModal from '@/components/PresentationModal';
 import VisualEditor from '@/components/chat/VisualEditor';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -56,6 +57,9 @@ export default function Home() {
   // Editor
   const [showEditor, setShowEditor] = useState(false);
   const [editingVisual, setEditingVisual] = useState(null);
+  
+  // Confirm modal
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null });
   
   // Dynamic settings from admin
   const [settings, setSettings] = useState({});
@@ -679,12 +683,18 @@ export default function Home() {
                     <DropdownMenuItem 
                       onClick={() => { 
                         if (currentVisual) {
-                          alert(language === 'fr' 
-                            ? '⚠️ Attention : Changer le format créera un nouveau visuel différent' 
-                            : '⚠️ Warning: Changing format will create a different new visual');
+                          setConfirmModal({
+                            isOpen: true,
+                            action: 'format',
+                            title: language === 'fr' ? 'Attention' : 'Warning',
+                            message: language === 'fr' 
+                              ? 'Changer le format créera un nouveau visuel différent. Voulez-vous continuer ?' 
+                              : 'Changing the format will create a different new visual. Do you want to continue?'
+                          });
+                        } else {
+                          setShowFormatSelector(!showFormatSelector);
+                          setShowStyleSelector(false);
                         }
-                        setShowFormatSelector(!showFormatSelector); 
-                        setShowStyleSelector(false); 
                       }}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
@@ -694,12 +704,18 @@ export default function Home() {
                     <DropdownMenuItem 
                       onClick={() => { 
                         if (currentVisual) {
-                          alert(language === 'fr' 
-                            ? '⚠️ Attention : Changer le style ou la palette créera un nouveau visuel différent' 
-                            : '⚠️ Warning: Changing style or palette will create a different new visual');
+                          setConfirmModal({
+                            isOpen: true,
+                            action: 'style',
+                            title: language === 'fr' ? 'Attention' : 'Warning',
+                            message: language === 'fr' 
+                              ? 'Changer le style ou la palette créera un nouveau visuel différent. Voulez-vous continuer ?' 
+                              : 'Changing the style or palette will create a different new visual. Do you want to continue?'
+                          });
+                        } else {
+                          setShowStyleSelector(!showStyleSelector);
+                          setShowFormatSelector(false);
                         }
-                        setShowStyleSelector(!showStyleSelector); 
-                        setShowFormatSelector(false); 
                       }}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
