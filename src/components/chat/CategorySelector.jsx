@@ -171,7 +171,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
                 
                 {/* Expert Mode Toggle */}
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2 group/toggle relative">
                   <button
                     onClick={(e) => toggleExpertMode(category.id, e)}
                     className={cn(
@@ -187,6 +187,22 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                   <span className="text-[10px] text-white/50">
                     {expertMode[category.id] ? (language === 'fr' ? 'Expert' : 'Expert') : (language === 'fr' ? 'Assisté' : 'Assisted')}
                   </span>
+                  
+                  {/* Tooltip */}
+                  <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-48">
+                    <div className="bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 shadow-xl">
+                      <p className="text-white text-[10px] leading-relaxed">
+                        {expertMode[category.id] 
+                          ? (language === 'fr' 
+                            ? '🎯 Mode expert : votre prompt est envoyé tel quel, sans enrichissement'
+                            : '🎯 Expert mode: your prompt is sent as is, without enhancement')
+                          : (language === 'fr'
+                            ? '✨ Mode assisté : prompt enrichi automatiquement pour de meilleurs résultats'
+                            : '✨ Assisted mode: prompt automatically enhanced for better results')
+                        }
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </button>
