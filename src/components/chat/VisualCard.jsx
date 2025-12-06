@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X, Palette } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
@@ -24,7 +24,6 @@ export default function VisualCard({
   onVariation,
   onEdit,
   onPromptClick,
-  onOpenPalette,
   // onAnimate, // Temporarily hidden
   isRegenerating,
   canDownload,
@@ -394,20 +393,6 @@ export default function VisualCard({
                 <X className="h-5 w-5" />
               </button>
             </div>
-
-            {/* Change Palette Button */}
-            {onOpenPalette && (
-              <button
-                onClick={() => {
-                  setShowColorModal(false);
-                  onOpenPalette();
-                }}
-                className="w-full mb-4 p-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 transition-all text-white font-medium text-sm flex items-center justify-center gap-2"
-              >
-                <Palette className="h-4 w-4" />
-                {language === 'fr' ? 'Changer de palette' : 'Change palette'}
-              </button>
-            )}
             
             <div className="space-y-3">
               {visual.color_palette.map((color, idx) => (

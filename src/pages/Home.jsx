@@ -181,82 +181,51 @@ export default function Home() {
     setInputValue('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsGenerating(true);
-
-    // Keep visual if it's a modification (not clearing it)
-    const isModification = currentVisual && (
-      userMessage.toLowerCase().includes('applique') || 
-      userMessage.toLowerCase().includes('change') || 
-      userMessage.toLowerCase().includes('apply') ||
-      userMessage.toLowerCase().includes('style') ||
-      userMessage.toLowerCase().includes('palette') ||
-      userMessage.toLowerCase().includes('couleur') ||
-      userMessage.toLowerCase().includes('color') ||
-      userMessage.toLowerCase().includes('format')
-    );
-
-    if (!isModification) {
-      setCurrentVisual(null);
-    }
+    setCurrentVisual(null);
 
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
 
     try {
       let enhancedPrompt = '';
-      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || currentVisual?.dimensions || '1080x1080';
+      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      // If modifying existing visual, use it as reference
-      if (isModification && currentVisual) {
-        enhancedPrompt = `Based on the provided image, ${userMessage}. Maintain the same composition and subject matter, only modify what is requested. Keep the overall design coherent.`;
+      // Try to get custom prompt template
+      const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
+      const template = promptTemplates.find(t => 
+        t.category === selectedCategory?.id && 
+        (!t.subcategory || t.subcategory === templateKey)
+      );
 
-        if (selectedStyle) {
-          enhancedPrompt += ` Apply ${selectedStyle.prompt} style.`;
-        }
-        if (selectedPalette) {
-          enhancedPrompt += ` Use these colors: ${selectedPalette.colors.join(', ')}.`;
-        }
-
-        enhancedPrompt += ' Professional quality, maintain visual coherence, 4K resolution.';
+      if (template) {
+        // Use custom template from admin
+        const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
+        enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
       } else {
-        // Creating new visual - use template
-        const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
-        const template = promptTemplates.find(t => 
-          t.category === selectedCategory?.id && 
-          (!t.subcategory || t.subcategory === templateKey)
-        );
-
-        if (template) {
-          const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
-          enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
-        } else {
-          if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
-            if (selectedCategory?.id === 'logo') {
-              enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
-            } else {
-              enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
-            }
-            enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+        // Fallback to default prompts
+        if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
+          if (selectedCategory?.id === 'logo') {
+            enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
           } else {
-            enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+            enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
           }
+          enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+        } else {
+          enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
         }
-
-        if (selectedStyle) {
-          enhancedPrompt += `, ${selectedStyle.prompt}`;
-        }
-        if (selectedPalette) {
-          enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
-        }
-
-        enhancedPrompt += ', professional quality, 4K resolution';
       }
 
-      // Generate image with reference if it's a modification
-      const generateParams = { prompt: enhancedPrompt };
-      if (isModification && currentVisual?.image_url) {
-        generateParams.file_urls = [currentVisual.image_url];
+      if (selectedStyle) {
+        enhancedPrompt += `, ${selectedStyle.prompt}`;
+      }
+      if (selectedPalette) {
+        enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
       }
 
-      const result = await base44.integrations.Core.GenerateImage(generateParams);
+      enhancedPrompt += ', professional quality, 4K resolution';
+
+      const result = await base44.integrations.Core.GenerateImage({
+        prompt: enhancedPrompt
+      });
 
       if (result.url) {
         // Extract color palette from generated image
@@ -579,10 +548,6 @@ export default function Home() {
                         setInputValue(prompt);
                         inputRef.current?.focus();
                       }}
-                      onOpenPalette={() => {
-                        setShowStyleSelector(true);
-                        setShowFormatSelector(false);
-                      }}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}
@@ -626,14 +591,6 @@ export default function Home() {
                     onSelect={(format) => {
                       setSelectedFormat(format);
                       setShowFormatSelector(false);
-                      // If we have a current visual, add modification instruction to input
-                      if (currentVisual) {
-                        const instruction = language === 'fr' 
-                          ? `Change le format en ${format.name} (${format.dimensions})`
-                          : `Change the format to ${format.name} (${format.dimensions})`;
-                        setInputValue(instruction);
-                        setTimeout(() => inputRef.current?.focus(), 100);
-                      }
                     }}
                     onClose={() => setShowFormatSelector(false)}
                   />
@@ -653,28 +610,8 @@ export default function Home() {
                   <StyleSelector
                     selectedStyle={selectedStyle}
                     selectedPalette={selectedPalette}
-                    onStyleChange={(style) => {
-                      setSelectedStyle(style);
-                      // If we have a current visual, add modification instruction to input
-                      if (currentVisual && style) {
-                        const instruction = language === 'fr' 
-                          ? `Applique un style ${style.name[language]} à ce visuel`
-                          : `Apply a ${style.name[language]} style to this visual`;
-                        setInputValue(instruction);
-                        setTimeout(() => inputRef.current?.focus(), 100);
-                      }
-                    }}
-                    onPaletteChange={(palette) => {
-                      setSelectedPalette(palette);
-                      // If we have a current visual, add modification instruction to input
-                      if (currentVisual && palette) {
-                        const instruction = language === 'fr' 
-                          ? `Change les couleurs avec la palette ${palette.name[language]}`
-                          : `Change the colors with the ${palette.name[language]} palette`;
-                        setInputValue(instruction);
-                        setTimeout(() => inputRef.current?.focus(), 100);
-                      }
-                    }}
+                    onStyleChange={setSelectedStyle}
+                    onPaletteChange={setSelectedPalette}
                     onClose={() => setShowStyleSelector(false)}
                   />
                 </motion.div>
@@ -741,6 +678,11 @@ export default function Home() {
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => { 
+                        if (currentVisual) {
+                          alert(language === 'fr' 
+                            ? '⚠️ Attention : Changer le format créera un nouveau visuel différent' 
+                            : '⚠️ Warning: Changing format will create a different new visual');
+                        }
                         setShowFormatSelector(!showFormatSelector); 
                         setShowStyleSelector(false); 
                       }}
@@ -751,6 +693,11 @@ export default function Home() {
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => { 
+                        if (currentVisual) {
+                          alert(language === 'fr' 
+                            ? '⚠️ Attention : Changer le style ou la palette créera un nouveau visuel différent' 
+                            : '⚠️ Warning: Changing style or palette will create a different new visual');
+                        }
                         setShowStyleSelector(!showStyleSelector); 
                         setShowFormatSelector(false); 
                       }}
