@@ -159,10 +159,6 @@ export default function VisualCard({
           </div>
         )}
 
-        {/* Color Palette Display */}
-        {visual.color_palette && visual.color_palette.length > 0 && (
-
-        )}
       </div>
 
       {/* Info & Actions */}
