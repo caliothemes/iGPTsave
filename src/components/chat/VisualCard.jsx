@@ -162,25 +162,25 @@ export default function VisualCard({
 
       </div>
 
+      {/* Color Palette Bar - Just under image */}
+      {visual.color_palette && visual.color_palette.length > 0 && (
+        <button
+          onClick={() => setShowColorModal(true)}
+          className="w-full flex gap-1 p-3 hover:bg-white/5 transition-all cursor-pointer"
+        >
+          {visual.color_palette.map((color, idx) => (
+            <div
+              key={idx}
+              className="flex-1 h-8 rounded-md shadow-lg hover:scale-105 transition-transform"
+              style={{ backgroundColor: color }}
+            />
+          ))}
+        </button>
+      )}
+
       {/* Info & Actions */}
       {showActions && (
-        <div className="p-4 space-y-3">
-          {/* Color Palette Bar */}
-          {visual.color_palette && visual.color_palette.length > 0 && (
-            <button
-              onClick={() => setShowColorModal(true)}
-              className="w-full flex gap-0.5 h-2 rounded-full overflow-hidden hover:h-2.5 transition-all cursor-pointer shadow-lg"
-            >
-              {visual.color_palette.map((color, idx) => (
-                <div
-                  key={idx}
-                  className="flex-1"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </button>
-          )}
-
+        <div className="p-4 pt-2 space-y-3">
           {/* Original Prompt - Clickable */}
           {visual.original_prompt && (
             <button
