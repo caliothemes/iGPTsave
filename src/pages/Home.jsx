@@ -591,6 +591,14 @@ export default function Home() {
                     onSelect={(format) => {
                       setSelectedFormat(format);
                       setShowFormatSelector(false);
+                      // If we have a current visual, add modification instruction to input
+                      if (currentVisual) {
+                        const instruction = language === 'fr' 
+                          ? `Change le format en ${format.name} (${format.dimensions})`
+                          : `Change the format to ${format.name} (${format.dimensions})`;
+                        setInputValue(instruction);
+                        setTimeout(() => inputRef.current?.focus(), 100);
+                      }
                     }}
                     onClose={() => setShowFormatSelector(false)}
                   />
@@ -610,8 +618,28 @@ export default function Home() {
                   <StyleSelector
                     selectedStyle={selectedStyle}
                     selectedPalette={selectedPalette}
-                    onStyleChange={setSelectedStyle}
-                    onPaletteChange={setSelectedPalette}
+                    onStyleChange={(style) => {
+                      setSelectedStyle(style);
+                      // If we have a current visual, add modification instruction to input
+                      if (currentVisual && style) {
+                        const instruction = language === 'fr' 
+                          ? `Applique un style ${style.name[language]} à ce visuel`
+                          : `Apply a ${style.name[language]} style to this visual`;
+                        setInputValue(instruction);
+                        setTimeout(() => inputRef.current?.focus(), 100);
+                      }
+                    }}
+                    onPaletteChange={(palette) => {
+                      setSelectedPalette(palette);
+                      // If we have a current visual, add modification instruction to input
+                      if (currentVisual && palette) {
+                        const instruction = language === 'fr' 
+                          ? `Change les couleurs avec la palette ${palette.name[language]}`
+                          : `Change the colors with the ${palette.name[language]} palette`;
+                        setInputValue(instruction);
+                        setTimeout(() => inputRef.current?.focus(), 100);
+                      }
+                    }}
                     onClose={() => setShowStyleSelector(false)}
                   />
                 </motion.div>
@@ -677,14 +705,20 @@ export default function Home() {
                       {language === 'fr' ? 'Importer une image' : 'Upload image'}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => { setShowFormatSelector(!showFormatSelector); setShowStyleSelector(false); }}
+                      onClick={() => { 
+                        setShowFormatSelector(!showFormatSelector); 
+                        setShowStyleSelector(false); 
+                      }}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
                       <SlidersHorizontal className="h-4 w-4 mr-2" />
                       {language === 'fr' ? 'Format & Dimensions' : 'Format & Dimensions'}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => { setShowStyleSelector(!showStyleSelector); setShowFormatSelector(false); }}
+                      onClick={() => { 
+                        setShowStyleSelector(!showStyleSelector); 
+                        setShowFormatSelector(false); 
+                      }}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
                       <Palette className="h-4 w-4 mr-2" />
