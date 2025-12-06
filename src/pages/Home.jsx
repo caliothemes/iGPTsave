@@ -548,6 +548,10 @@ export default function Home() {
                         setInputValue(prompt);
                         inputRef.current?.focus();
                       }}
+                      onOpenPalette={() => {
+                        setShowStyleSelector(true);
+                        setShowFormatSelector(false);
+                      }}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}
