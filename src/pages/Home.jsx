@@ -183,27 +183,28 @@ export default function Home() {
     try {
       let enhancedPrompt = '';
 
-      // ULTRA STRICT - NO TEXT EVER - ESPECIALLY LOGOS
+      // ULTIMATE NO TEXT ENFORCEMENT - MULTIPLE STRATEGIES
       if (selectedCategory?.id === 'logo') {
-        enhancedPrompt = 'LOGO WITHOUT ANY TEXT, NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY WHATSOEVER, PURE ICON, PURE SYMBOL, ABSTRACT LOGO MARK, PICTORIAL MARK, ';
-        enhancedPrompt += userMessage;
-        enhancedPrompt += ', CRITICAL REQUIREMENT: absolutely zero text, zero letters, zero words, zero typography, pure visual icon only, symbolic logo design, abstract graphic mark, no text elements, icon-only logo, wordmark forbidden, lettermark forbidden, text-free logo, pure graphic symbol';
+        // Pour les logos: icon-only, symbol-only approach
+        enhancedPrompt = `abstract icon logo, symbol mark, pictorial mark, brandmark, pure graphic icon representing ${userMessage}, icon-only design, geometric symbol, minimalist icon, visual symbol, graphic mark, emblem design`;
+        enhancedPrompt += ' ### NEGATIVE PROMPT: text, letters, words, typography, font, writing, alphabet, characters, wordmark, lettermark, type, typeface, calligraphy, script';
       } else {
-        enhancedPrompt = 'ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, NO WRITING, NO FONT, NO LABELS, TEXTLESS, TEXT-FREE, PURE VISUAL, ';
-        enhancedPrompt += userMessage;
-        enhancedPrompt += ', IMPORTANT: no text at all, no letters anywhere, no words, pure graphic design, shapes and colors only, icon style, symbolic design, abstract visual';
+        // Pour les autres visuels
+        enhancedPrompt = `pure visual design, abstract graphic, ${userMessage}, image-only, illustration, artwork, visual composition, graphic design`;
+        enhancedPrompt += ' ### NEGATIVE PROMPT: text, letters, words, typography, font, writing, alphabet, characters, labels, captions, titles';
       }
 
       if (selectedStyle) {
         enhancedPrompt += `, ${selectedStyle.prompt}`;
       }
       if (selectedPalette) {
-        enhancedPrompt += `, color palette: ${selectedPalette.colors.join(', ')}`;
+        enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
       }
-      // Get dimensions from category submenu or selectedFormat
+      
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      enhancedPrompt += ', high quality, professional design, ULTRA CRITICAL: no text, no letters, no words, no font, no typography, no writing, textless, without any text, sans texte, sin texto, kein Text, sem texto, 無文字';
+      // Triple enforcement at the end
+      enhancedPrompt += ', professional quality, clean design ### STRICTLY FORBIDDEN: any text, any letters, any words, any typography, any font, any writing, no text elements whatsoever';
       
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
