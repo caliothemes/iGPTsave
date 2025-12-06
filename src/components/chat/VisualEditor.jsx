@@ -2929,6 +2929,7 @@ Réponds en JSON avec:
               }}
             />
           )}
+          
           {/* Eraser Size Control - appears when erasing */}
           {isErasing && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-yellow-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2">
