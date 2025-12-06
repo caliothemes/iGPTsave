@@ -181,51 +181,82 @@ export default function Home() {
     setInputValue('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsGenerating(true);
-    setCurrentVisual(null);
-    
+
+    // Keep visual if it's a modification (not clearing it)
+    const isModification = currentVisual && (
+      userMessage.toLowerCase().includes('applique') || 
+      userMessage.toLowerCase().includes('change') || 
+      userMessage.toLowerCase().includes('apply') ||
+      userMessage.toLowerCase().includes('style') ||
+      userMessage.toLowerCase().includes('palette') ||
+      userMessage.toLowerCase().includes('couleur') ||
+      userMessage.toLowerCase().includes('color') ||
+      userMessage.toLowerCase().includes('format')
+    );
+
+    if (!isModification) {
+      setCurrentVisual(null);
+    }
+
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
-    
+
     try {
       let enhancedPrompt = '';
-      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
+      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || currentVisual?.dimensions || '1080x1080';
 
-      // Try to get custom prompt template
-      const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
-      const template = promptTemplates.find(t => 
-        t.category === selectedCategory?.id && 
-        (!t.subcategory || t.subcategory === templateKey)
-      );
+      // If modifying existing visual, use it as reference
+      if (isModification && currentVisual) {
+        enhancedPrompt = `Based on the provided image, ${userMessage}. Maintain the same composition and subject matter, only modify what is requested. Keep the overall design coherent.`;
 
-      if (template) {
-        // Use custom template from admin
-        const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
-        enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
-      } else {
-        // Fallback to default prompts
-        if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
-          if (selectedCategory?.id === 'logo') {
-            enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
-          } else {
-            enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
-          }
-          enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
-        } else {
-          enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+        if (selectedStyle) {
+          enhancedPrompt += ` Apply ${selectedStyle.prompt} style.`;
         }
+        if (selectedPalette) {
+          enhancedPrompt += ` Use these colors: ${selectedPalette.colors.join(', ')}.`;
+        }
+
+        enhancedPrompt += ' Professional quality, maintain visual coherence, 4K resolution.';
+      } else {
+        // Creating new visual - use template
+        const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
+        const template = promptTemplates.find(t => 
+          t.category === selectedCategory?.id && 
+          (!t.subcategory || t.subcategory === templateKey)
+        );
+
+        if (template) {
+          const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
+          enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
+        } else {
+          if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
+            if (selectedCategory?.id === 'logo') {
+              enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
+            } else {
+              enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
+            }
+            enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+          } else {
+            enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+          }
+        }
+
+        if (selectedStyle) {
+          enhancedPrompt += `, ${selectedStyle.prompt}`;
+        }
+        if (selectedPalette) {
+          enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
+        }
+
+        enhancedPrompt += ', professional quality, 4K resolution';
       }
 
-      if (selectedStyle) {
-        enhancedPrompt += `, ${selectedStyle.prompt}`;
-      }
-      if (selectedPalette) {
-        enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
+      // Generate image with reference if it's a modification
+      const generateParams = { prompt: enhancedPrompt };
+      if (isModification && currentVisual?.image_url) {
+        generateParams.file_urls = [currentVisual.image_url];
       }
 
-      enhancedPrompt += ', professional quality, 4K resolution';
-      
-      const result = await base44.integrations.Core.GenerateImage({
-        prompt: enhancedPrompt
-      });
+      const result = await base44.integrations.Core.GenerateImage(generateParams);
 
       if (result.url) {
         // Extract color palette from generated image
