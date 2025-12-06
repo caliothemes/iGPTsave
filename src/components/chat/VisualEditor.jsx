@@ -3201,13 +3201,13 @@ Réponds en JSON avec:
                 <span className="text-blue-400 text-xs font-medium w-8">{brushHardness}%</span>
               </div>
             </div>
-          </div>
-        )}
-        </div>
-      </div>
+            </div>
+            )}
+            </div>
+            </div>
 
-      {/* Bottom Panel - Layer Properties */}
-      {currentLayer && (
+            {/* Bottom Panel - Layer Properties */}
+            {currentLayer && (
         <div className="bg-white/5 rounded-xl p-3 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-white/60 text-xs flex items-center gap-2">
