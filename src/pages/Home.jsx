@@ -43,6 +43,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentVisual, setCurrentVisual] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [promptTemplates, setPromptTemplates] = useState([]);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
   
   // Format & Style selectors
@@ -94,6 +95,10 @@ export default function Home() {
           
           const visuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10);
           setSessionVisuals(visuals);
+
+          // Load prompt templates
+          const templates = await base44.entities.PromptTemplate.filter({ is_active: true });
+          setPromptTemplates(templates);
 
           // Check if there's an editVisual parameter
           const urlParams = new URLSearchParams(window.location.search);
@@ -184,19 +189,29 @@ export default function Home() {
       let enhancedPrompt = '';
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      // NO TEXT for logo, print, social - ONLY IMAGE/ICON category can have text
-      if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
-        // Force pure visual design without any text
-        if (selectedCategory?.id === 'logo') {
-          enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
-        } else {
-          // Pour print et social: adapter le design au contexte métier sans forcer des motifs tribaux
-          enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
-        }
-        enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+      // Try to get custom prompt template
+      const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
+      const template = promptTemplates.find(t => 
+        t.category === selectedCategory?.id && 
+        (!t.subcategory || t.subcategory === templateKey)
+      );
+
+      if (template) {
+        // Use custom template from admin
+        const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
+        enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
       } else {
-        // Image category can have everything
-        enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+        // Fallback to default prompts
+        if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
+          if (selectedCategory?.id === 'logo') {
+            enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
+          } else {
+            enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
+          }
+          enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+        } else {
+          enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+        }
       }
 
       if (selectedStyle) {

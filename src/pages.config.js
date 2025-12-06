@@ -13,6 +13,7 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import AdminPresentation from './pages/AdminPresentation';
 import Portfolio from './pages/Portfolio';
 import Home from './pages/Home';
+import AdminPrompts from './pages/AdminPrompts';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +33,7 @@ export const PAGES = {
     "AdminPresentation": AdminPresentation,
     "Portfolio": Portfolio,
     "Home": Home,
+    "AdminPrompts": AdminPrompts,
 }
 
 export const pagesConfig = {
