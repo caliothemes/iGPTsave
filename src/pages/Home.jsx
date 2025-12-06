@@ -313,6 +313,25 @@ export default function Home() {
       });
 
       if (result.url) {
+        // Extract new color palette from regenerated image
+        let extractedColors = null;
+        try {
+          const colorResult = await base44.integrations.Core.InvokeLLM({
+            prompt: 'Extract the 5 most dominant colors from this image as HEX codes. Return only an array of hex codes.',
+            response_json_schema: {
+              type: "object",
+              properties: {
+                colors: { type: "array", items: { type: "string" } }
+              }
+            },
+            file_urls: [result.url]
+          });
+          extractedColors = colorResult.colors;
+        } catch (e) {
+          console.error('Color extraction failed:', e);
+          extractedColors = visual.color_palette; // Fallback to old colors
+        }
+
         // Create new visual instead of updating
         const visualData = {
           user_email: user?.email || 'anonymous',
@@ -323,7 +342,7 @@ export default function Home() {
           dimensions: visual.dimensions,
           visual_type: visual.visual_type,
           style: visual.style,
-          color_palette: visual.color_palette,
+          color_palette: extractedColors,
           version: (visual.version || 1) + 1,
           parent_visual_id: visual.id
         };
