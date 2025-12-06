@@ -26,48 +26,48 @@ const CATEGORIES = [
         id: 'carte_visite', 
         name: { fr: 'Carte de visite', en: 'Business Card' },
         orientations: [
-                  { id: 'carte_visite_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une carte de visite horizontale sans texte', en: 'Create a horizontal business card without text' }, dimensions: '1050x600' },
-                  { id: 'carte_visite_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une carte de visite verticale sans texte', en: 'Create a vertical business card without text' }, dimensions: '600x1050' },
+                  { id: 'carte_visite_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une carte de visite horizontale', en: 'Create a horizontal business card' }, dimensions: '1050x600' },
+                  { id: 'carte_visite_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une carte de visite verticale', en: 'Create a vertical business card' }, dimensions: '600x1050' },
                 ]
       },
       { 
         id: 'flyer', 
         name: { fr: 'Flyer', en: 'Flyer' },
         orientations: [
-                  { id: 'flyer_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un flyer vertical sans texte', en: 'Create a vertical flyer without text' }, dimensions: '2100x2970' },
-                  { id: 'flyer_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un flyer horizontal sans texte', en: 'Create a horizontal flyer without text' }, dimensions: '2970x2100' },
+                  { id: 'flyer_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un flyer vertical', en: 'Create a vertical flyer' }, dimensions: '2100x2970' },
+                  { id: 'flyer_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un flyer horizontal', en: 'Create a horizontal flyer' }, dimensions: '2970x2100' },
                 ]
       },
       { 
         id: 'affiche', 
         name: { fr: 'Affiche', en: 'Poster' },
         orientations: [
-                  { id: 'affiche_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une affiche verticale sans texte', en: 'Create a vertical poster without text' }, dimensions: '2480x3508' },
-                  { id: 'affiche_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une affiche horizontale sans texte', en: 'Create a horizontal poster without text' }, dimensions: '3508x2480' },
+                  { id: 'affiche_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une affiche verticale', en: 'Create a vertical poster' }, dimensions: '2480x3508' },
+                  { id: 'affiche_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une affiche horizontale', en: 'Create a horizontal poster' }, dimensions: '3508x2480' },
                 ]
       },
       { 
         id: 'sticker', 
         name: { fr: 'Sticker', en: 'Sticker' },
         orientations: [
-                  { id: 'sticker_rond', name: { fr: 'Rond', en: 'Round' }, prompt: { fr: 'Crée un sticker rond sans texte', en: 'Create a round sticker without text' }, dimensions: '1000x1000' },
-                  { id: 'sticker_carre', name: { fr: 'Carré', en: 'Square' }, prompt: { fr: 'Crée un sticker carré sans texte', en: 'Create a square sticker without text' }, dimensions: '1000x1000' },
+                  { id: 'sticker_rond', name: { fr: 'Rond', en: 'Round' }, prompt: { fr: 'Crée un sticker rond', en: 'Create a round sticker' }, dimensions: '1000x1000' },
+                  { id: 'sticker_carre', name: { fr: 'Carré', en: 'Square' }, prompt: { fr: 'Crée un sticker carré', en: 'Create a square sticker' }, dimensions: '1000x1000' },
                 ]
       },
       { 
         id: 'invitation', 
         name: { fr: 'Invitation', en: 'Invitation' },
         orientations: [
-                  { id: 'invitation_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une invitation verticale sans texte', en: 'Create a vertical invitation without text' }, dimensions: '1400x2100' },
-                  { id: 'invitation_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une invitation horizontale sans texte', en: 'Create a horizontal invitation without text' }, dimensions: '2100x1400' },
+                  { id: 'invitation_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une invitation verticale', en: 'Create a vertical invitation' }, dimensions: '1400x2100' },
+                  { id: 'invitation_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une invitation horizontale', en: 'Create a horizontal invitation' }, dimensions: '2100x1400' },
                 ]
       },
       { 
         id: 'menu', 
         name: { fr: 'Menu', en: 'Menu' },
         orientations: [
-                  { id: 'menu_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un menu vertical sans texte', en: 'Create a vertical menu without text' }, dimensions: '2100x2970' },
-                  { id: 'menu_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un menu horizontal sans texte', en: 'Create a horizontal menu without text' }, dimensions: '2970x2100' },
+                  { id: 'menu_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un menu vertical', en: 'Create a vertical menu' }, dimensions: '2100x2970' },
+                  { id: 'menu_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un menu horizontal', en: 'Create a horizontal menu' }, dimensions: '2970x2100' },
                 ]
       },
     ]
