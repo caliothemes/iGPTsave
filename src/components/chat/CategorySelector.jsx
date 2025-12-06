@@ -104,30 +104,36 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
   const { language } = useLanguage();
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [openNestedSubmenu, setOpenNestedSubmenu] = useState(null);
+  const [expertMode, setExpertMode] = useState({});
 
   const handleCategoryClick = (category) => {
     if (category.hasSubmenu) {
       setOpenSubmenu(openSubmenu === category.id ? null : category.id);
       setOpenNestedSubmenu(null);
     } else {
-      onSelect(category);
+      onSelect({ ...category, expertMode: expertMode[category.id] || false });
       setOpenSubmenu(null);
       setOpenNestedSubmenu(null);
     }
+  };
+
+  const toggleExpertMode = (categoryId, e) => {
+    e.stopPropagation();
+    setExpertMode(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
   };
 
   const handleSubmenuClick = (category, submenuItem) => {
     if (submenuItem.orientations) {
       setOpenNestedSubmenu(openNestedSubmenu === submenuItem.id ? null : submenuItem.id);
     } else {
-      onSelect({ ...category, selectedSubmenu: submenuItem });
+      onSelect({ ...category, selectedSubmenu: submenuItem, expertMode: expertMode[category.id] || false });
       setOpenSubmenu(null);
       setOpenNestedSubmenu(null);
     }
   };
 
   const handleOrientationClick = (category, submenuItem, orientation) => {
-    onSelect({ ...category, selectedSubmenu: { ...submenuItem, ...orientation } });
+    onSelect({ ...category, selectedSubmenu: { ...submenuItem, ...orientation }, expertMode: expertMode[category.id] || false });
     setOpenSubmenu(null);
     setOpenNestedSubmenu(null);
   };
@@ -163,6 +169,25 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                   )}
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
+                
+                {/* Expert Mode Toggle */}
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    onClick={(e) => toggleExpertMode(category.id, e)}
+                    className={cn(
+                      "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
+                      expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
+                    )}
+                  >
+                    <span className={cn(
+                      "inline-block h-3 w-3 transform rounded-full bg-white transition-transform",
+                      expertMode[category.id] ? "translate-x-5" : "translate-x-1"
+                    )} />
+                  </button>
+                  <span className="text-[10px] text-white/50">
+                    {expertMode[category.id] ? (language === 'fr' ? 'Expert' : 'Expert') : (language === 'fr' ? 'Assisté' : 'Assisted')}
+                  </span>
+                </div>
               </div>
             </button>
 

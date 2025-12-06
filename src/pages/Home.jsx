@@ -192,40 +192,47 @@ export default function Home() {
     try {
       let enhancedPrompt = '';
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
+      const isExpertMode = selectedCategory?.expertMode || false;
 
-      // Try to get custom prompt template
-      const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
-      const template = promptTemplates.find(t => 
-        t.category === selectedCategory?.id && 
-        (!t.subcategory || t.subcategory === templateKey)
-      );
-
-      if (template) {
-        // Use custom template from admin
-        const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
-        enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
+      if (isExpertMode) {
+        // Mode expert : prompt brut de l'utilisateur
+        enhancedPrompt = userMessage;
       } else {
-        // Fallback to default prompts
-        if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
-          if (selectedCategory?.id === 'logo') {
-            enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
-          } else {
-            enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
-          }
-          enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+        // Mode assisté : enrichissement du prompt
+        // Try to get custom prompt template
+        const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
+        const template = promptTemplates.find(t => 
+          t.category === selectedCategory?.id && 
+          (!t.subcategory || t.subcategory === templateKey)
+        );
+
+        if (template) {
+          // Use custom template from admin
+          const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
+          enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
         } else {
-          enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+          // Fallback to default prompts
+          if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
+            if (selectedCategory?.id === 'logo') {
+              enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
+            } else {
+              enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
+            }
+            enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+          } else {
+            enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+          }
         }
-      }
 
-      if (selectedStyle) {
-        enhancedPrompt += `, ${selectedStyle.prompt}`;
-      }
-      if (selectedPalette) {
-        enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
-      }
+        if (selectedStyle) {
+          enhancedPrompt += `, ${selectedStyle.prompt}`;
+        }
+        if (selectedPalette) {
+          enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
+        }
 
-      enhancedPrompt += ', professional quality, 4K resolution';
+        enhancedPrompt += ', professional quality, 4K resolution';
+      }
 
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
