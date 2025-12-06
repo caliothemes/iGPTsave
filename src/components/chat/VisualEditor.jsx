@@ -14,7 +14,7 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon
+  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -2407,7 +2407,7 @@ Réponds en JSON avec:
               className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 py-4 px-4 flex flex-col items-center gap-1.5 h-auto"
             >
               <div className="flex items-center">
-                {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Eraser className="h-4 w-4 mr-2" />}
+                {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
                 {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
               </div>
               <span className="text-[10px] text-white/70 font-normal leading-relaxed text-center">
@@ -3014,6 +3014,40 @@ Réponds en JSON avec:
         
         {/* Right Toolbar - Drawing Tools */}
         <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
+          <button
+            onClick={async () => {
+              setRemovingBg(true);
+              try {
+                const response = await base44.functions.invoke('removeBg', { image_url: originalImageUrl });
+                if (response.data?.success && response.data?.image_url) {
+                  const baseLayerIdx = layers.findIndex(l => l.isBaseImage);
+                  if (baseLayerIdx !== -1) {
+                    updateLayer(baseLayerIdx, { imageUrl: response.data.image_url });
+                  }
+                  setOriginalImageUrl(response.data.image_url);
+                  showHelp(language === 'fr' ? '✅ Fond supprimé ! (1 crédit utilisé)' : '✅ Background removed! (1 credit used)');
+                } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                  setServiceErrorType(response.data?.error);
+                  setShowServiceUnavailable(true);
+                } else {
+                  showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
+                }
+              } catch (err) {
+                console.error(err);
+                showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+              }
+              setRemovingBg(false);
+            }}
+            disabled={removingBg}
+            className={cn(
+              "p-2.5 rounded-lg transition-all relative",
+              removingBg ? "bg-pink-500/40 text-pink-300" : "bg-white/10 text-white/60 hover:text-pink-400 hover:bg-pink-500/20"
+            )}
+            title={language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+          >
+            {removingBg ? <Loader2 className="h-5 w-5 animate-spin" /> : <Scissors className="h-5 w-5" />}
+          </button>
+          
           <button
             onClick={() => {
               setIsErasing(!isErasing);
