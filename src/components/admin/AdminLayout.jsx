@@ -10,7 +10,8 @@ import {
   BarChart3,
   Scale,
   Brush,
-  CreditCard
+  CreditCard,
+  Wand2
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -19,6 +20,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, page: 'Admin' },
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
+  { id: 'prompts', label: 'Prompts IA', icon: Wand2, page: 'AdminPrompts' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
   { id: 'presentation', label: 'Présentation', icon: LayoutDashboard, page: 'AdminPresentation' },
   { id: 'pricing', label: 'Tarification', icon: CreditCard, page: 'AdminPricing' },
