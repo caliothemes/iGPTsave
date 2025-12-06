@@ -14,7 +14,7 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw, Upload, Scissors, ChevronDown as ChevronDownIcon
+  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -2347,7 +2347,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.proGradients && (
                   <div className="p-2">
-                    <div className="grid grid-cols-5 gap-1">
+                    <div className="grid grid-cols-8 gap-1">
                       {adminGradients.filter(g => g.preview_url).map(gradient => (
                         <button key={gradient.id} onClick={() => addBackgroundImageLayer(gradient.preview_url)}
                           className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
@@ -2372,7 +2372,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.textures && (
                   <div className="p-2">
-                    <div className="grid grid-cols-5 gap-1">
+                    <div className="grid grid-cols-8 gap-1">
                       {adminTexturesWithImage.map(texture => (
                         <button key={texture.id} onClick={() => addBackgroundImageLayer(texture.preview_url)}
                           className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
@@ -2449,7 +2449,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.texturesTab && (
                   <div className="p-2">
-                    <div className="grid grid-cols-5 gap-1.5">
+                    <div className="grid grid-cols-8 gap-1.5">
                       {adminTexturesWithImage.map(texture => (
                         <button key={texture.id} onClick={() => addImageLayer(texture.preview_url, canvasSize.width, canvasSize.height, true)}
                           className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
@@ -2477,7 +2477,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.sharedTextures && (
                   <div className="p-2">
-                    <div className="grid grid-cols-5 gap-1.5">
+                    <div className="grid grid-cols-8 gap-1.5">
                       {sharedLibrary.filter(item => item.type === 'texture').map((item, idx) => (
                         <div key={`shared-${idx}`} className="relative group">
                           <button onClick={() => addImageLayer(item.url, canvasSize.width, canvasSize.height, true)}
@@ -2530,7 +2530,7 @@ Réponds en JSON avec:
             {adminGradients.length > 0 ? (
               <>
                 <p className="text-white/40 text-xs px-1">{language === 'fr' ? 'Dégradés PRO disponibles:' : 'Available PRO gradients:'}</p>
-                <div className="grid grid-cols-5 gap-1.5">
+                <div className="grid grid-cols-8 gap-1.5">
                   {adminGradients.filter(g => g.preview_url).map(gradient => (
                     <button key={gradient.id} onClick={() => addImageLayer(gradient.preview_url, canvasSize.width, canvasSize.height, true)}
                       className="relative group rounded-lg overflow-hidden border border-white/10 hover:border-amber-500/50 transition-colors aspect-square">
@@ -2623,7 +2623,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.adminIllustrations && (
                   <div className="p-2">
-                    <div className="grid grid-cols-6 gap-1.5">
+                    <div className="grid grid-cols-8 gap-1.5">
                       {adminIllustrations.filter(a => a.preview_url).map(illust => (
                         <button key={illust.id} onClick={() => addImageLayer(illust.preview_url, 150, 150)}
                           className="relative group rounded-lg overflow-hidden border border-amber-500/30 hover:border-amber-500/60 transition-colors aspect-square">
@@ -2651,7 +2651,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.sharedIllustrations && (
                   <div className="p-2">
-                    <div className="grid grid-cols-6 gap-1.5">
+                    <div className="grid grid-cols-8 gap-1.5">
                       {sharedLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
                         <button 
                           key={`shared-illust-${idx}`} 
@@ -2682,7 +2682,7 @@ Réponds en JSON avec:
                 </button>
                 {bgAccordion.myIllustrations && (
                   <div className="p-2">
-                    <div className="grid grid-cols-6 gap-1.5">
+                    <div className="grid grid-cols-8 gap-1.5">
                       {userLibrary.filter(item => item.type === 'illustration').map((item, idx) => (
                         <div key={idx} className="relative group">
                           <button onClick={() => addImageLayer(item.url, 150, 150)}
@@ -2934,7 +2934,7 @@ Réponds en JSON avec:
           {isErasing && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-yellow-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2">
               <div className="flex items-center gap-3">
-                <Scissors className="h-4 w-4 text-yellow-400" />
+                <Eraser className="h-4 w-4 text-yellow-400" />
                 <div className="flex flex-col gap-1 min-w-[120px]">
                   <span className="text-white/60 text-xs">{language === 'fr' ? 'Taille gomme' : 'Eraser size'}</span>
                   <Slider 
@@ -3025,7 +3025,7 @@ Réponds en JSON avec:
             )}
             title={language === 'fr' ? 'Gomme' : 'Eraser'}
           >
-            <Scissors className="h-5 w-5" />
+            <Eraser className="h-5 w-5" />
           </button>
           
           <button
