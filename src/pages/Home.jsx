@@ -101,7 +101,8 @@ export default function Home() {
           if (editVisualId) {
             const visualToEdit = visuals.find(v => v.id === editVisualId);
             if (visualToEdit) {
-              handleOpenEditor(visualToEdit);
+              setCurrentVisual(visualToEdit);
+              setMessages([{ role: 'assistant', content: '✨ ' + (language === 'fr' ? 'Voici votre visuel' : 'Here is your visual') }]);
             }
           }
         }
