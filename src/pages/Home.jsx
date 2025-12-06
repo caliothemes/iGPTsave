@@ -102,7 +102,11 @@ export default function Home() {
             const visualToEdit = visuals.find(v => v.id === editVisualId);
             if (visualToEdit) {
               setCurrentVisual(visualToEdit);
-              setMessages([{ role: 'assistant', content: '✨ ' + (language === 'fr' ? 'Voici votre visuel' : 'Here is your visual') }]);
+              setMessages([{ role: 'assistant', content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.') }]);
+              // Set category based on visual type to enable prompt
+              if (visualToEdit.visual_type) {
+                setSelectedCategory({ id: visualToEdit.visual_type });
+              }
             }
           }
         }
