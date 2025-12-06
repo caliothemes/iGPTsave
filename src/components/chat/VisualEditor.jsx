@@ -2262,7 +2262,7 @@ Réponds en JSON avec:
               className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700 py-4 px-4 flex flex-col items-center gap-1.5 h-auto"
             >
               <div className="flex items-center">
-                {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+                {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Eraser className="h-4 w-4 mr-2" />}
                 {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
               </div>
               <span className="text-[10px] text-white/70 font-normal leading-relaxed text-center">
