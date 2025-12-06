@@ -182,29 +182,25 @@ export default function Home() {
     
     try {
       let enhancedPrompt = '';
+      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      // ULTIMATE NO TEXT ENFORCEMENT - MULTIPLE STRATEGIES
+      // RADICAL APPROACH: Don't even mention "logo" for logo generation
       if (selectedCategory?.id === 'logo') {
-        // Pour les logos: icon-only, symbol-only approach
-        enhancedPrompt = `abstract icon logo, symbol mark, pictorial mark, brandmark, pure graphic icon representing ${userMessage}, icon-only design, geometric symbol, minimalist icon, visual symbol, graphic mark, emblem design`;
-        enhancedPrompt += ' ### NEGATIVE PROMPT: text, letters, words, typography, font, writing, alphabet, characters, wordmark, lettermark, type, typeface, calligraphy, script';
+        // Describe as pure icon/symbol without mentioning logo
+        enhancedPrompt = `icon symbol representing ${userMessage}, minimalist geometric shape, simple pictogram, abstract emblem, clean graphic mark, monochromatic symbol design, vector icon style, flat design symbol`;
       } else {
-        // Pour les autres visuels
-        enhancedPrompt = `pure visual design, abstract graphic, ${userMessage}, image-only, illustration, artwork, visual composition, graphic design`;
-        enhancedPrompt += ' ### NEGATIVE PROMPT: text, letters, words, typography, font, writing, alphabet, characters, labels, captions, titles';
+        enhancedPrompt = `visual design for ${userMessage}, pure imagery, graphic illustration, abstract composition`;
       }
 
       if (selectedStyle) {
         enhancedPrompt += `, ${selectedStyle.prompt}`;
       }
       if (selectedPalette) {
-        enhancedPrompt += `, colors: ${selectedPalette.colors.join(', ')}`;
+        enhancedPrompt += `, color palette: ${selectedPalette.colors.join(', ')}`;
       }
-      
-      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      // Triple enforcement at the end
-      enhancedPrompt += ', professional quality, clean design ### STRICTLY FORBIDDEN: any text, any letters, any words, any typography, any font, any writing, no text elements whatsoever';
+      // Add quality descriptors ONLY - no more "no text" mentions (reverse psychology)
+      enhancedPrompt += ', high quality professional design, clean minimalist aesthetic, simple shapes, visual only';
       
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
