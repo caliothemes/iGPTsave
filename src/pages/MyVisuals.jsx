@@ -142,7 +142,6 @@ export default function MyVisuals() {
                   isRegenerating={false}
                   canDownload={true}
                   compact
-                  showActions={false}
                 />
               ))}
             </div>
