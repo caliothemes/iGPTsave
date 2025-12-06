@@ -2985,6 +2985,87 @@ Réponds en JSON avec:
             </button>
           )}
         </div>
+        
+        {/* Eraser Size Control - appears when erasing */}
+        {isErasing && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-yellow-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2">
+            <div className="flex items-center gap-3">
+              <Scissors className="h-4 w-4 text-yellow-400" />
+              <div className="flex flex-col gap-1 min-w-[120px]">
+                <span className="text-white/60 text-xs">{language === 'fr' ? 'Taille gomme' : 'Eraser size'}</span>
+                <Slider 
+                  value={[eraserSize]} 
+                  onValueChange={([v]) => setEraserSize(v)} 
+                  min={10} 
+                  max={100} 
+                  step={5} 
+                />
+              </div>
+              <span className="text-yellow-400 text-xs font-medium w-8">{eraserSize}</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Brush Controls - appears when brushing */}
+        {isBrushing && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-blue-400/30 rounded-lg p-3 shadow-lg animate-in fade-in slide-in-from-bottom-2 min-w-[280px]">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Brush className="h-4 w-4 text-blue-400" />
+                <span className="text-white/80 text-sm font-medium">{language === 'fr' ? 'Pinceau' : 'Brush'}</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-white/60 text-xs w-16">{language === 'fr' ? 'Couleur:' : 'Color:'}</span>
+                <input 
+                  type="color" 
+                  value={brushColor} 
+                  onChange={(e) => setBrushColor(e.target.value)} 
+                  className="w-8 h-8 rounded cursor-pointer border border-white/20"
+                />
+                <div className="flex gap-1">
+                  {['#FFFFFF', '#000000', '#FF6B6B', '#4ECDC4', '#FFD700', '#9B59B6'].map(color => (
+                    <button
+                      key={color}
+                      onClick={() => setBrushColor(color)}
+                      className={cn(
+                        "w-6 h-6 rounded-full border-2 transition-all hover:scale-110",
+                        brushColor === color ? "border-blue-400 ring-2 ring-blue-400/50" : "border-white/20"
+                      )}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-white/60 text-xs w-16">{language === 'fr' ? 'Taille:' : 'Size:'}</span>
+                <Slider 
+                  value={[brushSize]} 
+                  onValueChange={([v]) => setBrushSize(v)} 
+                  min={5} 
+                  max={80} 
+                  step={1} 
+                  className="flex-1"
+                />
+                <span className="text-blue-400 text-xs font-medium w-8">{brushSize}</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-white/60 text-xs w-16">{language === 'fr' ? 'Dureté:' : 'Hardness:'}</span>
+                <Slider 
+                  value={[brushHardness]} 
+                  onValueChange={([v]) => setBrushHardness(v)} 
+                  min={0} 
+                  max={100} 
+                  step={5} 
+                  className="flex-1"
+                />
+                <span className="text-blue-400 text-xs font-medium w-8">{brushHardness}%</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
         
         {/* Eraser Size Control - appears when erasing */}
