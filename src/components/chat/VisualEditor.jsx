@@ -224,6 +224,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [eraserSize, setEraserSize] = useState(30);
   const [erasedStrokes, setErasedStrokes] = useState([]);
   const [currentStroke, setCurrentStroke] = useState([]);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -1543,6 +1544,11 @@ Réponds en JSON avec:
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
     
+    // Track mouse position for eraser cursor
+    if (isErasing) {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    }
+    
     // Eraser mode - draw stroke
     if (isErasing && currentStroke.length > 0) {
       setCurrentStroke(prev => [...prev, { x, y }]);
@@ -2813,12 +2819,12 @@ Réponds en JSON avec:
           )}
           
           {/* Eraser cursor preview */}
-          {isErasing && (
+          {isErasing && mousePos.x > 0 && (
             <div 
-              className="fixed w-8 h-8 rounded-full border-2 border-yellow-400 bg-yellow-400/20 pointer-events-none z-50"
+              className="fixed rounded-full border-2 border-yellow-400 bg-yellow-400/20 pointer-events-none z-50"
               style={{ 
-                left: `${e.clientX}px`, 
-                top: `${e.clientY}px`,
+                left: `${mousePos.x}px`, 
+                top: `${mousePos.y}px`,
                 width: `${eraserSize}px`,
                 height: `${eraserSize}px`,
                 transform: 'translate(-50%, -50%)'
