@@ -138,12 +138,11 @@ export default function MyVisuals() {
                   visual={visual}
                   onDownload={() => handleDownload(visual, credits)}
                   onToggleFavorite={handleToggleFavorite}
-                  onRegenerate={() => {}}
-                  onVariation={() => {}}
                   onEdit={() => handleEdit(visual)}
                   isRegenerating={false}
                   canDownload={true}
                   compact
+                  showActions={false}
                 />
               ))}
             </div>

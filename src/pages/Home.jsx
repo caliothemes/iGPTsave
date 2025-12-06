@@ -94,6 +94,16 @@ export default function Home() {
           
           const visuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10);
           setSessionVisuals(visuals);
+
+          // Check if there's an editVisual parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const editVisualId = urlParams.get('editVisual');
+          if (editVisualId) {
+            const visualToEdit = visuals.find(v => v.id === editVisualId);
+            if (visualToEdit) {
+              handleOpenEditor(visualToEdit);
+            }
+          }
         }
       } catch (e) {
         console.error(e);
