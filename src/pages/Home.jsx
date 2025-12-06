@@ -183,10 +183,16 @@ export default function Home() {
     try {
       let enhancedPrompt = '';
 
-      // ULTRA STRICT - NO TEXT EVER - ALL VISUALS
-      enhancedPrompt = 'ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, NO WRITING, NO FONT, NO LABELS, TEXTLESS, TEXT-FREE, PURE VISUAL, ';
-      enhancedPrompt += userMessage;
-      enhancedPrompt += ', IMPORTANT: no text at all, no letters anywhere, no words, pure graphic design, shapes and colors only, icon style, symbolic design, abstract visual';
+      // ULTRA STRICT - NO TEXT EVER - ESPECIALLY LOGOS
+      if (selectedCategory?.id === 'logo') {
+        enhancedPrompt = 'LOGO WITHOUT ANY TEXT, NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY WHATSOEVER, PURE ICON, PURE SYMBOL, ABSTRACT LOGO MARK, PICTORIAL MARK, ';
+        enhancedPrompt += userMessage;
+        enhancedPrompt += ', CRITICAL REQUIREMENT: absolutely zero text, zero letters, zero words, zero typography, pure visual icon only, symbolic logo design, abstract graphic mark, no text elements, icon-only logo, wordmark forbidden, lettermark forbidden, text-free logo, pure graphic symbol';
+      } else {
+        enhancedPrompt = 'ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO TYPOGRAPHY, NO WRITING, NO FONT, NO LABELS, TEXTLESS, TEXT-FREE, PURE VISUAL, ';
+        enhancedPrompt += userMessage;
+        enhancedPrompt += ', IMPORTANT: no text at all, no letters anywhere, no words, pure graphic design, shapes and colors only, icon style, symbolic design, abstract visual';
+      }
 
       if (selectedStyle) {
         enhancedPrompt += `, ${selectedStyle.prompt}`;
@@ -197,7 +203,7 @@ export default function Home() {
       // Get dimensions from category submenu or selectedFormat
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
-      enhancedPrompt += ', high quality, professional design, CRITICAL: no text, no letters, no words, no font, no typography, textless, without any text, sans texte, sin texto, kein Text';
+      enhancedPrompt += ', high quality, professional design, ULTRA CRITICAL: no text, no letters, no words, no font, no typography, no writing, textless, without any text, sans texte, sin texto, kein Text, sem texto, 無文字';
       
       const result = await base44.integrations.Core.GenerateImage({
         prompt: enhancedPrompt
