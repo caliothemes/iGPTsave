@@ -3066,6 +3066,62 @@ Réponds en JSON avec:
             </button>
           )}
         </div>
+      </div>
+        
+        {/* Right Toolbar - Drawing Tools */}
+        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
+          <button
+            onClick={() => {
+              setIsErasing(!isErasing);
+              if (isBrushing) setIsBrushing(false);
+            }}
+            className={cn(
+              "p-2.5 rounded-lg transition-all relative",
+              isErasing ? "bg-yellow-500/40 text-yellow-300 ring-2 ring-yellow-400/50" : "bg-white/10 text-white/60 hover:text-yellow-400 hover:bg-yellow-500/20"
+            )}
+            title={language === 'fr' ? 'Gomme' : 'Eraser'}
+          >
+            <Scissors className="h-5 w-5" />
+          </button>
+          
+          <button
+            onClick={() => {
+              setIsBrushing(!isBrushing);
+              if (isErasing) setIsErasing(false);
+            }}
+            className={cn(
+              "p-2.5 rounded-lg transition-all relative",
+              isBrushing ? "bg-blue-500/40 text-blue-300 ring-2 ring-blue-400/50" : "bg-white/10 text-white/60 hover:text-blue-400 hover:bg-blue-500/20"
+            )}
+            title={language === 'fr' ? 'Pinceau' : 'Brush'}
+          >
+            <Brush className="h-5 w-5" />
+          </button>
+          
+          {/* Separator */}
+          <div className="h-px bg-white/10 my-1" />
+          
+          {/* Undo buttons */}
+          {erasedStrokes.length > 0 && isErasing && (
+            <button
+              onClick={undoEraser}
+              className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-in fade-in"
+              title={language === 'fr' ? 'Annuler gomme' : 'Undo erase'}
+            >
+              <RotateCw className="h-4 w-4 scale-x-[-1]" />
+            </button>
+          )}
+          
+          {brushStrokes.length > 0 && isBrushing && (
+            <button
+              onClick={undoBrush}
+              className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all animate-in fade-in"
+              title={language === 'fr' ? 'Annuler pinceau' : 'Undo brush'}
+            >
+              <RotateCw className="h-4 w-4 scale-x-[-1]" />
+            </button>
+          )}
+        </div>
         
         {/* Eraser Size Control - appears when erasing */}
         {isErasing && (
