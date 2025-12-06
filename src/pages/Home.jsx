@@ -788,6 +788,23 @@ export default function Home() {
           100% { background-position: 300% 50%; }
         }
       `}</style>
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, action: null })}
+        onConfirm={() => {
+          if (confirmModal.action === 'format') {
+            setShowFormatSelector(true);
+            setShowStyleSelector(false);
+          } else if (confirmModal.action === 'style') {
+            setShowStyleSelector(true);
+            setShowFormatSelector(false);
+          }
+        }}
+        title={confirmModal.title}
+        message={confirmModal.message}
+      />
     </div>
   );
 }
