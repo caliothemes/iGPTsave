@@ -136,6 +136,7 @@ export default function MyVisuals() {
                 <VisualCard
                   key={visual.id}
                   visual={visual}
+                  onRegenerate={() => {}}
                   onDownload={() => handleDownload(visual, credits)}
                   onToggleFavorite={handleToggleFavorite}
                   onEdit={() => handleEdit(visual)}
