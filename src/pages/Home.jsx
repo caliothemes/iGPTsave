@@ -477,7 +477,7 @@ export default function Home() {
             />
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4 py-6 pb-48">
+          <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 md:pb-48">
             <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
@@ -541,7 +541,7 @@ export default function Home() {
           {/* Black transparent overlay for footer */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
           
-          <div className="relative max-w-2xl mx-auto px-4 pb-4">
+          <div className="relative max-w-2xl mx-auto px-4 pb-6 md:pb-4">
             {/* Format Selector */}
             <AnimatePresence>
               {showFormatSelector && (
