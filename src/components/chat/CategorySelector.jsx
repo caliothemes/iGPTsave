@@ -109,6 +109,30 @@ const CATEGORIES = [
     ]
   },
   {
+    id: 'mockup',
+    icon: Image,
+    name: { fr: 'Mockups', en: 'Mockups' },
+    description: { fr: 'Mises en scène réalistes', en: 'Realistic mockups' },
+    hasSubmenu: true,
+    submenu: [
+      { id: 'mockup_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un mockup carré', en: 'Create a square mockup' }, dimensions: '1080x1080' },
+      { id: 'mockup_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un mockup portrait', en: 'Create a portrait mockup' }, dimensions: '1080x1350' },
+      { id: 'mockup_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un mockup paysage', en: 'Create a landscape mockup' }, dimensions: '1920x1080' },
+    ]
+  },
+  {
+    id: 'product',
+    icon: Image,
+    name: { fr: 'Produit', en: 'Product' },
+    description: { fr: 'Photos de produits', en: 'Product photos' },
+    hasSubmenu: true,
+    submenu: [
+      { id: 'product_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une photo de produit carrée', en: 'Create a square product photo' }, dimensions: '1080x1080' },
+      { id: 'product_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée une photo de produit portrait', en: 'Create a portrait product photo' }, dimensions: '1080x1350' },
+      { id: 'product_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée une photo de produit paysage', en: 'Create a landscape product photo' }, dimensions: '1920x1080' },
+    ]
+  },
+  {
     id: 'free_prompt',
     icon: Sparkles,
     name: { fr: 'Prompt 100% libre', en: '100% Free Prompt' },
@@ -169,7 +193,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 w-full max-w-xl mx-auto">
+    <div className="grid grid-cols-1 gap-3 w-full max-w-xl mx-auto">
       {CATEGORIES.map((category) => {
         const Icon = category.icon;
         const isOpen = openSubmenu === category.id;
@@ -192,25 +216,29 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                 <Icon className="h-5 w-5 text-white/70" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-white text-sm font-medium">{category.name[language]}</span>
-                  {category.hasSubmenu && (
-                    <ChevronDown className={cn(
-                      "h-4 w-4 text-white/40 transition-transform",
-                      isOpen && "rotate-180"
-                    )} />
-                  )}
-                  {/* Mode Badge - Always visible */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-white text-sm font-medium">{category.name[language]}</span>
+                    {category.hasSubmenu && (
+                      <ChevronDown className={cn(
+                        "h-4 w-4 text-white/40 transition-transform",
+                        isOpen && "rotate-180"
+                      )} />
+                    )}
+                  </div>
+                  {/* Mode Badge + Switch - side by side */}
                   {category.defaultExpertMode !== undefined && (
-                    expertMode[category.id] ? (
-                      <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
-                        EXPERT
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
-                        ASSISTÉ
-                      </span>
-                    )
+                    <div className="flex items-center gap-2">
+                      {expertMode[category.id] ? (
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                          EXPERT
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
+                          ASSISTÉ
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
