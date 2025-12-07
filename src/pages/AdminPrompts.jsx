@@ -28,10 +28,11 @@ export default function AdminPrompts() {
   const [filterCategory, setFilterCategory] = useState('all');
 
   const categories = [
-    { value: 'logo', label: 'Logo' },
-    { value: 'print', label: 'Print' },
-    { value: 'social', label: 'Réseaux sociaux' },
-    { value: 'image', label: 'Image réaliste' }
+    { value: 'logo_picto', label: 'Logo Pictogramme', mode: 'assisté' },
+    { value: 'logo_complet', label: 'Logo Complet', mode: 'expert' },
+    { value: 'print', label: 'Print', mode: 'modifiable' },
+    { value: 'social', label: 'Réseaux sociaux', mode: 'modifiable' },
+    { value: 'image', label: 'Image réaliste', mode: 'modifiable' }
   ];
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function AdminPrompts() {
 
   const handleCreate = () => {
     setEditingPrompt({
-      category: 'logo',
+      category: 'logo_picto',
       subcategory: '',
       prompt_fr: '',
       prompt_en: '',
@@ -131,11 +132,22 @@ export default function AdminPrompts() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="px-3 py-1 rounded-full bg-violet-600/20 text-violet-300 text-xs font-medium">
-                      {prompt.category}
+                      {categories.find(c => c.value === prompt.category)?.label || prompt.category}
                     </span>
                     {prompt.subcategory && (
                       <span className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 text-xs">
                         {prompt.subcategory}
+                      </span>
+                    )}
+                    {/* Mode Badge */}
+                    {prompt.category === 'logo_complet' && (
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full">
+                        MODE EXPERT
+                      </span>
+                    )}
+                    {prompt.category === 'logo_picto' && (
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
+                        MODE ASSISTÉ
                       </span>
                     )}
                     {!prompt.is_active && (
@@ -218,10 +230,20 @@ export default function AdminPrompts() {
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map(cat => (
-                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
+                          {cat.mode === 'expert' && ' 🎯'}
+                          {cat.mode === 'assisté' && ' ✨'}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {editingPrompt.category === 'logo_complet' && (
+                    <p className="text-orange-400 text-xs mt-1">🎯 Mode expert fixe - prompt non enrichi</p>
+                  )}
+                  {editingPrompt.category === 'logo_picto' && (
+                    <p className="text-cyan-400 text-xs mt-1">✨ Mode assisté fixe - prompt enrichi par iGPT</p>
+                  )}
                 </div>
 
                 <div>
@@ -246,7 +268,12 @@ export default function AdminPrompts() {
               </div>
 
               <div>
-                <label className="text-white/60 text-sm mb-2 block">Prompt FR *</label>
+                <label className="text-white/60 text-sm mb-2 block">
+                  Prompt FR * 
+                  {(editingPrompt.category === 'logo_picto' || editingPrompt.category === 'logo_complet') && (
+                    <span className="ml-2 text-yellow-400 text-xs">⚠️ Utilisez --no text --no letters --no words --no typography pour éviter les textes</span>
+                  )}
+                </label>
                 <Textarea
                   value={editingPrompt.prompt_fr}
                   onChange={(e) => setEditingPrompt({ ...editingPrompt, prompt_fr: e.target.value })}
