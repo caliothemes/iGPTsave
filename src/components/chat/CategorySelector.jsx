@@ -178,10 +178,9 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
 
         return (
           <div key={category.id} className="relative">
-            <button
-              onClick={() => handleCategoryClick(category)}
+            <div
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all text-left",
+                "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer",
                 isFreePrompt 
                   ? "bg-gradient-to-br from-orange-600/20 to-red-600/20 hover:from-orange-600/30 hover:to-red-600/30 border-2 border-orange-500/30 hover:border-orange-500/50"
                   : "bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20",
@@ -296,9 +295,25 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </button>
+                  )}
+
+                  {/* Choose Button */}
+                  <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCategoryClick(category);
+                  }}
+                  className={cn(
+                    "mt-3 w-full py-2 px-3 rounded-lg text-xs font-medium transition-all",
+                    isFreePrompt
+                      ? "bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
+                      : "bg-white/10 hover:bg-white/20 text-white"
+                  )}
+                  >
+                  {language === 'fr' ? 'Choisir ce format' : 'Choose this format'}
+                  </button>
+                  </div>
+                  </div>
 
             {/* Submenu */}
             {category.hasSubmenu && isOpen && (
