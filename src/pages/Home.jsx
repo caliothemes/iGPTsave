@@ -195,12 +195,8 @@ export default function Home() {
       const isExpertMode = selectedCategory?.expertMode || false;
 
       if (isExpertMode) {
-        // Mode expert : prompt brut avec structure pour logo complet
-        if (selectedCategory?.id === 'logo_complet') {
-          enhancedPrompt = `professional complete logo design, ${userMessage}, clean typography, modern font, balanced composition, brand identity, vector style, high quality`;
-        } else {
-          enhancedPrompt = userMessage;
-        }
+        // Mode expert : prompt brut tel quel, sans enrichissement
+        enhancedPrompt = userMessage;
       } else {
         // Mode assisté : enrichissement du prompt
         // Try to get custom prompt template
