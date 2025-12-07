@@ -222,8 +222,8 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                     <div className="mt-2 p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
                       <p className="text-[10px] text-orange-300 leading-tight">
                         {language === 'fr'
-                          ? 'Aucune assistance iGPT. Votre prompt doit être complet et détaillé pour obtenir de bons résultats.'
-                          : 'No iGPT assistance. Your prompt must be complete and detailed to get good results.'}
+                          ? 'Aucune assistance iGPT. Aucun format défini, aucune catégorie. Votre prompt doit être complet et détaillé pour obtenir de bons résultats.'
+                          : 'No iGPT assistance. No defined format, no category. Your prompt must be complete and detailed to get good results.'}
                       </p>
                     </div>
                   ) : (
