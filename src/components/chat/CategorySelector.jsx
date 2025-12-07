@@ -31,7 +31,6 @@ const CATEGORIES = [
     description: { fr: 'Carte de visite, flyer, affiche...', en: 'Business card, flyer, poster...' },
     hasSubmenu: true,
     hasNestedSubmenu: true,
-    defaultExpertMode: false,
     submenu: [
       { 
         id: 'carte_visite', 
@@ -89,7 +88,6 @@ const CATEGORIES = [
     name: { fr: 'Image réaliste', en: 'Realistic Image' },
     description: { fr: 'Photos IA, portraits, paysages', en: 'AI photos, portraits, landscapes' },
     hasSubmenu: true,
-    defaultExpertMode: false,
     submenu: [
       { id: 'image_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une image réaliste format carré', en: 'Create a realistic image in square format' }, dimensions: '1080x1080' },
       { id: 'image_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée une image réaliste format story', en: 'Create a realistic image in story format' }, dimensions: '1080x1920' },
@@ -103,7 +101,6 @@ const CATEGORIES = [
     name: { fr: 'Réseaux sociaux', en: 'Social Media' },
     description: { fr: 'Carré, Story, Bannière', en: 'Square, Story, Banner' },
     hasSubmenu: true,
-    defaultExpertMode: false,
     submenu: [
       { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un post pour les réseaux sociaux format carré', en: 'Create a social media post in square format' }, dimensions: '1080x1080' },
       { id: 'social_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée une story pour les réseaux sociaux', en: 'Create a social media story' }, dimensions: '1080x1920' },
