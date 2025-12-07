@@ -194,12 +194,13 @@ export default function Home() {
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
       const isExpertMode = selectedCategory?.expertMode || false;
 
+      // MODE EXPERT : Prompt brut, aucun template, aucun enrichissement
       if (isExpertMode) {
-        // Mode expert : prompt brut tel quel, sans enrichissement
         enhancedPrompt = userMessage;
-      } else {
-        // Mode assisté : enrichissement du prompt
-        // Try to get custom prompt template
+        console.log('🎯 MODE EXPERT - Prompt brut envoyé:', enhancedPrompt);
+      } 
+      // MODE ASSISTÉ : Enrichissement via templates ou prompts par défaut
+      else {
         const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
         const template = promptTemplates.find(t => 
           t.category === selectedCategory?.id && 
@@ -207,13 +208,14 @@ export default function Home() {
         );
 
         if (template) {
-          // Use custom template from admin
+          // Template admin personnalisé
           const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
           enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
+          console.log('✨ MODE ASSISTÉ - Template admin appliqué:', template.description);
         } else {
-          // Fallback to default prompts
-          if (['logo', 'print', 'social'].includes(selectedCategory?.id)) {
-            if (selectedCategory?.id === 'logo') {
+          // Prompts par défaut
+          if (['logo', 'logo_picto', 'logo_complet', 'print', 'social'].includes(selectedCategory?.id)) {
+            if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'logo_picto') {
               enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
             } else {
               enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
@@ -222,6 +224,7 @@ export default function Home() {
           } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
+          console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
         }
 
         if (selectedStyle) {
@@ -232,6 +235,7 @@ export default function Home() {
         }
 
         enhancedPrompt += ', professional quality, 4K resolution';
+        console.log('📝 Prompt final enrichi:', enhancedPrompt);
       }
 
       const result = await base44.integrations.Core.GenerateImage({
