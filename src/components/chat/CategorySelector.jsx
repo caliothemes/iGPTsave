@@ -2,17 +2,27 @@ import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import { 
-  Gem, Printer, Image, Share2, ChevronDown, ChevronRight
+  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles
 } from 'lucide-react';
 
 const CATEGORIES = [
   {
-    id: 'logo',
+    id: 'logo_picto',
     icon: Gem,
-    name: { fr: 'Logo HD', en: 'HD Logo' },
-    description: { fr: 'Logos vectoriels, icônes, symboles', en: 'Vector logos, icons, symbols' },
+    name: { fr: 'Logo Pictogramme', en: 'Logo Icon' },
+    description: { fr: 'Icône seule, symbole, pictogramme', en: 'Icon only, symbol, pictogram' },
     hasSubmenu: false,
-    prompt: { fr: 'Crée un logo', en: 'Create a logo' }
+    prompt: { fr: 'Crée un logo pictogramme', en: 'Create a logo icon' },
+    defaultExpertMode: false
+  },
+  {
+    id: 'logo_complet',
+    icon: Sparkles,
+    name: { fr: 'Logo Complet', en: 'Complete Logo' },
+    description: { fr: 'Logo avec texte, prêt à l\'emploi', en: 'Logo with text, ready to use' },
+    hasSubmenu: false,
+    prompt: { fr: 'Crée un logo complet', en: 'Create a complete logo' },
+    defaultExpertMode: true
   },
   {
     id: 'print',
@@ -104,7 +114,17 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
   const { language } = useLanguage();
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [openNestedSubmenu, setOpenNestedSubmenu] = useState(null);
-  const [expertMode, setExpertMode] = useState({});
+  
+  // Initialize expertMode with default values from categories
+  const [expertMode, setExpertMode] = useState(() => {
+    const defaults = {};
+    CATEGORIES.forEach(cat => {
+      if (cat.defaultExpertMode !== undefined) {
+        defaults[cat.id] = cat.defaultExpertMode;
+      }
+    });
+    return defaults;
+  });
 
   const handleCategoryClick = (category) => {
     if (category.hasSubmenu) {
@@ -159,13 +179,19 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                 <Icon className="h-5 w-5 text-white/70" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-white text-sm font-medium">{category.name[language]}</span>
                   {category.hasSubmenu && (
                     <ChevronDown className={cn(
                       "h-4 w-4 text-white/40 transition-transform",
                       isOpen && "rotate-180"
                     )} />
+                  )}
+                  {/* Expert Mode Badge - Visible indicator */}
+                  {expertMode[category.id] && (
+                    <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                      EXPERT
+                    </span>
                   )}
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
