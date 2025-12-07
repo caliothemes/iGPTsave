@@ -215,16 +215,16 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                   </span>
                   
                   {/* Tooltip */}
-                  <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-48">
+                  <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-56">
                     <div className="bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 shadow-xl">
                       <p className="text-white text-[10px] leading-relaxed">
                         {expertMode[category.id] 
                           ? (language === 'fr' 
-                            ? '🎯 Mode expert : votre prompt est envoyé tel quel, sans enrichissement'
-                            : '🎯 Expert mode: your prompt is sent as is, without enhancement')
+                            ? '🎯 Prompt non enrichi par iGPT, envoyé tel quel. Attention vous devez faire un prompt complet pour avoir de bons résultats.'
+                            : '🎯 Prompt not enhanced by iGPT, sent as is. Warning: you must write a complete prompt for good results.')
                           : (language === 'fr'
-                            ? '✨ Mode assisté : prompt enrichi automatiquement pour de meilleurs résultats'
-                            : '✨ Assisted mode: prompt automatically enhanced for better results')
+                            ? '✨ Prompt enrichi en arrière plan par iGPT'
+                            : '✨ Prompt enhanced in background by iGPT')
                         }
                       </p>
                     </div>
