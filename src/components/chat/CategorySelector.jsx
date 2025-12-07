@@ -108,7 +108,17 @@ const CATEGORIES = [
       { id: 'social_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée une bannière pour les réseaux sociaux', en: 'Create a social media banner' }, dimensions: '1920x1080' },
     ]
   },
-];
+  {
+    id: 'free_prompt',
+    icon: Sparkles,
+    name: { fr: 'Prompt 100% libre', en: '100% Free Prompt' },
+    description: { fr: '🎯 Pro uniquement - Aucune assistance', en: '🎯 Pro only - No assistance' },
+    hasSubmenu: false,
+    prompt: { fr: '', en: '' },
+    defaultExpertMode: true,
+    isFreePrompt: true
+  },
+  ];
 
 export default function CategorySelector({ onSelect, selectedCategory }) {
   const { language } = useLanguage();
@@ -164,6 +174,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
         const Icon = category.icon;
         const isOpen = openSubmenu === category.id;
         const isSelected = selectedCategory?.id === category.id;
+        const isFreePrompt = category.isFreePrompt;
 
         return (
           <div key={category.id} className="relative">
@@ -171,8 +182,11 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
               onClick={() => handleCategoryClick(category)}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all text-left",
-                "bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20",
-                isSelected && "bg-violet-500/10 border-violet-500/30"
+                isFreePrompt 
+                  ? "bg-gradient-to-br from-orange-600/20 to-red-600/20 hover:from-orange-600/30 hover:to-red-600/30 border-2 border-orange-500/30 hover:border-orange-500/50"
+                  : "bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20",
+                isSelected && !isFreePrompt && "bg-violet-500/10 border-violet-500/30",
+                isSelected && isFreePrompt && "border-orange-500/70"
               )}
             >
               <div className="p-2 rounded-lg bg-white/5">
@@ -202,40 +216,52 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
                 
-                {/* Expert Mode Toggle - Disabled for logo types */}
+                {/* Expert Mode Toggle */}
                 {category.defaultExpertMode !== undefined ? (
-                  <div className="flex items-center gap-2 mt-2 group/toggle relative">
-                    <div
-                      className={cn(
-                        "relative inline-flex h-5 w-9 items-center rounded-full opacity-40 cursor-not-allowed",
-                        expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
-                      )}
-                    >
-                      <span className={cn(
-                        "inline-block h-3 w-3 transform rounded-full bg-white",
-                        expertMode[category.id] ? "translate-x-5" : "translate-x-1"
-                      )} />
+                  category.isFreePrompt ? (
+                    // Free Prompt : info warning uniquement
+                    <div className="mt-2 p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                      <p className="text-[10px] text-orange-300 leading-tight">
+                        {language === 'fr'
+                          ? '⚠️ Aucune assistance IA - Vos prompts doivent être complets et détaillés'
+                          : '⚠️ No AI assistance - Your prompts must be complete and detailed'}
+                      </p>
                     </div>
-                    <span className="text-[10px] text-white/30">
-                      {expertMode[category.id] ? (language === 'fr' ? 'Expert' : 'Expert') : (language === 'fr' ? 'Assisté' : 'Assisted')}
-                    </span>
-                    
-                    {/* Tooltip */}
-                    <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-56">
-                      <div className="bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 shadow-xl">
-                        <p className="text-white text-[10px] leading-relaxed">
-                          {expertMode[category.id] 
-                            ? (language === 'fr' 
-                              ? '🎯 Mode expert fixe : optimal pour logos complets avec texte.'
-                              : '🎯 Fixed expert mode: optimal for complete logos with text.')
-                            : (language === 'fr'
-                              ? '✨ Mode assisté fixe : optimal pour pictogrammes et icônes.'
-                              : '✨ Fixed assisted mode: optimal for pictograms and icons.')
-                          }
-                        </p>
+                  ) : (
+                    // Logo types : mode fixe
+                    <div className="flex items-center gap-2 mt-2 group/toggle relative">
+                      <div
+                        className={cn(
+                          "relative inline-flex h-5 w-9 items-center rounded-full opacity-40 cursor-not-allowed",
+                          expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
+                        )}
+                      >
+                        <span className={cn(
+                          "inline-block h-3 w-3 transform rounded-full bg-white",
+                          expertMode[category.id] ? "translate-x-5" : "translate-x-1"
+                        )} />
+                      </div>
+                      <span className="text-[10px] text-white/30">
+                        {expertMode[category.id] ? (language === 'fr' ? 'Expert' : 'Expert') : (language === 'fr' ? 'Assisté' : 'Assisted')}
+                      </span>
+
+                      {/* Tooltip */}
+                      <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-56">
+                        <div className="bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 shadow-xl">
+                          <p className="text-white text-[10px] leading-relaxed">
+                            {expertMode[category.id] 
+                              ? (language === 'fr' 
+                                ? '🎯 Mode expert fixe : optimal pour logos complets avec texte.'
+                                : '🎯 Fixed expert mode: optimal for complete logos with text.')
+                              : (language === 'fr'
+                                ? '✨ Mode assisté fixe : optimal pour pictogrammes et icônes.'
+                                : '✨ Fixed assisted mode: optimal for pictograms and icons.')
+                            }
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )
                 ) : (
                   <div className="flex items-center gap-2 mt-2 group/toggle relative">
                     <button
