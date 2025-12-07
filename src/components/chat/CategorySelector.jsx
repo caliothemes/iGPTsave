@@ -182,10 +182,10 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer",
                 isFreePrompt 
-                  ? "bg-gradient-to-br from-orange-600/20 to-red-600/20 hover:from-orange-600/30 hover:to-red-600/30 border-2 border-orange-500/30 hover:border-orange-500/50"
+                  ? "bg-gradient-to-br from-blue-600/20 to-cyan-600/20 hover:from-blue-600/30 hover:to-cyan-600/30 border-2 border-blue-500/30 hover:border-blue-500/50"
                   : "bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20",
                 isSelected && !isFreePrompt && "bg-violet-500/10 border-violet-500/30",
-                isSelected && isFreePrompt && "border-orange-500/70"
+                isSelected && isFreePrompt && "border-blue-500/70"
               )}
             >
               <div className="p-2 rounded-lg bg-white/5">
@@ -219,8 +219,8 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                 {category.defaultExpertMode !== undefined ? (
                   category.isFreePrompt ? (
                     // Free Prompt : info warning uniquement
-                    <div className="mt-2 p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                      <p className="text-[10px] text-orange-300 leading-tight">
+                    <div className="mt-2 p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <p className="text-[10px] text-blue-300 leading-tight">
                         {language === 'fr'
                           ? 'Aucune assistance iGPT. Aucun format défini, aucune catégorie. Votre prompt doit être complet et détaillé pour obtenir de bons résultats.'
                           : 'No iGPT assistance. No defined format, no category. Your prompt must be complete and detailed to get good results.'}
@@ -306,7 +306,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                   className={cn(
                     "mt-3 w-full py-2 px-3 rounded-lg text-xs font-medium transition-all",
                     isFreePrompt
-                      ? "bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
+                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
                       : "bg-white/10 hover:bg-white/20 text-white"
                   )}
                   >
