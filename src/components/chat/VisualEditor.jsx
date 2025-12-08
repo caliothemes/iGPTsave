@@ -239,6 +239,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [showMockupModal, setShowMockupModal] = useState(false);
   const [mockupImageFile, setMockupImageFile] = useState(null);
   const [detectingZone, setDetectingZone] = useState(false);
+  const [mockupSelectionMode, setMockupSelectionMode] = useState(false);
+  const [detectedZones, setDetectedZones] = useState([]);
   const mockupInputRef = useRef(null);
 
   // Load user, library and admin assets
