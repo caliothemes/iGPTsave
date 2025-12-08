@@ -240,8 +240,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [mockupImageFile, setMockupImageFile] = useState(null);
   const [detectingZone, setDetectingZone] = useState(false);
   const [mockupSelectionMode, setMockupSelectionMode] = useState(false);
-  const [detectedZones, setDetectedZones] = useState([]);
+  const [detectedZone, setDetectedZone] = useState(null);
   const mockupInputRef = useRef(null);
+  const [tool, setTool] = useState('select');
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -684,7 +685,18 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-            // Apply effects for images
+            // Apply clipping mask if layer has one (for mockup zones)
+              if (layer.clipMask && layer.clipMask.length > 0) {
+                ctx.beginPath();
+                layer.clipMask.forEach((point, i) => {
+                  if (i === 0) ctx.moveTo(point[0], point[1]);
+                  else ctx.lineTo(point[0], point[1]);
+                });
+                ctx.closePath();
+                ctx.clip();
+              }
+              
+              // Apply effects for images
               if (layer.halo) {
                 ctx.shadowColor = layer.haloColor || '#FFD700';
                 ctx.shadowBlur = layer.haloSize || 15;
@@ -1547,6 +1559,59 @@ Réponds en JSON avec:
     setStylizingText(false);
   };
 
+  // Detect white zone using flood fill algorithm
+  const detectWhiteZone = (imageData, startX, startY, width, height) => {
+    const data = imageData.data;
+    const visited = new Array(width * height).fill(false);
+    const queue = [[startX, startY]];
+    const WHITE_THRESHOLD = 230;
+    const points = [];
+    
+    const getPixel = (x, y) => {
+      const idx = (y * width + x) * 4;
+      return { r: data[idx], g: data[idx + 1], b: data[idx + 2], a: data[idx + 3] };
+    };
+    
+    const isWhite = (pixel) => {
+      return pixel.r > WHITE_THRESHOLD && pixel.g > WHITE_THRESHOLD && pixel.b > WHITE_THRESHOLD;
+    };
+    
+    const startPixel = getPixel(startX, startY);
+    if (!isWhite(startPixel)) return null;
+    
+    while (queue.length > 0 && points.length < 50000) {
+      const [x, y] = queue.shift();
+      const idx = y * width + x;
+      
+      if (x < 0 || x >= width || y < 0 || y >= height || visited[idx]) continue;
+      
+      const pixel = getPixel(x, y);
+      if (!isWhite(pixel)) continue;
+      
+      visited[idx] = true;
+      points.push([x, y]);
+      
+      queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+    }
+    
+    if (points.length < 100) return null;
+    
+    const xs = points.map(p => p[0]);
+    const ys = points.map(p => p[1]);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+      points: points
+    };
+  };
+
   const removeFromLibrary = async (idx) => {
     const updatedLibrary = userLibrary.filter((_, i) => i !== idx);
     setUserLibrary(updatedLibrary);
@@ -1570,12 +1635,42 @@ Réponds en JSON avec:
     setSelectedLayer(newIndex);
   };
 
-  const handleCanvasMouseDown = (e) => {
+  const handleCanvasMouseDown = async (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const scaleX = canvasSize.width / rect.width;
     const scaleY = canvasSize.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
+    
+    // Mockup selection mode
+    if (mockupSelectionMode) {
+      setDetectingZone(true);
+      try {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        const zone = detectWhiteZone(imageData, Math.floor(x), Math.floor(y), canvas.width, canvas.height);
+        
+        if (zone) {
+          setDetectedZone(zone);
+          setMockupSelectionMode(false);
+          setShowMockupModal(true);
+          showHelp(language === 'fr' 
+            ? '✅ Zone détectée ! Uploadez votre image' 
+            : '✅ Zone detected! Upload your image');
+        } else {
+          showHelp(language === 'fr' 
+            ? '❌ Aucune zone blanche détectée ici' 
+            : '❌ No white area detected here');
+        }
+      } catch (err) {
+        console.error(err);
+        showHelp(language === 'fr' ? '❌ Erreur de détection' : '❌ Detection error');
+      }
+      setDetectingZone(false);
+      return;
+    }
     
     // Eraser mode
     if (isErasing) {
@@ -2904,42 +2999,67 @@ Réponds en JSON avec:
           <div className="h-px bg-white/10 my-1" />
           
           <button
-            onClick={() => setShowMockupModal(true)}
+            onClick={() => {
+              setMockupSelectionMode(true);
+              setTool('select');
+              setIsErasing(false);
+              setIsBrushing(false);
+              showHelp(language === 'fr' 
+                ? '👆 Cliquez sur une zone blanche du mockup' 
+                : '👆 Click on a white area of the mockup');
+            }}
             className={cn(
               "p-2.5 rounded-lg transition-all",
-              "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
+              mockupSelectionMode 
+                ? "bg-cyan-500/40 text-cyan-300 ring-2 ring-cyan-400/50" 
+                : "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
             )}
-            title={language === 'fr' ? 'Remplir Mockup' : 'Fill Mockup'}
+            title={language === 'fr' ? 'Remplir une zone du mockup' : 'Fill a mockup area'}
           >
-            <Frame className="h-5 w-5" />
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
+            </svg>
           </button>
         </div>
         
         {/* Canvas Container */}
         <div className="relative flex-1 flex items-center justify-center">
-          <canvas 
-            ref={canvasRef} 
-            width={canvasSize.width} 
-            height={canvasSize.height} 
-            className={cn(
-              "rounded-lg shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain",
-              (isErasing || isBrushing) ? "cursor-none" : "cursor-move"
+          <div className="relative">
+            <canvas 
+              ref={canvasRef} 
+              width={canvasSize.width} 
+              height={canvasSize.height} 
+              className={cn(
+                "rounded-lg shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain",
+                mockupSelectionMode ? "cursor-crosshair" : (isErasing || isBrushing) ? "cursor-none" : "cursor-move"
+              )}
+              style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
+              onMouseDown={handleCanvasMouseDown} 
+              onMouseMove={handleCanvasMouseMove} 
+              onMouseUp={handleCanvasMouseUp} 
+              onMouseLeave={handleCanvasMouseUp} 
+              onTouchStart={(e) => {
+                const touch = e.touches[0];
+                handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+              }}
+              onTouchMove={(e) => {
+                const touch = e.touches[0];
+                handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+              }}
+              onTouchEnd={handleCanvasMouseUp}
+            />
+            
+            {mockupSelectionMode && (
+              <div className="absolute inset-0 border-4 border-dashed border-cyan-400/60 rounded-lg pointer-events-none animate-pulse">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 px-4 py-2 rounded-lg">
+                  <p className="text-white text-sm font-medium">
+                    {language === 'fr' ? '👆 Cliquez sur une zone blanche' : '👆 Click on a white area'}
+                  </p>
+                </div>
+              </div>
             )}
-            style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
-            onMouseDown={handleCanvasMouseDown} 
-            onMouseMove={handleCanvasMouseMove} 
-            onMouseUp={handleCanvasMouseUp} 
-            onMouseLeave={handleCanvasMouseUp} 
-            onTouchStart={(e) => {
-              const touch = e.touches[0];
-              handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
-            }}
-            onTouchMove={(e) => {
-              const touch = e.touches[0];
-              handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
-            }}
-            onTouchEnd={handleCanvasMouseUp}
-          />
+          </div>
           {/* Center guides overlay */}
           {guides.showVertical && (
             <div 
@@ -3820,20 +3940,35 @@ Réponds en JSON avec:
       </Dialog>
 
       {/* Mockup Magic Fill Modal */}
-      <Dialog open={showMockupModal} onOpenChange={setShowMockupModal}>
+      <Dialog open={showMockupModal} onOpenChange={(open) => {
+        setShowMockupModal(open);
+        if (!open) {
+          setMockupImageFile(null);
+          setDetectedZone(null);
+          setMockupSelectionMode(false);
+        }
+      }}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Frame className="h-5 w-5 text-cyan-400" />
-              {language === 'fr' ? 'Remplissage Magique de Mockup' : 'Magic Mockup Fill'}
+              <svg className="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
+              </svg>
+              {language === 'fr' ? '✨ Remplir la zone' : '✨ Fill area'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-white/60 text-sm">
-              {language === 'fr' 
-                ? 'Uploadez votre image et l\'IA la placera automatiquement dans les zones blanches du mockup.' 
-                : 'Upload your image and the AI will automatically place it in the white zones of the mockup.'}
-            </p>
+            {detectedZone && (
+              <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                <p className="text-cyan-300 text-sm font-medium">
+                  {language === 'fr' ? '✅ Zone détectée' : '✅ Zone detected'}
+                </p>
+                <p className="text-white/60 text-xs mt-1">
+                  {Math.round(detectedZone.width)}×{Math.round(detectedZone.height)}px
+                </p>
+              </div>
+            )}
             
             <input
               type="file"
@@ -3844,20 +3979,32 @@ Réponds en JSON avec:
             />
             
             {!mockupImageFile ? (
-              <Button 
-                onClick={() => mockupInputRef.current?.click()} 
-                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+              <label
+                htmlFor="mockup-file-input"
+                className="block w-full p-8 border-2 border-dashed border-cyan-500/30 rounded-xl cursor-pointer hover:border-cyan-500/60 hover:bg-cyan-500/5 transition-all text-center"
+                onClick={() => mockupInputRef.current?.click()}
               >
-                <Upload className="h-4 w-4 mr-2" />
-                {language === 'fr' ? 'Choisir une image' : 'Choose an image'}
-              </Button>
+                <Upload className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+                <p className="text-white/70 text-sm font-medium">
+                  {language === 'fr' ? 'Cliquez pour choisir une image' : 'Click to choose an image'}
+                </p>
+                <p className="text-white/40 text-xs mt-1">
+                  {language === 'fr' ? 'Elle sera insérée dans la zone blanche' : 'It will be inserted in the white area'}
+                </p>
+              </label>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg">
-                  <ImagePlus className="h-4 w-4 text-cyan-400" />
-                  <span className="text-white/80 text-sm flex-1 truncate">{mockupImageFile.name}</span>
-                  <button onClick={() => setMockupImageFile(null)} className="p-1 hover:bg-white/10 rounded">
-                    <X className="h-4 w-4 text-white/40" />
+                <div className="relative rounded-lg overflow-hidden">
+                  <img
+                    src={URL.createObjectURL(mockupImageFile)}
+                    alt="Preview"
+                    className="w-full h-40 object-cover"
+                  />
+                  <button
+                    onClick={() => setMockupImageFile(null)}
+                    className="absolute top-2 right-2 p-2 bg-red-500 rounded-full hover:bg-red-600 shadow-lg"
+                  >
+                    <X className="h-4 w-4 text-white" />
                   </button>
                 </div>
                 
@@ -3865,69 +4012,35 @@ Réponds en JSON avec:
                   onClick={async () => {
                     setDetectingZone(true);
                     try {
-                      // Upload the user image first
                       const { file_url: userImageUrl } = await base44.integrations.Core.UploadFile({ file: mockupImageFile });
                       
-                      // Use AI to detect white/empty zones in the current canvas
-                      const result = await base44.integrations.Core.InvokeLLM({
-                        prompt: `Analyse this mockup image carefully and detect the main white/empty/blank rectangular zone where content should be placed (like a screen, frame, or display area).
-
-Look for:
-- White or very light colored rectangular areas
-- Screen displays on devices (phones, tablets, computers)
-- Photo frames or empty frames
-- Product packaging front panels
-- Any clearly defined empty space meant for content
-
-Return the EXACT coordinates and dimensions as percentages of the total image size.
-Be PRECISE - the inserted image must fit PERFECTLY within the detected zone without overflowing.
-
-Return in JSON format:
-- x: left edge position as percentage (0-100)
-- y: top edge position as percentage (0-100)
-- width: zone width as percentage (0-100)
-- height: zone height as percentage (0-100)
-
-Example: If the white screen area starts at 20% from left, 15% from top, and measures 60% wide by 70% tall, return: {"x": 20, "y": 15, "width": 60, "height": 70}`,
-                        response_json_schema: {
-                          type: "object",
-                          properties: {
-                            x: { type: "number" },
-                            y: { type: "number" },
-                            width: { type: "number" },
-                            height: { type: "number" }
-                          }
-                        },
-                        file_urls: [originalImageUrl]
-                      });
+                      const zone = detectedZone;
                       
-                      // Convert percentages to canvas pixels
-                      const zoneX = (result.x / 100) * canvasSize.width;
-                      const zoneY = (result.y / 100) * canvasSize.height;
-                      const zoneWidth = (result.width / 100) * canvasSize.width;
-                      const zoneHeight = (result.height / 100) * canvasSize.height;
-                      
-                      // Create the layer directly with the correct position and size
                       const newLayer = {
                         type: 'image',
                         imageUrl: userImageUrl,
-                        x: zoneX,
-                        y: zoneY,
-                        width: zoneWidth,
-                        height: zoneHeight,
-                        opacity: 100
+                        x: zone.x,
+                        y: zone.y,
+                        width: zone.width,
+                        height: zone.height,
+                        opacity: 100,
+                        clipMask: zone.points,
+                        lockedToMask: true
                       };
                       
                       setLayers([...layers, newLayer]);
                       setSelectedLayer(layers.length);
                       setActiveTab('layers');
                       
-                      showHelp(language === 'fr' ? '✨ Image intégrée au mockup ! Ajustez la position si besoin.' : '✨ Image integrated into mockup! Adjust position if needed.');
+                      showHelp(language === 'fr' 
+                        ? '✨ Image insérée ! Elle reste dans la zone blanche.' 
+                        : '✨ Image inserted! It stays within the white area.');
                       setShowMockupModal(false);
                       setMockupImageFile(null);
+                      setDetectedZone(null);
                     } catch (err) {
                       console.error(err);
-                      showHelp(language === 'fr' ? '❌ Erreur lors de la détection' : '❌ Detection error');
+                      showHelp(language === 'fr' ? '❌ Erreur lors de l\'insertion' : '❌ Insertion error');
                     }
                     setDetectingZone(false);
                   }}
@@ -3937,12 +4050,12 @@ Example: If the white screen area starts at 20% from left, 15% from top, and mea
                   {detectingZone ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      {language === 'fr' ? 'Détection en cours...' : 'Detecting...'}
+                      {language === 'fr' ? 'Insertion...' : 'Inserting...'}
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 mr-2" />
-                      {language === 'fr' ? 'Insérer automatiquement' : 'Insert automatically'}
+                      {language === 'fr' ? 'Insérer dans la zone' : 'Insert into zone'}
                     </>
                   )}
                 </Button>
