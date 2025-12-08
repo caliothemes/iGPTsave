@@ -505,12 +505,25 @@ export default function Store() {
                       <div 
                         className="relative cursor-pointer group/image"
                         onClick={() => setEnlargedImage(item)}
+                        onContextMenu={(e) => {
+                          if (!isAdmin) {
+                            e.preventDefault();
+                            return false;
+                          }
+                        }}
                       >
                         <img
                           src={item.image_url}
                           alt={item.title}
-                          className="w-full h-auto block"
+                          className="w-full h-auto block select-none"
                           loading="lazy"
+                          draggable="false"
+                          onContextMenu={(e) => {
+                            if (!isAdmin) {
+                              e.preventDefault();
+                              return false;
+                            }
+                          }}
                         />
                         {/* Watermark iGPT */}
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -660,11 +673,26 @@ export default function Store() {
                 className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="relative max-w-7xl max-h-[95vh] w-full h-full flex items-center justify-center">
+                <div 
+                  className="relative max-w-7xl max-h-[95vh] w-full h-full flex items-center justify-center"
+                  onContextMenu={(e) => {
+                    if (!isAdmin) {
+                      e.preventDefault();
+                      return false;
+                    }
+                  }}
+                >
                   <img
                     src={enlargedImage.image_url}
                     alt={enlargedImage.title}
-                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-2xl"
+                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-2xl select-none"
+                    draggable="false"
+                    onContextMenu={(e) => {
+                      if (!isAdmin) {
+                        e.preventDefault();
+                        return false;
+                      }
+                    }}
                   />
                   {/* Watermark iGPT */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
