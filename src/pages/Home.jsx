@@ -656,25 +656,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 md:pb-48">
-            <div className="max-w-3xl mx-auto space-y-4 relative">
-              {/* Favorites Button - Sticky à droite */}
-              <div className="absolute -right-4 top-0 sticky top-6 z-30 flex justify-end">
-                <button
-                  onClick={() => setShowFavoritesModal(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-2"
-                >
-                  <Heart className={cn("h-4 w-4", favoriteVisuals.length > 0 && "fill-white")} />
-                  <span className="text-sm font-medium whitespace-nowrap">
-                    {language === 'fr' ? 'Mes favoris' : 'My favorites'}
-                  </span>
-                  {favoriteVisuals.length > 0 && (
-                    <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                      {favoriteVisuals.length}
-                    </span>
-                  )}
-                </button>
-              </div>
-
+            <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
                   <motion.div
@@ -694,7 +676,23 @@ export default function Home() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex justify-center"
                 >
-                  <div className="w-full max-w-md">
+                  <div className="w-full max-w-md relative">
+                    {/* Favorites Button - Outside card, top right of image */}
+                    <button
+                      onClick={() => setShowFavoritesModal(true)}
+                      className="absolute -right-3 top-3 z-40 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
+                    >
+                      <Heart className={cn("h-4 w-4", favoriteVisuals.length > 0 && "fill-white")} />
+                      <span className="text-sm font-medium whitespace-nowrap">
+                        {language === 'fr' ? 'Mes favoris' : 'My favorites'}
+                      </span>
+                      {favoriteVisuals.length > 0 && (
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                          {favoriteVisuals.length}
+                        </span>
+                      )}
+                    </button>
+
                     <VisualCard
                       visual={currentVisual}
                       onRegenerate={handleRegenerate}
