@@ -324,14 +324,7 @@ export default function Store() {
               ? 'Découvrez et achetez des visuels prêts à l\'emploi, créés par notre équipe.'
               : 'Discover and purchase ready-to-use visuals, created by our team.'}
           </p>
-          {!isAdmin && (
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full">
-              <Lock className="h-4 w-4 text-amber-400" />
-              <span className="text-amber-300 text-sm">
-                {language === 'fr' ? 'Accès limité - Bientôt disponible' : 'Limited access - Coming soon'}
-              </span>
-            </div>
-          )}
+
         </div>
 
         {/* Categories Tabs */}
