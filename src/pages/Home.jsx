@@ -793,7 +793,7 @@ export default function Home() {
             {/* Footer Links */}
             <div className="flex items-center justify-center gap-4 mt-3 text-xs text-white/40">
               <Link to={createPageUrl('Store')} className="hover:text-white/60 transition-colors">
-                Store
+                iGPT Store
               </Link>
               <span>•</span>
               <Link to={createPageUrl('Pricing')} className="hover:text-white/60 transition-colors">

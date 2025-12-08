@@ -250,7 +250,7 @@ export default function Portfolio() {
           <div className={cn("transition-all duration-300", sidebarOpen && "md:ml-64")}>
             <div className="flex items-center justify-center">
               <p className="text-white/25 text-xs">
-                <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">Store</a>
+                <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">iGPT Store</a>
                 {' • '}
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                 {' • '}
