@@ -9,7 +9,7 @@ import { useLanguage } from '@/components/LanguageContext';
 import { createPageUrl } from '@/utils';
 import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Format Badge Component
@@ -116,28 +116,53 @@ export default function Store() {
 
   const handlePurchase = async (item) => {
     if (!user) {
-      toast.error(language === 'fr' ? 'Connectez-vous pour acheter' : 'Sign in to purchase');
+      toast.error(language === 'fr' ? 'Connectez-vous pour acheter' : 'Sign in to purchase', {
+        duration: 4000,
+        style: {
+          background: '#1f2937',
+          color: '#fff',
+          border: '1px solid #ef4444'
+        }
+      });
       return;
     }
 
     // Check if already purchased
     if (alreadyPurchased.has(item.id)) {
-      toast.info(
+      toast(
         language === 'fr' 
-          ? 'Visuel déjà acheté, retrouvez-le dans la page "Mes visuels"' 
-          : 'Visual already purchased, find it in "My Visuals"',
-        { duration: 4000 }
+          ? '🔵 Visuel déjà acheté, retrouvez-le dans la page "Mes visuels"' 
+          : '🔵 Visual already purchased, find it in "My Visuals"',
+        { 
+          duration: 5000,
+          style: {
+            background: '#1e3a8a',
+            color: '#fff',
+            border: '1px solid #3b82f6',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        }
       );
       return;
     }
 
     const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
     if (totalCredits < item.price_credits) {
-      toast.warning(
+      toast(
         language === 'fr' 
           ? "⚠️ Vous n'avez plus de crédit, rechargez avant d'effectuer un achat..." 
           : "⚠️ You don't have enough credits, recharge before making a purchase...",
-        { duration: 5000 }
+        { 
+          duration: 6000,
+          style: {
+            background: '#92400e',
+            color: '#fff',
+            border: '2px solid #f59e0b',
+            fontSize: '14px',
+            fontWeight: '500'
+          }
+        }
       );
       return;
     }
@@ -197,11 +222,20 @@ export default function Store() {
       setAlreadyPurchased(prev => new Set([...prev, item.id]));
       
       // Show success toast
-      toast.success(
+      toast(
         language === 'fr' 
           ? '✅ Achat réussi ! Retrouvez ce visuel dans "Mes visuels"' 
           : '✅ Purchase successful! Find this visual in "My Visuals"',
-        { duration: 5000 }
+        { 
+          duration: 6000,
+          style: {
+            background: '#065f46',
+            color: '#fff',
+            border: '2px solid #10b981',
+            fontSize: '14px',
+            fontWeight: '600'
+          }
+        }
       );
       
       // Remove success overlay after 4 seconds
@@ -232,6 +266,19 @@ export default function Store() {
 
   return (
     <div className="min-h-screen relative">
+      <Toaster 
+        position="top-center" 
+        expand={true}
+        richColors={false}
+        toastOptions={{
+          style: {
+            background: '#1f2937',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)',
+            fontSize: '14px'
+          }
+        }}
+      />
       <AnimatedBackground />
       <GlobalHeader page="Store" />
 
