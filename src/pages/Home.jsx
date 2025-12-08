@@ -282,6 +282,7 @@ export default function Home() {
 
         const visualData = {
           user_email: user?.email || 'anonymous',
+          conversation_id: activeConversation?.id,
           image_url: result.url,
           original_image_url: result.url,
           title: userMessage.slice(0, 50),
