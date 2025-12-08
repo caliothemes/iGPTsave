@@ -243,6 +243,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [detectedZone, setDetectedZone] = useState(null);
   const mockupInputRef = useRef(null);
   const [tool, setTool] = useState('select');
+  const [showMockupTooltip, setShowMockupTooltip] = useState(false);
+  
+  // Detect if this is a mockup visual
+  const isMockupVisual = visual.visual_type === 'mockup' || 
+                         visual.title?.toLowerCase().includes('mockup') ||
+                         visual.original_prompt?.toLowerCase().includes('mockup');
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -2827,17 +2833,29 @@ Réponds en JSON avec:
 
           <TabsContent value="mockup" className="mt-0 space-y-3">
             <Button 
-              onClick={() => setShowMockupModal(true)} 
+              onClick={() => {
+                setMockupSelectionMode(true);
+                setTool('select');
+                setIsErasing(false);
+                setIsBrushing(false);
+                showHelp(language === 'fr' 
+                  ? '👆 Cliquez une fois sur la zone blanche à remplir.' 
+                  : '👆 Click once on the white area to fill.');
+                setActiveTab('layers');
+              }} 
               size="default" 
               className="w-full py-3 bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 hover:from-blue-700 hover:via-cyan-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-blue-500/30 border border-blue-400/30"
             >
-              <Frame className="h-5 w-5 mr-2" />
+              <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
+              </svg>
               {language === 'fr' ? '✨ Remplir Mockup' : '✨ Fill Mockup'}
             </Button>
             <p className="text-white/40 text-xs text-center px-2 leading-relaxed">
               {language === 'fr' 
-                ? 'Uploadez une image et l\'IA la placera automatiquement dans les zones blanches/vides de votre mockup.' 
-                : 'Upload an image and the AI will automatically place it in the white/empty zones of your mockup.'}
+                ? 'Cliquez sur l\'icône, puis cliquez sur une zone blanche de votre mockup, puis uploadez votre image.' 
+                : 'Click the icon, then click on a white area of your mockup, then upload your image.'}
             </p>
           </TabsContent>
 
@@ -2998,29 +3016,46 @@ Réponds en JSON avec:
           {/* Separator */}
           <div className="h-px bg-white/10 my-1" />
           
-          <button
-            onClick={() => {
-              setMockupSelectionMode(true);
-              setTool('select');
-              setIsErasing(false);
-              setIsBrushing(false);
-              showHelp(language === 'fr' 
-                ? '👆 Cliquez sur une zone blanche du mockup' 
-                : '👆 Click on a white area of the mockup');
-            }}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              mockupSelectionMode 
-                ? "bg-cyan-500/40 text-cyan-300 ring-2 ring-cyan-400/50" 
-                : "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
-            )}
-            title={language === 'fr' ? 'Remplir une zone du mockup' : 'Fill a mockup area'}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
-            </svg>
-          </button>
+          {isMockupVisual && (
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowMockupTooltip(true)}
+              onMouseLeave={() => setShowMockupTooltip(false)}
+            >
+              <button
+                onClick={() => {
+                  setMockupSelectionMode(true);
+                  setTool('select');
+                  setIsErasing(false);
+                  setIsBrushing(false);
+                  showHelp(language === 'fr' 
+                    ? '👆 Cliquez une fois sur la zone blanche à remplir.' 
+                    : '👆 Click once on the white area to fill.');
+                }}
+                className={cn(
+                  "p-2.5 rounded-lg transition-all",
+                  mockupSelectionMode 
+                    ? "bg-cyan-500/40 text-cyan-300 ring-2 ring-cyan-400/50" 
+                    : "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
+                )}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
+                </svg>
+              </button>
+              
+              {showMockupTooltip && (
+                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 whitespace-nowrap">
+                  <div className="bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-cyan-500/30 shadow-lg">
+                    <p className="text-cyan-300 text-xs font-medium">
+                      {language === 'fr' ? 'Remplir une zone de mockup' : 'Fill a mockup area'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
         {/* Canvas Container */}
@@ -3052,9 +3087,9 @@ Réponds en JSON avec:
             
             {mockupSelectionMode && (
               <div className="absolute inset-0 border-4 border-dashed border-cyan-400/60 rounded-lg pointer-events-none animate-pulse">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 px-4 py-2 rounded-lg">
-                  <p className="text-white text-sm font-medium">
-                    {language === 'fr' ? '👆 Cliquez sur une zone blanche' : '👆 Click on a white area'}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/90 backdrop-blur-sm px-6 py-3 rounded-xl border border-cyan-400/50 shadow-2xl">
+                  <p className="text-white text-base font-semibold">
+                    {language === 'fr' ? '👆 Cliquez une fois sur la zone blanche à remplir.' : '👆 Click once on the white area to fill.'}
                   </p>
                 </div>
               </div>
