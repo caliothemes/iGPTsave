@@ -3868,14 +3868,25 @@ Réponds en JSON avec:
                       
                       // Use AI to detect white/empty zones in the current canvas
                       const result = await base44.integrations.Core.InvokeLLM({
-                        prompt: `Analyse this mockup image and detect the main white/empty rectangular zone where content should be placed.
-Return the coordinates and dimensions as percentages of the image size.
-If multiple zones exist, return the largest one.
+                        prompt: `Analyse this mockup image carefully and detect the main white/empty/blank rectangular zone where content should be placed (like a screen, frame, or display area).
+
+Look for:
+- White or very light colored rectangular areas
+- Screen displays on devices (phones, tablets, computers)
+- Photo frames or empty frames
+- Product packaging front panels
+- Any clearly defined empty space meant for content
+
+Return the EXACT coordinates and dimensions as percentages of the total image size.
+Be PRECISE - the inserted image must fit PERFECTLY within the detected zone without overflowing.
+
 Return in JSON format:
-- x: horizontal position as percentage (0-100)
-- y: vertical position as percentage (0-100)
-- width: width as percentage (0-100)
-- height: height as percentage (0-100)`,
+- x: left edge position as percentage (0-100)
+- y: top edge position as percentage (0-100)
+- width: zone width as percentage (0-100)
+- height: zone height as percentage (0-100)
+
+Example: If the white screen area starts at 20% from left, 15% from top, and measures 60% wide by 70% tall, return: {"x": 20, "y": 15, "width": 60, "height": 70}`,
                         response_json_schema: {
                           type: "object",
                           properties: {
@@ -3894,19 +3905,20 @@ Return in JSON format:
                       const zoneWidth = (result.width / 100) * canvasSize.width;
                       const zoneHeight = (result.height / 100) * canvasSize.height;
                       
-                      // Add the user image as a layer in the detected zone
-                      addImageLayer(userImageUrl, zoneWidth, zoneHeight);
+                      // Create the layer directly with the correct position and size
+                      const newLayer = {
+                        type: 'image',
+                        imageUrl: userImageUrl,
+                        x: zoneX,
+                        y: zoneY,
+                        width: zoneWidth,
+                        height: zoneHeight,
+                        opacity: 100
+                      };
                       
-                      // Update the layer position to match the detected zone
-                      setTimeout(() => {
-                        const lastLayerIdx = layers.length;
-                        updateLayer(lastLayerIdx, { 
-                          x: zoneX, 
-                          y: zoneY,
-                          width: zoneWidth,
-                          height: zoneHeight
-                        });
-                      }, 100);
+                      setLayers([...layers, newLayer]);
+                      setSelectedLayer(layers.length);
+                      setActiveTab('layers');
                       
                       showHelp(language === 'fr' ? '✨ Image intégrée au mockup ! Ajustez la position si besoin.' : '✨ Image integrated into mockup! Adjust position if needed.');
                       setShowMockupModal(false);
