@@ -464,23 +464,43 @@ export default function Home() {
   const handleSelectConversation = async (conv) => {
     setCurrentConversation(conv);
     setMessages(conv.messages || []);
-    setSelectedCategory(null);
     
     // Load the visual associated with this conversation
+    let loadedVisual = null;
+    
     if (conv.visual_id) {
       try {
         const visuals = await base44.entities.Visual.filter({ id: conv.visual_id });
         if (visuals.length > 0) {
-          setCurrentVisual(visuals[0]);
+          loadedVisual = visuals[0];
+          setCurrentVisual(loadedVisual);
+        }
+      } catch (e) {
+        console.error('Failed to load visual by visual_id:', e);
+      }
+    }
+    
+    // Fallback: try to find visual by conversation_id if visual_id not found
+    if (!loadedVisual) {
+      try {
+        const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, '-created_date', 1);
+        if (visuals.length > 0) {
+          loadedVisual = visuals[0];
+          setCurrentVisual(loadedVisual);
         } else {
           setCurrentVisual(null);
         }
       } catch (e) {
-        console.error('Failed to load visual:', e);
+        console.error('Failed to load visual by conversation_id:', e);
         setCurrentVisual(null);
       }
+    }
+    
+    // Set category based on visual type to allow continuing the conversation
+    if (loadedVisual?.visual_type) {
+      setSelectedCategory({ id: loadedVisual.visual_type });
     } else {
-      setCurrentVisual(null);
+      setSelectedCategory(null);
     }
   };
 
