@@ -355,95 +355,104 @@ export default function Store() {
                         <FormatBadge dimensions={item.dimensions} language={language} />
                       </div>
 
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 hover:opacity-100 transition-opacity duration-300 z-[10] p-4 flex flex-col">
-                        {/* Title */}
-                        <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{item.title}</h3>
-                        
-                        {/* Description */}
-                        {item.description && (
-                          <p className="text-white/70 text-xs mb-2 line-clamp-3">{item.description}</p>
-                        )}
-                        
-                        {/* Format badge in hover */}
-                        <div className="mb-auto pb-2">
-                          <FormatBadge dimensions={item.dimensions} language={language} />
-                        </div>
-                        
-                        {/* Bottom section */}
-                        <div className="mt-auto pt-3 border-t border-white/10">
-                          <div className="flex items-center justify-between gap-2">
-                            {/* Price */}
-                            <div className="flex items-center gap-1">
-                              <Sparkles className="h-4 w-4 text-amber-400" />
-                              <span className="text-white font-bold">{item.price_credits}</span>
-                              <span className="text-white/60 text-xs">
-                                {language === 'fr' ? 'crédits' : 'credits'}
-                              </span>
+                      {/* Hover overlay - with group class */}
+                      <div className="group absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 hover:opacity-100 transition-opacity duration-300 z-[10] p-4 flex flex-col pointer-events-none">
+                        <div className="pointer-events-auto">
+                          {/* Title */}
+                          <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{item.title}</h3>
+                          
+                          {/* Description */}
+                          {item.description && (
+                            <p className="text-white/70 text-xs mb-3 line-clamp-3">{item.description}</p>
+                          )}
+                          
+                          {/* Format badge in hover - VERY VISIBLE */}
+                          <div className="mb-4">
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600 text-white text-xs font-bold rounded-full shadow-lg">
+                              {item.dimensions || '1080x1080'}
+                            </span>
+                          </div>
+                          
+                          {/* Bottom section */}
+                          <div className="mt-auto pt-3 border-t border-white/10">
+                            <div className="flex items-center justify-between gap-2">
+                              {/* Price */}
+                              <div className="flex items-center gap-1">
+                                <Sparkles className="h-4 w-4 text-amber-400" />
+                                <span className="text-white font-bold text-base">{item.price_credits}</span>
+                                <span className="text-white/60 text-xs">
+                                  {language === 'fr' ? 'crédits' : 'credits'}
+                                </span>
+                              </div>
+                              
+                              {/* Button */}
+                              {wasAlreadyPurchased ? (
+                                <Button
+                                  size="sm"
+                                  disabled
+                                  className="bg-blue-600 hover:bg-blue-600 text-white cursor-default opacity-100 pointer-events-auto"
+                                >
+                                  <Check className="h-4 w-4 mr-1" />
+                                  {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePurchase(item);
+                                  }}
+                                  disabled={purchasing === item.id}
+                                  className="bg-green-600 hover:bg-green-700 text-white pointer-events-auto shadow-lg"
+                                >
+                                  {purchasing === item.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    language === 'fr' ? 'Acheter' : 'Buy'
+                                  )}
+                                </Button>
+                              )}
                             </div>
-                            
-                            {/* Button */}
-                            {wasAlreadyPurchased ? (
-                              <Button
-                                size="sm"
-                                disabled
-                                className="bg-blue-600 hover:bg-blue-600 text-white cursor-default opacity-100"
-                              >
-                                <Check className="h-4 w-4 mr-1" />
-                                {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                onClick={() => handlePurchase(item)}
-                                disabled={purchasing === item.id}
-                                className="bg-violet-600 hover:bg-violet-700 text-white"
-                              >
-                                {purchasing === item.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  language === 'fr' ? 'Acheter' : 'Buy'
-                                )}
-                              </Button>
-                            )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Success overlay after purchase */}
-                      {isPurchased && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          className="absolute inset-0 bg-gradient-to-br from-green-600 to-green-700 z-[20] flex flex-col items-center justify-center p-6"
-                        >
+                      {/* Success overlay after purchase - z-index 30 to be ABOVE everything */}
+                      <AnimatePresence>
+                        {isPurchased && (
                           <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
-                            className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-4 shadow-xl"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="absolute inset-0 bg-gradient-to-br from-green-600 to-green-700 z-[30] flex flex-col items-center justify-center p-6 pointer-events-none"
                           >
-                            <Check className="h-10 w-10 text-green-600" strokeWidth={3} />
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
+                              className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-4 shadow-xl"
+                            >
+                              <Check className="h-10 w-10 text-green-600" strokeWidth={3} />
+                            </motion.div>
+                            <motion.h3
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.4 }}
+                              className="text-white font-bold text-lg mb-2 text-center"
+                            >
+                              {language === 'fr' ? 'Achat effectué !' : 'Purchase complete!'}
+                            </motion.h3>
+                            <motion.p
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.5 }}
+                              className="text-white/90 text-sm text-center"
+                            >
+                              {language === 'fr' ? 'Retrouvez ce visuel dans "Mes visuels"' : 'Find this visual in "My Visuals"'}
+                            </motion.p>
                           </motion.div>
-                          <motion.h3
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                            className="text-white font-bold text-lg mb-2 text-center"
-                          >
-                            {language === 'fr' ? 'Achat effectué !' : 'Purchase complete!'}
-                          </motion.h3>
-                          <motion.p
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="text-white/90 text-sm text-center"
-                          >
-                            {language === 'fr' ? 'Retrouvez ce visuel dans "Mes visuels"' : 'Find this visual in "My Visuals"'}
-                          </motion.p>
-                        </motion.div>
-                      )}
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
                 );
