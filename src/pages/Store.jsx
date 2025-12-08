@@ -254,33 +254,40 @@ export default function Store() {
                       className="w-full h-auto block"
                       loading="lazy"
                     />
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute inset-0 p-4 flex flex-col justify-end">
-                        <h3 className="text-white font-bold text-sm mb-1 line-clamp-1">{item.title}</h3>
+                    {/* Hover overlay - Full card coverage */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute inset-0 p-4 flex flex-col">
+                        {/* Title at top */}
+                        <h3 className="text-white font-bold text-sm mb-2 line-clamp-2 leading-tight">{item.title}</h3>
+                        
+                        {/* Description with more lines in middle */}
                         {item.description && (
-                          <p className="text-white/70 text-xs mb-3 line-clamp-2">{item.description}</p>
+                          <p className="text-white/70 text-xs mb-auto line-clamp-4 leading-relaxed">{item.description}</p>
                         )}
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1">
-                            <Sparkles className="h-4 w-4 text-amber-400" />
-                            <span className="text-white font-bold">{item.price_credits}</span>
-                            <span className="text-white/60 text-xs">
-                              {language === 'fr' ? 'crédits' : 'credits'}
-                            </span>
+                        
+                        {/* Price and button at bottom */}
+                        <div className="mt-auto pt-3 border-t border-white/10">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1">
+                              <Sparkles className="h-4 w-4 text-amber-400" />
+                              <span className="text-white font-bold">{item.price_credits}</span>
+                              <span className="text-white/60 text-xs">
+                                {language === 'fr' ? 'crédits' : 'credits'}
+                              </span>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => handlePurchase(item)}
+                              disabled={purchasing === item.id}
+                              className="bg-violet-600 hover:bg-violet-700 text-white"
+                            >
+                              {purchasing === item.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                language === 'fr' ? 'Acheter' : 'Buy'
+                              )}
+                            </Button>
                           </div>
-                          <Button
-                            size="sm"
-                            onClick={() => handlePurchase(item)}
-                            disabled={purchasing === item.id}
-                            className="bg-violet-600 hover:bg-violet-700 text-white"
-                          >
-                            {purchasing === item.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              language === 'fr' ? 'Acheter' : 'Buy'
-                            )}
-                          </Button>
                         </div>
                       </div>
                     </div>

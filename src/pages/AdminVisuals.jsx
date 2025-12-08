@@ -4,10 +4,50 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag } from 'lucide-react';
+import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StoreItemModal from '@/components/admin/StoreItemModal';
 import { cn } from "@/lib/utils";
+
+function StoreStatsBlock() {
+  const [storeCount, setStoreCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStoreCount = async () => {
+      try {
+        const items = await base44.entities.StoreItem.filter({ is_active: true });
+        setStoreCount(items.length);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    loadStoreCount();
+  }, []);
+
+  return (
+    <a 
+      href={createPageUrl('AdminStoreCategories')} 
+      className="block px-4 py-3 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/30 hover:border-violet-400/50 transition-all group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-lg bg-violet-600/30 group-hover:bg-violet-600/40 transition-colors">
+          <Store className="h-5 w-5 text-violet-300" />
+        </div>
+        <div>
+          <div className="text-violet-300 text-sm font-medium">In Store</div>
+          {loading ? (
+            <Loader2 className="h-4 w-4 text-violet-400 animate-spin" />
+          ) : (
+            <div className="text-white text-lg font-bold">{storeCount} visuels</div>
+          )}
+        </div>
+        <div className="ml-auto text-violet-400 group-hover:translate-x-1 transition-transform">→</div>
+      </div>
+    </a>
+  );
+}
 
 export default function AdminVisuals() {
   const [loading, setLoading] = useState(true);
@@ -144,6 +184,9 @@ export default function AdminVisuals() {
             Voir le portfolio →
           </a>
         </div>
+
+        {/* Store Stats */}
+        <StoreStatsBlock />
 
         {/* Visuals Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
