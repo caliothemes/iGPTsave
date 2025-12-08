@@ -11,7 +11,8 @@ import {
   Scale,
   Brush,
   CreditCard,
-  Wand2
+  Wand2,
+  Store
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -20,6 +21,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, page: 'Admin' },
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
+  { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
   { id: 'prompts', label: 'Prompts IA', icon: Wand2, page: 'AdminPrompts' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
   { id: 'presentation', label: 'Présentation', icon: LayoutDashboard, page: 'AdminPresentation' },
