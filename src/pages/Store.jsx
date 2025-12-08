@@ -419,7 +419,10 @@ export default function Store() {
                               <Sparkles className="h-4 w-4 text-amber-400" />
                               <span className="text-white font-bold text-lg">{item.price_credits}</span>
                               <span className="text-white/60 text-xs">
-                                {language === 'fr' ? 'crédits' : 'credits'}
+                                {language === 'fr' 
+                                  ? (item.price_credits === 1 ? 'crédit' : 'crédits')
+                                  : (item.price_credits === 1 ? 'credit' : 'credits')
+                                }
                               </span>
                             </div>
                           
