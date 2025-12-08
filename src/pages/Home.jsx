@@ -606,22 +606,6 @@ export default function Home() {
         "flex-1 flex flex-col transition-all duration-300 relative z-10",
         sidebarOpen ? "ml-64" : "ml-0"
       )}>
-        {/* Favorites Button */}
-        {!showInitialView && (
-          <button
-            onClick={() => setShowFavoritesModal(true)}
-            className="fixed right-6 top-20 z-30 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            <Heart className={cn("h-4 w-4", favoriteVisuals.length > 0 && "fill-white")} />
-            <span className="text-sm font-medium">{t('myFavorites') || (language === 'fr' ? 'Mes favoris' : 'My favorites')}</span>
-            {favoriteVisuals.length > 0 && (
-              <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                {favoriteVisuals.length}
-              </span>
-            )}
-          </button>
-        )}
-
         {showInitialView ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 pt-16">
             {/* Logo - Clickable to open modal - NO TEXT */}
@@ -672,7 +656,25 @@ export default function Home() {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 md:pb-48">
-            <div className="max-w-3xl mx-auto space-y-4">
+            <div className="max-w-3xl mx-auto space-y-4 relative">
+              {/* Favorites Button - Sticky à droite */}
+              <div className="absolute -right-4 top-0 sticky top-6 z-30 flex justify-end">
+                <button
+                  onClick={() => setShowFavoritesModal(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-2"
+                >
+                  <Heart className={cn("h-4 w-4", favoriteVisuals.length > 0 && "fill-white")} />
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    {language === 'fr' ? 'Mes favoris' : 'My favorites'}
+                  </span>
+                  {favoriteVisuals.length > 0 && (
+                    <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                      {favoriteVisuals.length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
               <AnimatePresence>
                 {messages.map((msg, idx) => (
                   <motion.div
