@@ -133,7 +133,12 @@ export default function Store() {
 
     const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
     if (totalCredits < item.price_credits) {
-      toast.error(language === 'fr' ? 'Crédits insuffisants' : 'Insufficient credits');
+      toast.warning(
+        language === 'fr' 
+          ? "⚠️ Vous n'avez plus de crédit, rechargez avant d'effectuer un achat..." 
+          : "⚠️ You don't have enough credits, recharge before making a purchase...",
+        { duration: 5000 }
+      );
       return;
     }
 
