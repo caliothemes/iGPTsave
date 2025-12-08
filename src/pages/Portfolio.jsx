@@ -7,6 +7,7 @@ import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { createPageUrl } from '@/utils';
 import { cn } from "@/lib/utils";
+import Masonry from 'react-masonry-css';
 
 export default function Portfolio() {
   const { language, t } = useLanguage();
@@ -155,35 +156,17 @@ export default function Portfolio() {
         {/* Masonry Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
           <style>{`
-            .masonry-portfolio {
-              column-count: 6;
-              column-gap: 8px;
+            .masonry-grid {
+              display: flex;
+              margin-left: -8px;
+              width: auto;
             }
-            .masonry-portfolio > div {
-              break-inside: avoid;
+            .masonry-column {
+              padding-left: 8px;
+              background-clip: padding-box;
+            }
+            .masonry-column > div {
               margin-bottom: 8px;
-              display: inline-block;
-              width: 100%;
-            }
-            @media (max-width: 1400px) {
-              .masonry-portfolio {
-                column-count: 5;
-              }
-            }
-            @media (max-width: 1024px) {
-              .masonry-portfolio {
-                column-count: 4;
-              }
-            }
-            @media (max-width: 768px) {
-              .masonry-portfolio {
-                column-count: 3;
-              }
-            }
-            @media (max-width: 480px) {
-              .masonry-portfolio {
-                column-count: 2;
-              }
             }
           `}</style>
           {visuals.length === 0 ? (
@@ -193,46 +176,57 @@ export default function Portfolio() {
               </p>
             </div>
           ) : (
-            <div className="masonry-portfolio">
+            <Masonry
+              breakpointCols={{
+                default: 6,
+                1400: 5,
+                1024: 4,
+                768: 3,
+                480: 2
+              }}
+              className="masonry-grid"
+              columnClassName="masonry-column"
+            >
               {visuals.map((visual, index) => {
                 const isLast = index === visuals.length - 1;
                 return (
                   <div
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
-                    className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300"
                   >
-                    <img
-                      src={visual.image_url}
-                      alt={visual.title || 'Création iGPT'}
-                      className="w-full h-auto block pointer-events-none select-none"
-                      loading="lazy"
-                      draggable={false}
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                    {/* Watermark */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-white/20 text-3xl font-bold rotate-[-30deg] select-none">
-                        iGPT
+                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
+                      <img
+                        src={visual.image_url}
+                        alt={visual.title || 'Création iGPT'}
+                        className="w-full h-auto block pointer-events-none select-none"
+                        loading="lazy"
+                        draggable={false}
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
+                      {/* Watermark */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="text-white/20 text-3xl font-bold rotate-[-30deg] select-none">
+                          iGPT
+                        </div>
                       </div>
-                    </div>
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-0 left-0 right-0 p-2">
-                        {visual.title && (
-                          <p className="text-white font-medium text-xs truncate">{visual.title}</p>
-                        )}
-                        {visual.visual_type && (
-                          <span className="inline-block mt-0.5 px-1.5 py-0.5 bg-white/20 rounded-full text-white/80 text-[10px]">
-                            {visual.visual_type}
-                          </span>
-                        )}
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute bottom-0 left-0 right-0 p-2">
+                          {visual.title && (
+                            <p className="text-white font-medium text-xs truncate">{visual.title}</p>
+                          )}
+                          {visual.visual_type && (
+                            <span className="inline-block mt-0.5 px-1.5 py-0.5 bg-white/20 rounded-full text-white/80 text-[10px]">
+                              {visual.visual_type}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 );
               })}
-            </div>
+            </Masonry>
           )}
 
           {/* Loading more indicator */}
