@@ -17,8 +17,24 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
     title: '',
     description: '',
     price_credits: 10,
-    category_slug: ''
+    category_slug: '',
+    dimensions: '1080x1080'
   });
+
+  const formatOptions = [
+    { value: '1080x1080', label: '1080x1080 - 1:1 (Carré)' },
+    { value: '1080x1920', label: '1080x1920 - 9:16 (Story/Vertical)' },
+    { value: '1920x1080', label: '1920x1080 - 16:9 (Paysage)' },
+    { value: '1200x628', label: '1200x628 - ~2:1 (Couverture Facebook)' },
+    { value: '1024x1024', label: '1024x1024 - 1:1 (Logo HD)' },
+    { value: '2000x2000', label: '2000x2000 - 1:1 (Print Carré)' },
+    { value: '2480x3508', label: '2480x3508 - A4 Portrait' },
+    { value: '3508x2480', label: '3508x2480 - A4 Paysage' },
+    { value: '1748x2480', label: '1748x2480 - A5 Portrait' },
+    { value: '2480x1748', label: '2480x1748 - A5 Paysage' },
+    { value: '3508x4961', label: '3508x4961 - A3 Portrait' },
+    { value: '4961x3508', label: '4961x3508 - A3 Paysage' }
+  ];
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -44,7 +60,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             title: item.title,
             description: item.description || '',
             price_credits: item.price_credits,
-            category_slug: item.category_slug
+            category_slug: item.category_slug,
+            dimensions: item.dimensions || visual.dimensions || '1080x1080'
           });
         } else {
           setExistingItem(null);
@@ -52,7 +69,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             title: visual.title || '',
             description: visual.original_prompt || '',
             price_credits: 10,
-            category_slug: visual.visual_type || ''
+            category_slug: visual.visual_type || '',
+            dimensions: visual.dimensions || '1080x1080'
           });
         }
       }
@@ -75,7 +93,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           description: formData.description,
           price_credits: formData.price_credits,
           category_slug: formData.category_slug,
-          image_url: visual.image_url
+          image_url: visual.image_url,
+          dimensions: formData.dimensions
         });
         toast.success('✨ Produit modifié !');
       } else {
@@ -87,6 +106,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           price_credits: formData.price_credits,
           category_slug: formData.category_slug,
           image_url: visual.image_url,
+          dimensions: formData.dimensions,
           is_active: true
         });
         toast.success('✨ Visuel ajouté au Store !');
@@ -169,6 +189,25 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
                   {categories.map(cat => (
                     <SelectItem key={cat.id} value={cat.slug} className="text-white">
                       {cat.name_fr}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">Format / Dimensions *</label>
+              <Select 
+                value={formData.dimensions}
+                onValueChange={(value) => setFormData({ ...formData, dimensions: value })}
+              >
+                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectValue placeholder="Sélectionner un format" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-900 border-white/10">
+                  {formatOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-white">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
