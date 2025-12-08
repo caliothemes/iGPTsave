@@ -423,8 +423,8 @@ export default function Store() {
 
         {/* Categories Tabs */}
         <div className="px-6 mb-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex gap-2 overflow-x-auto pb-2 flex-1">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="flex gap-2 overflow-x-auto pb-2">
               <button
                 onClick={() => setSelectedCategory('all')}
                 className={cn(
