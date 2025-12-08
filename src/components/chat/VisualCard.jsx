@@ -376,6 +376,7 @@ export default function VisualCard({
           )}
         </div>
       )}
+      </div>
 
       {/* Download Modal */}
       <DownloadModal
