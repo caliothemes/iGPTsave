@@ -94,7 +94,7 @@ export default function Home() {
             setCredits(newCredits);
           }
           
-          const convs = await base44.entities.Conversation.filter({ user_email: currentUser.email }, '-created_date', 20);
+          const convs = await base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20);
           setConversations(convs);
           
           const visuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10);
