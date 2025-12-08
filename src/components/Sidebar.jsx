@@ -132,7 +132,7 @@ export default function Sidebar({
                 {visuals.length > 4 && (
                   <a 
                     href={createPageUrl('MyVisuals')}
-                    className="block text-violet-400 text-xs text-center py-2 hover:text-violet-300 transition-colors"
+                    className="block text-violet-400 text-xs text-left py-2 hover:text-violet-300 transition-colors px-2"
                   >
                     {t('seeAll')} ({visuals.length})
                   </a>
