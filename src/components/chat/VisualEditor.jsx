@@ -3013,49 +3013,6 @@ Réponds en JSON avec:
             <IllustrationIcon className="h-5 w-5" />
           </button>
           
-          {/* Separator */}
-          <div className="h-px bg-white/10 my-1" />
-          
-          {isMockupVisual && (
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowMockupTooltip(true)}
-              onMouseLeave={() => setShowMockupTooltip(false)}
-            >
-              <button
-                onClick={() => {
-                  setMockupSelectionMode(true);
-                  setTool('select');
-                  setIsErasing(false);
-                  setIsBrushing(false);
-                  showHelp(language === 'fr' 
-                    ? '👆 Cliquez une fois sur la zone blanche à remplir.' 
-                    : '👆 Click once on the white area to fill.');
-                }}
-                className={cn(
-                  "p-2.5 rounded-lg transition-all",
-                  mockupSelectionMode 
-                    ? "bg-cyan-500/40 text-cyan-300 ring-2 ring-cyan-400/50" 
-                    : "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
-                )}
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
-                </svg>
-              </button>
-              
-              {showMockupTooltip && (
-                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 whitespace-nowrap">
-                  <div className="bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-cyan-500/30 shadow-lg">
-                    <p className="text-cyan-300 text-xs font-medium">
-                      {language === 'fr' ? 'Remplir une zone de mockup' : 'Fill a mockup area'}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
         
         {/* Canvas Container */}
@@ -3285,6 +3242,47 @@ Réponds en JSON avec:
           >
             <Brush className="h-5 w-5" />
           </button>
+          
+          {isMockupVisual && (
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowMockupTooltip(true)}
+              onMouseLeave={() => setShowMockupTooltip(false)}
+            >
+              <button
+                onClick={() => {
+                  setMockupSelectionMode(true);
+                  setTool('select');
+                  setIsErasing(false);
+                  setIsBrushing(false);
+                  showHelp(language === 'fr' 
+                    ? '👆 Cliquez une fois sur la zone blanche à remplir.' 
+                    : '👆 Click once on the white area to fill.');
+                }}
+                className={cn(
+                  "p-2.5 rounded-lg transition-all",
+                  mockupSelectionMode 
+                    ? "bg-cyan-500/40 text-cyan-300 ring-2 ring-cyan-400/50" 
+                    : "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
+                )}
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 8l3 3" />
+                </svg>
+              </button>
+              
+              {showMockupTooltip && (
+                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 whitespace-nowrap">
+                  <div className="bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-cyan-500/30 shadow-lg">
+                    <p className="text-cyan-300 text-xs font-medium">
+                      {language === 'fr' ? 'Remplir une zone de mockup' : 'Fill a mockup area'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Separator */}
           <div className="h-px bg-white/10 my-1" />
