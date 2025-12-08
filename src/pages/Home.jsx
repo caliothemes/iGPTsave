@@ -710,7 +710,13 @@ export default function Home() {
                       }}
                       onPromptClick={(prompt) => {
                         setInputValue(prompt);
-                        inputRef.current?.focus();
+                        setTimeout(() => {
+                          if (inputRef.current) {
+                            inputRef.current.style.height = 'auto';
+                            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                            inputRef.current.focus();
+                          }
+                        }, 0);
                       }}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
