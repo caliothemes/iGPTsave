@@ -338,120 +338,112 @@ export default function Store() {
             >
               {filteredItems.map((item) => {
                 const isPurchased = purchasedItems.has(item.id);
-                const wasAlreadyPurchased = alreadyPurchased.has(item.id) && !isPurchased;
+                const wasAlreadyPurchased = alreadyPurchased.has(item.id);
                 return (
                   <div key={item.id}>
-                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
+                    <div className="relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
+                      {/* Image */}
                       <img
                         src={item.image_url}
                         alt={item.title}
                         className="w-full h-auto block"
                         loading="lazy"
                       />
-                      {/* Format badge - visible without hover */}
-                      <div className="absolute top-2 right-2 z-10">
+                      
+                      {/* Format badge - top right corner */}
+                      <div className="absolute top-2 right-2 z-[5]">
                         <FormatBadge dimensions={item.dimensions} language={language} />
                       </div>
 
-                      {/* Hover overlay - Full card coverage */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                        <div className="absolute inset-0 p-4 flex flex-col">
-                          {/* Title at top */}
-                          <h3 className="text-white font-bold text-sm mb-2 line-clamp-2 leading-tight">{item.title}</h3>
-                          
-                          {/* Description with more lines in middle */}
-                          {item.description && (
-                            <p className="text-white/70 text-xs mb-2 line-clamp-4 leading-relaxed">{item.description}</p>
-                          )}
-                          
-                          {/* Format badge under description */}
-                          <div className="mb-auto">
-                            <FormatBadge dimensions={item.dimensions} language={language} />
-                          </div>
-                          
-                          {/* Price and button at bottom */}
-                          <div className="mt-auto pt-3 border-t border-white/10">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-1">
-                                <Sparkles className="h-4 w-4 text-amber-400" />
-                                <span className="text-white font-bold">{item.price_credits}</span>
-                                <span className="text-white/60 text-xs">
-                                  {language === 'fr' ? 'crédits' : 'credits'}
-                                </span>
-                              </div>
-                              {wasAlreadyPurchased ? (
-                                <Button
-                                  size="sm"
-                                  disabled
-                                  className="bg-blue-600 text-white cursor-default"
-                                >
-                                  <Check className="h-4 w-4 mr-1" />
-                                  {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
-                                </Button>
-                              ) : isPurchased ? (
-                                <Button
-                                  size="sm"
-                                  disabled
-                                  className="bg-green-600 text-white cursor-default"
-                                >
-                                  <Check className="h-4 w-4 mr-1" />
-                                  {language === 'fr' ? 'Acheté' : 'Purchased'}
-                                </Button>
-                              ) : (
-                                <Button
-                                  size="sm"
-                                  onClick={() => handlePurchase(item)}
-                                  disabled={purchasing === item.id}
-                                  className="bg-violet-600 hover:bg-violet-700 text-white"
-                                >
-                                  {purchasing === item.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    language === 'fr' ? 'Acheter' : 'Buy'
-                                  )}
-                                </Button>
-                              )}
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 hover:opacity-100 transition-opacity duration-300 z-[10] p-4 flex flex-col">
+                        {/* Title */}
+                        <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{item.title}</h3>
+                        
+                        {/* Description */}
+                        {item.description && (
+                          <p className="text-white/70 text-xs mb-2 line-clamp-3">{item.description}</p>
+                        )}
+                        
+                        {/* Format badge in hover */}
+                        <div className="mb-auto pb-2">
+                          <FormatBadge dimensions={item.dimensions} language={language} />
+                        </div>
+                        
+                        {/* Bottom section */}
+                        <div className="mt-auto pt-3 border-t border-white/10">
+                          <div className="flex items-center justify-between gap-2">
+                            {/* Price */}
+                            <div className="flex items-center gap-1">
+                              <Sparkles className="h-4 w-4 text-amber-400" />
+                              <span className="text-white font-bold">{item.price_credits}</span>
+                              <span className="text-white/60 text-xs">
+                                {language === 'fr' ? 'crédits' : 'credits'}
+                              </span>
                             </div>
+                            
+                            {/* Button */}
+                            {wasAlreadyPurchased ? (
+                              <Button
+                                size="sm"
+                                disabled
+                                className="bg-blue-600 hover:bg-blue-600 text-white cursor-default opacity-100"
+                              >
+                                <Check className="h-4 w-4 mr-1" />
+                                {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                onClick={() => handlePurchase(item)}
+                                disabled={purchasing === item.id}
+                                className="bg-violet-600 hover:bg-violet-700 text-white"
+                              >
+                                {purchasing === item.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  language === 'fr' ? 'Acheter' : 'Buy'
+                                )}
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Success overlay after purchase - ABOVE HOVER */}
-                      <AnimatePresence>
-                        {isPurchased && (
+                      {/* Success overlay after purchase */}
+                      {isPurchased && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          className="absolute inset-0 bg-gradient-to-br from-green-600 to-green-700 z-[20] flex flex-col items-center justify-center p-6"
+                        >
                           <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-800/90 to-green-700/80 z-30 flex flex-col items-center justify-center p-4 pointer-events-none"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
+                            className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-4 shadow-xl"
                           >
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                              className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center mb-3"
-                            >
-                              <Check className="h-8 w-8 text-white" />
-                            </motion.div>
-                            <motion.h3
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.3 }}
-                              className="text-white font-bold text-sm mb-1 text-center"
-                            >
-                              {language === 'fr' ? 'Achat effectué !' : 'Purchase complete!'}
-                            </motion.h3>
-                            <motion.p
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.4 }}
-                              className="text-white/80 text-xs text-center"
-                            >
-                              {language === 'fr' ? 'Retrouvez ce visuel dans "Mes visuels"' : 'Find this visual in "My Visuals"'}
-                            </motion.p>
+                            <Check className="h-10 w-10 text-green-600" strokeWidth={3} />
                           </motion.div>
-                        )}
-                      </AnimatePresence>
+                          <motion.h3
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-white font-bold text-lg mb-2 text-center"
+                          >
+                            {language === 'fr' ? 'Achat effectué !' : 'Purchase complete!'}
+                          </motion.h3>
+                          <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-white/90 text-sm text-center"
+                          >
+                            {language === 'fr' ? 'Retrouvez ce visuel dans "Mes visuels"' : 'Find this visual in "My Visuals"'}
+                          </motion.p>
+                        </motion.div>
+                      )}
                     </div>
                   </div>
                 );
