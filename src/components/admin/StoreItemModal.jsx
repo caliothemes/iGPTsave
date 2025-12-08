@@ -73,7 +73,9 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gray-900 border-white/10 max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white">Ajouter au Store</DialogTitle>
+          <DialogTitle className="text-white">
+            {existingItem ? 'Modifier le produit' : 'Ajouter au Store'}
+          </DialogTitle>
         </DialogHeader>
         
         {visual && (

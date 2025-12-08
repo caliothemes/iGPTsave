@@ -9,27 +9,16 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import StoreItemModal from '@/components/admin/StoreItemModal';
 import { cn } from "@/lib/utils";
 
-function StoreStatsBlock() {
-  const [storeCount, setStoreCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadStoreCount = async () => {
-      try {
-        const items = await base44.entities.StoreItem.filter({ is_active: true });
-        setStoreCount(items.length);
-      } catch (e) {
-        console.error(e);
-      }
-      setLoading(false);
-    };
-    loadStoreCount();
-  }, []);
-
+function StoreStatsBlock({ storeCount, isActive, onClick }) {
   return (
-    <a 
-      href={createPageUrl('AdminStoreCategories')} 
-      className="block px-4 py-3 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/30 hover:border-violet-400/50 transition-all group"
+    <button 
+      onClick={onClick}
+      className={cn(
+        "block w-full px-4 py-3 rounded-lg bg-gradient-to-br border transition-all group text-left",
+        isActive 
+          ? "from-violet-500/40 to-purple-500/40 border-violet-400" 
+          : "from-violet-500/20 to-purple-500/20 border-violet-500/30 hover:border-violet-400/50"
+      )}
     >
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-violet-600/30 group-hover:bg-violet-600/40 transition-colors">
@@ -37,24 +26,25 @@ function StoreStatsBlock() {
         </div>
         <div>
           <div className="text-violet-300 text-sm font-medium">In Store</div>
-          {loading ? (
-            <Loader2 className="h-4 w-4 text-violet-400 animate-spin" />
-          ) : (
-            <div className="text-white text-lg font-bold">{storeCount} visuels</div>
-          )}
+          <div className="text-white text-lg font-bold">{storeCount} visuels</div>
         </div>
-        <div className="ml-auto text-violet-400 group-hover:translate-x-1 transition-transform">→</div>
+        {isActive && <span className="ml-auto text-violet-300">✓</span>}
+        <div className="ml-auto text-violet-400 group-hover:translate-x-1 transition-transform">
+          {isActive ? '✓' : '→'}
+        </div>
       </div>
-    </a>
+    </button>
   );
 }
 
 export default function AdminVisuals() {
   const [loading, setLoading] = useState(true);
   const [visuals, setVisuals] = useState([]);
+  const [storeItems, setStoreItems] = useState([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [portfolioFilter, setPortfolioFilter] = useState(false);
+  const [storeFilter, setStoreFilter] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
 
@@ -67,8 +57,12 @@ export default function AdminVisuals() {
           return;
         }
 
-        const fetchedVisuals = await base44.entities.Visual.list('-updated_date', 200);
+        const [fetchedVisuals, fetchedStoreItems] = await Promise.all([
+          base44.entities.Visual.list('-updated_date', 200),
+          base44.entities.StoreItem.list()
+        ]);
         setVisuals(fetchedVisuals);
+        setStoreItems(fetchedStoreItems);
       } catch (e) {
         window.location.href = createPageUrl('Home');
       }
@@ -95,18 +89,25 @@ export default function AdminVisuals() {
   };
 
   const loadVisuals = async () => {
-    const fetchedVisuals = await base44.entities.Visual.list('-updated_date', 200);
+    const [fetchedVisuals, fetchedStoreItems] = await Promise.all([
+      base44.entities.Visual.list('-updated_date', 200),
+      base44.entities.StoreItem.list()
+    ]);
     setVisuals(fetchedVisuals);
+    setStoreItems(fetchedStoreItems);
   };
 
   const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
+
+  const storeVisualIds = new Set(storeItems.map(item => item.visual_id));
 
   const filteredVisuals = visuals.filter(v => {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase()) ||
                          v.user_email?.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === 'all' || v.visual_type === typeFilter;
     const matchesPortfolio = !portfolioFilter || v.in_portfolio;
-    return matchesSearch && matchesType && matchesPortfolio;
+    const matchesStore = !storeFilter || storeVisualIds.has(v.id);
+    return matchesSearch && matchesType && matchesPortfolio && matchesStore;
   });
 
   if (loading) {
@@ -186,7 +187,11 @@ export default function AdminVisuals() {
         </div>
 
         {/* Store Stats */}
-        <StoreStatsBlock />
+        <StoreStatsBlock 
+          storeCount={storeItems.length} 
+          isActive={storeFilter}
+          onClick={() => setStoreFilter(!storeFilter)}
+        />
 
         {/* Visuals Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
