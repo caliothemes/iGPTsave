@@ -464,6 +464,7 @@ export default function Home() {
   const handleSelectConversation = async (conv) => {
     setCurrentConversation(conv);
     setMessages(conv.messages || []);
+    setCurrentVisual(null); // Reset visual first
     
     // Load the visual associated with this conversation
     let loadedVisual = null;
