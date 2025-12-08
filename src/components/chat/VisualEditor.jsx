@@ -14,7 +14,7 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors
+  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors, Frame
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -234,6 +234,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [brushHardness, setBrushHardness] = useState(80);
   const [brushStrokes, setBrushStrokes] = useState([]);
   const [currentBrushStroke, setCurrentBrushStroke] = useState([]);
+  
+  // Mockup Magic Fill
+  const [showMockupModal, setShowMockupModal] = useState(false);
+  const [mockupImageFile, setMockupImageFile] = useState(null);
+  const [detectingZone, setDetectingZone] = useState(false);
+  const mockupInputRef = useRef(null);
 
   // Load user, library and admin assets
   useEffect(() => {
@@ -2216,6 +2222,7 @@ Réponds en JSON avec:
           <TabsTrigger value="gradients" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><GradientIcon className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="images" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Upload className="h-4 w-4" /></TabsTrigger>
           <TabsTrigger value="illustrations" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><IllustrationIcon className="h-4 w-4" /></TabsTrigger>
+          <TabsTrigger value="mockup" className="flex-1 h-full rounded-md data-[state=active]:bg-violet-500/40 data-[state=active]:text-white text-white/60 hover:text-white transition-colors"><Frame className="h-4 w-4" /></TabsTrigger>
         </TabsList>
 
         {/* Tool Content Panel */}
@@ -2721,6 +2728,22 @@ Réponds en JSON avec:
             )}
           </TabsContent>
 
+          <TabsContent value="mockup" className="mt-0 space-y-3">
+            <Button 
+              onClick={() => setShowMockupModal(true)} 
+              size="default" 
+              className="w-full py-3 bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 hover:from-blue-700 hover:via-cyan-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-blue-500/30 border border-blue-400/30"
+            >
+              <Frame className="h-5 w-5 mr-2" />
+              {language === 'fr' ? '✨ Remplir Mockup' : '✨ Fill Mockup'}
+            </Button>
+            <p className="text-white/40 text-xs text-center px-2 leading-relaxed">
+              {language === 'fr' 
+                ? 'Uploadez une image et l\'IA la placera automatiquement dans les zones blanches/vides de votre mockup.' 
+                : 'Upload an image and the AI will automatically place it in the white/empty zones of your mockup.'}
+            </p>
+          </TabsContent>
+
           <TabsContent value="layers" className="mt-0 space-y-2">
             {layers.length > 0 && (
               <p className="text-amber-400/80 text-xs px-2 py-1 bg-amber-500/10 rounded-lg flex items-center gap-1">
@@ -2873,6 +2896,20 @@ Réponds en JSON avec:
             title={language === 'fr' ? 'Illustrations' : 'Illustrations'}
           >
             <IllustrationIcon className="h-5 w-5" />
+          </button>
+          
+          {/* Separator */}
+          <div className="h-px bg-white/10 my-1" />
+          
+          <button
+            onClick={() => setShowMockupModal(true)}
+            className={cn(
+              "p-2.5 rounded-lg transition-all",
+              "bg-cyan-500/20 text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/30"
+            )}
+            title={language === 'fr' ? 'Remplir Mockup' : 'Fill Mockup'}
+          >
+            <Frame className="h-5 w-5" />
           </button>
         </div>
         
@@ -3776,6 +3813,127 @@ Réponds en JSON avec:
                 </button>
               </div>
             ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Mockup Magic Fill Modal */}
+      <Dialog open={showMockupModal} onOpenChange={setShowMockupModal}>
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Frame className="h-5 w-5 text-cyan-400" />
+              {language === 'fr' ? 'Remplissage Magique de Mockup' : 'Magic Mockup Fill'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-white/60 text-sm">
+              {language === 'fr' 
+                ? 'Uploadez votre image et l\'IA la placera automatiquement dans les zones blanches du mockup.' 
+                : 'Upload your image and the AI will automatically place it in the white zones of the mockup.'}
+            </p>
+            
+            <input
+              type="file"
+              ref={mockupInputRef}
+              onChange={(e) => setMockupImageFile(e.target.files?.[0] || null)}
+              accept="image/*"
+              className="hidden"
+            />
+            
+            {!mockupImageFile ? (
+              <Button 
+                onClick={() => mockupInputRef.current?.click()} 
+                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {language === 'fr' ? 'Choisir une image' : 'Choose an image'}
+              </Button>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg">
+                  <ImagePlus className="h-4 w-4 text-cyan-400" />
+                  <span className="text-white/80 text-sm flex-1 truncate">{mockupImageFile.name}</span>
+                  <button onClick={() => setMockupImageFile(null)} className="p-1 hover:bg-white/10 rounded">
+                    <X className="h-4 w-4 text-white/40" />
+                  </button>
+                </div>
+                
+                <Button 
+                  onClick={async () => {
+                    setDetectingZone(true);
+                    try {
+                      // Upload the user image first
+                      const { file_url: userImageUrl } = await base44.integrations.Core.UploadFile({ file: mockupImageFile });
+                      
+                      // Use AI to detect white/empty zones in the current canvas
+                      const result = await base44.integrations.Core.InvokeLLM({
+                        prompt: `Analyse this mockup image and detect the main white/empty rectangular zone where content should be placed.
+Return the coordinates and dimensions as percentages of the image size.
+If multiple zones exist, return the largest one.
+Return in JSON format:
+- x: horizontal position as percentage (0-100)
+- y: vertical position as percentage (0-100)
+- width: width as percentage (0-100)
+- height: height as percentage (0-100)`,
+                        response_json_schema: {
+                          type: "object",
+                          properties: {
+                            x: { type: "number" },
+                            y: { type: "number" },
+                            width: { type: "number" },
+                            height: { type: "number" }
+                          }
+                        },
+                        file_urls: [originalImageUrl]
+                      });
+                      
+                      // Convert percentages to canvas pixels
+                      const zoneX = (result.x / 100) * canvasSize.width;
+                      const zoneY = (result.y / 100) * canvasSize.height;
+                      const zoneWidth = (result.width / 100) * canvasSize.width;
+                      const zoneHeight = (result.height / 100) * canvasSize.height;
+                      
+                      // Add the user image as a layer in the detected zone
+                      addImageLayer(userImageUrl, zoneWidth, zoneHeight);
+                      
+                      // Update the layer position to match the detected zone
+                      setTimeout(() => {
+                        const lastLayerIdx = layers.length;
+                        updateLayer(lastLayerIdx, { 
+                          x: zoneX, 
+                          y: zoneY,
+                          width: zoneWidth,
+                          height: zoneHeight
+                        });
+                      }, 100);
+                      
+                      showHelp(language === 'fr' ? '✨ Image intégrée au mockup ! Ajustez la position si besoin.' : '✨ Image integrated into mockup! Adjust position if needed.');
+                      setShowMockupModal(false);
+                      setMockupImageFile(null);
+                    } catch (err) {
+                      console.error(err);
+                      showHelp(language === 'fr' ? '❌ Erreur lors de la détection' : '❌ Detection error');
+                    }
+                    setDetectingZone(false);
+                  }}
+                  disabled={detectingZone}
+                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                >
+                  {detectingZone ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      {language === 'fr' ? 'Détection en cours...' : 'Detecting...'}
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      {language === 'fr' ? 'Insérer automatiquement' : 'Insert automatically'}
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
