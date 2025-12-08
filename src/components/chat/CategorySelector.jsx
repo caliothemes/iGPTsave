@@ -171,6 +171,17 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
     }
   };
 
+  const handleBlockClick = (category) => {
+    if (category.hasSubmenu) {
+      setOpenSubmenu(openSubmenu === category.id ? null : category.id);
+      setOpenNestedSubmenu(null);
+    } else {
+      onSelect({ ...category, expertMode: expertMode[category.id] || false });
+      setOpenSubmenu(null);
+      setOpenNestedSubmenu(null);
+    }
+  };
+
   const toggleExpertMode = (categoryId, e) => {
     e.stopPropagation();
     setExpertMode(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
@@ -203,6 +214,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
         return (
           <div key={category.id} className="relative">
             <div
+              onClick={() => handleBlockClick(category)}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer",
                 isFreePrompt 
@@ -227,11 +239,57 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                     )}
                   </div>
                   {/* Switch + Badge - side by side top right */}
-                  {category.defaultExpertMode !== undefined && (
-                    <div className="flex items-center gap-2">
-                      {category.isFreePrompt ? (
-                        // Free prompt : pas de switch
-                        expertMode[category.id] ? (
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    {category.id === 'free_prompt' ? (
+                      // Free prompt : mode expert fixe, pas de switch
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                        EXPERT
+                      </span>
+                    ) : category.id === 'logo_picto' ? (
+                      // Logo pictogramme : mode assisté fixe (grisé)
+                      <>
+                        <div className={cn(
+                          "relative inline-flex h-4 w-7 items-center rounded-full opacity-40 cursor-not-allowed",
+                          "bg-white/20"
+                        )}>
+                          <span className="inline-block h-2.5 w-2.5 transform rounded-full bg-white translate-x-1" />
+                        </div>
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
+                          ASSISTÉ
+                        </span>
+                      </>
+                    ) : category.id === 'logo_complet' ? (
+                      // Logo complet : mode expert fixe (grisé)
+                      <>
+                        <div className={cn(
+                          "relative inline-flex h-4 w-7 items-center rounded-full opacity-40 cursor-not-allowed",
+                          "bg-violet-600"
+                        )}>
+                          <span className="inline-block h-2.5 w-2.5 transform rounded-full bg-white translate-x-4" />
+                        </div>
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                          EXPERT
+                        </span>
+                      </>
+                    ) : (
+                      // Tous les autres : switch actif
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpertMode(category.id, e);
+                          }}
+                          className={cn(
+                            "relative inline-flex h-4 w-7 items-center rounded-full transition-colors",
+                            expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
+                          )}
+                        >
+                          <span className={cn(
+                            "inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform",
+                            expertMode[category.id] ? "translate-x-4" : "translate-x-1"
+                          )} />
+                        </button>
+                        {expertMode[category.id] ? (
                           <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
                             EXPERT
                           </span>
@@ -239,41 +297,15 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                           <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
                             ASSISTÉ
                           </span>
-                        )
-                      ) : (
-                        <>
-                          {/* Switch */}
-                          <button
-                            onClick={(e) => toggleExpertMode(category.id, e)}
-                            className={cn(
-                              "relative inline-flex h-4 w-7 items-center rounded-full transition-colors",
-                              expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
-                            )}
-                          >
-                            <span className={cn(
-                              "inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform",
-                              expertMode[category.id] ? "translate-x-4" : "translate-x-1"
-                            )} />
-                          </button>
-                          {/* Badge */}
-                          {expertMode[category.id] ? (
-                            <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
-                              EXPERT
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
-                              ASSISTÉ
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
                 
-                {/* Info or Tooltips */}
-                {category.defaultExpertMode !== undefined && category.isFreePrompt && (
+                {/* Info for free prompt */}
+                {category.id === 'free_prompt' && (
                   <div className="mt-2 p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
                     <p className="text-[10px] text-blue-300 leading-tight">
                       {language === 'fr'
@@ -282,22 +314,6 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                     </p>
                   </div>
                   )}
-
-                  {/* Choose Button */}
-                  <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCategoryClick(category);
-                  }}
-                  className={cn(
-                    "mt-3 w-full py-2 px-3 rounded-lg text-xs font-medium transition-all",
-                    isFreePrompt
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-                      : "bg-white/10 hover:bg-white/20 text-white"
-                  )}
-                  >
-                  {language === 'fr' ? 'Choisir ce format' : 'Choose this format'}
-                  </button>
                   </div>
                   </div>
 
