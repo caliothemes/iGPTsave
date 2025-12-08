@@ -132,18 +132,12 @@ export default function AdminVisuals() {
           </a>
         </div>
 
-        {/* Visuals Grid - Masonry */}
-        <div 
-          style={{
-            columnCount: 'auto',
-            columnWidth: '200px',
-            columnGap: '12px'
-          }}
-        >
+        {/* Visuals Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           {filteredVisuals.map((visual) => (
             <div 
               key={visual.id}
-              className="break-inside-avoid group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all mb-3"
+              className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all"
             >
               <div className="relative">
                 {visual.image_url ? (

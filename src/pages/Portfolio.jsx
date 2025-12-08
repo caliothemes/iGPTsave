@@ -152,40 +152,8 @@ export default function Portfolio() {
           </p>
         </div>
 
-        {/* Masonry Grid */}
+        {/* Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
-          <style>{`
-            .masonry-portfolio {
-              column-count: 6;
-              column-gap: 8px;
-            }
-            .masonry-portfolio > div {
-              break-inside: avoid;
-              margin-bottom: 8px;
-              display: inline-block;
-              width: 100%;
-            }
-            @media (max-width: 1400px) {
-              .masonry-portfolio {
-                column-count: 5;
-              }
-            }
-            @media (max-width: 1024px) {
-              .masonry-portfolio {
-                column-count: 4;
-              }
-            }
-            @media (max-width: 768px) {
-              .masonry-portfolio {
-                column-count: 3;
-              }
-            }
-            @media (max-width: 480px) {
-              .masonry-portfolio {
-                column-count: 2;
-              }
-            }
-          `}</style>
           {visuals.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-white/40 text-lg">
@@ -193,7 +161,7 @@ export default function Portfolio() {
               </p>
             </div>
           ) : (
-            <div className="masonry-portfolio">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
               {visuals.map((visual, index) => {
                 const isLast = index === visuals.length - 1;
                 return (
