@@ -311,7 +311,7 @@ export default function Home() {
           return newMsgs;
         });
 
-        // Update conversation with new messages
+        // Update conversation with new messages and visual_id
         if (activeConversation && user) {
           try {
             const updatedMessages = [
@@ -321,9 +321,10 @@ export default function Home() {
             ];
             await base44.entities.Conversation.update(activeConversation.id, {
               messages: updatedMessages,
-              title: activeConversation.title || userMessage.slice(0, 50)
+              title: activeConversation.title || userMessage.slice(0, 50),
+              visual_id: savedVisual.id
             });
-            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages }));
+            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
           } catch (e) {
             console.error('Failed to update conversation:', e);
           }
@@ -460,11 +461,27 @@ export default function Home() {
     setMessages([]);
   };
   
-  const handleSelectConversation = (conv) => {
+  const handleSelectConversation = async (conv) => {
     setCurrentConversation(conv);
     setMessages(conv.messages || []);
-    setCurrentVisual(null);
     setSelectedCategory(null);
+    
+    // Load the visual associated with this conversation
+    if (conv.visual_id) {
+      try {
+        const visuals = await base44.entities.Visual.filter({ id: conv.visual_id });
+        if (visuals.length > 0) {
+          setCurrentVisual(visuals[0]);
+        } else {
+          setCurrentVisual(null);
+        }
+      } catch (e) {
+        console.error('Failed to load visual:', e);
+        setCurrentVisual(null);
+      }
+    } else {
+      setCurrentVisual(null);
+    }
   };
 
   const handleOpenEditor = (visual) => {
