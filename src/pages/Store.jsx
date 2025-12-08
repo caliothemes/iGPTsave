@@ -558,16 +558,6 @@ export default function Store() {
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
               onClick={() => setEnlargedImage(null)}
             >
-              {/* Close button - fixed position */}
-              <button
-                onClick={() => setEnlargedImage(null)}
-                className="fixed top-4 right-4 z-[60] p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-all"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-
               {/* Image container */}
               <motion.div
                 initial={{ scale: 0.95 }}
@@ -588,6 +578,15 @@ export default function Store() {
                       iGPT
                     </div>
                   </div>
+                  {/* Close button - inside image */}
+                  <button
+                    onClick={() => setEnlargedImage(null)}
+                    className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-all z-10"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               </motion.div>
             </motion.div>
