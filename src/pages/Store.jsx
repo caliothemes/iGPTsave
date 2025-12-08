@@ -361,8 +361,13 @@ export default function Store() {
                           
                           {/* Description with more lines in middle */}
                           {item.description && (
-                            <p className="text-white/70 text-xs mb-auto line-clamp-4 leading-relaxed">{item.description}</p>
+                            <p className="text-white/70 text-xs mb-2 line-clamp-4 leading-relaxed">{item.description}</p>
                           )}
+                          
+                          {/* Format badge under description */}
+                          <div className="mb-auto">
+                            <FormatBadge dimensions={item.dimensions} language={language} />
+                          </div>
                           
                           {/* Price and button at bottom */}
                           <div className="mt-auto pt-3 border-t border-white/10">
