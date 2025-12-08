@@ -104,6 +104,8 @@ export default function PageWrapper({ children, requireAuth = false }) {
           <div className="mt-auto px-4">
             <div className="max-w-4xl mx-auto flex items-center justify-center">
               <p className="text-white/25 text-xs">
+                <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">Store</a>
+                {' • '}
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                 {' • '}
                 <a href={createPageUrl('Portfolio')} className="hover:text-violet-400 transition-colors">Portfolio</a>
