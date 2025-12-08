@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -28,6 +28,7 @@ import StyleSelector from '@/components/chat/StyleSelector';
 import PresentationModal from '@/components/PresentationModal';
 import VisualEditor from '@/components/chat/VisualEditor';
 import ConfirmModal from '@/components/ConfirmModal';
+import FavoritesModal from '@/components/FavoritesModal';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -60,6 +61,10 @@ export default function Home() {
   
   // Confirm modal
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null });
+  
+  // Favorites modal
+  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+  const favoriteVisuals = sessionVisuals.filter(v => v.is_favorite);
   
   // Dynamic settings from admin
   const [settings, setSettings] = useState({});
@@ -601,6 +606,22 @@ export default function Home() {
         "flex-1 flex flex-col transition-all duration-300 relative z-10",
         sidebarOpen ? "ml-64" : "ml-0"
       )}>
+        {/* Favorites Button */}
+        {!showInitialView && (
+          <button
+            onClick={() => setShowFavoritesModal(true)}
+            className="fixed right-6 top-20 z-30 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
+            <Heart className={cn("h-4 w-4", favoriteVisuals.length > 0 && "fill-white")} />
+            <span className="text-sm font-medium">{t('myFavorites') || (language === 'fr' ? 'Mes favoris' : 'My favorites')}</span>
+            {favoriteVisuals.length > 0 && (
+              <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                {favoriteVisuals.length}
+              </span>
+            )}
+          </button>
+        )}
+
         {showInitialView ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 pt-16">
             {/* Logo - Clickable to open modal - NO TEXT */}
@@ -953,6 +974,14 @@ export default function Home() {
         title={confirmModal.title}
         message={confirmModal.message}
       />
-    </div>
-  );
-}
+
+      {/* Favorites Modal */}
+      <FavoritesModal
+        isOpen={showFavoritesModal}
+        onClose={() => setShowFavoritesModal(false)}
+        favorites={favoriteVisuals}
+        onSelectVisual={(visual) => setCurrentVisual(visual)}
+      />
+      </div>
+      );
+      }
