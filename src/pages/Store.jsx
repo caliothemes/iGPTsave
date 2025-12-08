@@ -154,13 +154,17 @@ export default function Store() {
           ? "⚠️ Vous n'avez plus de crédit, rechargez avant d'effectuer un achat..." 
           : "⚠️ You don't have enough credits, recharge before making a purchase...",
         { 
-          duration: 6000,
+          duration: 8000,
           style: {
             background: '#92400e',
             color: '#fff',
             border: '2px solid #f59e0b',
             fontSize: '14px',
             fontWeight: '500'
+          },
+          action: {
+            label: language === 'fr' ? 'Recharger' : 'Recharge',
+            onClick: () => window.location.href = createPageUrl('Pricing')
           }
         }
       );
@@ -227,13 +231,17 @@ export default function Store() {
           ? '✅ Achat réussi ! Retrouvez ce visuel dans "Mes visuels"' 
           : '✅ Purchase successful! Find this visual in "My Visuals"',
         { 
-          duration: 6000,
+          duration: 8000,
           style: {
             background: '#065f46',
             color: '#fff',
             border: '2px solid #10b981',
             fontSize: '14px',
             fontWeight: '600'
+          },
+          action: {
+            label: language === 'fr' ? 'Mes visuels' : 'My Visuals',
+            onClick: () => window.location.href = createPageUrl('MyVisuals')
           }
         }
       );
