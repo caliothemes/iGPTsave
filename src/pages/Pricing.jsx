@@ -34,8 +34,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Zap',
         gradient: 'from-blue-600 to-cyan-600',
         features: { 
-          fr: ['100 messages/mois', 'Visuels HD', 'Support email'],
-          en: ['100 messages/month', 'HD visuals', 'Email support']
+          fr: ['100 messages/mois', 'Visuels HD', 'Support'],
+          en: ['100 messages/month', 'HD visuals', 'Support']
         }
       },
       { 
@@ -48,8 +48,8 @@ const STRIPE_PRODUCTS = {
         gradient: 'from-violet-600 to-purple-600',
         is_popular: true,
         features: { 
-          fr: ['250 messages/mois', 'Visuels HD', 'Support prioritaire'],
-          en: ['250 messages/month', 'HD visuals', 'Priority support']
+          fr: ['250 messages/mois', 'Visuels HD', 'Support'],
+          en: ['250 messages/month', 'HD visuals', 'Support']
         }
       },
       { 
@@ -61,8 +61,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Crown',
         gradient: 'from-amber-600 to-orange-600',
         features: { 
-          fr: ['500 messages/mois', 'Visuels HD & Print', 'Support VIP'],
-          en: ['500 messages/month', 'HD & Print visuals', 'VIP support']
+          fr: ['500 messages/mois', 'Visuels HD & Print', 'Support'],
+          en: ['500 messages/month', 'HD & Print visuals', 'Support']
         }
       },
       { 
@@ -74,8 +74,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Gem',
         gradient: 'from-rose-600 to-pink-600',
         features: { 
-          fr: ['1000 messages/mois', 'Visuels HD & Print', 'Support VIP 24/7'],
-          en: ['1000 messages/month', 'HD & Print visuals', 'VIP support 24/7']
+          fr: ['1000 messages/mois', 'Visuels HD & Print', 'Support'],
+          en: ['1000 messages/month', 'HD & Print visuals', 'Support']
         }
       }
     ],
@@ -122,8 +122,8 @@ const STRIPE_PRODUCTS = {
         gradient: 'from-violet-600 to-purple-600',
         is_popular: true,
         features: { 
-          fr: ['250 messages/mois', '3000/an', 'Support prioritaire'],
-          en: ['250 messages/month', '3000/year', 'Priority support']
+          fr: ['250 messages/mois', '3000/an', 'Support'],
+          en: ['250 messages/month', '3000/year', 'Support']
         }
       },
       { 
@@ -137,8 +137,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Crown',
         gradient: 'from-amber-600 to-orange-600',
         features: { 
-          fr: ['500 messages/mois', '6000/an', 'Support VIP'],
-          en: ['500 messages/month', '6000/year', 'VIP support']
+          fr: ['500 messages/mois', '6000/an', 'Support'],
+          en: ['500 messages/month', '6000/year', 'Support']
         }
       },
       { 
@@ -152,8 +152,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Gem',
         gradient: 'from-rose-600 to-pink-600',
         features: { 
-          fr: ['1000 messages/mois', '12000/an', 'Support VIP 24/7'],
-          en: ['1000 messages/month', '12000/year', 'VIP support 24/7']
+          fr: ['1000 messages/mois', '12000/an', 'Support'],
+          en: ['1000 messages/month', '12000/year', 'Support']
         }
       }
     ]
