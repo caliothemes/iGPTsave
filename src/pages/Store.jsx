@@ -339,25 +339,31 @@ export default function Store() {
               {filteredItems.map((item) => {
                 const isPurchased = purchasedItems.has(item.id);
                 const wasAlreadyPurchased = alreadyPurchased.has(item.id);
+                
+                // Get visual data for dimensions
+                const visualDimensions = item.dimensions || '1080x1080';
+                
                 return (
-                  <div key={item.id}>
-                    <div className="relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
-                      {/* Image */}
-                      <img
-                        src={item.image_url}
-                        alt={item.title}
-                        className="w-full h-auto block"
-                        loading="lazy"
-                      />
-                      
-                      {/* Format badge - top right corner */}
-                      <div className="absolute top-2 right-2 z-[5]">
-                        <FormatBadge dimensions={item.dimensions} language={language} />
-                      </div>
+                  <div key={item.id} className="break-inside-avoid">
+                    <div className="relative rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 group">
+                      {/* Image Container */}
+                      <div className="relative overflow-hidden rounded-lg">
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-auto block"
+                          loading="lazy"
+                        />
+                        
+                        {/* Format badge - top right corner - ALWAYS VISIBLE */}
+                        <div className="absolute top-2 right-2 z-[15]">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-black/80 backdrop-blur-sm text-white text-[10px] font-bold rounded-full border border-white/30 shadow-lg">
+                            {visualDimensions}
+                          </span>
+                        </div>
 
-                      {/* Hover overlay - with group class */}
-                      <div className="group absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 hover:opacity-100 transition-opacity duration-300 z-[10] p-4 flex flex-col pointer-events-none">
-                        <div className="pointer-events-auto">
+                        {/* Hover overlay - FULL HEIGHT */}
+                        <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-[10] p-4 flex flex-col">
                           {/* Title */}
                           <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{item.title}</h3>
                           
@@ -369,7 +375,7 @@ export default function Store() {
                           {/* Format badge in hover - VERY VISIBLE */}
                           <div className="mb-4">
                             <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600 text-white text-xs font-bold rounded-full shadow-lg">
-                              {item.dimensions || '1080x1080'}
+                              📐 {visualDimensions}
                             </span>
                           </div>
                           
@@ -390,7 +396,7 @@ export default function Store() {
                                 <Button
                                   size="sm"
                                   disabled
-                                  className="bg-blue-600 hover:bg-blue-600 text-white cursor-default opacity-100 pointer-events-auto"
+                                  className="bg-blue-600 hover:bg-blue-600 text-white cursor-default opacity-100"
                                 >
                                   <Check className="h-4 w-4 mr-1" />
                                   {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
@@ -403,7 +409,7 @@ export default function Store() {
                                     handlePurchase(item);
                                   }}
                                   disabled={purchasing === item.id}
-                                  className="bg-green-600 hover:bg-green-700 text-white pointer-events-auto shadow-lg"
+                                  className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
                                 >
                                   {purchasing === item.id ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -415,44 +421,44 @@ export default function Store() {
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Success overlay after purchase - z-index 30 to be ABOVE everything */}
-                      <AnimatePresence>
-                        {isPurchased && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute inset-0 bg-gradient-to-br from-green-600 to-green-700 z-[30] flex flex-col items-center justify-center p-6 pointer-events-none"
-                          >
+                        {/* Success overlay after purchase - FULL SCREEN z-50 */}
+                        <AnimatePresence>
+                          {isPurchased && (
                             <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
-                              className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-4 shadow-xl"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-br from-green-600 via-green-600 to-green-700 z-[50] flex flex-col items-center justify-center p-6"
                             >
-                              <Check className="h-10 w-10 text-green-600" strokeWidth={3} />
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 20 }}
+                                className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-3 shadow-2xl"
+                              >
+                                <Check className="h-9 w-9 text-green-600" strokeWidth={4} />
+                              </motion.div>
+                              <motion.h3
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="text-white font-bold text-base mb-1 text-center"
+                              >
+                                {language === 'fr' ? '✨ Achat réussi !' : '✨ Purchase complete!'}
+                              </motion.h3>
+                              <motion.p
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                className="text-white/90 text-xs text-center"
+                              >
+                                {language === 'fr' ? 'Dans "Mes visuels"' : 'In "My Visuals"'}
+                              </motion.p>
                             </motion.div>
-                            <motion.h3
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.4 }}
-                              className="text-white font-bold text-lg mb-2 text-center"
-                            >
-                              {language === 'fr' ? 'Achat effectué !' : 'Purchase complete!'}
-                            </motion.h3>
-                            <motion.p
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.5 }}
-                              className="text-white/90 text-sm text-center"
-                            >
-                              {language === 'fr' ? 'Retrouvez ce visuel dans "Mes visuels"' : 'Find this visual in "My Visuals"'}
-                            </motion.p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </div>
                 );
