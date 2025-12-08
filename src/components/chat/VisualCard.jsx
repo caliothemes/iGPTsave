@@ -69,8 +69,9 @@ export default function VisualCard({
   };
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
-      {/* Image Container */}
+    <>
+      <div className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
+        {/* Image Container */}
         <div className="relative overflow-hidden bg-black/20" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}>
           <img 
           src={visual.image_url} 
@@ -384,62 +385,7 @@ export default function VisualCard({
         onDownload={handleDownloadComplete}
       />
 
-      {/* Color Palette Modal */}
-      {showColorModal && visual.color_palette && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowColorModal(false)}
-        >
-          <div 
-            className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold">
-                {language === 'fr' ? 'Palette de couleurs' : 'Color palette'}
-              </h3>
-              <button
-                onClick={() => setShowColorModal(false)}
-                className="text-white/60 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              {visual.color_palette.map((color, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => copyToClipboard(color)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group"
-                >
-                  <div
-                    className="w-12 h-12 rounded-lg shadow-lg flex-shrink-0 border border-white/10"
-                    style={{ backgroundColor: color }}
-                  />
-                  <div className="flex-1 text-left">
-                    <p className="text-white font-mono text-sm">{color}</p>
-                    <p className="text-white/50 text-xs">
-                      {copiedColor === color 
-                        ? (language === 'fr' ? '✓ Copié !' : '✓ Copied!') 
-                        : (language === 'fr' ? 'Cliquer pour copier' : 'Click to copy')}
-                    </p>
-                  </div>
-                  {copiedColor === color ? (
-                    <Check className="h-5 w-5 text-green-400" />
-                  ) : (
-                    <div className="text-white/40 group-hover:text-white/60">
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
