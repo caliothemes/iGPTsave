@@ -228,8 +228,8 @@ export default function Store() {
           </div>
           <p className="text-base text-white/50">
             {language === 'fr' 
-              ? 'Découvrez et achetez des visuels prêts à l\'emploi'
-              : 'Discover and purchase ready-to-use visuals'}
+              ? 'Découvrez et achetez des visuels prêts à l\'emploi, créés par notre équipe.'
+              : 'Discover and purchase ready-to-use visuals, created by our team.'}
           </p>
           {!isAdmin && (
             <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full">
