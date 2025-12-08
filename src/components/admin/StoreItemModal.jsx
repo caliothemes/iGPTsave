@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, Tag, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
@@ -18,8 +18,10 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
     description: '',
     price_credits: 10,
     category_slug: '',
-    dimensions: '1080x1080'
+    dimensions: '1080x1080',
+    keywords: []
   });
+  const [keywordInput, setKeywordInput] = useState('');
 
   const formatOptions = [
     { value: '1080x1080', label: '1080x1080 - 1:1 (Carré)' },
@@ -61,7 +63,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             description: item.description || '',
             price_credits: item.price_credits,
             category_slug: item.category_slug,
-            dimensions: item.dimensions || visual.dimensions || '1080x1080'
+            dimensions: item.dimensions || visual.dimensions || '1080x1080',
+            keywords: item.keywords || []
           });
         } else {
           setExistingItem(null);
@@ -70,7 +73,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             description: visual.original_prompt || '',
             price_credits: 10,
             category_slug: visual.visual_type || '',
-            dimensions: visual.dimensions || '1080x1080'
+            dimensions: visual.dimensions || '1080x1080',
+            keywords: []
           });
         }
       }
@@ -94,7 +98,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           price_credits: formData.price_credits,
           category_slug: formData.category_slug,
           image_url: visual.image_url,
-          dimensions: formData.dimensions
+          dimensions: formData.dimensions,
+          keywords: formData.keywords
         });
         toast.success('✨ Produit modifié !');
       } else {
@@ -107,6 +112,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           category_slug: formData.category_slug,
           image_url: visual.image_url,
           dimensions: formData.dimensions,
+          keywords: formData.keywords,
           is_active: true
         });
         toast.success('✨ Visuel ajouté au Store !');
@@ -223,6 +229,71 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
                 placeholder="10"
                 className="bg-white/5 border-white/10 text-white"
               />
+            </div>
+
+            {/* Keywords */}
+            <div>
+              <label className="block text-white/60 text-sm mb-2 flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                Mots-clés (pour la recherche)
+              </label>
+              <div className="flex gap-2 mb-2">
+                <Input
+                  value={keywordInput}
+                  onChange={(e) => setKeywordInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const newKeyword = keywordInput.trim().toLowerCase();
+                      if (newKeyword && !formData.keywords.includes(newKeyword)) {
+                        setFormData({ ...formData, keywords: [...formData.keywords, newKeyword] });
+                        setKeywordInput('');
+                      }
+                    }
+                  }}
+                  placeholder="Tapez un mot-clé et appuyez sur Entrée"
+                  className="bg-white/5 border-white/10 text-white"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const newKeyword = keywordInput.trim().toLowerCase();
+                    if (newKeyword && !formData.keywords.includes(newKeyword)) {
+                      setFormData({ ...formData, keywords: [...formData.keywords, newKeyword] });
+                      setKeywordInput('');
+                    }
+                  }}
+                  className="bg-violet-600 hover:bg-violet-700 border-0"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {formData.keywords.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.keywords.map((keyword, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs rounded-full"
+                    >
+                      {keyword}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({
+                            ...formData,
+                            keywords: formData.keywords.filter((_, i) => i !== idx)
+                          });
+                        }}
+                        className="hover:text-white"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2 justify-between pt-4">
