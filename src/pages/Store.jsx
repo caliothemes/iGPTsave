@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Loader2, ShoppingBag, Sparkles, Lock } from 'lucide-react';
+import { Loader2, ShoppingBag, Sparkles, Lock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Sidebar from '@/components/Sidebar';
@@ -10,6 +10,7 @@ import { createPageUrl } from '@/utils';
 import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Format Badge Component
 function FormatBadge({ dimensions, language }) {
@@ -68,6 +69,7 @@ export default function Store() {
   const [conversations, setConversations] = useState([]);
   const [userVisuals, setUserVisuals] = useState([]);
   const [purchasing, setPurchasing] = useState(null);
+  const [purchasedItems, setPurchasedItems] = useState(new Set());
 
   useEffect(() => {
     const init = async () => {
@@ -175,6 +177,7 @@ export default function Store() {
       });
 
       toast.success(language === 'fr' ? '✨ Achat réussi !' : '✨ Purchase successful!');
+      setPurchasedItems(prev => new Set([...prev, item.id]));
     } catch (e) {
       console.error(e);
       toast.error(language === 'fr' ? 'Erreur lors de l\'achat' : 'Purchase error');
@@ -306,60 +309,111 @@ export default function Store() {
               className="masonry-grid"
               columnClassName="masonry-column"
             >
-              {filteredItems.map((item) => (
-                <div key={item.id}>
-                  <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
-                    <img
-                      src={item.image_url}
-                      alt={item.title}
-                      className="w-full h-auto block"
-                      loading="lazy"
-                    />
-                    {/* Format badge - visible without hover */}
-                    <div className="absolute top-2 right-2 z-10">
-                      <FormatBadge dimensions={item.dimensions} language={language} />
-                    </div>
+              {filteredItems.map((item) => {
+                const isPurchased = purchasedItems.has(item.id);
+                return (
+                  <div key={item.id}>
+                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
+                        className="w-full h-auto block"
+                        loading="lazy"
+                      />
+                      {/* Format badge - visible without hover */}
+                      <div className="absolute top-2 right-2 z-10">
+                        <FormatBadge dimensions={item.dimensions} language={language} />
+                      </div>
 
-                    {/* Hover overlay - Full card coverage */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute inset-0 p-4 flex flex-col">
-                        {/* Title at top */}
-                        <h3 className="text-white font-bold text-sm mb-2 line-clamp-2 leading-tight">{item.title}</h3>
-                        
-                        {/* Description with more lines in middle */}
-                        {item.description && (
-                          <p className="text-white/70 text-xs mb-auto line-clamp-4 leading-relaxed">{item.description}</p>
-                        )}
-                        
-                        {/* Price and button at bottom */}
-                        <div className="mt-auto pt-3 border-t border-white/10">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1">
-                              <Sparkles className="h-4 w-4 text-amber-400" />
-                              <span className="text-white font-bold">{item.price_credits}</span>
-                              <span className="text-white/60 text-xs">
-                                {language === 'fr' ? 'crédits' : 'credits'}
-                              </span>
-                            </div>
-                            <Button
-                              size="sm"
-                              onClick={() => handlePurchase(item)}
-                              disabled={purchasing === item.id}
-                              className="bg-violet-600 hover:bg-violet-700 text-white"
+                      {/* Success overlay after purchase */}
+                      <AnimatePresence>
+                        {isPurchased && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-gradient-to-t from-green-900/95 via-green-800/90 to-green-700/80 z-20 flex flex-col items-center justify-center p-4"
+                          >
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                              className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center mb-3"
                             >
-                              {purchasing === item.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                              <Check className="h-8 w-8 text-white" />
+                            </motion.div>
+                            <motion.h3
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.3 }}
+                              className="text-white font-bold text-sm mb-1 text-center"
+                            >
+                              {language === 'fr' ? 'Achat effectué !' : 'Purchase complete!'}
+                            </motion.h3>
+                            <motion.p
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.4 }}
+                              className="text-white/80 text-xs text-center"
+                            >
+                              {language === 'fr' ? 'Retrouvez ce visuel dans "Mes visuels"' : 'Find this visual in "My Visuals"'}
+                            </motion.p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Hover overlay - Full card coverage */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute inset-0 p-4 flex flex-col">
+                          {/* Title at top */}
+                          <h3 className="text-white font-bold text-sm mb-2 line-clamp-2 leading-tight">{item.title}</h3>
+                          
+                          {/* Description with more lines in middle */}
+                          {item.description && (
+                            <p className="text-white/70 text-xs mb-auto line-clamp-4 leading-relaxed">{item.description}</p>
+                          )}
+                          
+                          {/* Price and button at bottom */}
+                          <div className="mt-auto pt-3 border-t border-white/10">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1">
+                                <Sparkles className="h-4 w-4 text-amber-400" />
+                                <span className="text-white font-bold">{item.price_credits}</span>
+                                <span className="text-white/60 text-xs">
+                                  {language === 'fr' ? 'crédits' : 'credits'}
+                                </span>
+                              </div>
+                              {isPurchased ? (
+                                <Button
+                                  size="sm"
+                                  disabled
+                                  className="bg-green-600 text-white cursor-default"
+                                >
+                                  <Check className="h-4 w-4 mr-1" />
+                                  {language === 'fr' ? 'Acheté' : 'Purchased'}
+                                </Button>
                               ) : (
-                                language === 'fr' ? 'Acheter' : 'Buy'
+                                <Button
+                                  size="sm"
+                                  onClick={() => handlePurchase(item)}
+                                  disabled={purchasing === item.id}
+                                  className="bg-violet-600 hover:bg-violet-700 text-white"
+                                >
+                                  {purchasing === item.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    language === 'fr' ? 'Acheter' : 'Buy'
+                                  )}
+                                </Button>
                               )}
-                            </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </Masonry>
           )}
         </div>
