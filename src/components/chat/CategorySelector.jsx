@@ -116,6 +116,7 @@ const CATEGORIES = [
     hasSubmenu: true,
     submenu: [
       { id: 'mockup_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un mockup carré', en: 'Create a square mockup' }, dimensions: '1080x1080' },
+      { id: 'mockup_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un mockup story', en: 'Create a story mockup' }, dimensions: '1080x1920' },
       { id: 'mockup_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un mockup portrait', en: 'Create a portrait mockup' }, dimensions: '1080x1350' },
       { id: 'mockup_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un mockup paysage', en: 'Create a landscape mockup' }, dimensions: '1920x1080' },
     ]
@@ -128,6 +129,7 @@ const CATEGORIES = [
     hasSubmenu: true,
     submenu: [
       { id: 'product_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une photo de produit carrée', en: 'Create a square product photo' }, dimensions: '1080x1080' },
+      { id: 'product_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée une photo de produit story', en: 'Create a story product photo' }, dimensions: '1080x1920' },
       { id: 'product_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée une photo de produit portrait', en: 'Create a portrait product photo' }, dimensions: '1080x1350' },
       { id: 'product_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée une photo de produit paysage', en: 'Create a landscape product photo' }, dimensions: '1920x1080' },
     ]
