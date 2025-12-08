@@ -384,7 +384,6 @@ export default function VisualCard({
         visual={visual}
         onDownload={handleDownloadComplete}
       />
-      </div>
 
       {/* Color Palette Modal - Outside the card */}
       {showColorModal && visual.color_palette && (
