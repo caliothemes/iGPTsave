@@ -555,74 +555,38 @@ export default function Store() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
               onClick={() => setEnlargedImage(null)}
             >
+              {/* Close button - fixed position */}
+              <button
+                onClick={() => setEnlargedImage(null)}
+                className="fixed top-4 right-4 z-[60] p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Image container */}
               <motion.div
-                initial={{ scale: 0.9 }}
+                initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
-                className="relative max-w-5xl max-h-[90vh] w-full"
+                exit={{ scale: 0.95 }}
+                className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Close button */}
-                <button
-                  onClick={() => setEnlargedImage(null)}
-                  className="absolute -top-12 right-0 p-2 text-white/60 hover:text-white transition-colors"
-                >
-                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-
-                {/* Image with watermark */}
-                <div className="relative rounded-xl overflow-hidden">
+                <div className="relative max-w-7xl max-h-[95vh] w-full h-full flex items-center justify-center">
                   <img
                     src={enlargedImage.image_url}
                     alt={enlargedImage.title}
-                    className="w-full h-auto max-h-[85vh] object-contain"
+                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-2xl"
                   />
                   {/* Watermark iGPT */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-white/20 text-8xl font-bold rotate-[-30deg] select-none">
+                    <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
                       iGPT
                     </div>
-                  </div>
-                </div>
-
-                {/* Info below image */}
-                <div className="mt-4 text-center">
-                  <h3 className="text-white font-bold text-lg mb-2">{enlargedImage.title}</h3>
-                  {enlargedImage.description && (
-                    <p className="text-white/60 text-sm mb-3">{enlargedImage.description}</p>
-                  )}
-                  <div className="flex items-center justify-center gap-4">
-                    <span className="flex items-center gap-1 text-amber-400">
-                      <Sparkles className="h-4 w-4" />
-                      <span className="font-bold">{enlargedImage.price_credits}</span>
-                      <span className="text-sm text-white/60">
-                        {language === 'fr' 
-                          ? (enlargedImage.price_credits === 1 ? 'crédit' : 'crédits')
-                          : (enlargedImage.price_credits === 1 ? 'credit' : 'credits')
-                        }
-                      </span>
-                    </span>
-                    <Button
-                      onClick={() => {
-                        setEnlargedImage(null);
-                        handlePurchase(enlargedImage);
-                      }}
-                      disabled={purchasing === enlargedImage.id || alreadyPurchased.has(enlargedImage.id)}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      {alreadyPurchased.has(enlargedImage.id) ? (
-                        language === 'fr' ? 'Déjà acheté' : 'Already purchased'
-                      ) : purchasing === enlargedImage.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        language === 'fr' ? 'Acheter' : 'Buy'
-                      )}
-                    </Button>
                   </div>
                 </div>
               </motion.div>
