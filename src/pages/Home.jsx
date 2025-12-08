@@ -189,6 +189,23 @@ export default function Home() {
 
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
 
+    // Create conversation if it doesn't exist
+    let activeConversation = currentConversation;
+    if (!activeConversation && user) {
+      try {
+        const newConv = await base44.entities.Conversation.create({
+          user_email: user.email,
+          title: userMessage.slice(0, 50),
+          messages: [{ role: 'user', content: userMessage }]
+        });
+        setCurrentConversation(newConv);
+        setConversations(prev => [newConv, ...prev]);
+        activeConversation = newConv;
+      } catch (e) {
+        console.error('Failed to create conversation:', e);
+      }
+    }
+
     try {
       let enhancedPrompt = '';
       const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
@@ -283,26 +300,62 @@ export default function Home() {
         }
 
         setCurrentVisual(savedVisual);
+
+        const successMessage = `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`;
         setMessages(prev => {
           const newMsgs = [...prev];
           newMsgs[newMsgs.length - 1] = { 
             role: 'assistant', 
-            content: `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`
+            content: successMessage
           };
           return newMsgs;
         });
-      }
-    } catch (error) {
-      console.error(error);
-      setMessages(prev => {
+
+        // Update conversation with new messages
+        if (activeConversation && user) {
+          try {
+            const updatedMessages = [
+              ...(activeConversation.messages || []),
+              { role: 'user', content: userMessage },
+              { role: 'assistant', content: successMessage }
+            ];
+            await base44.entities.Conversation.update(activeConversation.id, {
+              messages: updatedMessages,
+              title: activeConversation.title || userMessage.slice(0, 50)
+            });
+            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages }));
+          } catch (e) {
+            console.error('Failed to update conversation:', e);
+          }
+        }
+        }
+        } catch (error) {
+        console.error(error);
+        const errorMsg = t('error');
+        setMessages(prev => {
         const newMsgs = [...prev];
-        newMsgs[newMsgs.length - 1] = { role: 'assistant', content: t('error') };
+        newMsgs[newMsgs.length - 1] = { role: 'assistant', content: errorMsg };
         return newMsgs;
-      });
-    }
-    
-    setIsGenerating(false);
-  };
+        });
+
+        // Update conversation with error
+        if (activeConversation && user) {
+        try {
+          await base44.entities.Conversation.update(activeConversation.id, {
+            messages: [
+              ...(activeConversation.messages || []),
+              { role: 'user', content: userMessage },
+              { role: 'assistant', content: errorMsg }
+            ]
+          });
+        } catch (e) {
+          console.error('Failed to update conversation:', e);
+        }
+        }
+        }
+
+        setIsGenerating(false);
+        };
 
   const handleRegenerate = async (visual) => {
     setIsGenerating(true);
@@ -406,6 +459,13 @@ export default function Home() {
     setSelectedPalette(null);
     setMessages([]);
   };
+  
+  const handleSelectConversation = (conv) => {
+    setCurrentConversation(conv);
+    setMessages(conv.messages || []);
+    setCurrentVisual(null);
+    setSelectedCategory(null);
+  };
 
   const handleOpenEditor = (visual) => {
     setEditingVisual(visual);
@@ -471,10 +531,13 @@ export default function Home() {
         visuals={sessionVisuals}
         currentConversationId={currentConversation?.id}
         onNewChat={handleNewChat}
-        onSelectConversation={(conv) => setCurrentConversation(conv)}
+        onSelectConversation={handleSelectConversation}
         onDeleteConversation={async (id) => {
           await base44.entities.Conversation.delete(id);
           setConversations(prev => prev.filter(c => c.id !== id));
+          if (currentConversation?.id === id) {
+            handleNewChat();
+          }
         }}
         onSelectVisual={(v) => setCurrentVisual(v)}
         onLogin={handleLogin}
