@@ -3273,7 +3273,7 @@ Réponds en JSON avec:
               </button>
               
               {showMockupTooltip && (
-                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 whitespace-nowrap">
+                <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 z-50 whitespace-nowrap">
                   <div className="bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-cyan-500/30 shadow-lg">
                     <p className="text-cyan-300 text-xs font-medium">
                       {language === 'fr' ? 'Remplir une zone de mockup' : 'Fill a mockup area'}
