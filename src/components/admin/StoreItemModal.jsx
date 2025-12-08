@@ -10,7 +10,9 @@ import { toast } from 'sonner';
 
 export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [existingItem, setExistingItem] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -31,15 +33,32 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
   }, []);
 
   useEffect(() => {
-    if (visual) {
-      setFormData({
-        title: visual.title || '',
-        description: visual.original_prompt || '',
-        price_credits: 10,
-        category_slug: visual.visual_type || ''
-      });
-    }
-  }, [visual]);
+    const loadExistingItem = async () => {
+      if (visual && isOpen) {
+        // Check if this visual is already in store
+        const items = await base44.entities.StoreItem.filter({ visual_id: visual.id });
+        if (items.length > 0) {
+          const item = items[0];
+          setExistingItem(item);
+          setFormData({
+            title: item.title,
+            description: item.description || '',
+            price_credits: item.price_credits,
+            category_slug: item.category_slug
+          });
+        } else {
+          setExistingItem(null);
+          setFormData({
+            title: visual.title || '',
+            description: visual.original_prompt || '',
+            price_credits: 10,
+            category_slug: visual.visual_type || ''
+          });
+        }
+      }
+    };
+    loadExistingItem();
+  }, [visual, isOpen]);
 
   const handleSubmit = async () => {
     if (!formData.title || !formData.price_credits || !formData.category_slug) {
@@ -49,24 +68,53 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      await base44.entities.StoreItem.create({
-        visual_id: visual.id,
-        title: formData.title,
-        description: formData.description,
-        price_credits: formData.price_credits,
-        category_slug: formData.category_slug,
-        image_url: visual.image_url,
-        is_active: true
-      });
-
-      toast.success('✨ Visuel ajouté au Store !');
+      if (existingItem) {
+        // Update existing item
+        await base44.entities.StoreItem.update(existingItem.id, {
+          title: formData.title,
+          description: formData.description,
+          price_credits: formData.price_credits,
+          category_slug: formData.category_slug,
+          image_url: visual.image_url
+        });
+        toast.success('✨ Produit modifié !');
+      } else {
+        // Create new item
+        await base44.entities.StoreItem.create({
+          visual_id: visual.id,
+          title: formData.title,
+          description: formData.description,
+          price_credits: formData.price_credits,
+          category_slug: formData.category_slug,
+          image_url: visual.image_url,
+          is_active: true
+        });
+        toast.success('✨ Visuel ajouté au Store !');
+      }
       onSuccess();
       onClose();
     } catch (e) {
       console.error(e);
-      toast.error('Erreur lors de l\'ajout au Store');
+      toast.error('Erreur lors de l\'opération');
     }
     setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    if (!existingItem) return;
+    if (!confirm('Supprimer ce produit du store ?')) return;
+
+    setDeleting(true);
+    try {
+      await base44.entities.StoreItem.delete(existingItem.id);
+      toast.success('✨ Produit retiré du store !');
+      onSuccess();
+      onClose();
+    } catch (e) {
+      console.error(e);
+      toast.error('Erreur lors de la suppression');
+    }
+    setDeleting(false);
   };
 
   return (
@@ -138,20 +186,41 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
               />
             </div>
 
-            <div className="flex gap-2 justify-end pt-4">
-              <Button variant="outline" onClick={onClose} disabled={loading}>
-                Annuler
-              </Button>
-              <Button onClick={handleSubmit} disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Ajout...
-                  </>
-                ) : (
-                  'Valider'
+            <div className="flex gap-2 justify-between pt-4">
+              <div>
+                {existingItem && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleDelete} 
+                    disabled={deleting || loading}
+                    className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                  >
+                    {deleting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Suppression...
+                      </>
+                    ) : (
+                      'Supprimer'
+                    )}
+                  </Button>
                 )}
-              </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={onClose} disabled={loading || deleting}>
+                  Annuler
+                </Button>
+                <Button onClick={handleSubmit} disabled={loading || deleting}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      {existingItem ? 'Modification...' : 'Ajout...'}
+                    </>
+                  ) : (
+                    existingItem ? 'Modifier' : 'Ajouter'
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         )}
