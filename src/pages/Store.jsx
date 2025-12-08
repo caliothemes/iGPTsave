@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Loader2, ShoppingBag, Sparkles, Lock, Check } from 'lucide-react';
+import { Loader2, ShoppingBag, Sparkles, Lock, Check, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Sidebar from '@/components/Sidebar';
@@ -59,6 +59,9 @@ export default function Store() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [storeItems, setStoreItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [popularKeywords, setPopularKeywords] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [userVisuals, setUserVisuals] = useState([]);
@@ -71,34 +74,53 @@ export default function Store() {
     const init = async () => {
       try {
         const auth = await base44.auth.isAuthenticated();
-        if (!auth) {
-          base44.auth.redirectToLogin(createPageUrl('Store'));
-          return;
-        }
-
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-        setIsAdmin(currentUser.role === 'admin');
-
-        const [cats, items, userCreds, userVis, userConvs, purchases] = await Promise.all([
+        
+        // Load public data (categories and items) for everyone
+        const [cats, items] = await Promise.all([
           base44.entities.StoreCategory.filter({ is_active: true }, 'order'),
-          base44.entities.StoreItem.filter({ is_active: true }, '-created_date'),
-          base44.entities.UserCredits.filter({ user_email: currentUser.email }),
-          base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 50),
-          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20),
-          base44.entities.StorePurchase.filter({ user_email: currentUser.email })
+          base44.entities.StoreItem.filter({ is_active: true }, '-created_date')
         ]);
-
+        
         setCategories(cats);
         setStoreItems(items);
         setFilteredItems(items);
-        if (userCreds.length > 0) setCredits(userCreds[0]);
-        setUserVisuals(userVis);
-        setConversations(userConvs);
         
-        // Set already purchased items
-        const purchasedItemIds = new Set(purchases.map(p => p.store_item_id));
-        setAlreadyPurchased(purchasedItemIds);
+        // Calculate popular keywords
+        const keywordCount = {};
+        items.forEach(item => {
+          if (item.keywords && Array.isArray(item.keywords)) {
+            item.keywords.forEach(keyword => {
+              keywordCount[keyword] = (keywordCount[keyword] || 0) + 1;
+            });
+          }
+        });
+        const sorted = Object.entries(keywordCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 20)
+          .map(([keyword]) => keyword);
+        setPopularKeywords(sorted);
+
+        // Load user-specific data only if authenticated
+        if (auth) {
+          const currentUser = await base44.auth.me();
+          setUser(currentUser);
+          setIsAdmin(currentUser.role === 'admin');
+
+          const [userCreds, userVis, userConvs, purchases] = await Promise.all([
+            base44.entities.UserCredits.filter({ user_email: currentUser.email }),
+            base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 50),
+            base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20),
+            base44.entities.StorePurchase.filter({ user_email: currentUser.email })
+          ]);
+
+          if (userCreds.length > 0) setCredits(userCreds[0]);
+          setUserVisuals(userVis);
+          setConversations(userConvs);
+          
+          // Set already purchased items
+          const purchasedItemIds = new Set(purchases.map(p => p.store_item_id));
+          setAlreadyPurchased(purchasedItemIds);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -108,12 +130,26 @@ export default function Store() {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredItems(storeItems);
-    } else {
-      setFilteredItems(storeItems.filter(item => item.category_slug === selectedCategory));
+    let items = storeItems;
+    
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      items = items.filter(item => item.category_slug === selectedCategory);
     }
-  }, [selectedCategory, storeItems]);
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      items = items.filter(item => {
+        const titleMatch = item.title?.toLowerCase().includes(query);
+        const descMatch = item.description?.toLowerCase().includes(query);
+        const keywordsMatch = item.keywords?.some(k => k.toLowerCase().includes(query));
+        return titleMatch || descMatch || keywordsMatch;
+      });
+    }
+    
+    setFilteredItems(items);
+  }, [selectedCategory, storeItems, searchQuery]);
 
   const handlePurchase = async (item) => {
     if (!user) {
@@ -319,28 +355,87 @@ export default function Store() {
             </h1>
             <Sparkles className="h-6 w-6 text-amber-400" />
           </div>
-          <p className="text-base text-white/50">
+          <p className="text-base text-white/50 mb-6">
             {language === 'fr' 
               ? 'Découvrez et achetez des visuels prêts à l\'emploi, créés par notre équipe.'
               : 'Discover and purchase ready-to-use visuals, created by our team.'}
           </p>
 
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto relative">
+            <div className={cn(
+              "relative bg-white/5 backdrop-blur-xl border rounded-2xl transition-all duration-300",
+              searchFocused ? "border-violet-500/50 shadow-lg shadow-violet-500/20" : "border-white/10"
+            )}>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Search className="h-5 w-5 text-white/40" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                  placeholder={language === 'fr' ? 'Rechercher un visuel...' : 'Search for a visual...'}
+                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <X className="h-4 w-4 text-white/40" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Popular Keywords Dropdown */}
+            <AnimatePresence>
+              {searchFocused && popularKeywords.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full mt-2 left-0 right-0 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl z-50"
+                >
+                  <p className="text-white/50 text-xs mb-3">
+                    {language === 'fr' ? 'Mots-clés populaires' : 'Popular keywords'}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {popularKeywords.map((keyword, idx) => (
+                      <button
+                        key={idx}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setSearchQuery(keyword);
+                        }}
+                        className="px-3 py-1.5 bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-300 text-xs rounded-full transition-colors"
+                      >
+                        {keyword}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Categories Tabs */}
         <div className="px-6 mb-6">
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
-                selectedCategory === 'all'
-                  ? "bg-violet-600 text-white"
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
-              )}
-            >
-              {language === 'fr' ? 'Tout' : 'All'}
-            </button>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex gap-2 overflow-x-auto pb-2 flex-1">
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className={cn(
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
+                  selectedCategory === 'all'
+                    ? "bg-violet-600 text-white"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                )}
+              >
+                {language === 'fr' ? 'Tout' : 'All'}
+              </button>
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -355,8 +450,14 @@ export default function Store() {
                 {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
               </button>
             ))}
-          </div>
-        </div>
+            </div>
+            {(searchQuery || selectedCategory !== 'all') && (
+            <span className="text-white/40 text-sm whitespace-nowrap">
+              {filteredItems.length} {language === 'fr' ? 'résultat(s)' : 'result(s)'}
+            </span>
+            )}
+            </div>
+            </div>
 
         {/* Masonry Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
