@@ -581,7 +581,7 @@ export default function Store() {
                   {/* Close button - inside image */}
                   <button
                     onClick={() => setEnlargedImage(null)}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl"
+                    className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl"
                   >
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
