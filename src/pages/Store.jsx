@@ -413,14 +413,15 @@ export default function Store() {
                         </div>
                         
                         {/* Price and Button */}
-                        <div className="flex items-center justify-between gap-3 pt-2">
-                          <div className="flex items-center gap-1">
-                            <Sparkles className="h-4 w-4 text-amber-400" />
-                            <span className="text-white font-bold text-lg">{item.price_credits}</span>
-                            <span className="text-white/60 text-xs">
-                              {language === 'fr' ? 'crédits' : 'credits'}
-                            </span>
-                          </div>
+                        <div className="space-y-2 pt-2">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-1">
+                              <Sparkles className="h-4 w-4 text-amber-400" />
+                              <span className="text-white font-bold text-lg">{item.price_credits}</span>
+                              <span className="text-white/60 text-xs">
+                                {language === 'fr' ? 'crédits' : 'credits'}
+                              </span>
+                            </div>
                           
                           {wasAlreadyPurchased ? (
                             <Button
@@ -445,7 +446,18 @@ export default function Store() {
                               )}
                             </Button>
                           )}
-                        </div>
+                          </div>
+
+                          {/* User Credits Display */}
+                          {credits && (
+                          <div className="text-xs text-white/40 flex items-center gap-1">
+                            <span>{language === 'fr' ? 'Vos crédits :' : 'Your credits:'}</span>
+                            <span className="text-amber-400 font-medium">
+                              {(credits.free_downloads || 0) + (credits.paid_credits || 0)}
+                            </span>
+                          </div>
+                          )}
+                          </div>
                       </div>
                     </div>
                   </div>
