@@ -32,8 +32,18 @@ export default function MyVisuals() {
     const load = async () => {
       try {
         const user = await base44.auth.me();
-        const userVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-updated_date', 200);
-        setVisuals(userVisuals);
+        const [userVisuals, purchases] = await Promise.all([
+          base44.entities.Visual.filter({ user_email: user.email }, '-updated_date', 200),
+          base44.entities.StorePurchase.filter({ user_email: user.email }, '-created_date')
+        ]);
+        
+        const purchasedVisualIds = new Set(purchases.map(p => p.visual_id));
+        const visualsWithPurchaseFlag = userVisuals.map(v => ({
+          ...v,
+          isPurchased: purchasedVisualIds.has(v.id)
+        }));
+        
+        setVisuals(visualsWithPurchaseFlag);
       } catch (e) {
         console.error(e);
       }
@@ -133,16 +143,24 @@ export default function MyVisuals() {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredVisuals.map((visual) => (
-                <VisualCard
-                  key={visual.id}
-                  visual={visual}
-                  onDownload={() => handleDownload(visual, credits)}
-                  onToggleFavorite={handleToggleFavorite}
-                  onEdit={() => handleEdit(visual)}
-                  isRegenerating={false}
-                  canDownload={true}
-                  compact
-                />
+                <div key={visual.id} className="relative">
+                  {visual.isPurchased && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-violet-600 text-white text-xs font-medium rounded-full shadow-lg">
+                        🛍️ Store
+                      </span>
+                    </div>
+                  )}
+                  <VisualCard
+                    visual={visual}
+                    onDownload={() => handleDownload(visual, credits)}
+                    onToggleFavorite={handleToggleFavorite}
+                    onEdit={() => handleEdit(visual)}
+                    isRegenerating={false}
+                    canDownload={true}
+                    compact
+                  />
+                </div>
               ))}
             </div>
           )}

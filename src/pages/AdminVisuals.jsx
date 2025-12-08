@@ -4,8 +4,9 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Trash2, Download, Image, Star } from 'lucide-react';
+import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
+import StoreItemModal from '@/components/admin/StoreItemModal';
 import { cn } from "@/lib/utils";
 
 export default function AdminVisuals() {
@@ -14,6 +15,8 @@ export default function AdminVisuals() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [portfolioFilter, setPortfolioFilter] = useState(false);
+  const [storeModalOpen, setStoreModalOpen] = useState(false);
+  const [selectedVisual, setSelectedVisual] = useState(null);
 
   useEffect(() => {
     const init = async () => {
@@ -44,6 +47,16 @@ export default function AdminVisuals() {
     const newValue = !visual.in_portfolio;
     await base44.entities.Visual.update(visual.id, { in_portfolio: newValue });
     setVisuals(prev => prev.map(v => v.id === visual.id ? { ...v, in_portfolio: newValue } : v));
+  };
+
+  const handleOpenStoreModal = (visual) => {
+    setSelectedVisual(visual);
+    setStoreModalOpen(true);
+  };
+
+  const loadVisuals = async () => {
+    const fetchedVisuals = await base44.entities.Visual.list('-updated_date', 200);
+    setVisuals(fetchedVisuals);
   };
 
   const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
@@ -166,6 +179,15 @@ export default function AdminVisuals() {
                   <Button
                     size="icon"
                     variant="ghost"
+                    onClick={() => handleOpenStoreModal(visual)}
+                    className="h-8 w-8 bg-black/50 text-violet-400 hover:text-violet-300 hover:bg-violet-500/20"
+                    title="Ajouter au Store"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
                     onClick={() => togglePortfolio(visual)}
                     className={cn(
                       "h-8 w-8 bg-black/50",
@@ -222,6 +244,16 @@ export default function AdminVisuals() {
           </div>
         )}
       </div>
+
+      <StoreItemModal
+        visual={selectedVisual}
+        isOpen={storeModalOpen}
+        onClose={() => {
+          setStoreModalOpen(false);
+          setSelectedVisual(null);
+        }}
+        onSuccess={loadVisuals}
+      />
     </AdminLayout>
   );
 }
