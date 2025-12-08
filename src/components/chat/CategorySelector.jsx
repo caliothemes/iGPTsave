@@ -226,102 +226,60 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                       )} />
                     )}
                   </div>
-                  {/* Mode Badge + Switch - side by side */}
+                  {/* Switch + Badge - side by side top right */}
                   {category.defaultExpertMode !== undefined && (
                     <div className="flex items-center gap-2">
-                      {expertMode[category.id] ? (
-                        <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
-                          EXPERT
-                        </span>
+                      {category.isFreePrompt ? (
+                        // Free prompt : pas de switch
+                        expertMode[category.id] ? (
+                          <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                            EXPERT
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
+                            ASSISTÉ
+                          </span>
+                        )
                       ) : (
-                        <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
-                          ASSISTÉ
-                        </span>
+                        <>
+                          {/* Switch */}
+                          <button
+                            onClick={(e) => toggleExpertMode(category.id, e)}
+                            className={cn(
+                              "relative inline-flex h-4 w-7 items-center rounded-full transition-colors",
+                              expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
+                            )}
+                          >
+                            <span className={cn(
+                              "inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform",
+                              expertMode[category.id] ? "translate-x-4" : "translate-x-1"
+                            )} />
+                          </button>
+                          {/* Badge */}
+                          {expertMode[category.id] ? (
+                            <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                              EXPERT
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500/60 to-cyan-500/60 text-white text-[10px] font-medium rounded-full">
+                              ASSISTÉ
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
                 
-                {/* Expert Mode Toggle */}
-                {category.defaultExpertMode !== undefined ? (
-                  category.isFreePrompt ? (
-                    // Free Prompt : info warning uniquement
-                    <div className="mt-2 p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                      <p className="text-[10px] text-blue-300 leading-tight">
-                        {language === 'fr'
-                          ? 'Aucune assistance iGPT. Aucun format défini, aucune catégorie. Votre prompt doit être complet et détaillé pour obtenir de bons résultats.'
-                          : 'No iGPT assistance. No defined format, no category. Your prompt must be complete and detailed to get good results.'}
-                      </p>
-                    </div>
-                  ) : (
-                    // Logo types : mode fixe
-                    <div className="flex items-center gap-2 mt-2 group/toggle relative">
-                      <div
-                        className={cn(
-                          "relative inline-flex h-5 w-9 items-center rounded-full opacity-40 cursor-not-allowed",
-                          expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
-                        )}
-                      >
-                        <span className={cn(
-                          "inline-block h-3 w-3 transform rounded-full bg-white",
-                          expertMode[category.id] ? "translate-x-5" : "translate-x-1"
-                        )} />
-                      </div>
-                      <span className="text-[10px] text-white/30">
-                        {expertMode[category.id] ? (language === 'fr' ? 'Expert' : 'Expert') : (language === 'fr' ? 'Assisté' : 'Assisted')}
-                      </span>
-
-                      {/* Tooltip */}
-                      <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-56">
-                        <div className="bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 shadow-xl">
-                          <p className="text-white text-[10px] leading-relaxed">
-                            {expertMode[category.id] 
-                              ? (language === 'fr' 
-                                ? '🎯 Mode expert fixe : optimal pour logos complets avec texte.'
-                                : '🎯 Fixed expert mode: optimal for complete logos with text.')
-                              : (language === 'fr'
-                                ? '✨ Mode assisté fixe : optimal pour pictogrammes et icônes.'
-                                : '✨ Fixed assisted mode: optimal for pictograms and icons.')
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <div className="flex items-center gap-2 mt-2 group/toggle relative">
-                    <button
-                      onClick={(e) => toggleExpertMode(category.id, e)}
-                      className={cn(
-                        "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
-                        expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
-                      )}
-                    >
-                      <span className={cn(
-                        "inline-block h-3 w-3 transform rounded-full bg-white transition-transform",
-                        expertMode[category.id] ? "translate-x-5" : "translate-x-1"
-                      )} />
-                    </button>
-                    <span className="text-[10px] text-white/50">
-                      {expertMode[category.id] ? (language === 'fr' ? 'Expert' : 'Expert') : (language === 'fr' ? 'Assisté' : 'Assisted')}
-                    </span>
-                    
-                    {/* Tooltip */}
-                    <div className="absolute left-0 bottom-full mb-2 opacity-0 group-hover/toggle:opacity-100 pointer-events-none transition-opacity z-50 w-56">
-                      <div className="bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 shadow-xl">
-                        <p className="text-white text-[10px] leading-relaxed">
-                          {expertMode[category.id] 
-                            ? (language === 'fr' 
-                              ? '🎯 Prompt non enrichi par iGPT, envoyé tel quel. Attention vous devez faire un prompt complet pour avoir de bons résultats.'
-                              : '🎯 Prompt not enhanced by iGPT, sent as is. Warning: you must write a complete prompt for good results.')
-                            : (language === 'fr'
-                              ? '✨ Prompt enrichi en arrière plan par iGPT'
-                              : '✨ Prompt enhanced in background by iGPT')
-                          }
-                        </p>
-                      </div>
-                    </div>
+                {/* Info or Tooltips */}
+                {category.defaultExpertMode !== undefined && category.isFreePrompt && (
+                  <div className="mt-2 p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                    <p className="text-[10px] text-blue-300 leading-tight">
+                      {language === 'fr'
+                        ? 'Aucune assistance iGPT. Aucun format défini, aucune catégorie. Votre prompt doit être complet et détaillé pour obtenir de bons résultats.'
+                        : 'No iGPT assistance. No defined format, no category. Your prompt must be complete and detailed to get good results.'}
+                    </p>
                   </div>
                   )}
 
