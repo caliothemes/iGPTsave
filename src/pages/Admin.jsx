@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3, ChevronLeft, ChevronRight, Search, Star } from 'lucide-react';
+import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3, ChevronLeft, ChevronRight, Search, Star, X } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StatCard from '@/components/admin/StatCard';
 import { 
@@ -85,6 +85,7 @@ export default function Admin() {
   const [recentRequests, setRecentRequests] = useState([]);
   const [topRequests, setTopRequests] = useState([]);
   const [requestsPage, setRequestsPage] = useState(0);
+  const [showRequestsModal, setShowRequestsModal] = useState(false);
   const REQUESTS_PER_PAGE = 10;
   
   const [revenueChartData, setRevenueChartData] = useState([]);
@@ -323,38 +324,46 @@ export default function Admin() {
           downloadsThisWeek
         });
 
-        // Extract first user questions from conversations (excluding admins)
-        const firstQuestions = allConversations
+        // Extract ALL user messages from conversations (excluding admins)
+        const allUserMessages = [];
+        allConversations
           .filter(c => !adminEmailsSet.has(c.user_email))
-          .map(c => {
-            const firstUserMsg = c.messages?.find(m => m.role === 'user');
-            return firstUserMsg ? {
-              question: firstUserMsg.content,
-              user_email: c.user_email,
-              created_date: c.created_date,
-              conv_id: c.id
-            } : null;
-          })
-          .filter(Boolean)
-          .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
-          .slice(0, 100);
+          .forEach(c => {
+            if (c.messages && Array.isArray(c.messages)) {
+              c.messages.forEach(m => {
+                if (m.role === 'user' && m.content) {
+                  allUserMessages.push({
+                    question: m.content,
+                    user_email: c.user_email,
+                    created_date: c.created_date,
+                    conv_id: c.id
+                  });
+                }
+              });
+            }
+          });
 
-        setRecentRequests(firstQuestions);
+        // Sort by most recent
+        const sortedMessages = allUserMessages.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+        setRecentRequests(sortedMessages);
 
-        // Count question frequencies for top requests
+        // Count question frequencies for top requests (use first 50 chars for grouping similar questions)
         const questionCounts = {};
-        firstQuestions.forEach(q => {
-          // Normalize question (lowercase, trim, remove punctuation for grouping)
-          const normalized = q.question.toLowerCase().trim().slice(0, 100);
+        allUserMessages.forEach(q => {
+          const normalized = q.question.toLowerCase().trim().slice(0, 50);
           if (!questionCounts[normalized]) {
-            questionCounts[normalized] = { question: q.question, count: 0 };
+            questionCounts[normalized] = { question: q.question, count: 0, examples: [] };
           }
           questionCounts[normalized].count++;
+          if (questionCounts[normalized].examples.length < 3) {
+            questionCounts[normalized].examples.push(q.question);
+          }
         });
 
         const topRequestsList = Object.values(questionCounts)
+          .filter(item => item.count > 1) // Only show if appears more than once
           .sort((a, b) => b.count - a.count)
-          .slice(0, 100);
+          .slice(0, 50);
 
         setTopRequests(topRequestsList);
 
@@ -706,47 +715,30 @@ export default function Admin() {
         {/* Recent & Top Requests */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Requests */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div 
+            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-white/10 transition-colors"
+            onClick={() => setShowRequestsModal(true)}
+          >
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Clock className="h-5 w-5 text-blue-400" />
-              Dernières demandes ({recentRequests.length})
+              Dernières demandes (5)
             </h3>
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-              {recentRequests
-                .slice(requestsPage * REQUESTS_PER_PAGE, (requestsPage + 1) * REQUESTS_PER_PAGE)
-                .map((req, idx) => (
-                  <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5">
-                    <p className="text-white text-sm line-clamp-2">{req.question}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-white/40 text-xs">{req.user_email}</span>
-                      <span className="text-white/30 text-xs">
-                        {new Date(req.created_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
+            <div className="space-y-2">
+              {recentRequests.slice(0, 5).map((req, idx) => (
+                <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5">
+                  <p className="text-white text-sm line-clamp-2">{req.question}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-white/40 text-xs">{req.user_email}</span>
+                    <span className="text-white/30 text-xs">
+                      {new Date(req.created_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
-            {recentRequests.length > REQUESTS_PER_PAGE && (
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                <button
-                  onClick={() => setRequestsPage(p => Math.max(0, p - 1))}
-                  disabled={requestsPage === 0}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <span className="text-white/50 text-sm">
-                  Page {requestsPage + 1} / {Math.ceil(recentRequests.length / REQUESTS_PER_PAGE)}
-                </span>
-                <button
-                  onClick={() => setRequestsPage(p => Math.min(Math.ceil(recentRequests.length / REQUESTS_PER_PAGE) - 1, p + 1))}
-                  disabled={requestsPage >= Math.ceil(recentRequests.length / REQUESTS_PER_PAGE) - 1}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            )}
+            <p className="text-white/40 text-xs text-center mt-4">
+              Cliquez pour voir les 50 dernières demandes
+            </p>
           </div>
 
           {/* Top Requests */}
@@ -971,6 +963,36 @@ export default function Admin() {
           </div>
         </div>
       </div>
+
+      {/* Requests Modal */}
+      {showRequestsModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowRequestsModal(false)}>
+          <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Clock className="h-6 w-6 text-blue-400" />
+                50 Dernières demandes
+              </h2>
+              <button onClick={() => setShowRequestsModal(false)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <X className="h-5 w-5 text-white" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-2">
+              {recentRequests.slice(0, 50).map((req, idx) => (
+                <div key={idx} className="p-4 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors">
+                  <p className="text-white text-sm mb-2">{req.question}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/40 text-xs">{req.user_email}</span>
+                    <span className="text-white/30 text-xs">
+                      {new Date(req.created_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
