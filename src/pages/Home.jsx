@@ -266,6 +266,7 @@ export default function Home() {
         const visualData = {
           user_email: user?.email || 'anonymous',
           image_url: result.url,
+          original_image_url: result.url,
           title: userMessage.slice(0, 50),
           original_prompt: userMessage,
           image_prompt: enhancedPrompt,
@@ -347,6 +348,7 @@ export default function Home() {
         const visualData = {
           user_email: user?.email || 'anonymous',
           image_url: result.url,
+          original_image_url: result.url,
           title: visual.title,
           original_prompt: visual.original_prompt,
           image_prompt: visual.image_prompt,
