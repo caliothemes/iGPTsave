@@ -80,7 +80,7 @@ export default function VisualCard({
         />
         
         {/* Top Right Buttons */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 items-center">
           {/* Favorite Button */}
           {onToggleFavorite && (
             <button
