@@ -859,18 +859,28 @@ export default function Home() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
-                <input
+                <textarea
                   ref={inputRef}
-                  type="text"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
                   placeholder={selectedCategory 
                     ? (language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...')
                     : (language === 'fr' ? 'Sélectionnez d\'abord un type ci-dessus...' : 'Select a type above first...')
                   }
-                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm"
+                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px]"
+                  rows={1}
                   disabled={isGenerating || !selectedCategory}
+                  style={{ height: '24px' }}
                 />
 
                 <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
