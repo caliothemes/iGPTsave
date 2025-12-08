@@ -147,7 +147,7 @@ export default function MyVisuals() {
                   {visual.isPurchased && (
                     <div className="absolute top-2 left-2 z-10">
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-violet-600 text-white text-xs font-medium rounded-full shadow-lg">
-                        🛍️ Store
+                        🛍️ {language === 'fr' ? 'Acheté sur l\'iGPT Store' : 'Purchased on iGPT Store'}
                       </span>
                     </div>
                   )}

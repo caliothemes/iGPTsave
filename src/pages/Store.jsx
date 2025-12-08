@@ -11,6 +11,49 @@ import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
 import { toast } from 'sonner';
 
+// Format Badge Component
+function FormatBadge({ dimensions, language }) {
+  if (!dimensions) return null;
+  
+  const getFormatInfo = (dim, lang) => {
+    const [w, h] = dim.split('x').map(n => parseInt(n));
+    if (!w || !h) return { label: dim, shape: '' };
+    
+    const ratio = w / h;
+    let shape = '';
+    let label = dim;
+    
+    if (Math.abs(ratio - 1) < 0.1) {
+      shape = '1:1';
+      label = lang === 'fr' ? 'Carré' : 'Square';
+    } else if (Math.abs(ratio - 16/9) < 0.1) {
+      shape = '16:9';
+      label = lang === 'fr' ? 'Paysage' : 'Landscape';
+    } else if (Math.abs(ratio - 9/16) < 0.1) {
+      shape = '9:16';
+      label = 'Story';
+    } else if (Math.abs(ratio - 4/3) < 0.1) {
+      shape = '4:3';
+    } else if (ratio > 1) {
+      shape = `${Math.round(ratio)}:1`;
+      label = lang === 'fr' ? 'Paysage' : 'Landscape';
+    } else {
+      shape = `1:${Math.round(1/ratio)}`;
+      label = 'Portrait';
+    }
+    
+    return { label: `${dim} • ${shape}`, shape };
+  };
+  
+  const { label } = getFormatInfo(dimensions, language);
+  
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20">
+      {label}
+    </span>
+  );
+}
+
 export default function Store() {
   const { language } = useLanguage();
   const [loading, setLoading] = useState(true);
@@ -98,11 +141,29 @@ export default function Store() {
         setCredits(prev => ({ ...prev, free_downloads: 0, paid_credits: prev.paid_credits - remainingPrice }));
       }
 
+      // Get the original visual to copy its properties
+      const originalVisual = await base44.entities.Visual.filter({ id: item.visual_id });
+      const visualData = originalVisual[0] || {};
+
+      // Create a copy of the visual for the buyer
+      const newVisual = await base44.entities.Visual.create({
+        user_email: user.email,
+        image_url: item.image_url,
+        original_image_url: item.image_url,
+        title: item.title,
+        visual_type: visualData.visual_type || 'image',
+        dimensions: visualData.dimensions || item.dimensions || '1080x1080',
+        original_prompt: visualData.original_prompt || '',
+        image_prompt: visualData.image_prompt || '',
+        style: visualData.style || '',
+        color_palette: visualData.color_palette || []
+      });
+
       // Create purchase record
       await base44.entities.StorePurchase.create({
         user_email: user.email,
         store_item_id: item.id,
-        visual_id: item.visual_id,
+        visual_id: newVisual.id,
         price_paid: item.price_credits,
         item_title: item.title,
         image_url: item.image_url
@@ -254,6 +315,11 @@ export default function Store() {
                       className="w-full h-auto block"
                       loading="lazy"
                     />
+                    {/* Format badge - visible without hover */}
+                    <div className="absolute top-2 right-2 z-10">
+                      <FormatBadge dimensions={item.dimensions} language={language} />
+                    </div>
+
                     {/* Hover overlay - Full card coverage */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="absolute inset-0 p-4 flex flex-col">
