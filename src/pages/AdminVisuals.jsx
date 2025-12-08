@@ -259,6 +259,11 @@ export default function AdminVisuals() {
 
                 {/* Status badges */}
                 <div className="absolute top-2 left-2 flex gap-1">
+                  {storeVisualIds.has(visual.id) && (
+                    <span className="p-1.5 rounded-full bg-violet-600 shadow-lg">
+                      <ShoppingBag className="h-3.5 w-3.5 text-white" />
+                    </span>
+                  )}
                   {visual.downloaded && (
                     <span className="p-1 rounded-full bg-green-500/80">
                       <Download className="h-3 w-3 text-white" />
