@@ -339,15 +339,13 @@ export default function Store() {
               {filteredItems.map((item) => {
                 const isPurchased = purchasedItems.has(item.id);
                 const wasAlreadyPurchased = alreadyPurchased.has(item.id);
-                
-                // Get visual data for dimensions
                 const visualDimensions = item.dimensions || '1080x1080';
                 
                 return (
                   <div key={item.id} className="break-inside-avoid">
-                    <div className="relative rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 group">
-                      {/* Image Container */}
-                      <div className="relative overflow-hidden rounded-lg">
+                    <div className="rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 overflow-hidden">
+                      {/* Image */}
+                      <div className="relative">
                         <img
                           src={item.image_url}
                           alt={item.title}
@@ -355,81 +353,14 @@ export default function Store() {
                           loading="lazy"
                         />
                         
-                        {/* Format badge - top right corner - ALWAYS VISIBLE */}
-                        <div className="absolute top-2 right-2 z-[15]">
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-black/80 backdrop-blur-sm text-white text-[10px] font-bold rounded-full border border-white/30 shadow-lg">
-                            {visualDimensions}
-                          </span>
-                        </div>
-
-                        {/* Hover overlay - FULL HEIGHT */}
-                        <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-[10] p-4 flex flex-col">
-                          {/* Title */}
-                          <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{item.title}</h3>
-                          
-                          {/* Description */}
-                          {item.description && (
-                            <p className="text-white/70 text-xs mb-3 line-clamp-3">{item.description}</p>
-                          )}
-                          
-                          {/* Format badge in hover - VERY VISIBLE */}
-                          <div className="mb-4">
-                            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600 text-white text-xs font-bold rounded-full shadow-lg">
-                              📐 {visualDimensions}
-                            </span>
-                          </div>
-                          
-                          {/* Bottom section */}
-                          <div className="mt-auto pt-3 border-t border-white/10">
-                            <div className="flex items-center justify-between gap-2">
-                              {/* Price */}
-                              <div className="flex items-center gap-1">
-                                <Sparkles className="h-4 w-4 text-amber-400" />
-                                <span className="text-white font-bold text-base">{item.price_credits}</span>
-                                <span className="text-white/60 text-xs">
-                                  {language === 'fr' ? 'crédits' : 'credits'}
-                                </span>
-                              </div>
-                              
-                              {/* Button */}
-                              {wasAlreadyPurchased ? (
-                                <Button
-                                  size="sm"
-                                  disabled
-                                  className="bg-blue-600 hover:bg-blue-600 text-white cursor-default opacity-100"
-                                >
-                                  <Check className="h-4 w-4 mr-1" />
-                                  {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
-                                </Button>
-                              ) : (
-                                <Button
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlePurchase(item);
-                                  }}
-                                  disabled={purchasing === item.id}
-                                  className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
-                                >
-                                  {purchasing === item.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    language === 'fr' ? 'Acheter' : 'Buy'
-                                  )}
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Success overlay after purchase - FULL SCREEN z-50 */}
+                        {/* Success overlay - only on image */}
                         <AnimatePresence>
                           {isPurchased && (
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-br from-green-600 via-green-600 to-green-700 z-[50] flex flex-col items-center justify-center p-6"
+                              className="absolute inset-0 bg-gradient-to-br from-green-600 to-green-700 flex flex-col items-center justify-center"
                             >
                               <motion.div
                                 initial={{ scale: 0 }}
@@ -458,6 +389,63 @@ export default function Store() {
                             </motion.div>
                           )}
                         </AnimatePresence>
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="p-4 space-y-3">
+                        {/* Title */}
+                        <h3 className="text-white font-bold text-sm line-clamp-2 min-h-[2.5rem]">
+                          {item.title}
+                        </h3>
+                        
+                        {/* Description */}
+                        {item.description && (
+                          <p className="text-white/60 text-xs line-clamp-2 min-h-[2rem]">
+                            {item.description}
+                          </p>
+                        )}
+                        
+                        {/* Format Badge */}
+                        <div>
+                          <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-bold rounded-full">
+                            📐 {visualDimensions}
+                          </span>
+                        </div>
+                        
+                        {/* Price and Button */}
+                        <div className="flex items-center justify-between gap-3 pt-2">
+                          <div className="flex items-center gap-1">
+                            <Sparkles className="h-4 w-4 text-amber-400" />
+                            <span className="text-white font-bold text-lg">{item.price_credits}</span>
+                            <span className="text-white/60 text-xs">
+                              {language === 'fr' ? 'crédits' : 'credits'}
+                            </span>
+                          </div>
+                          
+                          {wasAlreadyPurchased ? (
+                            <Button
+                              size="sm"
+                              disabled
+                              className="bg-blue-600 hover:bg-blue-600 text-white cursor-default"
+                            >
+                              <Check className="h-4 w-4 mr-1" />
+                              {language === 'fr' ? 'Acheté' : 'Purchased'}
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => handlePurchase(item)}
+                              disabled={purchasing === item.id}
+                              className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
+                            >
+                              {purchasing === item.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                language === 'fr' ? 'Acheter' : 'Buy'
+                              )}
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
