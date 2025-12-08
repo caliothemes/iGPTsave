@@ -22,25 +22,19 @@ function FormatBadge({ dimensions, language }) {
     
     const ratio = w / h;
     let shape = '';
-    let label = dim;
     
     if (Math.abs(ratio - 1) < 0.1) {
       shape = '1:1';
-      label = lang === 'fr' ? 'Carré' : 'Square';
     } else if (Math.abs(ratio - 16/9) < 0.1) {
       shape = '16:9';
-      label = lang === 'fr' ? 'Paysage' : 'Landscape';
     } else if (Math.abs(ratio - 9/16) < 0.1) {
       shape = '9:16';
-      label = 'Story';
     } else if (Math.abs(ratio - 4/3) < 0.1) {
       shape = '4:3';
     } else if (ratio > 1) {
       shape = `${Math.round(ratio)}:1`;
-      label = lang === 'fr' ? 'Paysage' : 'Landscape';
     } else {
       shape = `1:${Math.round(1/ratio)}`;
-      label = 'Portrait';
     }
     
     return { label: `${dim} • ${shape}`, shape };
@@ -49,7 +43,7 @@ function FormatBadge({ dimensions, language }) {
   const { label } = getFormatInfo(dimensions, language);
   
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20">
+    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-bold rounded-full">
       {label}
     </span>
   );
@@ -193,18 +187,26 @@ export default function Store() {
         sales_count: (item.sales_count || 0) + 1
       });
 
-      toast.success(language === 'fr' ? '✨ Achat réussi !' : '✨ Purchase successful!');
+      // Show success overlay
       setPurchasedItems(prev => new Set([...prev, item.id]));
       setAlreadyPurchased(prev => new Set([...prev, item.id]));
       
-      // Remove success overlay after 3 seconds
+      // Show success toast
+      toast.success(
+        language === 'fr' 
+          ? '✅ Achat réussi ! Retrouvez ce visuel dans "Mes visuels"' 
+          : '✅ Purchase successful! Find this visual in "My Visuals"',
+        { duration: 5000 }
+      );
+      
+      // Remove success overlay after 4 seconds
       setTimeout(() => {
         setPurchasedItems(prev => {
           const newSet = new Set(prev);
           newSet.delete(item.id);
           return newSet;
         });
-      }, 3000);
+      }, 4000);
     } catch (e) {
       console.error(e);
       toast.error(language === 'fr' ? 'Erreur lors de l\'achat' : 'Purchase error');
@@ -407,9 +409,7 @@ export default function Store() {
                         
                         {/* Format Badge */}
                         <div>
-                          <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-bold rounded-full">
-                            📐 {visualDimensions}
-                          </span>
+                          <FormatBadge dimensions={visualDimensions} language={language} />
                         </div>
                         
                         {/* Price and Button */}
