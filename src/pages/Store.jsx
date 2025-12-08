@@ -65,6 +65,7 @@ export default function Store() {
   const [purchasing, setPurchasing] = useState(null);
   const [purchasedItems, setPurchasedItems] = useState(new Set());
   const [alreadyPurchased, setAlreadyPurchased] = useState(new Set());
+  const [enlargedImage, setEnlargedImage] = useState(null);
 
   useEffect(() => {
     const init = async () => {
@@ -407,13 +408,30 @@ export default function Store() {
                   <div key={item.id} className="break-inside-avoid">
                     <div className="rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 overflow-hidden">
                       {/* Image */}
-                      <div className="relative">
+                      <div 
+                        className="relative cursor-pointer group/image"
+                        onClick={() => setEnlargedImage(item)}
+                      >
                         <img
                           src={item.image_url}
                           alt={item.title}
                           className="w-full h-auto block"
                           loading="lazy"
                         />
+                        {/* Watermark iGPT */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="text-white/15 text-4xl font-bold rotate-[-30deg] select-none">
+                            iGPT
+                          </div>
+                        </div>
+                        {/* Hover zoom indicator */}
+                        <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                          <div className="opacity-0 group-hover/image:opacity-100 transition-opacity bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                            </svg>
+                          </div>
+                        </div>
                         
                         {/* Success overlay - only on image */}
                         <AnimatePresence>
@@ -529,6 +547,88 @@ export default function Store() {
             </Masonry>
           )}
         </div>
+
+        {/* Image Enlarged Modal */}
+        <AnimatePresence>
+          {enlargedImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+              onClick={() => setEnlargedImage(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="relative max-w-5xl max-h-[90vh] w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close button */}
+                <button
+                  onClick={() => setEnlargedImage(null)}
+                  className="absolute -top-12 right-0 p-2 text-white/60 hover:text-white transition-colors"
+                >
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Image with watermark */}
+                <div className="relative rounded-xl overflow-hidden">
+                  <img
+                    src={enlargedImage.image_url}
+                    alt={enlargedImage.title}
+                    className="w-full h-auto max-h-[85vh] object-contain"
+                  />
+                  {/* Watermark iGPT */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-white/20 text-8xl font-bold rotate-[-30deg] select-none">
+                      iGPT
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info below image */}
+                <div className="mt-4 text-center">
+                  <h3 className="text-white font-bold text-lg mb-2">{enlargedImage.title}</h3>
+                  {enlargedImage.description && (
+                    <p className="text-white/60 text-sm mb-3">{enlargedImage.description}</p>
+                  )}
+                  <div className="flex items-center justify-center gap-4">
+                    <span className="flex items-center gap-1 text-amber-400">
+                      <Sparkles className="h-4 w-4" />
+                      <span className="font-bold">{enlargedImage.price_credits}</span>
+                      <span className="text-sm text-white/60">
+                        {language === 'fr' 
+                          ? (enlargedImage.price_credits === 1 ? 'crédit' : 'crédits')
+                          : (enlargedImage.price_credits === 1 ? 'credit' : 'credits')
+                        }
+                      </span>
+                    </span>
+                    <Button
+                      onClick={() => {
+                        setEnlargedImage(null);
+                        handlePurchase(enlargedImage);
+                      }}
+                      disabled={purchasing === enlargedImage.id || alreadyPurchased.has(enlargedImage.id)}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {alreadyPurchased.has(enlargedImage.id) ? (
+                        language === 'fr' ? 'Déjà acheté' : 'Already purchased'
+                      ) : purchasing === enlargedImage.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        language === 'fr' ? 'Acheter' : 'Buy'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
