@@ -280,14 +280,35 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
                             toggleExpertMode(category.id, e);
                           }}
                           className={cn(
-                            "relative inline-flex h-4 w-7 items-center rounded-full transition-colors",
+                            "relative inline-flex h-4 w-7 items-center rounded-full transition-colors group/switch",
                             expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
                           )}
+                          title={expertMode[category.id] 
+                            ? (language === 'fr' ? 'Mode Expert : Prompt brut sans assistance' : 'Expert Mode: Raw prompt without assistance')
+                            : (language === 'fr' ? 'Mode Assisté : iGPT enrichit votre prompt' : 'Assisted Mode: iGPT enhances your prompt')
+                          }
                         >
                           <span className={cn(
                             "inline-block h-2.5 w-2.5 transform rounded-full bg-white transition-transform",
                             expertMode[category.id] ? "translate-x-4" : "translate-x-1"
                           )} />
+                          {/* Tooltip on hover */}
+                          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/switch:opacity-100 transition-opacity pointer-events-none z-50">
+                            <div className="bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
+                              <p className="text-white text-xs font-medium">
+                                {expertMode[category.id] 
+                                  ? (language === 'fr' ? 'Mode Expert' : 'Expert Mode')
+                                  : (language === 'fr' ? 'Mode Assisté' : 'Assisted Mode')
+                                }
+                              </p>
+                              <p className="text-white/60 text-[10px] mt-0.5">
+                                {expertMode[category.id] 
+                                  ? (language === 'fr' ? 'Prompt brut sans assistance' : 'Raw prompt without assistance')
+                                  : (language === 'fr' ? 'iGPT enrichit votre prompt' : 'iGPT enhances your prompt')
+                                }
+                              </p>
+                            </div>
+                          </div>
                         </button>
                         {expertMode[category.id] ? (
                           <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
