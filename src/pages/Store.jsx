@@ -1,0 +1,317 @@
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Loader2, ShoppingBag, Sparkles, Lock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import AnimatedBackground from '@/components/AnimatedBackground';
+import Sidebar from '@/components/Sidebar';
+import GlobalHeader from '@/components/GlobalHeader';
+import { useLanguage } from '@/components/LanguageContext';
+import { createPageUrl } from '@/utils';
+import { cn } from "@/lib/utils";
+import Masonry from 'react-masonry-css';
+import { toast } from 'sonner';
+
+export default function Store() {
+  const { language } = useLanguage();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [credits, setCredits] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [storeItems, setStoreItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [conversations, setConversations] = useState([]);
+  const [userVisuals, setUserVisuals] = useState([]);
+  const [purchasing, setPurchasing] = useState(null);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const auth = await base44.auth.isAuthenticated();
+        if (!auth) {
+          base44.auth.redirectToLogin(createPageUrl('Store'));
+          return;
+        }
+
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        setIsAdmin(currentUser.role === 'admin');
+
+        const [cats, items, userCreds, userVis, userConvs] = await Promise.all([
+          base44.entities.StoreCategory.filter({ is_active: true }, 'order'),
+          base44.entities.StoreItem.filter({ is_active: true }, '-created_date'),
+          base44.entities.UserCredits.filter({ user_email: currentUser.email }),
+          base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 50),
+          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20)
+        ]);
+
+        setCategories(cats);
+        setStoreItems(items);
+        setFilteredItems(items);
+        if (userCreds.length > 0) setCredits(userCreds[0]);
+        setUserVisuals(userVis);
+        setConversations(userConvs);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory === 'all') {
+      setFilteredItems(storeItems);
+    } else {
+      setFilteredItems(storeItems.filter(item => item.category_slug === selectedCategory));
+    }
+  }, [selectedCategory, storeItems]);
+
+  const handlePurchase = async (item) => {
+    if (!user) {
+      toast.error(language === 'fr' ? 'Connectez-vous pour acheter' : 'Sign in to purchase');
+      return;
+    }
+
+    const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+    if (totalCredits < item.price_credits) {
+      toast.error(language === 'fr' ? 'Crédits insuffisants' : 'Insufficient credits');
+      return;
+    }
+
+    setPurchasing(item.id);
+    try {
+      // Deduct credits
+      if (credits.free_downloads >= item.price_credits) {
+        await base44.entities.UserCredits.update(credits.id, {
+          free_downloads: credits.free_downloads - item.price_credits
+        });
+        setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - item.price_credits }));
+      } else {
+        const remainingPrice = item.price_credits - credits.free_downloads;
+        await base44.entities.UserCredits.update(credits.id, {
+          free_downloads: 0,
+          paid_credits: credits.paid_credits - remainingPrice
+        });
+        setCredits(prev => ({ ...prev, free_downloads: 0, paid_credits: prev.paid_credits - remainingPrice }));
+      }
+
+      // Create purchase record
+      await base44.entities.StorePurchase.create({
+        user_email: user.email,
+        store_item_id: item.id,
+        visual_id: item.visual_id,
+        price_paid: item.price_credits,
+        item_title: item.title,
+        image_url: item.image_url
+      });
+
+      // Update sales count
+      await base44.entities.StoreItem.update(item.id, {
+        sales_count: (item.sales_count || 0) + 1
+      });
+
+      toast.success(language === 'fr' ? '✨ Achat réussi !' : '✨ Purchase successful!');
+    } catch (e) {
+      console.error(e);
+      toast.error(language === 'fr' ? 'Erreur lors de l\'achat' : 'Purchase error');
+    }
+    setPurchasing(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen relative">
+        <AnimatedBackground />
+        <div className="relative z-10 flex items-center justify-center h-screen">
+          <Loader2 className="h-8 w-8 text-violet-400 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen relative">
+      <AnimatedBackground />
+      <GlobalHeader page="Store" />
+
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        user={user}
+        credits={credits}
+        conversations={conversations}
+        visuals={userVisuals}
+        onNewChat={() => window.location.href = createPageUrl('Home')}
+        onSelectConversation={() => window.location.href = createPageUrl('Home')}
+        onDeleteConversation={() => {}}
+        onSelectVisual={() => window.location.href = createPageUrl('Home')}
+        onLogin={() => base44.auth.redirectToLogin(createPageUrl('Store'))}
+        onLogout={() => base44.auth.logout()}
+      />
+
+      <div className={cn(
+        "relative z-10 min-h-screen flex flex-col transition-all duration-300",
+        sidebarOpen && "md:ml-64"
+      )}>
+        {/* Hero */}
+        <div className="px-6 py-12 text-center pt-20">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <ShoppingBag className="h-6 w-6 text-violet-400" />
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-amber-400 bg-clip-text text-transparent">
+              iGPT Store
+            </h1>
+            <Sparkles className="h-6 w-6 text-amber-400" />
+          </div>
+          <p className="text-base text-white/50">
+            {language === 'fr' 
+              ? 'Découvrez et achetez des visuels prêts à l\'emploi'
+              : 'Discover and purchase ready-to-use visuals'}
+          </p>
+          {!isAdmin && (
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full">
+              <Lock className="h-4 w-4 text-amber-400" />
+              <span className="text-amber-300 text-sm">
+                {language === 'fr' ? 'Accès limité - Bientôt disponible' : 'Limited access - Coming soon'}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Categories Tabs */}
+        <div className="px-6 mb-6">
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={cn(
+                "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
+                selectedCategory === 'all'
+                  ? "bg-violet-600 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10"
+              )}
+            >
+              {language === 'fr' ? 'Tout' : 'All'}
+            </button>
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className={cn(
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
+                  selectedCategory === cat.slug
+                    ? "bg-violet-600 text-white"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                )}
+              >
+                {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Masonry Grid */}
+        <div className="px-2 pb-32 flex-1 w-full">
+          <style>{`
+            .masonry-grid {
+              display: flex;
+              margin-left: -8px;
+              width: auto;
+            }
+            .masonry-column {
+              padding-left: 8px;
+              background-clip: padding-box;
+            }
+            .masonry-column > div {
+              margin-bottom: 8px;
+            }
+          `}</style>
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-white/40 text-lg">
+                {language === 'fr' ? 'Aucun produit dans cette catégorie' : 'No products in this category'}
+              </p>
+            </div>
+          ) : (
+            <Masonry
+              breakpointCols={{
+                default: 6,
+                1400: 5,
+                1024: 4,
+                768: 3,
+                480: 2
+              }}
+              className="masonry-grid"
+              columnClassName="masonry-column"
+            >
+              {filteredItems.map((item) => (
+                <div key={item.id}>
+                  <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-full h-auto block"
+                      loading="lazy"
+                    />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                        <h3 className="text-white font-bold text-sm mb-1 line-clamp-1">{item.title}</h3>
+                        {item.description && (
+                          <p className="text-white/70 text-xs mb-3 line-clamp-2">{item.description}</p>
+                        )}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1">
+                            <Sparkles className="h-4 w-4 text-amber-400" />
+                            <span className="text-white font-bold">{item.price_credits}</span>
+                            <span className="text-white/60 text-xs">
+                              {language === 'fr' ? 'crédits' : 'credits'}
+                            </span>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => handlePurchase(item)}
+                            disabled={purchasing === item.id}
+                            className="bg-violet-600 hover:bg-violet-700 text-white"
+                          >
+                            {purchasing === item.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              language === 'fr' ? 'Acheter' : 'Buy'
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </Masonry>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
+          <div className={cn("transition-all duration-300", sidebarOpen && "md:ml-64")}>
+            <div className="flex items-center justify-center">
+              <p className="text-white/25 text-xs">
+                <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors text-violet-400">Store</a>
+                {' • '}
+                <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">
+                  {language === 'fr' ? 'Tarifs' : 'Pricing'}
+                </a>
+                {' • '}
+                <a href={createPageUrl('Portfolio')} className="hover:text-violet-400 transition-colors">Portfolio</a>
+                {' • '}
+                <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">
+                  {language === 'fr' ? 'Mentions légales' : 'Legal'}
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
