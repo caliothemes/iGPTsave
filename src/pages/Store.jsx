@@ -129,14 +129,20 @@ export default function Store() {
     init();
   }, []);
 
+  // Calculate item counts per category
+  const getCategoryCount = (categorySlug) => {
+    if (categorySlug === 'all') return storeItems.length;
+    return storeItems.filter(item => item.category_slug === categorySlug).length;
+  };
+
   useEffect(() => {
     let items = storeItems;
-    
+
     // Filter by category
     if (selectedCategory !== 'all') {
       items = items.filter(item => item.category_slug === selectedCategory);
     }
-    
+
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -147,7 +153,7 @@ export default function Store() {
         return titleMatch || descMatch || keywordsMatch;
       });
     }
-    
+
     setFilteredItems(items);
   }, [selectedCategory, storeItems, searchQuery]);
 
@@ -428,34 +434,41 @@ export default function Store() {
               <button
                 onClick={() => setSelectedCategory('all')}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2",
                   selectedCategory === 'all'
                     ? "bg-violet-600 text-white"
                     : "bg-white/5 text-white/60 hover:bg-white/10"
                 )}
               >
-                {language === 'fr' ? 'Tout' : 'All'}
+                <span>{language === 'fr' ? 'Tout' : 'All'}</span>
+                <span className={cn(
+                  "px-1.5 py-0.5 rounded-full text-xs",
+                  selectedCategory === 'all' ? "bg-white/20" : "bg-white/10"
+                )}>
+                  {getCategoryCount('all')}
+                </span>
               </button>
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.slug)}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2",
                   selectedCategory === cat.slug
                     ? "bg-violet-600 text-white"
                     : "bg-white/5 text-white/60 hover:bg-white/10"
                 )}
               >
-                {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
+                <span>{language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}</span>
+                <span className={cn(
+                  "px-1.5 py-0.5 rounded-full text-xs",
+                  selectedCategory === cat.slug ? "bg-white/20" : "bg-white/10"
+                )}>
+                  {getCategoryCount(cat.slug)}
+                </span>
               </button>
             ))}
             </div>
-            {(searchQuery || selectedCategory !== 'all') && (
-            <span className="text-white/40 text-sm whitespace-nowrap">
-              {filteredItems.length} {language === 'fr' ? 'résultat(s)' : 'result(s)'}
-            </span>
-            )}
             </div>
             </div>
 
