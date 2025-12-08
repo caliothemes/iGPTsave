@@ -84,7 +84,7 @@ export default function Sidebar({
         <div className="p-3 pt-4 flex flex-col border-b border-white/10">
           <p className="text-white/50 text-xs font-medium mb-3 ml-1">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
           <div className="flex items-center gap-2 mb-3">
-                            <button onClick={onNewChat} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white transition-colors" title={t('newCreation')}>
+                            <button onClick={onNewChat} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white transition-colors" title={t('newCreation')}>
                               <Plus className="h-4 w-4" />
                             </button>
                             <a href={createPageUrl('MyVisuals')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors" title={t('myVisuals')}>
