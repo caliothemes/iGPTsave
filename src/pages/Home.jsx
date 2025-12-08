@@ -680,7 +680,7 @@ export default function Home() {
                     {/* Favorites Button - Outside card, top right of image */}
                     <button
                       onClick={() => setShowFavoritesModal(true)}
-                      className="absolute -right-3 top-3 z-40 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
+                      className="absolute -right-3 top-3 z-40 flex items-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
                     >
                       <Heart className={cn("h-4 w-4", favoriteVisuals.length > 0 && "fill-white")} />
                       <span className="text-sm font-medium whitespace-nowrap">
