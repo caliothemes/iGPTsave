@@ -70,6 +70,7 @@ export default function Store() {
   const [userVisuals, setUserVisuals] = useState([]);
   const [purchasing, setPurchasing] = useState(null);
   const [purchasedItems, setPurchasedItems] = useState(new Set());
+  const [alreadyPurchased, setAlreadyPurchased] = useState(new Set());
 
   useEffect(() => {
     const init = async () => {
@@ -84,12 +85,13 @@ export default function Store() {
         setUser(currentUser);
         setIsAdmin(currentUser.role === 'admin');
 
-        const [cats, items, userCreds, userVis, userConvs] = await Promise.all([
+        const [cats, items, userCreds, userVis, userConvs, purchases] = await Promise.all([
           base44.entities.StoreCategory.filter({ is_active: true }, 'order'),
           base44.entities.StoreItem.filter({ is_active: true }, '-created_date'),
           base44.entities.UserCredits.filter({ user_email: currentUser.email }),
           base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 50),
-          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20)
+          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20),
+          base44.entities.StorePurchase.filter({ user_email: currentUser.email })
         ]);
 
         setCategories(cats);
@@ -98,6 +100,10 @@ export default function Store() {
         if (userCreds.length > 0) setCredits(userCreds[0]);
         setUserVisuals(userVis);
         setConversations(userConvs);
+        
+        // Set already purchased items
+        const purchasedItemIds = new Set(purchases.map(p => p.store_item_id));
+        setAlreadyPurchased(purchasedItemIds);
       } catch (e) {
         console.error(e);
       }
@@ -117,6 +123,17 @@ export default function Store() {
   const handlePurchase = async (item) => {
     if (!user) {
       toast.error(language === 'fr' ? 'Connectez-vous pour acheter' : 'Sign in to purchase');
+      return;
+    }
+
+    // Check if already purchased
+    if (alreadyPurchased.has(item.id)) {
+      toast.info(
+        language === 'fr' 
+          ? 'Visuel déjà acheté, retrouvez-le dans la page "Mes visuels"' 
+          : 'Visual already purchased, find it in "My Visuals"',
+        { duration: 4000 }
+      );
       return;
     }
 
@@ -178,6 +195,16 @@ export default function Store() {
 
       toast.success(language === 'fr' ? '✨ Achat réussi !' : '✨ Purchase successful!');
       setPurchasedItems(prev => new Set([...prev, item.id]));
+      setAlreadyPurchased(prev => new Set([...prev, item.id]));
+      
+      // Remove success overlay after 3 seconds
+      setTimeout(() => {
+        setPurchasedItems(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(item.id);
+          return newSet;
+        });
+      }, 3000);
     } catch (e) {
       console.error(e);
       toast.error(language === 'fr' ? 'Erreur lors de l\'achat' : 'Purchase error');
@@ -311,6 +338,7 @@ export default function Store() {
             >
               {filteredItems.map((item) => {
                 const isPurchased = purchasedItems.has(item.id);
+                const wasAlreadyPurchased = alreadyPurchased.has(item.id) && !isPurchased;
                 return (
                   <div key={item.id}>
                     <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
@@ -383,7 +411,16 @@ export default function Store() {
                                   {language === 'fr' ? 'crédits' : 'credits'}
                                 </span>
                               </div>
-                              {isPurchased ? (
+                              {wasAlreadyPurchased ? (
+                                <Button
+                                  size="sm"
+                                  disabled
+                                  className="bg-blue-600 text-white cursor-default"
+                                >
+                                  <Check className="h-4 w-4 mr-1" />
+                                  {language === 'fr' ? 'Déjà acheté' : 'Already purchased'}
+                                </Button>
+                              ) : isPurchased ? (
                                 <Button
                                   size="sm"
                                   disabled
