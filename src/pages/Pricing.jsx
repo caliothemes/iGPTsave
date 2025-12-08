@@ -21,8 +21,8 @@ const STRIPE_PRODUCTS = {
                     gradient: 'from-slate-600 to-gray-600',
                     isFree: true,
                     features: { 
-                      fr: ['25 messages offerts / mois', 'Visuels avec filigrane', 'Support communauté'],
-                      en: ['25 free messages / month', 'Visuals with watermark', 'Community support']
+                      fr: ['25 messages offerts / mois', 'Support'],
+                      en: ['25 free messages / month', 'Support']
                     }
                   },
       { 
@@ -91,8 +91,8 @@ const STRIPE_PRODUCTS = {
                     gradient: 'from-slate-600 to-gray-600',
                     isFree: true,
                     features: { 
-                      fr: ['25 messages offerts / mois', 'Visuels avec filigrane', 'Support communauté'],
-                      en: ['25 free messages / month', 'Visuals with watermark', 'Community support']
+                      fr: ['25 messages offerts / mois', 'Support'],
+                      en: ['25 free messages / month', 'Support']
                     }
                   },
       { 
