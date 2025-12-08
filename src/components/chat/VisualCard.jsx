@@ -151,13 +151,41 @@ export default function VisualCard({
 
         {/* Regenerating Overlay */}
         {isRegenerating && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <div className="text-center">
-              <Loader2 className="h-8 w-8 text-violet-400 animate-spin mx-auto mb-2" />
-              <span className="text-white/80 text-sm">
-                {language === 'fr' ? 'Création en cours...' : 'Creating...'}
-              </span>
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-violet-950/60 to-black/80 backdrop-blur-sm flex flex-col items-center justify-center">
+            <div className="text-center space-y-4">
+              {/* Spinner avec cercles concentriques */}
+              <div className="relative w-20 h-20 mx-auto">
+                <div className="absolute inset-0 rounded-full border-4 border-violet-500/20"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-violet-500 animate-spin"></div>
+                <div className="absolute inset-2 rounded-full border-4 border-transparent border-t-purple-400 animate-spin" style={{ animationDuration: '1.5s', animationDirection: 'reverse' }}></div>
+                <Sparkles className="absolute inset-0 m-auto h-8 w-8 text-violet-300 animate-pulse" />
+              </div>
+              
+              {/* Texte */}
+              <div className="space-y-1">
+                <span className="text-white font-medium text-sm block">
+                  {language === 'fr' ? 'Création en cours...' : 'Creating...'}
+                </span>
+                <span className="text-white/60 text-xs block">
+                  {language === 'fr' ? 'Génération de votre visuel' : 'Generating your visual'}
+                </span>
+              </div>
+              
+              {/* Progress bar animée */}
+              <div className="w-48 h-1 bg-white/10 rounded-full overflow-hidden mx-auto">
+                <div className="h-full bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 rounded-full animate-pulse" style={{ 
+                  width: '60%',
+                  animation: 'shimmer 2s ease-in-out infinite'
+                }}></div>
+              </div>
             </div>
+            
+            <style>{`
+              @keyframes shimmer {
+                0%, 100% { transform: translateX(-100%); opacity: 0.5; }
+                50% { transform: translateX(150%); opacity: 1; }
+              }
+            `}</style>
           </div>
         )}
 

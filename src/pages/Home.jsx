@@ -188,6 +188,11 @@ export default function Home() {
     
     const userMessage = inputValue.trim();
     setInputValue('');
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = '24px';
+    }
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsGenerating(true);
     setCurrentVisual(null);
