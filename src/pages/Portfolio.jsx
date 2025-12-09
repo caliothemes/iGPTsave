@@ -257,10 +257,11 @@ export default function Portfolio() {
         </div>
 
         {/* Footer */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0a0a0f] border-t border-white/5 py-4">
+        <div className="fixed bottom-0 left-0 right-0 z-40">
           <div className={cn("transition-all duration-300", sidebarOpen && "md:ml-64")}>
-            <div className="flex items-center justify-center">
-              <p className="text-white/25 text-xs">
+            <div className="bg-[#0a0a0f]/90 backdrop-blur-sm border-t border-white/5 py-4">
+              <div className="flex items-center justify-center">
+                <p className="text-white/40 text-xs">
                 <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">iGPT Store</a>
                 {' • '}
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
@@ -269,9 +270,10 @@ export default function Portfolio() {
                 {' • '}
                 <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
               </p>
-            </div>
-          </div>
-        </div>
+              </div>
+              </div>
+              </div>
+              </div>
       </div>
     </div>
   );
