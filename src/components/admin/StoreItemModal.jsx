@@ -24,18 +24,10 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
   const [keywordInput, setKeywordInput] = useState('');
 
   const formatOptions = [
-    { value: '1080x1080', label: '1080x1080 - 1:1 (Carré)' },
-    { value: '1080x1920', label: '1080x1920 - 9:16 (Story/Vertical)' },
-    { value: '1920x1080', label: '1920x1080 - 16:9 (Paysage)' },
-    { value: '1200x628', label: '1200x628 - ~2:1 (Couverture Facebook)' },
-    { value: '1024x1024', label: '1024x1024 - 1:1 (Logo HD)' },
-    { value: '2000x2000', label: '2000x2000 - 1:1 (Print Carré)' },
-    { value: '2480x3508', label: '2480x3508 - A4 Portrait' },
-    { value: '3508x2480', label: '3508x2480 - A4 Paysage' },
-    { value: '1748x2480', label: '1748x2480 - A5 Portrait' },
-    { value: '2480x1748', label: '2480x1748 - A5 Paysage' },
-    { value: '3508x4961', label: '3508x4961 - A3 Portrait' },
-    { value: '4961x3508', label: '4961x3508 - A3 Paysage' }
+    { value: '1080x1080', label: 'Carré 1:1' },
+    { value: '1080x1920', label: 'Story vertical 9:16' },
+    { value: '1080x1350', label: 'Portrait 3:4' },
+    { value: '1920x1080', label: 'Paysage 16:9' }
   ];
 
   useEffect(() => {
