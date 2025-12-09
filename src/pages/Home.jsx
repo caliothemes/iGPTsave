@@ -204,7 +204,14 @@ export default function Home() {
 
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
-    if (!selectedCategory) return;
+
+    // Auto-select free_prompt if no category selected
+    let activeCategory = selectedCategory;
+    if (!activeCategory) {
+      const freePromptCategory = CATEGORIES.find(c => c.id === 'free_prompt');
+      activeCategory = freePromptCategory;
+      setSelectedCategory(freePromptCategory);
+    }
     
     const userMessage = inputValue.trim();
     setInputValue('');
@@ -238,8 +245,7 @@ export default function Home() {
 
     try {
       let enhancedPrompt = '';
-      const dimensions = selectedCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
-      const isExpertMode = selectedCategory?.expertMode || false;
+      const dimensions = activeCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
 
       // MODE EXPERT : Prompt brut, aucun template, aucun enrichissement
       if (isExpertMode) {
@@ -248,9 +254,9 @@ export default function Home() {
       } 
       // MODE ASSISTÉ : Enrichissement via templates ou prompts par défaut
       else {
-        const templateKey = selectedCategory?.selectedSubmenu?.id || selectedCategory?.id;
+        const templateKey = activeCategory?.selectedSubmenu?.id || activeCategory?.id;
         const template = promptTemplates.find(t => 
-          t.category === selectedCategory?.id && 
+          t.category === activeCategory?.id && 
           (!t.subcategory || t.subcategory === templateKey)
         );
 
@@ -261,14 +267,14 @@ export default function Home() {
           console.log('✨ MODE ASSISTÉ - Template admin appliqué:', template.description);
         } else {
           // Prompts par défaut
-          if (['logo', 'logo_picto', 'logo_complet'].includes(selectedCategory?.id)) {
-            if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'logo_picto') {
+          if (['logo', 'logo_picto', 'logo_complet'].includes(activeCategory?.id)) {
+            if (activeCategory?.id === 'logo' || activeCategory?.id === 'logo_picto') {
               enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
             } else {
               enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
             }
             enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
-          } else if (['print', 'social'].includes(selectedCategory?.id)) {
+            } else if (['print', 'social'].includes(activeCategory?.id)) {
             // Design à plat pour print et social
             enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
           } else {
@@ -322,7 +328,7 @@ export default function Home() {
           original_prompt: userMessage,
           image_prompt: enhancedPrompt,
           dimensions: dimensions,
-          visual_type: selectedCategory?.id,
+          visual_type: activeCategory?.id,
           style: selectedStyle?.name?.[language],
           color_palette: extractedColors
         };
@@ -776,6 +782,37 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
           
           <div className="relative max-w-2xl mx-auto px-4 pb-6 md:pb-4">
+            {/* Free Prompt Warning */}
+            <AnimatePresence>
+              {!selectedCategory && inputValue.trim().length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="mb-3"
+                >
+                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl">
+                    <div className="p-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex-shrink-0">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-orange-300 text-sm font-medium mb-1">
+                        {language === 'fr' ? 'Mode Prompt 100% libre activé' : '100% Free Prompt mode activated'}
+                      </p>
+                      <p className="text-orange-200/80 text-xs leading-relaxed">
+                        {language === 'fr' 
+                          ? 'Vous n\'avez pas sélectionné de format ci-dessus. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique de iGPT. Pour de meilleurs résultats, choisissez un format adapté.'
+                          : 'You haven\'t selected a format above. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable format.'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Format Selector */}
             <AnimatePresence>
               {showFormatSelector && (
@@ -1020,13 +1057,10 @@ export default function Home() {
                       handleSend();
                     }
                   }}
-                  placeholder={selectedCategory 
-                    ? (language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...')
-                    : (language === 'fr' ? 'Sélectionnez d\'abord un type ci-dessus...' : 'Select a type above first...')
-                  }
+                  placeholder={language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...'}
                   className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px]"
                   rows={1}
-                  disabled={isGenerating || !selectedCategory}
+                  disabled={isGenerating}
                   style={{ height: '24px' }}
                 />
 
@@ -1036,7 +1070,7 @@ export default function Home() {
 
                 <Button
                   onClick={handleSend}
-                  disabled={!inputValue.trim() || isGenerating || !selectedCategory}
+                  disabled={!inputValue.trim() || isGenerating}
                   size="icon"
                   className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
                 >
