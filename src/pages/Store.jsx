@@ -536,10 +536,21 @@ export default function Store() {
                         <img
                           src={item.image_url}
                           alt={item.title}
-                          className="select-none"
-                          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+                          className="select-none pointer-events-none"
+                          style={{ 
+                            display: 'block', 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover',
+                            userSelect: 'none',
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            msUserSelect: 'none',
+                            WebkitTouchCallout: 'none'
+                          }}
                           loading="lazy"
                           draggable="false"
+                          onDragStart={(e) => !isAdmin && e.preventDefault()}
                           onContextMenu={(e) => {
                             if (!isAdmin) {
                               e.preventDefault();
@@ -547,14 +558,25 @@ export default function Store() {
                             }
                           }}
                         />
+                        {/* Transparent overlay to prevent long-press on mobile */}
+                        {!isAdmin && (
+                          <div 
+                            className="absolute inset-0 z-10"
+                            style={{ 
+                              WebkitTouchCallout: 'none',
+                              WebkitUserSelect: 'none',
+                              userSelect: 'none'
+                            }}
+                          />
+                        )}
                         {/* Watermark iGPT */}
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                           <div className="text-white/15 text-4xl font-bold rotate-[-30deg] select-none">
                             iGPT
                           </div>
                         </div>
                         {/* Hover zoom indicator */}
-                        <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 flex items-center justify-center z-30 pointer-events-none">
                           <div className="opacity-0 group-hover/image:opacity-100 transition-opacity bg-white/20 backdrop-blur-sm rounded-full p-3">
                             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -746,23 +768,40 @@ export default function Store() {
                           height: '100%',
                           objectFit: 'cover',
                           userSelect: 'none',
+                          WebkitUserSelect: 'none',
+                          MozUserSelect: 'none',
+                          msUserSelect: 'none',
+                          WebkitTouchCallout: 'none',
                           pointerEvents: 'none',
                           aspectRatio: `${w} / ${h}`
                         }}
                         draggable="false"
                         onDragStart={(e) => e.preventDefault()}
                         onContextMenu={(e) => {
-                          e.preventDefault();
-                          return false;
+                          if (!isAdmin) {
+                            e.preventDefault();
+                            return false;
+                          }
                         }}
                       />
                     {/* Watermark iGPT */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                       <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
                         iGPT
                       </div>
                     </div>
-                  </div>
+                    {/* Transparent overlay to prevent long-press/download on mobile */}
+                    {!isAdmin && (
+                      <div 
+                        className="absolute inset-0 z-30"
+                        style={{ 
+                          WebkitTouchCallout: 'none',
+                          WebkitUserSelect: 'none',
+                          userSelect: 'none'
+                        }}
+                      />
+                    )}
+                    </div>
                   {/* Close button - outside image container */}
                   <button
                     onClick={() => setEnlargedImage(null)}
