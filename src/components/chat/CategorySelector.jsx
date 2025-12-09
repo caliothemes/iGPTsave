@@ -40,7 +40,7 @@ const CATEGORIES = [
   {
     id: 'social',
     icon: Share2,
-    name: { fr: 'Réseaux sociaux', en: 'Social Media' },
+    name: { fr: 'Design Print, Réseaux', en: 'Print Design, Social' },
     description: { fr: 'Carré, Story, Bannière', en: 'Square, Story, Banner' },
     hasSubmenu: true,
     submenu: [
