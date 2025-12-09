@@ -189,17 +189,27 @@ export default function Portfolio() {
             >
               {visuals.map((visual, index) => {
                 const isLast = index === visuals.length - 1;
+                
+                // Calculate aspect ratio from dimensions
+                let aspectRatio = '1 / 1'; // default square
+                if (visual.dimensions) {
+                  const [w, h] = visual.dimensions.split('x').map(n => parseInt(n));
+                  if (w && h) {
+                    aspectRatio = `${w} / ${h}`;
+                  }
+                }
+                
                 return (
                   <div
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
                   >
-                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
+                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300" style={{ aspectRatio }}>
                       <img
                         src={visual.image_url}
                         alt={visual.title || 'Création iGPT'}
                         className="pointer-events-none select-none"
-                        style={{ display: 'block', width: '100%', height: 'auto' }}
+                        style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
                         loading="lazy"
                         draggable={false}
                         onContextMenu={(e) => e.preventDefault()}

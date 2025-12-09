@@ -511,6 +511,13 @@ export default function Store() {
                 const wasAlreadyPurchased = alreadyPurchased.has(item.id);
                 const visualDimensions = item.dimensions || '1080x1080';
                 
+                // Calculate aspect ratio from dimensions
+                let aspectRatio = '1 / 1'; // default square
+                const [w, h] = visualDimensions.split('x').map(n => parseInt(n));
+                if (w && h) {
+                  aspectRatio = `${w} / ${h}`;
+                }
+                
                 return (
                   <div key={item.id} className="break-inside-avoid">
                     <div className="rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300 overflow-hidden">
@@ -524,12 +531,13 @@ export default function Store() {
                             return false;
                           }
                         }}
+                        style={{ aspectRatio }}
                       >
                         <img
                           src={item.image_url}
                           alt={item.title}
                           className="select-none"
-                          style={{ display: 'block', width: '100%', height: 'auto' }}
+                          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
                           loading="lazy"
                           draggable="false"
                           onContextMenu={(e) => {
