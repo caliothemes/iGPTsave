@@ -528,8 +528,8 @@ export default function Store() {
                         <img
                           src={item.image_url}
                           alt={item.title}
-                          className="w-full select-none"
-                          style={{ display: 'block', height: 'auto', objectFit: 'contain' }}
+                          className="select-none"
+                          style={{ display: 'block', width: '100%', height: 'auto' }}
                           loading="lazy"
                           draggable="false"
                           onContextMenu={(e) => {

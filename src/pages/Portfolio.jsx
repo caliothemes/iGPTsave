@@ -198,8 +198,8 @@ export default function Portfolio() {
                       <img
                         src={visual.image_url}
                         alt={visual.title || 'Création iGPT'}
-                        className="w-full pointer-events-none select-none"
-                        style={{ display: 'block', height: 'auto', objectFit: 'contain' }}
+                        className="pointer-events-none select-none"
+                        style={{ display: 'block', width: '100%', height: 'auto' }}
                         loading="lazy"
                         draggable={false}
                         onContextMenu={(e) => e.preventDefault()}
