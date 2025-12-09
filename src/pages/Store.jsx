@@ -524,13 +524,15 @@ export default function Store() {
                             return false;
                           }
                         }}
+                        style={{ aspectRatio: 'auto' }}
                       >
                         <img
                           src={item.image_url}
                           alt={item.title}
-                          className="w-full h-auto block select-none"
+                          className="w-full block select-none"
                           loading="lazy"
                           draggable="false"
+                          style={{ display: 'block', height: 'auto' }}
                           onContextMenu={(e) => {
                             if (!isAdmin) {
                               e.preventDefault();
