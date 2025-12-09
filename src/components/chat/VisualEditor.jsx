@@ -3645,6 +3645,37 @@ Réponds en JSON avec:
 
           {currentLayer.type === 'image' && (
               <div className="space-y-2">
+                {/* Remove Background for uploaded images */}
+                {!currentLayer.isBaseImage && (
+                  <Button
+                    onClick={async () => {
+                      setRemovingBgFromLayer(true);
+                      try {
+                        const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
+                        if (response.data?.success && response.data?.image_url) {
+                          updateLayer(selectedLayer, { imageUrl: response.data.image_url });
+                          showHelp(language === 'fr' ? '✅ Fond supprimé de l\'image ! (1 crédit utilisé)' : '✅ Background removed from image! (1 credit used)');
+                        } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                          setServiceErrorType(response.data?.error);
+                          setShowServiceUnavailable(true);
+                        } else {
+                          showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+                      }
+                      setRemovingBgFromLayer(false);
+                    }}
+                    disabled={removingBgFromLayer}
+                    className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
+                    size="sm"
+                  >
+                    {removingBgFromLayer ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+                    {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
+                  </Button>
+                )}
+
                 <div className="flex gap-3 items-center flex-wrap">
                   <div className="flex-1 min-w-[100px]">
                     <label className="text-white/50 text-[10px]">{language === 'fr' ? 'Largeur' : 'W'}</label>
