@@ -68,14 +68,17 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           });
         } else {
           setExistingItem(null);
+          // Prioritize visual dimensions from the database
+          const visualDimensions = visual.dimensions || '1080x1080';
           setFormData({
             title: visual.title || '',
             description: visual.original_prompt || '',
             price_credits: 10,
             category_slug: visual.visual_type || '',
-            dimensions: visual.dimensions || '1080x1080',
+            dimensions: visualDimensions,
             keywords: []
           });
+          console.log('📐 Dimensions du visuel:', visualDimensions);
         }
       }
     };
