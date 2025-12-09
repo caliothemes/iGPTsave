@@ -588,7 +588,13 @@ export default function Home() {
             handleNewChat();
           }
         }}
-        onSelectVisual={(v) => setCurrentVisual(v)}
+        onSelectVisual={(v) => {
+          setCurrentVisual(v);
+          // Set category based on visual type to enable editing prompt
+          if (v.visual_type) {
+            setSelectedCategory({ id: v.visual_type });
+          }
+        }}
         onLogin={handleLogin}
         onLogout={handleLogout}
         sidebarTitle={settings.sidebar_title}
