@@ -1653,8 +1653,45 @@ Réponds en JSON avec:
       setDetectingZone(true);
       try {
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        // Create a fresh temporary canvas with ONLY the layers, no eraser/brush effects
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+        
+        // Redraw all layers WITHOUT eraser/brush strokes
+        layers.forEach((layer) => {
+          tempCtx.save();
+          tempCtx.globalAlpha = layer.opacity / 100;
+          
+          if (layer.type === 'background') {
+            if (layer.bgType === 'solid') {
+              tempCtx.fillStyle = layer.bgValue;
+              tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (layer.bgType === 'gradient') {
+              const gradient = tempCtx.createLinearGradient(0, 0, canvas.width, canvas.height);
+              gradient.addColorStop(0, layer.bgValue.color1);
+              gradient.addColorStop(1, layer.bgValue.color2);
+              tempCtx.fillStyle = gradient;
+              tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (layer.bgType === 'image' && loadedImages[layer.bgValue]) {
+              tempCtx.drawImage(loadedImages[layer.bgValue], 0, 0, canvas.width, canvas.height);
+            }
+          } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
+            tempCtx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+          } else if (layer.type === 'shape') {
+            tempCtx.fillStyle = layer.color;
+            drawShape(tempCtx, layer.shape, layer.x, layer.y, layer.width, layer.height);
+            tempCtx.fill();
+          }
+          
+          tempCtx.restore();
+        });
+        
+        // Get clean image data from temp canvas
+        const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
         
         const zone = detectWhiteZone(imageData, Math.floor(x), Math.floor(y), canvas.width, canvas.height);
         
