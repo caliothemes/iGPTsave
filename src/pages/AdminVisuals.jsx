@@ -195,21 +195,31 @@ export default function AdminVisuals() {
 
         {/* Visuals Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-          {filteredVisuals.map((visual) => (
+          {filteredVisuals.map((visual) => {
+            // Calculate aspect ratio from dimensions
+            let aspectRatio = '1 / 1'; // default square
+            if (visual.dimensions) {
+              const [w, h] = visual.dimensions.split('x').map(n => parseInt(n));
+              if (w && h) {
+                aspectRatio = `${w} / ${h}`;
+              }
+            }
+            
+            return (
             <div 
               key={visual.id}
               className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all"
             >
-              <div className="relative">
+              <div className="relative" style={{ aspectRatio }}>
                 {visual.image_url ? (
                   <img 
                     src={visual.image_url} 
                     alt={visual.title}
-                    className="w-full h-auto block"
-                    style={{ display: 'block' }}
+                    className="block"
+                    style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (
-                  <div className="w-full flex items-center justify-center bg-white/5" style={{ aspectRatio: '1' }}>
+                  <div className="w-full h-full flex items-center justify-center bg-white/5">
                     <Image className="h-8 w-8 text-white/20" />
                   </div>
                 )}
@@ -288,7 +298,8 @@ export default function AdminVisuals() {
                 </div>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {filteredVisuals.length === 0 && (
