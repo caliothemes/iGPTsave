@@ -102,16 +102,16 @@ export default function PageWrapper({ children, requireAuth = false }) {
 
           {/* Footer */}
           <div className="mt-auto px-4">
-            <div className="max-w-4xl mx-auto flex items-center justify-center">
-              <p className="text-white/25 text-xs">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-center gap-4 text-xs text-white/40 bg-[#0a0a0f]/90 backdrop-blur-sm px-4 py-3 rounded-lg border-t border-white/5">
                 <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">iGPT Store</a>
-                {' • '}
+                <span>•</span>
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
-                {' • '}
+                <span>•</span>
                 <a href={createPageUrl('Portfolio')} className="hover:text-violet-400 transition-colors">Portfolio</a>
-                {' • '}
+                <span>•</span>
                 <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
-              </p>
+              </div>
             </div>
           </div>
         </main>
