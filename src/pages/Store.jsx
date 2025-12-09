@@ -737,11 +737,10 @@ export default function Store() {
                       </svg>
                     </button>
                   </div>
-                  </motion.div>
-                  </motion.div>
-                  </motion.div>
-                  )}
-                  </AnimatePresence>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         {/* Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
