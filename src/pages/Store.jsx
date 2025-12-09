@@ -680,8 +680,9 @@ export default function Store() {
         {/* Image Enlarged Modal */}
         <AnimatePresence>
           {enlargedImage && (() => {
-              // Calculate aspect ratio for enlarged image
+              // Use StoreItem dimensions (chosen in admin modal) as priority
               const dims = enlargedImage.dimensions || '1080x1080';
+              console.log('📐 Modal dimensions:', dims);
               const [w, h] = dims.split('x').map(n => parseInt(n));
               const aspectRatio = w && h ? w / h : 1;
 
