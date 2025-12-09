@@ -743,20 +743,21 @@ export default function Store() {
                         iGPT
                       </div>
                     </div>
-                    {/* Close button - inside image */}
-                    <button
-                      onClick={() => setEnlargedImage(null)}
-                      className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl"
-                    >
-                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
                   </div>
+                  {/* Close button - outside image container */}
+                  <button
+                    onClick={() => setEnlargedImage(null)}
+                    className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl pointer-events-auto"
+                  >
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </motion.div>
               </motion.div>
-            )}
-          </AnimatePresence>
+            );
+          })()}
+        </AnimatePresence>
 
         {/* Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
