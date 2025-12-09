@@ -261,13 +261,16 @@ export default function Home() {
           console.log('✨ MODE ASSISTÉ - Template admin appliqué:', template.description);
         } else {
           // Prompts par défaut
-          if (['logo', 'logo_picto', 'logo_complet', 'print', 'social'].includes(selectedCategory?.id)) {
+          if (['logo', 'logo_picto', 'logo_complet'].includes(selectedCategory?.id)) {
             if (selectedCategory?.id === 'logo' || selectedCategory?.id === 'logo_picto') {
               enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
             } else {
               enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
             }
             enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
+          } else if (['print', 'social'].includes(selectedCategory?.id)) {
+            // Design à plat pour print et social
+            enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
           } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
