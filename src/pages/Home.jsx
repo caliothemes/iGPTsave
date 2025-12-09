@@ -22,7 +22,7 @@ import Logo from '@/components/Logo';
 import { useLanguage } from '@/components/LanguageContext';
 import MessageBubble from '@/components/chat/MessageBubble';
 import VisualCard from '@/components/chat/VisualCard';
-import CategorySelector from '@/components/chat/CategorySelector';
+import CategorySelector, { CATEGORIES } from '@/components/chat/CategorySelector';
 import FormatSelector from '@/components/chat/FormatSelector';
 import StyleSelector from '@/components/chat/StyleSelector';
 import PresentationModal from '@/components/PresentationModal';
@@ -54,6 +54,18 @@ export default function Home() {
   const [selectedFormat, setSelectedFormat] = useState(null);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [selectedPalette, setSelectedPalette] = useState(null);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [openNestedSubmenu, setOpenNestedSubmenu] = useState(null);
+  const [expertMode, setExpertMode] = useState(() => {
+    const defaults = {};
+    CATEGORIES.forEach(cat => {
+      if (cat.defaultExpertMode !== undefined) {
+        defaults[cat.id] = cat.defaultExpertMode;
+      }
+    });
+    return defaults;
+  });
   
   // Editor
   const [showEditor, setShowEditor] = useState(false);
@@ -172,7 +184,15 @@ export default function Home() {
       ? category.selectedSubmenu.prompt[language]
       : category.prompt[language];
     setInputValue(prompt + ' ');
+    setCategoryDropdownOpen(false);
+    setOpenSubmenu(null);
+    setOpenNestedSubmenu(null);
     setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const toggleExpertMode = (categoryId, e) => {
+    e.stopPropagation();
+    setExpertMode(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
   };
 
   const handleFileUpload = (e) => {
@@ -833,54 +853,153 @@ export default function Home() {
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3">
-                {/* Plus Dropdown Menu */}
-                <DropdownMenu>
+                {/* Plus Category Menu */}
+                <DropdownMenu open={categoryDropdownOpen} onOpenChange={setCategoryDropdownOpen}>
                   <DropdownMenuTrigger asChild>
                     <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
                       <Plus className="h-5 w-5" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 bg-gray-900/95 backdrop-blur-xl border border-white/10">
-                    <DropdownMenuLabel className="text-white/50 text-xs">
+                  <DropdownMenuContent align="start" className="w-72 bg-gray-900/95 backdrop-blur-xl border border-white/10 p-0">
+                    <DropdownMenuLabel className="text-white/50 text-xs px-3 py-2">
                       {language === 'fr' ? 'Choisir un type de visuel' : 'Choose a visual type'}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem 
-                      onClick={() => handleCategorySelect({ id: 'logo_picto', prompt: { fr: 'logo minimaliste, icône symbole', en: 'minimalist logo, icon symbol' } })}
-                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      {language === 'fr' ? 'Logo / Picto' : 'Logo / Icon'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleCategorySelect({ id: 'logo_complet', prompt: { fr: 'logo complet avec fond thématique', en: 'full logo with themed background' } })}
-                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      {language === 'fr' ? 'Logo Complet' : 'Full Logo'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleCategorySelect({ id: 'print', prompt: { fr: 'design pour impression', en: 'design for print' } })}
-                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      {language === 'fr' ? 'Print (Flyers, Cartes...)' : 'Print (Flyers, Cards...)'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleCategorySelect({ id: 'social', prompt: { fr: 'post pour réseaux sociaux', en: 'social media post' } })}
-                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      {language === 'fr' ? 'Réseaux Sociaux' : 'Social Media'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleCategorySelect({ id: 'image', prompt: { fr: 'image photoréaliste', en: 'photorealistic image' } })}
-                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      {language === 'fr' ? 'Image IA' : 'AI Image'}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleCategorySelect({ id: 'mockup', prompt: { fr: 'mockup de produit', en: 'product mockup' } })}
-                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      Mockup
-                    </DropdownMenuItem>
+                    <div className="max-h-96 overflow-y-auto">
+                      {CATEGORIES.map((category) => {
+                        const Icon = category.icon;
+                        const isOpen = openSubmenu === category.id;
+                        const isFreePrompt = category.isFreePrompt;
+
+                        return (
+                          <div key={category.id}>
+                            <div
+                              onClick={() => {
+                                if (category.hasSubmenu) {
+                                  setOpenSubmenu(isOpen ? null : category.id);
+                                  setOpenNestedSubmenu(null);
+                                } else {
+                                  handleCategorySelect({ ...category, expertMode: expertMode[category.id] || false });
+                                }
+                              }}
+                              className={cn(
+                                "px-3 py-2.5 flex items-center gap-3 cursor-pointer transition-colors",
+                                "hover:bg-white/10",
+                                isFreePrompt && "bg-blue-600/10 hover:bg-blue-600/20"
+                              )}
+                            >
+                              <div className="p-1.5 rounded-lg bg-white/5">
+                                <Icon className="h-4 w-4 text-white/70" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-white text-xs font-medium">{category.name[language]}</span>
+                                  {category.hasSubmenu && (
+                                    <ChevronDown className={cn(
+                                      "h-3 w-3 text-white/40 transition-transform",
+                                      isOpen && "rotate-180"
+                                    )} />
+                                  )}
+                                </div>
+                              </div>
+                              {/* Switch + Badge */}
+                              <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                {category.id === 'free_prompt' ? (
+                                  <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold rounded-full">
+                                    EXPERT
+                                  </span>
+                                ) : category.id === 'logo_picto' ? (
+                                  <>
+                                    <div className="relative inline-flex h-3 w-5 items-center rounded-full opacity-40 cursor-not-allowed bg-white/20">
+                                      <span className="inline-block h-2 w-2 transform rounded-full bg-white translate-x-0.5" />
+                                    </div>
+                                    <span className="px-1.5 py-0.5 bg-blue-500/60 text-white text-[9px] font-medium rounded-full">
+                                      ASSISTÉ
+                                    </span>
+                                  </>
+                                ) : category.id === 'logo_complet' ? (
+                                  <>
+                                    <div className="relative inline-flex h-3 w-5 items-center rounded-full opacity-40 cursor-not-allowed bg-violet-600">
+                                      <span className="inline-block h-2 w-2 transform rounded-full bg-white translate-x-2.5" />
+                                    </div>
+                                    <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold rounded-full">
+                                      EXPERT
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={(e) => toggleExpertMode(category.id, e)}
+                                      className={cn(
+                                        "relative inline-flex h-3 w-5 items-center rounded-full transition-colors",
+                                        expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
+                                      )}
+                                    >
+                                      <span className={cn(
+                                        "inline-block h-2 w-2 transform rounded-full bg-white transition-transform",
+                                        expertMode[category.id] ? "translate-x-2.5" : "translate-x-0.5"
+                                      )} />
+                                    </button>
+                                    {expertMode[category.id] ? (
+                                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold rounded-full">
+                                        EXPERT
+                                      </span>
+                                    ) : (
+                                      <span className="px-1.5 py-0.5 bg-blue-500/60 text-white text-[9px] font-medium rounded-full">
+                                        ASSISTÉ
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Submenu content */}
+                            {category.hasSubmenu && isOpen && (
+                              <div className="bg-gray-800/50 border-t border-white/5">
+                                {category.submenu.map((item) => (
+                                  <div key={item.id}>
+                                    <button
+                                      onClick={() => {
+                                        if (item.orientations) {
+                                          setOpenNestedSubmenu(openNestedSubmenu === item.id ? null : item.id);
+                                        } else {
+                                          handleCategorySelect({ ...category, selectedSubmenu: item, expertMode: expertMode[category.id] || false });
+                                        }
+                                      }}
+                                      className="w-full px-6 py-2 text-left text-white/70 text-xs hover:bg-white/10 transition-colors flex items-center justify-between"
+                                    >
+                                      {item.name[language]}
+                                      {item.orientations && (
+                                        <ChevronRight className={cn(
+                                          "h-3 w-3 text-white/40 transition-transform",
+                                          openNestedSubmenu === item.id && "rotate-90"
+                                        )} />
+                                      )}
+                                    </button>
+
+                                    {/* Nested orientations */}
+                                    {item.orientations && openNestedSubmenu === item.id && (
+                                      <div className="bg-gray-700/50">
+                                        {item.orientations.map((orientation) => (
+                                          <button
+                                            key={orientation.id}
+                                            onClick={() => handleCategorySelect({ ...category, selectedSubmenu: { ...item, ...orientation }, expertMode: expertMode[category.id] || false })}
+                                            className="w-full px-8 py-1.5 text-left text-white/60 text-xs hover:bg-white/10 transition-colors"
+                                          >
+                                            {orientation.name[language]}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
