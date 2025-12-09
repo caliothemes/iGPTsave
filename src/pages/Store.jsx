@@ -679,7 +679,16 @@ export default function Store() {
 
         {/* Image Enlarged Modal */}
         <AnimatePresence>
-          {enlargedImage && (
+          {enlargedImage && (() => {
+            // Calculate aspect ratio for enlarged image
+            let aspectRatio = '1 / 1';
+            const dims = enlargedImage.dimensions || '1080x1080';
+            const [w, h] = dims.split('x').map(n => parseInt(n));
+            if (w && h) {
+              aspectRatio = `${w} / ${h}`;
+            }
+
+            return (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -696,7 +705,12 @@ export default function Store() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div 
-                  className="relative max-w-7xl max-h-[95vh] w-full h-full flex items-center justify-center"
+                  className="relative flex items-center justify-center"
+                  style={{ 
+                    aspectRatio,
+                    maxWidth: '90vw',
+                    maxHeight: '90vh'
+                  }}
                   onContextMenu={(e) => {
                     if (!isAdmin) {
                       e.preventDefault();
@@ -707,7 +721,13 @@ export default function Store() {
                   <img
                     src={enlargedImage.image_url}
                     alt={enlargedImage.title}
-                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-2xl select-none"
+                    className="rounded-lg shadow-2xl select-none"
+                    style={{ 
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain'
+                    }}
                     draggable="false"
                     onContextMenu={(e) => {
                       if (!isAdmin) {
