@@ -791,7 +791,7 @@ export default function Home() {
                   exit={{ opacity: 0, y: 20 }}
                   className="mb-3"
                 >
-                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/50 rounded-xl">
+                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 border border-orange-500 rounded-xl">
                     <div className="p-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex-shrink-0">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
