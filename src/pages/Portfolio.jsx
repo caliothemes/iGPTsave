@@ -194,15 +194,15 @@ export default function Portfolio() {
                     key={visual.id}
                     ref={isLast ? lastVisualRef : null}
                   >
-                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300" style={{ aspectRatio: 'auto' }}>
+                    <div className="group relative overflow-hidden rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/50 transition-all duration-300">
                       <img
                         src={visual.image_url}
                         alt={visual.title || 'Création iGPT'}
-                        className="w-full block pointer-events-none select-none"
+                        className="w-full pointer-events-none select-none"
+                        style={{ display: 'block', height: 'auto', objectFit: 'contain' }}
                         loading="lazy"
                         draggable={false}
                         onContextMenu={(e) => e.preventDefault()}
-                        style={{ display: 'block', height: 'auto' }}
                       />
                       {/* Watermark */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
