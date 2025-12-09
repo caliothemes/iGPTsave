@@ -680,11 +680,16 @@ export default function Store() {
         {/* Image Enlarged Modal */}
         <AnimatePresence>
           {enlargedImage && (() => {
-              // Use StoreItem dimensions (chosen in admin modal) as priority
+              // ALWAYS use StoreItem dimensions - this is what admin chose
               const dims = enlargedImage.dimensions || '1080x1080';
-              console.log('📐 Modal dimensions:', dims);
               const [w, h] = dims.split('x').map(n => parseInt(n));
-              const aspectRatio = w && h ? w / h : 1;
+
+              if (!w || !h) {
+                console.error('Invalid dimensions:', dims);
+                return null;
+              }
+
+              const aspectRatio = w / h;
 
               // Calculate max dimensions based on viewport
               const maxWidth = window.innerWidth * 0.9;
