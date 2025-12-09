@@ -680,63 +680,74 @@ export default function Store() {
         {/* Image Enlarged Modal */}
         <AnimatePresence>
           {enlargedImage && (() => {
-            // Calculate aspect ratio for enlarged image
-            const dims = enlargedImage.dimensions || '1080x1080';
-            const [w, h] = dims.split('x').map(n => parseInt(n));
-            let aspectRatio = '1 / 1';
-            if (w && h) {
-              aspectRatio = `${w} / ${h}`;
-            }
+              // Calculate aspect ratio for enlarged image
+              const dims = enlargedImage.dimensions || '1080x1080';
+              const [w, h] = dims.split('x').map(n => parseInt(n));
+              const aspectRatio = w && h ? w / h : 1;
 
-            return (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
-                onClick={() => setEnlargedImage(null)}
-                onContextMenu={(e) => {
-                  if (!isAdmin) {
-                    e.preventDefault();
-                    return false;
-                  }
-                }}
-              >
-                {/* Image container */}
+              // Calculate max dimensions based on viewport
+              const maxWidth = window.innerWidth * 0.9;
+              const maxHeight = window.innerHeight * 0.9;
+
+              let displayWidth, displayHeight;
+              if (aspectRatio > maxWidth / maxHeight) {
+                // Width-constrained
+                displayWidth = maxWidth;
+                displayHeight = maxWidth / aspectRatio;
+              } else {
+                // Height-constrained
+                displayHeight = maxHeight;
+                displayWidth = maxHeight * aspectRatio;
+              }
+
+              return (
                 <motion.div
-                  initial={{ scale: 0.95 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.95 }}
-                  className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
-                  onClick={(e) => e.stopPropagation()}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+                  onClick={() => setEnlargedImage(null)}
+                  onContextMenu={(e) => {
+                    if (!isAdmin) {
+                      e.preventDefault();
+                      return false;
+                    }
+                  }}
                 >
-                  <div 
-                    className="relative pointer-events-none select-none"
-                    style={{
-                      aspectRatio,
-                      maxWidth: '90vw',
-                      maxHeight: '90vh'
-                    }}
+                  {/* Image container */}
+                  <motion.div
+                    initial={{ scale: 0.95 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0.95 }}
+                    className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <img
-                      src={enlargedImage.image_url}
-                      alt={enlargedImage.title}
-                      className="rounded-lg shadow-2xl select-none pointer-events-none"
-                      style={{ 
-                        display: 'block',
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        userSelect: 'none',
-                        pointerEvents: 'none'
+                    <div 
+                      className="relative pointer-events-none select-none"
+                      style={{
+                        width: `${displayWidth}px`,
+                        height: `${displayHeight}px`
                       }}
-                      draggable="false"
-                      onDragStart={(e) => e.preventDefault()}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        return false;
-                      }}
-                    />
+                    >
+                      <img
+                        src={enlargedImage.image_url}
+                        alt={enlargedImage.title}
+                        className="rounded-lg shadow-2xl select-none pointer-events-none"
+                        style={{ 
+                          display: 'block',
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          userSelect: 'none',
+                          pointerEvents: 'none'
+                        }}
+                        draggable="false"
+                        onDragStart={(e) => e.preventDefault()}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          return false;
+                        }}
+                      />
                     {/* Watermark iGPT */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
