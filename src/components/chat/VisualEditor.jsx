@@ -1570,7 +1570,7 @@ Réponds en JSON avec:
     const data = imageData.data;
     const visited = new Array(width * height).fill(false);
     const queue = [[startX, startY]];
-    const WHITE_THRESHOLD = 230;
+    const WHITE_THRESHOLD = 200; // Lowered from 230
     const points = [];
     
     const getPixel = (x, y) => {
@@ -1583,6 +1583,9 @@ Réponds en JSON avec:
     };
     
     const startPixel = getPixel(startX, startY);
+    console.log('🔍 Pixel cliqué:', startPixel, 'Position:', startX, startY);
+    console.log('🔍 Est blanc?', isWhite(startPixel), 'Seuil:', WHITE_THRESHOLD);
+    
     if (!isWhite(startPixel)) return null;
     
     while (queue.length > 0 && points.length < 50000) {
