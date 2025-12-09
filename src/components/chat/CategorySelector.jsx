@@ -161,7 +161,7 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-3 w-full max-w-xl mx-auto">
+    <div className="grid grid-cols-1 gap-3 w-full max-w-xl mx-auto mb-8">
       {CATEGORIES.map((category) => {
         const Icon = category.icon;
         const isOpen = openSubmenu === category.id;
