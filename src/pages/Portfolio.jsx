@@ -8,7 +8,6 @@ import { useLanguage } from '@/components/LanguageContext';
 import { createPageUrl } from '@/utils';
 import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
-import ScrollToTop from '@/components/ScrollToTop';
 
 export default function Portfolio() {
   const { language, t } = useLanguage();
@@ -262,8 +261,7 @@ export default function Portfolio() {
             </div>
           </div>
         </div>
-        </div>
-        <ScrollToTop />
-        </div>
-        );
-        }
+      </div>
+    </div>
+  );
+}
