@@ -689,74 +689,74 @@ export default function Store() {
             }
 
             return (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
-              onClick={() => setEnlargedImage(null)}
-            >
-              {/* Image container */}
               <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.95 }}
-                className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
-                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+                onClick={() => setEnlargedImage(null)}
               >
-                <div 
-                  className="relative flex items-center justify-center"
-                  style={{ 
-                    aspectRatio,
-                    maxWidth: '90vw',
-                    maxHeight: '90vh'
-                  }}
-                  onContextMenu={(e) => {
-                    if (!isAdmin) {
-                      e.preventDefault();
-                      return false;
-                    }
-                  }}
+                {/* Image container */}
+                <motion.div
+                  initial={{ scale: 0.95 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0.95 }}
+                  className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <img
-                    src={enlargedImage.image_url}
-                    alt={enlargedImage.title}
-                    className="rounded-lg shadow-2xl select-none"
+                  <div 
+                    className="relative flex items-center justify-center"
                     style={{ 
-                      display: 'block',
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain'
+                      aspectRatio,
+                      maxWidth: '90vw',
+                      maxHeight: '90vh'
                     }}
-                    draggable="false"
                     onContextMenu={(e) => {
                       if (!isAdmin) {
                         e.preventDefault();
                         return false;
                       }
                     }}
-                  />
-                  {/* Watermark iGPT */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
-                      iGPT
-                    </div>
-                  </div>
-                  {/* Close button - inside image */}
-                  <button
-                    onClick={() => setEnlargedImage(null)}
-                    className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl"
                   >
-                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                    <img
+                      src={enlargedImage.image_url}
+                      alt={enlargedImage.title}
+                      className="rounded-lg shadow-2xl select-none"
+                      style={{ 
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain'
+                      }}
+                      draggable="false"
+                      onContextMenu={(e) => {
+                        if (!isAdmin) {
+                          e.preventDefault();
+                          return false;
+                        }
+                      }}
+                    />
+                    {/* Watermark iGPT */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
+                        iGPT
+                      </div>
+                    </div>
+                    {/* Close button - inside image */}
+                    <button
+                      onClick={() => setEnlargedImage(null)}
+                      className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl"
+                    >
+                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
-                  </motion.div>
-                  </motion.div>
-                  );
-                  })()}
-                  </AnimatePresence>
+                </motion.div>
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
 
         {/* Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
