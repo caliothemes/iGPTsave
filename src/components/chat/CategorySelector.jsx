@@ -25,19 +25,6 @@ const CATEGORIES = [
     defaultExpertMode: true
   },
   {
-    id: 'print',
-    icon: Printer,
-    name: { fr: 'Print', en: 'Print' },
-    description: { fr: 'Documents à imprimer', en: 'Print documents' },
-    hasSubmenu: true,
-    submenu: [
-      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design print carré', en: 'Create a square print design' }, dimensions: '2100x2100' },
-      { id: 'print_vertical', name: { fr: 'Vertical (9:16)', en: 'Vertical (9:16)' }, prompt: { fr: 'Crée un design print vertical', en: 'Create a vertical print design' }, dimensions: '2100x3733' },
-      { id: 'print_portrait', name: { fr: 'Portrait (3:4)', en: 'Portrait (3:4)' }, prompt: { fr: 'Crée un design print portrait', en: 'Create a portrait print design' }, dimensions: '2100x2800' },
-      { id: 'print_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design print paysage', en: 'Create a landscape print design' }, dimensions: '3733x2100' },
-    ]
-  },
-  {
     id: 'image',
     icon: Image,
     name: { fr: 'Image réaliste', en: 'Realistic Image' },
