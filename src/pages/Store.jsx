@@ -679,48 +679,64 @@ export default function Store() {
 
         {/* Image Enlarged Modal */}
         <AnimatePresence>
-          {enlargedImage && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
-              onClick={() => setEnlargedImage(null)}
-            >
-              {/* Image container */}
+          {enlargedImage && (() => {
+            // Calculate aspect ratio for enlarged image
+            const dims = enlargedImage.dimensions || '1080x1080';
+            const [w, h] = dims.split('x').map(n => parseInt(n));
+            let aspectRatio = '1 / 1';
+            if (w && h) {
+              aspectRatio = `${w} / ${h}`;
+            }
+
+            return (
               <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.95 }}
-                className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
-                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+                onClick={() => setEnlargedImage(null)}
+                onContextMenu={(e) => {
+                  if (!isAdmin) {
+                    e.preventDefault();
+                    return false;
+                  }
+                }}
               >
-                <div 
-                  className="relative"
-                  onContextMenu={(e) => {
-                    if (!isAdmin) {
-                      e.preventDefault();
-                      return false;
-                    }
-                  }}
+                {/* Image container */}
+                <motion.div
+                  initial={{ scale: 0.95 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0.95 }}
+                  className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <img
-                    src={enlargedImage.image_url}
-                    alt={enlargedImage.title}
-                    className="rounded-lg shadow-2xl select-none max-w-[90vw] max-h-[90vh]"
-                    style={{ 
-                      display: 'block',
-                      width: 'auto',
-                      height: 'auto'
+                  <div 
+                    className="relative pointer-events-none select-none"
+                    style={{
+                      aspectRatio,
+                      maxWidth: '90vw',
+                      maxHeight: '90vh'
                     }}
-                    draggable="false"
-                    onContextMenu={(e) => {
-                      if (!isAdmin) {
+                  >
+                    <img
+                      src={enlargedImage.image_url}
+                      alt={enlargedImage.title}
+                      className="rounded-lg shadow-2xl select-none pointer-events-none"
+                      style={{ 
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        userSelect: 'none',
+                        pointerEvents: 'none'
+                      }}
+                      draggable="false"
+                      onDragStart={(e) => e.preventDefault()}
+                      onContextMenu={(e) => {
                         e.preventDefault();
                         return false;
-                      }
-                    }}
-                  />
+                      }}
+                    />
                     {/* Watermark iGPT */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
