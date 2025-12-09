@@ -330,12 +330,18 @@ export default function Admin() {
           .filter(c => !adminEmailsSet.has(c.user_email))
           .forEach(c => {
             if (c.messages && Array.isArray(c.messages)) {
-              c.messages.forEach(m => {
+              c.messages.forEach((m, msgIndex) => {
                 if (m.role === 'user' && m.content) {
+                  // Use conversation updated_date as fallback, or created_date
+                  // For more accurate ordering, we approximate message time based on conversation timeline
+                  const baseDate = new Date(c.updated_date || c.created_date);
+                  // Add milliseconds offset based on message index to maintain order within conversation
+                  const messageDate = new Date(baseDate.getTime() + msgIndex * 1000);
+                  
                   allUserMessages.push({
                     question: m.content,
                     user_email: c.user_email,
-                    created_date: c.created_date,
+                    created_date: messageDate.toISOString(),
                     conv_id: c.id
                   });
                 }
