@@ -791,7 +791,7 @@ export default function Home() {
                   exit={{ opacity: 0, y: 20 }}
                   className="mb-3"
                 >
-                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl">
+                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/50 rounded-xl">
                     <div className="p-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex-shrink-0">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -801,10 +801,10 @@ export default function Home() {
                       <p className="text-orange-300 text-sm font-medium mb-1">
                         {language === 'fr' ? 'Mode Prompt 100% libre activé' : '100% Free Prompt mode activated'}
                       </p>
-                      <p className="text-orange-200/80 text-xs leading-relaxed">
+                      <p className="text-orange-200 text-xs leading-relaxed">
                         {language === 'fr' 
-                          ? 'Vous n\'avez pas sélectionné de format ci-dessus. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique de iGPT. Pour de meilleurs résultats, choisissez un format adapté.'
-                          : 'You haven\'t selected a format above. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable format.'
+                          ? 'Vous n\'avez pas sélectionné de format ci-dessus ou dans l\'icône + de ce prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez un format adapté et optimisé à votre besoin.'
+                          : 'You haven\'t selected a format above or in the + icon of this prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable format.'
                         }
                       </p>
                     </div>
