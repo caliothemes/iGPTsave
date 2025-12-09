@@ -732,7 +732,8 @@ export default function Store() {
                       className="relative pointer-events-none select-none"
                       style={{
                         width: `${displayWidth}px`,
-                        height: `${displayHeight}px`
+                        height: `${displayHeight}px`,
+                        aspectRatio: `${w} / ${h}`
                       }}
                     >
                       <img
@@ -743,9 +744,10 @@ export default function Store() {
                           display: 'block',
                           width: '100%',
                           height: '100%',
-                          objectFit: 'contain',
+                          objectFit: 'cover',
                           userSelect: 'none',
-                          pointerEvents: 'none'
+                          pointerEvents: 'none',
+                          aspectRatio: `${w} / ${h}`
                         }}
                         draggable="false"
                         onDragStart={(e) => e.preventDefault()}
