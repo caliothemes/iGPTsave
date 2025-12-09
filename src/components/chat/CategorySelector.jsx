@@ -44,10 +44,10 @@ const CATEGORIES = [
     description: { fr: 'Carré, Story, Bannière', en: 'Square, Story, Banner' },
     hasSubmenu: true,
     submenu: [
-      { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design pour', en: 'Create a design for' }, dimensions: '1080x1080' },
-      { id: 'social_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design pour', en: 'Create a design for' }, dimensions: '1080x1920' },
-      { id: 'social_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design pour', en: 'Create a design for' }, dimensions: '1080x1350' },
-      { id: 'social_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design pour', en: 'Create a design for' }, dimensions: '1920x1080' },
+      { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design format carré pour', en: 'Create a square format design for' }, dimensions: '1080x1080' },
+      { id: 'social_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design format story pour', en: 'Create a story format design for' }, dimensions: '1080x1920' },
+      { id: 'social_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design format portrait pour', en: 'Create a portrait format design for' }, dimensions: '1080x1350' },
+      { id: 'social_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design format paysage pour', en: 'Create a landscape format design for' }, dimensions: '1920x1080' },
     ]
   },
   {
