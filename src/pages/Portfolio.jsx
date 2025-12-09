@@ -107,10 +107,10 @@ export default function Portfolio() {
         <AnimatedBackground />
         <div className="relative z-10 flex items-center justify-center h-screen">
           <Loader2 className="h-8 w-8 text-violet-400 animate-spin" />
+        <ScrollToTop />
         </div>
-      </div>
-    );
-  }
+        );
+        }
 
   return (
     <div className="min-h-screen relative" onContextMenu={(e) => e.preventDefault()}>

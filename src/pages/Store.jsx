@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
 import { toast, Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import ScrollToTop from '@/components/ScrollToTop';
 
 // Format Badge Component
 function FormatBadge({ dimensions, language }) {
@@ -311,9 +312,10 @@ export default function Store() {
         <div className="relative z-10 flex items-center justify-center h-screen">
           <Loader2 className="h-8 w-8 text-violet-400 animate-spin" />
         </div>
+      <ScrollToTop />
       </div>
-    );
-  }
+      );
+      }
 
   return (
     <div className="min-h-screen relative">
