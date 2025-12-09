@@ -679,63 +679,48 @@ export default function Store() {
 
         {/* Image Enlarged Modal */}
         <AnimatePresence>
-          {enlargedImage && (() => {
-            // Calculate aspect ratio for enlarged image
-            let aspectRatio = '1 / 1';
-            const dims = enlargedImage.dimensions || '1080x1080';
-            const [w, h] = dims.split('x').map(n => parseInt(n));
-            if (w && h) {
-              aspectRatio = `${w} / ${h}`;
-            }
-
-            return (
+          {enlargedImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+              onClick={() => setEnlargedImage(null)}
+            >
+              {/* Image container */}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
-                onClick={() => setEnlargedImage(null)}
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.95 }}
+                className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                onClick={(e) => e.stopPropagation()}
               >
-                {/* Image container */}
-                <motion.div
-                  initial={{ scale: 0.95 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.95 }}
-                  className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
-                  onClick={(e) => e.stopPropagation()}
+                <div 
+                  className="relative"
+                  onContextMenu={(e) => {
+                    if (!isAdmin) {
+                      e.preventDefault();
+                      return false;
+                    }
+                  }}
                 >
-                  <div 
-                    className="relative flex items-center justify-center"
+                  <img
+                    src={enlargedImage.image_url}
+                    alt={enlargedImage.title}
+                    className="rounded-lg shadow-2xl select-none max-w-[90vw] max-h-[90vh]"
                     style={{ 
-                      aspectRatio,
-                      maxWidth: '90vw',
-                      maxHeight: '90vh'
+                      display: 'block',
+                      width: 'auto',
+                      height: 'auto'
                     }}
+                    draggable="false"
                     onContextMenu={(e) => {
                       if (!isAdmin) {
                         e.preventDefault();
                         return false;
                       }
                     }}
-                  >
-                    <img
-                      src={enlargedImage.image_url}
-                      alt={enlargedImage.title}
-                      className="rounded-lg shadow-2xl select-none"
-                      style={{ 
-                        display: 'block',
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain'
-                      }}
-                      draggable="false"
-                      onContextMenu={(e) => {
-                        if (!isAdmin) {
-                          e.preventDefault();
-                          return false;
-                        }
-                      }}
-                    />
+                  />
                     {/* Watermark iGPT */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
@@ -752,11 +737,11 @@ export default function Store() {
                       </svg>
                     </button>
                   </div>
-                </motion.div>
-              </motion.div>
-            );
-          })()}
-        </AnimatePresence>
+                  </motion.div>
+                  </motion.div>
+                  </motion.div>
+                  )}
+                  </AnimatePresence>
 
         {/* Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
