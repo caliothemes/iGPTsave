@@ -818,7 +818,7 @@ export default function Store() {
           </AnimatePresence>
 
         {/* Footer */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#0a0a0f] to-transparent py-4">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0a0a0f] border-t border-white/5 py-4">
           <div className={cn("transition-all duration-300", sidebarOpen && "md:ml-64")}>
             <div className="flex items-center justify-center">
               <p className="text-white/25 text-xs">

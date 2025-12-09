@@ -1050,7 +1050,7 @@ export default function Home() {
             </div>
 
             {/* Footer Links */}
-            <div className="flex items-center justify-center gap-4 mt-3 text-xs text-white/40">
+            <div className="flex items-center justify-center gap-4 mt-3 text-xs text-white/40 bg-[#0a0a0f]/90 backdrop-blur-sm -mx-4 px-4 py-3 rounded-lg border-t border-white/5">
               <Link to={createPageUrl('Store')} className="hover:text-white/60 transition-colors">
                 iGPT Store
               </Link>
