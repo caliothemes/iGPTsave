@@ -528,10 +528,9 @@ export default function Store() {
                         <img
                           src={item.image_url}
                           alt={item.title}
-                          className="w-full h-auto block select-none object-contain"
+                          className="w-full h-auto block select-none"
                           loading="lazy"
                           draggable="false"
-                          style={{ aspectRatio: 'auto' }}
                           onContextMenu={(e) => {
                             if (!isAdmin) {
                               e.preventDefault();

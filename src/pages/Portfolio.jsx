@@ -198,11 +198,10 @@ export default function Portfolio() {
                       <img
                         src={visual.image_url}
                         alt={visual.title || 'Création iGPT'}
-                        className="w-full h-auto block pointer-events-none select-none object-contain"
+                        className="w-full h-auto block pointer-events-none select-none"
                         loading="lazy"
                         draggable={false}
                         onContextMenu={(e) => e.preventDefault()}
-                        style={{ aspectRatio: 'auto' }}
                       />
                       {/* Watermark */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
