@@ -1040,6 +1040,20 @@ export default function Home() {
                         );
                       })}
                     </div>
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <Link 
+                      to={createPageUrl('Store')}
+                      className="px-3 py-2.5 flex items-center gap-3 hover:bg-violet-500/20 transition-colors"
+                    >
+                      <div className="p-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600">
+                        <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-violet-300 text-xs font-medium">iGPT Store</span>
+                      </div>
+                    </Link>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
