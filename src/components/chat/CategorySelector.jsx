@@ -38,16 +38,29 @@ const CATEGORIES = [
     ]
   },
   {
-    id: 'social',
-    icon: Share2,
-    name: { fr: 'Design Print, Réseaux', en: 'Print Design, Social' },
-    description: { fr: 'Carré, Story, Bannière', en: 'Square, Story, Banner' },
+    id: 'print',
+    icon: Printer,
+    name: { fr: 'Design Print', en: 'Print Design' },
+    description: { fr: 'Carte de visite, Flyer, Affiche', en: 'Business card, Flyer, Poster' },
     hasSubmenu: true,
     submenu: [
-      { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design format carré pour', en: 'Create a square format design for' }, dimensions: '1080x1080' },
-      { id: 'social_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design format story pour', en: 'Create a story format design for' }, dimensions: '1080x1920' },
-      { id: 'social_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design format portrait pour', en: 'Create a portrait format design for' }, dimensions: '1080x1350' },
-      { id: 'social_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design format paysage pour', en: 'Create a landscape format design for' }, dimensions: '1920x1080' },
+      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design print format carré pour', en: 'Create a square format print design for' }, dimensions: '1080x1080' },
+      { id: 'print_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design print format story pour', en: 'Create a story format print design for' }, dimensions: '1080x1920' },
+      { id: 'print_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design print format portrait pour', en: 'Create a portrait format print design for' }, dimensions: '1080x1350' },
+      { id: 'print_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design print format paysage pour', en: 'Create a landscape format print design for' }, dimensions: '1920x1080' },
+    ]
+  },
+  {
+    id: 'social',
+    icon: Share2,
+    name: { fr: 'Réseaux Sociaux', en: 'Social Media' },
+    description: { fr: 'Posts, Stories, Bannières', en: 'Posts, Stories, Banners' },
+    hasSubmenu: true,
+    submenu: [
+      { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design social format carré pour', en: 'Create a square format social design for' }, dimensions: '1080x1080' },
+      { id: 'social_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design social format story pour', en: 'Create a story format social design for' }, dimensions: '1080x1920' },
+      { id: 'social_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design social format portrait pour', en: 'Create a portrait format social design for' }, dimensions: '1080x1350' },
+      { id: 'social_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design social format paysage pour', en: 'Create a landscape format social design for' }, dimensions: '1920x1080' },
     ]
   },
   {
