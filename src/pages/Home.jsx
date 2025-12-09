@@ -842,57 +842,44 @@ export default function Home() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-56 bg-gray-900/95 backdrop-blur-xl border border-white/10">
                     <DropdownMenuLabel className="text-white/50 text-xs">
-                      {language === 'fr' ? 'Options' : 'Options'}
+                      {language === 'fr' ? 'Choisir un type de visuel' : 'Choose a visual type'}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-white/10" />
                     <DropdownMenuItem 
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() => handleCategorySelect({ id: 'logo_picto', prompt: { fr: 'logo minimaliste, icône symbole', en: 'minimalist logo, icon symbol' } })}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
-                      <Upload className="h-4 w-4 mr-2" />
-                      {language === 'fr' ? 'Importer une image' : 'Upload image'}
+                      {language === 'fr' ? 'Logo / Picto' : 'Logo / Icon'}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => { 
-                        if (currentVisual) {
-                          setConfirmModal({
-                            isOpen: true,
-                            action: 'format',
-                            title: language === 'fr' ? 'Attention' : 'Warning',
-                            message: language === 'fr' 
-                              ? 'Changer le format créera un nouveau visuel différent. Voulez-vous continuer ?' 
-                              : 'Changing the format will create a different new visual. Do you want to continue?'
-                          });
-                        } else {
-                          setShowFormatSelector(!showFormatSelector);
-                          setShowStyleSelector(false);
-                        }
-                      }}
+                      onClick={() => handleCategorySelect({ id: 'logo_complet', prompt: { fr: 'logo complet avec fond thématique', en: 'full logo with themed background' } })}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
-                      <SlidersHorizontal className="h-4 w-4 mr-2" />
-                      {language === 'fr' ? 'Format & Dimensions' : 'Format & Dimensions'}
+                      {language === 'fr' ? 'Logo Complet' : 'Full Logo'}
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => { 
-                        if (currentVisual) {
-                          setConfirmModal({
-                            isOpen: true,
-                            action: 'style',
-                            title: language === 'fr' ? 'Attention' : 'Warning',
-                            message: language === 'fr' 
-                              ? 'Changer le style ou la palette créera un nouveau visuel différent. Voulez-vous continuer ?' 
-                              : 'Changing the style or palette will create a different new visual. Do you want to continue?'
-                          });
-                        } else {
-                          setShowStyleSelector(!showStyleSelector);
-                          setShowFormatSelector(false);
-                        }
-                      }}
+                      onClick={() => handleCategorySelect({ id: 'print', prompt: { fr: 'design pour impression', en: 'design for print' } })}
                       className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     >
-                      <Palette className="h-4 w-4 mr-2" />
-                      {language === 'fr' ? 'Style & Couleurs' : 'Style & Colors'}
+                      {language === 'fr' ? 'Print (Flyers, Cartes...)' : 'Print (Flyers, Cards...)'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleCategorySelect({ id: 'social', prompt: { fr: 'post pour réseaux sociaux', en: 'social media post' } })}
+                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      {language === 'fr' ? 'Réseaux Sociaux' : 'Social Media'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleCategorySelect({ id: 'image', prompt: { fr: 'image photoréaliste', en: 'photorealistic image' } })}
+                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      {language === 'fr' ? 'Image IA' : 'AI Image'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleCategorySelect({ id: 'mockup', prompt: { fr: 'mockup de produit', en: 'product mockup' } })}
+                      className="text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      Mockup
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
