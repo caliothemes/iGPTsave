@@ -28,58 +28,13 @@ const CATEGORIES = [
     id: 'print',
     icon: Printer,
     name: { fr: 'Print', en: 'Print' },
-    description: { fr: 'Carte de visite, flyer, affiche...', en: 'Business card, flyer, poster...' },
+    description: { fr: 'Documents à imprimer', en: 'Print documents' },
     hasSubmenu: true,
-    hasNestedSubmenu: true,
     submenu: [
-      { 
-        id: 'carte_visite', 
-        name: { fr: 'Carte de visite', en: 'Business Card' },
-        orientations: [
-                  { id: 'carte_visite_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une carte de visite horizontale', en: 'Create a horizontal business card' }, dimensions: '1050x600' },
-                  { id: 'carte_visite_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une carte de visite verticale', en: 'Create a vertical business card' }, dimensions: '600x1050' },
-                ]
-      },
-      { 
-        id: 'flyer', 
-        name: { fr: 'Flyer', en: 'Flyer' },
-        orientations: [
-                  { id: 'flyer_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un flyer vertical', en: 'Create a vertical flyer' }, dimensions: '2100x2970' },
-                  { id: 'flyer_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un flyer horizontal', en: 'Create a horizontal flyer' }, dimensions: '2970x2100' },
-                ]
-      },
-      { 
-        id: 'affiche', 
-        name: { fr: 'Affiche', en: 'Poster' },
-        orientations: [
-                  { id: 'affiche_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une affiche verticale', en: 'Create a vertical poster' }, dimensions: '2480x3508' },
-                  { id: 'affiche_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une affiche horizontale', en: 'Create a horizontal poster' }, dimensions: '3508x2480' },
-                ]
-      },
-      { 
-        id: 'sticker', 
-        name: { fr: 'Sticker', en: 'Sticker' },
-        orientations: [
-                  { id: 'sticker_rond', name: { fr: 'Rond', en: 'Round' }, prompt: { fr: 'Crée un sticker rond', en: 'Create a round sticker' }, dimensions: '1000x1000' },
-                  { id: 'sticker_carre', name: { fr: 'Carré', en: 'Square' }, prompt: { fr: 'Crée un sticker carré', en: 'Create a square sticker' }, dimensions: '1000x1000' },
-                ]
-      },
-      { 
-        id: 'invitation', 
-        name: { fr: 'Invitation', en: 'Invitation' },
-        orientations: [
-                  { id: 'invitation_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée une invitation verticale', en: 'Create a vertical invitation' }, dimensions: '1400x2100' },
-                  { id: 'invitation_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée une invitation horizontale', en: 'Create a horizontal invitation' }, dimensions: '2100x1400' },
-                ]
-      },
-      { 
-        id: 'menu', 
-        name: { fr: 'Menu', en: 'Menu' },
-        orientations: [
-                  { id: 'menu_v', name: { fr: 'Vertical', en: 'Vertical' }, prompt: { fr: 'Crée un menu vertical', en: 'Create a vertical menu' }, dimensions: '2100x2970' },
-                  { id: 'menu_h', name: { fr: 'Horizontal', en: 'Horizontal' }, prompt: { fr: 'Crée un menu horizontal', en: 'Create a horizontal menu' }, dimensions: '2970x2100' },
-                ]
-      },
+      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design print carré', en: 'Create a square print design' }, dimensions: '2100x2100' },
+      { id: 'print_vertical', name: { fr: 'Vertical (9:16)', en: 'Vertical (9:16)' }, prompt: { fr: 'Crée un design print vertical', en: 'Create a vertical print design' }, dimensions: '2100x3733' },
+      { id: 'print_portrait', name: { fr: 'Portrait (3:4)', en: 'Portrait (3:4)' }, prompt: { fr: 'Crée un design print portrait', en: 'Create a portrait print design' }, dimensions: '2100x2800' },
+      { id: 'print_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design print paysage', en: 'Create a landscape print design' }, dimensions: '3733x2100' },
     ]
   },
   {
