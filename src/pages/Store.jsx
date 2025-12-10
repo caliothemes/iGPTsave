@@ -784,10 +784,22 @@ export default function Store() {
                           }
                         }}
                       />
-                    {/* Watermark iGPT */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                      <div className="text-white/30 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none drop-shadow-[0_0_4px_rgba(0,0,0,0.6)]">
-                        iGPT
+                    {/* Watermark iGPT + diagonal lines */}
+                    <div className="absolute inset-0 pointer-events-none z-20">
+                      {/* Diagonal lines pattern */}
+                      <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <pattern id="diagonalLines" patternUnits="userSpaceOnUse" width="50" height="50" patternTransform="rotate(-30)">
+                            <line x1="0" y1="0" x2="0" y2="50" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#diagonalLines)" />
+                      </svg>
+                      {/* Text watermark */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-white/30 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none drop-shadow-[0_0_4px_rgba(0,0,0,0.6)]">
+                          iGPT
+                        </div>
                       </div>
                     </div>
                     {/* Transparent overlay to prevent long-press/download on mobile */}
