@@ -143,7 +143,8 @@ export default function MyVisuals() {
   const filteredVisuals = visuals.filter(v => {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || (filter === 'favorites' && v.is_favorite) || (filter === 'downloaded' && v.downloaded);
-    const matchesType = typeFilter === 'all' || v.visual_type === typeFilter;
+    const mainCat = getMainCategory(v.visual_type);
+    const matchesType = typeFilter === 'all' || mainCat === typeFilter;
     return matchesSearch && matchesFilter && matchesType;
   });
 
