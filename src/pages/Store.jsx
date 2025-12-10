@@ -813,9 +813,9 @@ export default function Store() {
                   </button>
                   
                   {/* Watermark info message */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600/20 backdrop-blur-sm px-6 py-3 rounded-full border border-blue-400/30 pointer-events-none">
-                    <p className="text-blue-300 text-sm font-medium flex items-center gap-2">
-                      <Info className="h-4 w-4" />
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 pointer-events-none">
+                    <p className="text-white/90 text-sm font-medium flex items-center gap-2">
+                      <Info className="h-4 w-4 text-yellow-400" />
                       {language === 'fr' 
                         ? 'Le filigrane iGPT disparaît après achat dans "Mes visuels"'
                         : 'iGPT watermark disappears after purchase in "My Visuals"'}
