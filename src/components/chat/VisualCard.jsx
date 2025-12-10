@@ -31,7 +31,8 @@ export default function VisualCard({
   showActions = true,
   showValidation = false,
   onValidate,
-  compact = false
+  compact = false,
+  hideInfoMessage = false
 }) {
   const { t, language } = useLanguage();
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -211,7 +212,7 @@ export default function VisualCard({
       {showActions && (
         <div className="p-4 pt-2 space-y-3">
           {/* Info Message for certain visual types */}
-          {['print', 'social', 'image'].includes(visual.visual_type) && (
+          {!hideInfoMessage && ['print', 'social', 'image'].includes(visual.visual_type) && (
             <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
               <Info className="h-4 w-4 text-blue-400 flex-shrink-0 mt-0.5" />
               <p className="text-xs text-blue-200 leading-relaxed">
