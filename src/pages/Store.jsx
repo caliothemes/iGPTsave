@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Loader2, ShoppingBag, Sparkles, Lock, Check, Search, X } from 'lucide-react';
+import { Loader2, ShoppingBag, Sparkles, Lock, Check, Search, X, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Sidebar from '@/components/Sidebar';
