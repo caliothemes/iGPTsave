@@ -65,8 +65,10 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
       });
 
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      
+      // Use natural dimensions to preserve aspect ratio
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
       const ctx = canvas.getContext('2d');
 
       // Handle transparent background
