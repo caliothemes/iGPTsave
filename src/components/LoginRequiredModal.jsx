@@ -23,58 +23,22 @@ export default function LoginRequiredModal({ isOpen, onClose, onLogin, guestProm
           onClick={(e) => e.stopPropagation()}
         >
           {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <Logo size="default" showText={false} />
+          <div className="flex justify-center mb-8">
+            <Logo size="large" showText={false} />
           </div>
           
           {/* Title */}
-          <h3 className="text-white font-bold text-2xl mb-3 text-center bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-            {language === 'fr' ? '🎨 Continuez à créer !' : '🎨 Keep creating!'}
+          <h3 className="text-white font-bold text-2xl mb-4 text-center">
+            {language === 'fr' ? 'Plus de crédits' : 'No more credits'}
           </h3>
           
           {/* Message */}
-          <p className="text-white/80 text-sm leading-relaxed mb-6 text-center">
+          <p className="text-white/80 text-base leading-relaxed mb-8 text-center">
             {language === 'fr' 
-              ? `Vous avez utilisé vos ${guestPromptsUsed} générations gratuites sans compte. Créez un compte pour obtenir 25 crédits gratuits par mois et débloquer toutes les fonctionnalités d'iGPT !`
-              : `You've used your ${guestPromptsUsed} free generations without an account. Create an account to get 25 free credits per month and unlock all iGPT features!`
+              ? 'Vous avez utilisé vos 3 crédits / messages gratuits sans compte. Pour continuer d\'utiliser iGPT créez votre compte gratuitement et obtenez 25 crédits / messages mensuels.'
+              : 'You\'ve used your 3 free credits / messages without an account. To continue using iGPT, create your free account and get 25 credits / messages monthly.'
             }
           </p>
-
-          {/* Benefits */}
-          <div className="bg-white/5 rounded-xl p-4 mb-6 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-400 text-lg">✓</span>
-              </div>
-              <span className="text-white/70 text-sm">
-                {language === 'fr' ? '25 crédits/mois gratuits' : '25 credits/month free'}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-400 text-lg">✓</span>
-              </div>
-              <span className="text-white/70 text-sm">
-                {language === 'fr' ? 'Historique & favoris sauvegardés' : 'History & favorites saved'}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-400 text-lg">✓</span>
-              </div>
-              <span className="text-white/70 text-sm">
-                {language === 'fr' ? 'Téléchargements HD sans filigrane' : 'HD downloads without watermark'}
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <span className="text-emerald-400 text-lg">✓</span>
-              </div>
-              <span className="text-white/70 text-sm">
-                {language === 'fr' ? 'Éditeur magique complet' : 'Full magic editor'}
-              </span>
-            </div>
-          </div>
           
           {/* Buttons */}
           <div className="space-y-3">
@@ -85,7 +49,7 @@ export default function LoginRequiredModal({ isOpen, onClose, onLogin, guestProm
               }}
               className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold py-6 text-base shadow-lg shadow-violet-500/30"
             >
-              {language === 'fr' ? '🚀 Créer mon compte gratuitement' : '🚀 Create my free account'}
+              {language === 'fr' ? 'Créer mon compte gratuitement' : 'Create my free account'}
             </Button>
             
             <button
