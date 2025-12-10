@@ -436,30 +436,49 @@ export default function Store() {
           </div>
         </div>
 
-        {/* Categories Slider */}
-        <div className="px-6 mb-8">
+        {/* Categories Slider - Full Width */}
+        <div className="mb-8 w-full">
           <div className="relative">
-            <div className="overflow-x-auto scrollbar-hide">
-              <div className="flex gap-3 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
+            <div 
+              ref={(el) => {
+                if (el && !el.dataset.autoScrolling) {
+                  el.dataset.autoScrolling = 'true';
+                  let scrollAmount = 0;
+                  const scroll = () => {
+                    if (el) {
+                      scrollAmount += 1;
+                      if (scrollAmount >= el.scrollWidth - el.clientWidth) {
+                        scrollAmount = 0;
+                      }
+                      el.scrollTo({ left: scrollAmount, behavior: 'auto' });
+                    }
+                  };
+                  setInterval(scroll, 30);
+                }
+              }}
+              className="overflow-x-auto scrollbar-hide"
+              style={{ scrollBehavior: 'auto' }}
+            >
+              <div className="flex gap-4 px-6">
                 {/* All category */}
                 <button
                   onClick={() => setSelectedCategory('all')}
                   className={cn(
                     "flex-shrink-0 rounded-xl overflow-hidden transition-all border-2",
                     selectedCategory === 'all'
-                      ? "border-violet-500 shadow-lg shadow-violet-500/30"
+                      ? "border-violet-500 shadow-lg shadow-violet-500/30 scale-105"
                       : "border-white/10 hover:border-white/20"
                   )}
-                  style={{ scrollSnapAlign: 'start', width: '180px' }}
+                  style={{ width: '200px' }}
                 >
-                  <div className="relative h-32 bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">iGPT</span>
+                  <div className="relative h-40 bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl">iGPT</span>
                   </div>
-                  <div className="bg-white/5 backdrop-blur-sm px-3 py-2">
-                    <p className="text-white font-medium text-sm text-center">
+                  <div className="bg-gradient-to-b from-gray-900/95 to-gray-900 backdrop-blur-sm px-4 py-4 border-t border-white/10">
+                    <p className="text-white font-bold text-base text-center mb-1">
                       {language === 'fr' ? 'Tout' : 'All'}
                     </p>
-                    <p className="text-white/60 text-xs text-center">
+                    <p className="text-violet-400 text-sm text-center font-semibold">
                       {getCategoryCount('all')} {language === 'fr' ? 'visuels' : 'visuals'}
                     </p>
                   </div>
@@ -473,12 +492,12 @@ export default function Store() {
                     className={cn(
                       "flex-shrink-0 rounded-xl overflow-hidden transition-all border-2",
                       selectedCategory === cat.slug
-                        ? "border-violet-500 shadow-lg shadow-violet-500/30"
+                        ? "border-violet-500 shadow-lg shadow-violet-500/30 scale-105"
                         : "border-white/10 hover:border-white/20"
                     )}
-                    style={{ scrollSnapAlign: 'start', width: '180px' }}
+                    style={{ width: '200px' }}
                   >
-                    <div className="relative h-32 bg-white/5">
+                    <div className="relative h-40 bg-white/5">
                       {cat.latestImage ? (
                         <>
                           <img
@@ -486,7 +505,7 @@ export default function Store() {
                             alt={cat.name_fr}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                         </>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
@@ -494,11 +513,11 @@ export default function Store() {
                         </div>
                       )}
                     </div>
-                    <div className="bg-white/5 backdrop-blur-sm px-3 py-2">
-                      <p className="text-white font-medium text-sm text-center truncate">
+                    <div className="bg-gradient-to-b from-gray-900/95 to-gray-900 backdrop-blur-sm px-4 py-4 border-t border-white/10">
+                      <p className="text-white font-bold text-base text-center truncate mb-1">
                         {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
                       </p>
-                      <p className="text-white/60 text-xs text-center">
+                      <p className="text-violet-400 text-sm text-center font-semibold">
                         {getCategoryCount(cat.slug)} {language === 'fr' ? 'visuels' : 'visuals'}
                       </p>
                     </div>
