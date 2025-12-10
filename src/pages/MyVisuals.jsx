@@ -130,6 +130,7 @@ export default function MyVisuals() {
     { id: 'social', name: language === 'fr' ? 'Réseaux sociaux' : 'Social Media' },
     { id: 'mockup', name: 'Mockups' },
     { id: 'product', name: language === 'fr' ? 'Produit' : 'Product' },
+    { id: 'textures', name: 'Textures' },
     { id: 'free_prompt', name: language === 'fr' ? 'Prompt 100% libre' : '100% Free Prompt' }
   ];
 
