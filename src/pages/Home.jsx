@@ -81,6 +81,13 @@ export default function Home() {
   // Dynamic settings from admin
   const [settings, setSettings] = useState({});
   
+  // Guest prompts tracking (3 max sans connexion)
+  const [guestPrompts, setGuestPrompts] = useState(() => {
+    const saved = localStorage.getItem('igpt_guest_prompts');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
@@ -210,6 +217,32 @@ export default function Home() {
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
+    // Vérification des crédits AVANT la génération
+    if (!user) {
+      // Guest : max 3 prompts
+      if (guestPrompts >= 3) {
+        setShowLoginModal(true);
+        return;
+      }
+    } else {
+      // User connecté : vérifier les crédits
+      const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+      const isUnlimited = credits?.subscription_type === 'unlimited';
+      const isAdmin = user?.role === 'admin';
+      
+      if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+        setConfirmModal({
+          isOpen: true,
+          title: language === 'fr' ? '💳 Plus de crédits' : '💳 No credits left',
+          message: language === 'fr' 
+            ? 'Vous n\'avez plus de crédits pour générer des visuels. Rechargez vos crédits pour continuer.'
+            : 'You have no credits left to generate visuals. Recharge your credits to continue.',
+          action: 'recharge'
+        });
+        return;
+      }
+    }
+
     // Auto-select free_prompt if no category selected
     let activeCategory = selectedCategory;
     if (!activeCategory) {
@@ -249,6 +282,22 @@ export default function Home() {
     }
 
     try {
+      // Déduire 1 crédit AVANT la génération
+      if (user && credits) {
+        if (credits.free_downloads > 0) {
+          await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+          setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
+        } else if (credits.paid_credits > 0) {
+          await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+          setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
+        }
+      } else if (!user) {
+        // Guest : incrémenter le compteur
+        const newCount = guestPrompts + 1;
+        setGuestPrompts(newCount);
+        localStorage.setItem('igpt_guest_prompts', newCount.toString());
+      }
+
       let enhancedPrompt = '';
       const dimensions = activeCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
       const isExpertMode = activeCategory?.expertMode || activeCategory?.id === 'free_prompt';
@@ -405,6 +454,25 @@ export default function Home() {
         };
 
   const handleRegenerate = async (visual) => {
+    // Vérification des crédits AVANT régénération
+    if (user && credits) {
+      const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+      const isUnlimited = credits?.subscription_type === 'unlimited';
+      const isAdmin = user?.role === 'admin';
+      
+      if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+        setConfirmModal({
+          isOpen: true,
+          title: language === 'fr' ? '💳 Plus de crédits' : '💳 No credits left',
+          message: language === 'fr' 
+            ? 'Vous n\'avez plus de crédits pour régénérer des visuels. Rechargez vos crédits pour continuer.'
+            : 'You have no credits left to regenerate visuals. Recharge your credits to continue.',
+          action: 'recharge'
+        });
+        return;
+      }
+    }
+
     setIsGenerating(true);
     setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
 
@@ -1138,6 +1206,17 @@ export default function Home() {
         }
       `}</style>
 
+      {/* Login Modal for Guests */}
+      <ConfirmModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onConfirm={handleLogin}
+        title={language === 'fr' ? '🔐 Connexion requise' : '🔐 Login required'}
+        message={language === 'fr' 
+          ? 'Vous avez utilisé vos 3 générations gratuites. Créez un compte pour obtenir 25 crédits gratuits par mois et continuer à créer vos visuels !'
+          : 'You\'ve used your 3 free generations. Create an account to get 25 free credits per month and continue creating your visuals!'}
+      />
+
       {/* Confirm Modal */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
@@ -1149,6 +1228,8 @@ export default function Home() {
           } else if (confirmModal.action === 'style') {
             setShowStyleSelector(true);
             setShowFormatSelector(false);
+          } else if (confirmModal.action === 'recharge') {
+            window.location.href = createPageUrl('Pricing');
           }
         }}
         title={confirmModal.title}
