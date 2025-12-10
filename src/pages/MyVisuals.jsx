@@ -132,6 +132,7 @@ export default function MyVisuals() {
     { id: 'product', name: language === 'fr' ? 'Produit' : 'Product' },
     { id: 'textures', name: 'Textures' },
     { id: 'illustrations', name: 'Illustrations' },
+    { id: 'icones_picto', name: language === 'fr' ? 'Icônes Picto' : 'Icons Picto' },
     { id: 'free_prompt', name: language === 'fr' ? 'Prompt 100% libre' : '100% Free Prompt' }
   ];
 
