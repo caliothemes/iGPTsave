@@ -51,24 +51,27 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
 
   const downloadImage = async (url, format) => {
     try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      
-      // Create canvas to convert format
+      // Create image element and wait for it to fully load
       const img = new Image();
       img.crossOrigin = 'anonymous';
       
       await new Promise((resolve, reject) => {
-        img.onload = resolve;
+        img.onload = () => {
+          // Ensure dimensions are loaded
+          if (img.naturalWidth && img.naturalHeight) {
+            resolve();
+          } else {
+            reject(new Error('Image dimensions not available'));
+          }
+        };
         img.onerror = reject;
         img.src = url;
       });
 
+      // Create canvas with natural dimensions
       const canvas = document.createElement('canvas');
-      
-      // Use natural dimensions to preserve aspect ratio
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
       const ctx = canvas.getContext('2d');
 
       // Handle transparent background
@@ -77,6 +80,7 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
+      // Draw image at its natural size
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // Convert to selected format
