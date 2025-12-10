@@ -246,6 +246,7 @@ export default function Home() {
     try {
       let enhancedPrompt = '';
       const dimensions = activeCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
+      const isExpertMode = activeCategory?.expertMode || activeCategory?.id === 'free_prompt';
 
       // MODE EXPERT : Prompt brut, aucun template, aucun enrichissement
       if (isExpertMode) {
