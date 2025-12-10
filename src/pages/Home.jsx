@@ -29,6 +29,7 @@ import PresentationModal from '@/components/PresentationModal';
 import VisualEditor from '@/components/chat/VisualEditor';
 import ConfirmModal from '@/components/ConfirmModal';
 import FavoritesModal from '@/components/FavoritesModal';
+import LoginRequiredModal from '@/components/LoginRequiredModal';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -1207,14 +1208,11 @@ export default function Home() {
       `}</style>
 
       {/* Login Modal for Guests */}
-      <ConfirmModal
+      <LoginRequiredModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
-        onConfirm={handleLogin}
-        title={language === 'fr' ? '🔐 Connexion requise' : '🔐 Login required'}
-        message={language === 'fr' 
-          ? 'Vous avez utilisé vos 3 générations gratuites. Créez un compte pour obtenir 25 crédits gratuits par mois et continuer à créer vos visuels !'
-          : 'You\'ve used your 3 free generations. Create an account to get 25 free credits per month and continue creating your visuals!'}
+        onLogin={handleLogin}
+        guestPromptsUsed={guestPrompts}
       />
 
       {/* Confirm Modal */}
