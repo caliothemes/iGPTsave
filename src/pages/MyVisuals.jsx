@@ -96,34 +96,38 @@ export default function MyVisuals() {
     if (selectedVisual?.id === visual.id) setSelectedVisual(prev => ({ ...prev, is_favorite: newState }));
   };
 
-  const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
-
-  // Get category name from ID
-  const getCategoryName = (typeId) => {
-    if (!typeId) return typeId;
+  // Get all possible categories from CATEGORIES
+  const getAllCategories = () => {
+    const categories = [];
     
-    // Search in main categories
-    const mainCategory = CATEGORIES.find(cat => cat.id === typeId);
-    if (mainCategory) return mainCategory.name[language];
-    
-    // Search in submenus
-    for (const cat of CATEGORIES) {
-      if (cat.submenu) {
-        const subItem = cat.submenu.find(sub => sub.id === typeId);
-        if (subItem) return subItem.name[language];
-        
-        // Search in nested orientations
-        for (const sub of cat.submenu) {
-          if (sub.orientations) {
-            const orientation = sub.orientations.find(o => o.id === typeId);
-            if (orientation) return orientation.name[language];
-          }
+    CATEGORIES.forEach(cat => {
+      if (!cat.isFreePrompt) {
+        if (cat.hasSubmenu && cat.submenu) {
+          cat.submenu.forEach(sub => {
+            if (sub.orientations) {
+              sub.orientations.forEach(orientation => {
+                categories.push({ id: orientation.id, name: orientation.name[language] });
+              });
+            } else {
+              categories.push({ id: sub.id, name: sub.name[language] });
+            }
+          });
+        } else {
+          categories.push({ id: cat.id, name: cat.name[language] });
         }
       }
-    }
+    });
     
-    return typeId;
+    return categories;
   };
+
+  const allCategories = getAllCategories();
+  const visualTypesCounts = visuals.reduce((acc, v) => {
+    if (v.visual_type) {
+      acc[v.visual_type] = (acc[v.visual_type] || 0) + 1;
+    }
+    return acc;
+  }, {});
 
   const filteredVisuals = visuals.filter(v => {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase());
@@ -156,7 +160,7 @@ export default function MyVisuals() {
             </div>
 
             {/* Category Tags */}
-            {visualTypes.length > 0 && (
+            {allCategories.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setTypeFilter('all')}
@@ -167,22 +171,38 @@ export default function MyVisuals() {
                       : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
                   )}
                 >
-                  {language === 'fr' ? 'Tous' : 'All'}
+                  {language === 'fr' ? 'Tous' : 'All'} ({filteredVisuals.length})
                 </button>
-                {visualTypes.map(type => (
-                  <button
-                    key={type}
-                    onClick={() => setTypeFilter(type)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                      typeFilter === type 
-                        ? "bg-violet-600 text-white" 
-                        : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
-                    )}
-                  >
-                    {getCategoryName(type)}
-                  </button>
-                ))}
+                {allCategories.map(cat => {
+                  const count = visualTypesCounts[cat.id] || 0;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setTypeFilter(cat.id)}
+                      disabled={count === 0}
+                      className={cn(
+                        "px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5",
+                        typeFilter === cat.id 
+                          ? "bg-violet-600 text-white" 
+                          : count > 0
+                            ? "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+                            : "bg-white/5 text-white/30 cursor-not-allowed"
+                      )}
+                    >
+                      {cat.name}
+                      <span className={cn(
+                        "px-1.5 py-0.5 rounded-full text-[10px]",
+                        typeFilter === cat.id
+                          ? "bg-white/20"
+                          : count > 0
+                            ? "bg-white/10"
+                            : "bg-white/5"
+                      )}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
