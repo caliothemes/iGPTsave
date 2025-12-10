@@ -36,8 +36,8 @@ export default function NoCreditsModal({ isOpen, onClose, onRecharge }) {
           {/* Message */}
           <p className="text-white/80 text-base leading-relaxed mb-8 text-center">
             {language === 'fr' 
-              ? 'Vous avez utilisé tous vos crédits / messages, veuillez recharger pour continuer d\'utiliser iGPT.'
-              : 'You\'ve used all your credits / messages, please recharge to continue using iGPT.'
+              ? 'Vous avez utilisé tous vos crédits, messages, veuillez recharger pour continuer d\'utiliser iGPT.'
+              : 'You\'ve used all your credits, messages, please recharge to continue using iGPT.'
             }
           </p>
           
