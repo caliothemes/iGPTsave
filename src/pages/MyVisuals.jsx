@@ -9,6 +9,7 @@ import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
+import { CATEGORIES } from '@/components/chat/CategorySelector';
 
 export default function MyVisuals() {
   const { language } = useLanguage();
@@ -97,6 +98,33 @@ export default function MyVisuals() {
 
   const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
 
+  // Get category name from ID
+  const getCategoryName = (typeId) => {
+    if (!typeId) return typeId;
+    
+    // Search in main categories
+    const mainCategory = CATEGORIES.find(cat => cat.id === typeId);
+    if (mainCategory) return mainCategory.name[language];
+    
+    // Search in submenus
+    for (const cat of CATEGORIES) {
+      if (cat.submenu) {
+        const subItem = cat.submenu.find(sub => sub.id === typeId);
+        if (subItem) return subItem.name[language];
+        
+        // Search in nested orientations
+        for (const sub of cat.submenu) {
+          if (sub.orientations) {
+            const orientation = sub.orientations.find(o => o.id === typeId);
+            if (orientation) return orientation.name[language];
+          }
+        }
+      }
+    }
+    
+    return typeId;
+  };
+
   const filteredVisuals = visuals.filter(v => {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || (filter === 'favorites' && v.is_favorite) || (filter === 'downloaded' && v.downloaded);
@@ -139,7 +167,7 @@ export default function MyVisuals() {
                       : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
                   )}
                 >
-                  Tous
+                  {language === 'fr' ? 'Tous' : 'All'}
                 </button>
                 {visualTypes.map(type => (
                   <button
@@ -152,7 +180,7 @@ export default function MyVisuals() {
                         : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
                     )}
                   >
-                    {type}
+                    {getCategoryName(type)}
                   </button>
                 ))}
               </div>
