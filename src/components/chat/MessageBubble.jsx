@@ -21,7 +21,10 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
       {/* Avatar - for assistant with animated gradient border */}
       {!isUser && (
-        <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20 relative">
+        <div className={cn(
+          "flex-shrink-0 w-12 h-12 rounded-full p-[2px] shadow-lg relative",
+          isStreaming ? "bg-gradient-streaming shadow-violet-500/40" : "bg-gradient-success shadow-emerald-500/40"
+        )}>
           <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
@@ -30,14 +33,17 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
             />
           </div>
           <style>{`
-            .bg-gradient-conic-animated {
-              background: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6);
-              background-size: 300% 100%;
-              animation: gradient-rotate 3s linear infinite;
+            .bg-gradient-streaming {
+              background: linear-gradient(90deg, #8b5cf6, #3b82f6, #ec4899, #8b5cf6, #3b82f6);
+              background-size: 400% 100%;
+              animation: gradient-streaming 2s linear infinite;
             }
-            @keyframes gradient-rotate {
+            .bg-gradient-success {
+              background: linear-gradient(135deg, #10b981, #059669, #047857);
+            }
+            @keyframes gradient-streaming {
               0% { background-position: 0% 50%; }
-              100% { background-position: 300% 50%; }
+              100% { background-position: 400% 50%; }
             }
           `}</style>
         </div>

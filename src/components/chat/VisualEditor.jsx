@@ -3057,6 +3057,17 @@ Réponds en JSON avec:
         
         {/* Canvas Container */}
         <div className="relative flex-1 flex items-center justify-center">
+          {/* Message de suppression de fond */}
+          {removingBg && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-pink-600/95 backdrop-blur-sm px-6 py-3 rounded-xl border border-pink-400/50 shadow-2xl animate-pulse">
+              <p className="text-white text-sm font-semibold flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {language === 'fr' 
+                  ? 'Patience... iGPT supprime le fond avec noBG.me' 
+                  : 'Please wait... iGPT is removing background with noBG.me'}
+              </p>
+            </div>
+          )}
           <div className="relative">
             <canvas 
               ref={canvasRef} 
