@@ -811,6 +811,15 @@ export default function Store() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
+                  
+                  {/* Watermark info message */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 pointer-events-none">
+                    <p className="text-white/90 text-sm font-medium">
+                      ℹ️ {language === 'fr' 
+                        ? 'Le filigrane iGPT disparaît après achat dans "Mes visuels"'
+                        : 'iGPT watermark disappears after purchase in "My Visuals"'}
+                    </p>
+                  </div>
                 </motion.div>
               </motion.div>
             );
