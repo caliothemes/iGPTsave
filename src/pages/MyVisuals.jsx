@@ -105,35 +105,57 @@ export default function MyVisuals() {
   });
 
   return (
-    <PageWrapper requireAuth>
+    <PageWrapper requireAuth fullWidth>
       {({ credits }) => (
         <div className="space-y-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">{t.title}</h1>
-            <p className="text-white/60">{t.subtitle} ({visuals.length})</p>
+            <p className="text-white/60">{t.subtitle} ({filteredVisuals.length})</p>
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
-              <Input placeholder={t.search} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4">
+            <div className="flex flex-wrap gap-4">
+              <div className="relative flex-1 min-w-48">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                <Input placeholder={t.search} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              </div>
+              <div className="flex gap-2">
+                <Button variant={filter === 'all' ? 'default' : 'ghost'} onClick={() => setFilter('all')} className={cn(filter === 'all' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}>{t.all}</Button>
+                <Button variant={filter === 'favorites' ? 'default' : 'ghost'} onClick={() => setFilter('favorites')} className={cn(filter === 'favorites' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}><Heart className="h-4 w-4 mr-1" />{t.favorites}</Button>
+                <Button variant={filter === 'downloaded' ? 'default' : 'ghost'} onClick={() => setFilter('downloaded')} className={cn(filter === 'downloaded' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}><Download className="h-4 w-4 mr-1" />{t.downloaded}</Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant={filter === 'all' ? 'default' : 'ghost'} onClick={() => setFilter('all')} className={cn(filter === 'all' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}>{t.all}</Button>
-              <Button variant={filter === 'favorites' ? 'default' : 'ghost'} onClick={() => setFilter('favorites')} className={cn(filter === 'favorites' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}><Heart className="h-4 w-4 mr-1" />{t.favorites}</Button>
-              <Button variant={filter === 'downloaded' ? 'default' : 'ghost'} onClick={() => setFilter('downloaded')} className={cn(filter === 'downloaded' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}><Download className="h-4 w-4 mr-1" />{t.downloaded}</Button>
-            </div>
+
+            {/* Category Tags */}
             {visualTypes.length > 0 && (
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous types</SelectItem>
-                  {visualTypes.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setTypeFilter('all')}
+                  className={cn(
+                    "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                    typeFilter === 'all' 
+                      ? "bg-violet-600 text-white" 
+                      : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+                  )}
+                >
+                  Tous
+                </button>
+                {visualTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setTypeFilter(type)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                      typeFilter === type 
+                        ? "bg-violet-600 text-white" 
+                        : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
@@ -141,7 +163,7 @@ export default function MyVisuals() {
           {filteredVisuals.length === 0 ? (
             <div className="text-center py-12 text-white/40">{t.noVisuals}</div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {filteredVisuals.map((visual) => (
                 <div key={visual.id} className="relative">
                   {visual.isPurchased && (
