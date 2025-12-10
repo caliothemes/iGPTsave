@@ -36,8 +36,8 @@ export default function GuestCreditsModal({ isOpen, onClose, onCreateAccount }) 
           {/* Message */}
           <p className="text-white/80 text-base leading-relaxed mb-8 text-center">
             {language === 'fr' 
-              ? 'Vous avez utilisé tous vos 3 crédits gratuits sans compte, veuillez créer votre compte gratuitement pour bénéficier de 25 messages gratuits / mois.'
-              : 'You\'ve used all your 3 free credits without an account, please create your free account to get 25 free messages/month.'
+              ? 'Vous avez utilisé vos 3 crédits gratuits sans compte, veuillez créer votre compte gratuitement pour bénéficier de 25 messages gratuits / mois.'
+              : 'You\'ve used your 3 free credits without an account, please create your free account to get 25 free messages/month.'
             }
           </p>
           
