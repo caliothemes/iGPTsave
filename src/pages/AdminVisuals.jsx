@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store } from 'lucide-react';
+import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StoreItemModal from '@/components/admin/StoreItemModal';
 import { cn } from "@/lib/utils";
@@ -40,6 +40,7 @@ function StoreStatsBlock({ storeCount, isActive, onClick }) {
 export default function AdminVisuals() {
   const [loading, setLoading] = useState(true);
   const [visuals, setVisuals] = useState([]);
+  const [allVisualsCount, setAllVisualsCount] = useState(0);
   const [storeItems, setStoreItems] = useState([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -47,6 +48,9 @@ export default function AdminVisuals() {
   const [storeFilter, setStoreFilter] = useState(false);
   const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const itemsPerPage = 100;
 
   useEffect(() => {
     const init = async () => {
@@ -57,8 +61,12 @@ export default function AdminVisuals() {
           return;
         }
 
+        // Get total count first
+        const allVisuals = await base44.entities.Visual.list('-updated_date', 10000);
+        setAllVisualsCount(allVisuals.length);
+
         const [fetchedVisuals, fetchedStoreItems] = await Promise.all([
-          base44.entities.Visual.list('-updated_date', 200),
+          base44.entities.Visual.list('-updated_date', itemsPerPage, 0),
           base44.entities.StoreItem.list()
         ]);
         setVisuals(fetchedVisuals);
@@ -70,6 +78,16 @@ export default function AdminVisuals() {
     };
     init();
   }, []);
+
+  const loadPage = async (page) => {
+    setLoadingMore(true);
+    const skip = (page - 1) * itemsPerPage;
+    const fetchedVisuals = await base44.entities.Visual.list('-updated_date', itemsPerPage, skip);
+    setVisuals(fetchedVisuals);
+    setCurrentPage(page);
+    setLoadingMore(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleDelete = async (visualId) => {
     if (!confirm('Supprimer ce visuel ?')) return;
@@ -89,8 +107,9 @@ export default function AdminVisuals() {
   };
 
   const loadVisuals = async () => {
+    const skip = (currentPage - 1) * itemsPerPage;
     const [fetchedVisuals, fetchedStoreItems] = await Promise.all([
-      base44.entities.Visual.list('-updated_date', 200),
+      base44.entities.Visual.list('-updated_date', itemsPerPage, skip),
       base44.entities.StoreItem.list()
     ]);
     setVisuals(fetchedVisuals);
@@ -110,6 +129,9 @@ export default function AdminVisuals() {
     return matchesSearch && matchesType && matchesPortfolio && matchesStore;
   });
 
+  const totalPages = Math.ceil(allVisualsCount / itemsPerPage);
+  const showPagination = totalPages > 1;
+
   if (loading) {
     return (
       <AdminLayout currentPage="visuals">
@@ -126,7 +148,7 @@ export default function AdminVisuals() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Visuels</h1>
-          <p className="text-white/60">{visuals.length} visuels générés</p>
+          <p className="text-white/60">{allVisualsCount} visuels générés • Page {currentPage}/{totalPages}</p>
         </div>
 
         {/* Filters */}
@@ -305,6 +327,63 @@ export default function AdminVisuals() {
         {filteredVisuals.length === 0 && (
           <div className="text-center py-12 text-white/40">
             Aucun visuel trouvé
+          </div>
+        )}
+
+        {/* Pagination */}
+        {showPagination && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <Button
+              onClick={() => loadPage(currentPage - 1)}
+              disabled={currentPage === 1 || loadingMore}
+              variant="outline"
+              className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Précédent
+            </Button>
+            
+            <div className="flex gap-1">
+              {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <Button
+                    key={pageNum}
+                    onClick={() => loadPage(pageNum)}
+                    disabled={loadingMore}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    className={cn(
+                      "w-10 h-10",
+                      currentPage === pageNum 
+                        ? "bg-violet-600 text-white hover:bg-violet-700" 
+                        : "bg-white/5 border-white/10 text-white hover:bg-white/10"
+                    )}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+
+            <Button
+              onClick={() => loadPage(currentPage + 1)}
+              disabled={currentPage === totalPages || loadingMore}
+              variant="outline"
+              className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+            >
+              Suivant
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
         )}
       </div>
