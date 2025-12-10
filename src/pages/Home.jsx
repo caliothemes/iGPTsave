@@ -300,8 +300,13 @@ export default function Home() {
         console.log('📝 Prompt final enrichi:', enhancedPrompt);
       }
 
+      // Parse dimensions from format
+      const [width, height] = dimensions.split('x').map(Number);
+
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: enhancedPrompt
+        prompt: enhancedPrompt,
+        width: width || 1024,
+        height: height || 1024
       });
 
       if (result.url) {
