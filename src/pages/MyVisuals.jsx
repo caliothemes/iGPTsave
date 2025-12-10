@@ -131,6 +131,7 @@ export default function MyVisuals() {
     { id: 'mockup', name: 'Mockups' },
     { id: 'product', name: language === 'fr' ? 'Produit' : 'Product' },
     { id: 'textures', name: 'Textures' },
+    { id: 'illustrations', name: 'Illustrations' },
     { id: 'free_prompt', name: language === 'fr' ? 'Prompt 100% libre' : '100% Free Prompt' }
   ];
 
