@@ -447,14 +447,18 @@ export default function Store() {
                   let isPaused = false;
 
                   const scrollToCard = (index) => {
-                    const cardWidth = 204; // 200px + 4px gap
-                    el.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
+                    const cardWidth = 200; // largeur d'une card
+                    const gap = 16; // gap-4 = 16px
+                    const scrollPosition = index * (cardWidth + gap);
+                    el.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                   };
 
                   const autoScroll = () => {
                     if (!isPaused && el) {
-                      const maxIndex = Math.floor((el.scrollWidth - el.clientWidth) / 204);
-                      currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+                      const cardWidth = 200;
+                      const gap = 16;
+                      const totalCards = Math.ceil((el.scrollWidth - el.clientWidth) / (cardWidth + gap)) + 1;
+                      currentIndex = currentIndex >= totalCards - 1 ? 0 : currentIndex + 1;
                       scrollToCard(currentIndex);
                     }
                   };
