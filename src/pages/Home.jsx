@@ -31,6 +31,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import FavoritesModal from '@/components/FavoritesModal';
 import LoginRequiredModal from '@/components/LoginRequiredModal';
 import NoCreditsModal from '@/components/NoCreditsModal';
+import GuestCreditsModal from '@/components/GuestCreditsModal';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -90,6 +91,7 @@ export default function Home() {
   });
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
+  const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -224,7 +226,7 @@ export default function Home() {
     if (!user) {
       // Guest : max 3 prompts
       if (guestPrompts >= 3) {
-        setShowLoginModal(true);
+        setShowGuestCreditsModal(true);
         return;
       }
     } else {
@@ -451,11 +453,17 @@ export default function Home() {
 
   const handleRegenerate = async (visual) => {
     // Vérification des crédits AVANT régénération
-    if (user && credits) {
+    if (!user) {
+      // Guest : max 3 prompts
+      if (guestPrompts >= 3) {
+        setShowGuestCreditsModal(true);
+        return;
+      }
+    } else if (credits) {
       const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
       const isUnlimited = credits?.subscription_type === 'unlimited';
       const isAdmin = user?.role === 'admin';
-      
+
       if (!isAdmin && !isUnlimited && totalCredits <= 0) {
         setShowNoCreditsModal(true);
         return;
@@ -467,7 +475,12 @@ export default function Home() {
 
     try {
       // Deduct credit before generation
-      if (credits && user) {
+      if (!user) {
+        // Guest: increment counter
+        const newCount = guestPrompts + 1;
+        setGuestPrompts(newCount);
+        localStorage.setItem('igpt_guest_prompts', newCount.toString());
+      } else if (credits) {
         if (credits.free_downloads > 0) {
           await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
           setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
@@ -1208,6 +1221,13 @@ export default function Home() {
         isOpen={showNoCreditsModal}
         onClose={() => setShowNoCreditsModal(false)}
         onRecharge={() => window.location.href = createPageUrl('Pricing')}
+      />
+
+      {/* Guest Credits Modal */}
+      <GuestCreditsModal
+        isOpen={showGuestCreditsModal}
+        onClose={() => setShowGuestCreditsModal(false)}
+        onCreateAccount={handleLogin}
       />
 
       {/* Confirm Modal */}
