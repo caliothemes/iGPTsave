@@ -20,9 +20,12 @@ export default function MyVisuals() {
     return urlParams.get('filter') || 'all';
   });
   const [typeFilter, setTypeFilter] = useState('all');
+  const [formatFilter, setFormatFilter] = useState('all');
   const [gridSize, setGridSize] = useState('medium');
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -30,26 +33,48 @@ export default function MyVisuals() {
   }[language];
 
   useEffect(() => {
-    const load = async () => {
+    const loadAllVisuals = async () => {
       try {
         const user = await base44.auth.me();
-        const [userVisuals, purchases] = await Promise.all([
-          base44.entities.Visual.filter({ user_email: user.email }, '-updated_date', 200),
-          base44.entities.StorePurchase.filter({ user_email: user.email }, '-created_date')
-        ]);
+        let allVisuals = [];
+        let skip = 0;
+        const limit = 200;
+        let hasMoreData = true;
         
+        // Load all visuals in batches
+        while (hasMoreData) {
+          const batch = await base44.entities.Visual.filter(
+            { user_email: user.email }, 
+            '-updated_date', 
+            limit, 
+            skip
+          );
+          
+          if (batch.length === 0) {
+            hasMoreData = false;
+          } else {
+            allVisuals = [...allVisuals, ...batch];
+            skip += limit;
+            if (batch.length < limit) {
+              hasMoreData = false;
+            }
+          }
+        }
+        
+        const purchases = await base44.entities.StorePurchase.filter({ user_email: user.email }, '-created_date');
         const purchasedVisualIds = new Set(purchases.map(p => p.visual_id));
-        const visualsWithPurchaseFlag = userVisuals.map(v => ({
+        const visualsWithPurchaseFlag = allVisuals.map(v => ({
           ...v,
           isPurchased: purchasedVisualIds.has(v.id)
         }));
         
         setVisuals(visualsWithPurchaseFlag);
+        setHasMore(false);
       } catch (e) {
         console.error(e);
       }
     };
-    load();
+    loadAllVisuals();
   }, []);
 
   // Deduct 1 message/credit
@@ -140,12 +165,27 @@ export default function MyVisuals() {
     return acc;
   }, {});
 
+  // Get aspect ratio from dimensions
+  const getAspectRatio = (dimensions) => {
+    if (!dimensions) return null;
+    const [w, h] = dimensions.split('x').map(Number);
+    if (!w || !h) return null;
+    const ratio = w / h;
+    if (Math.abs(ratio - 1) < 0.1) return '1:1'; // Square
+    if (Math.abs(ratio - 9/16) < 0.1 || Math.abs(ratio - 0.5625) < 0.1) return '9:16'; // Story
+    if (Math.abs(ratio - 3/4) < 0.1 || Math.abs(ratio - 0.75) < 0.1) return '3:4'; // Portrait
+    if (Math.abs(ratio - 16/9) < 0.1 || Math.abs(ratio - 1.777) < 0.1) return '16:9'; // Landscape
+    return 'other';
+  };
+
   const filteredVisuals = visuals.filter(v => {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || (filter === 'favorites' && v.is_favorite) || (filter === 'downloaded' && v.downloaded);
     const mainCat = getMainCategory(v.visual_type);
     const matchesType = typeFilter === 'all' || mainCat === typeFilter;
-    return matchesSearch && matchesFilter && matchesType;
+    const aspectRatio = getAspectRatio(v.dimensions);
+    const matchesFormat = formatFilter === 'all' || aspectRatio === formatFilter;
+    return matchesSearch && matchesFilter && matchesType && matchesFormat;
   });
 
   return (
@@ -164,6 +204,18 @@ export default function MyVisuals() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
                 <Input placeholder={t.search} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               </div>
+              <Select value={formatFilter} onValueChange={setFormatFilter}>
+                <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
+                  <SelectValue placeholder="Format" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{language === 'fr' ? 'Tous formats' : 'All formats'}</SelectItem>
+                  <SelectItem value="1:1">{language === 'fr' ? 'Carré 1:1' : 'Square 1:1'}</SelectItem>
+                  <SelectItem value="9:16">Story 9:16</SelectItem>
+                  <SelectItem value="3:4">Portrait 3:4</SelectItem>
+                  <SelectItem value="16:9">Paysage 16:9</SelectItem>
+                </SelectContent>
+              </Select>
               <div className="flex gap-2">
                 <Button variant={filter === 'all' ? 'default' : 'ghost'} onClick={() => setFilter('all')} className={cn(filter === 'all' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}>{t.all}</Button>
                 <Button variant={filter === 'favorites' ? 'default' : 'ghost'} onClick={() => setFilter('favorites')} className={cn(filter === 'favorites' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}><Heart className="h-4 w-4 mr-1" />{t.favorites}</Button>
