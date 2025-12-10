@@ -429,25 +429,24 @@ export default function Store() {
 
         {/* Categories Tabs */}
         <div className="px-6 mb-6">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2",
-                  selectedCategory === 'all'
-                    ? "bg-violet-600 text-white"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                )}
-              >
-                <span>{language === 'fr' ? 'Tout' : 'All'}</span>
-                <span className={cn(
-                  "px-1.5 py-0.5 rounded-full text-xs",
-                  selectedCategory === 'all' ? "bg-white/20" : "bg-white/10"
-                )}>
-                  {getCategoryCount('all')}
-                </span>
-              </button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={cn(
+                "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2",
+                selectedCategory === 'all'
+                  ? "bg-violet-600 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10"
+              )}
+            >
+              <span>{language === 'fr' ? 'Tout' : 'All'}</span>
+              <span className={cn(
+                "px-1.5 py-0.5 rounded-full text-xs",
+                selectedCategory === 'all' ? "bg-white/20" : "bg-white/10"
+              )}>
+                {getCategoryCount('all')}
+              </span>
+            </button>
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -468,9 +467,8 @@ export default function Store() {
                 </span>
               </button>
             ))}
-            </div>
-            </div>
-            </div>
+          </div>
+        </div>
 
         {/* Masonry Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
