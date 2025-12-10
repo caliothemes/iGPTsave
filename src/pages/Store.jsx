@@ -81,7 +81,16 @@ export default function Store() {
           base44.entities.StoreItem.filter({ is_active: true }, '-created_date')
         ]);
         
-        setCategories(cats);
+        // Get latest visual for each category
+        const catsWithImages = await Promise.all(
+          cats.map(async (cat) => {
+            const categoryItems = items.filter(item => item.category_slug === cat.slug);
+            const latestItem = categoryItems.length > 0 ? categoryItems[0] : null;
+            return { ...cat, latestImage: latestItem?.image_url };
+          })
+        );
+        
+        setCategories(catsWithImages);
         setStoreItems(items);
         setFilteredItems(items);
         
@@ -427,47 +436,86 @@ export default function Store() {
           </div>
         </div>
 
-        {/* Categories Tabs */}
-        <div className="px-6 mb-6">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2",
-                selectedCategory === 'all'
-                  ? "bg-violet-600 text-white"
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
-              )}
-            >
-              <span>{language === 'fr' ? 'Tout' : 'All'}</span>
-              <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-xs",
-                selectedCategory === 'all' ? "bg-white/20" : "bg-white/10"
-              )}>
-                {getCategoryCount('all')}
-              </span>
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.slug)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2",
-                  selectedCategory === cat.slug
-                    ? "bg-violet-600 text-white"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                )}
-              >
-                <span>{language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}</span>
-                <span className={cn(
-                  "px-1.5 py-0.5 rounded-full text-xs",
-                  selectedCategory === cat.slug ? "bg-white/20" : "bg-white/10"
-                )}>
-                  {getCategoryCount(cat.slug)}
-                </span>
-              </button>
-            ))}
+        {/* Categories Slider */}
+        <div className="px-6 mb-8">
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
+                {/* All category */}
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className={cn(
+                    "flex-shrink-0 rounded-xl overflow-hidden transition-all border-2",
+                    selectedCategory === 'all'
+                      ? "border-violet-500 shadow-lg shadow-violet-500/30"
+                      : "border-white/10 hover:border-white/20"
+                  )}
+                  style={{ scrollSnapAlign: 'start', width: '180px' }}
+                >
+                  <div className="relative h-32 bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
+                    <span className="text-white font-bold text-xl">iGPT</span>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-sm px-3 py-2">
+                    <p className="text-white font-medium text-sm text-center">
+                      {language === 'fr' ? 'Tout' : 'All'}
+                    </p>
+                    <p className="text-white/60 text-xs text-center">
+                      {getCategoryCount('all')} {language === 'fr' ? 'visuels' : 'visuals'}
+                    </p>
+                  </div>
+                </button>
+
+                {/* Categories with images */}
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.slug)}
+                    className={cn(
+                      "flex-shrink-0 rounded-xl overflow-hidden transition-all border-2",
+                      selectedCategory === cat.slug
+                        ? "border-violet-500 shadow-lg shadow-violet-500/30"
+                        : "border-white/10 hover:border-white/20"
+                    )}
+                    style={{ scrollSnapAlign: 'start', width: '180px' }}
+                  >
+                    <div className="relative h-32 bg-white/5">
+                      {cat.latestImage ? (
+                        <>
+                          <img
+                            src={cat.latestImage}
+                            alt={cat.name_fr}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        </>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                          <span className="text-white/30 text-xs">{language === 'fr' ? 'Aucun visuel' : 'No visual'}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="bg-white/5 backdrop-blur-sm px-3 py-2">
+                      <p className="text-white font-medium text-sm text-center truncate">
+                        {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
+                      </p>
+                      <p className="text-white/60 text-xs text-center">
+                        {getCategoryCount(cat.slug)} {language === 'fr' ? 'visuels' : 'visuals'}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
+          <style>{`
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+            .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+          `}</style>
         </div>
 
         {/* Masonry Grid */}
