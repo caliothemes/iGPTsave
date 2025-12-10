@@ -125,14 +125,19 @@ export default function Home() {
           const urlParams = new URLSearchParams(window.location.search);
           const editVisualId = urlParams.get('editVisual');
           if (editVisualId) {
-            const visualToEdit = visuals.find(v => v.id === editVisualId);
-            if (visualToEdit) {
-              setCurrentVisual(visualToEdit);
-              setMessages([{ role: 'assistant', content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.') }]);
-              // Set category based on visual type to enable prompt
-              if (visualToEdit.visual_type) {
-                setSelectedCategory({ id: visualToEdit.visual_type });
+            try {
+              const visualToEditArray = await base44.entities.Visual.filter({ id: editVisualId });
+              if (visualToEditArray.length > 0) {
+                const visualToEdit = visualToEditArray[0];
+                setCurrentVisual(visualToEdit);
+                setMessages([{ role: 'assistant', content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.') }]);
+                // Set category based on visual type to enable prompt
+                if (visualToEdit.visual_type) {
+                  setSelectedCategory({ id: visualToEdit.visual_type });
+                }
               }
+            } catch (e) {
+              console.error('Failed to load visual:', e);
             }
           }
         }
