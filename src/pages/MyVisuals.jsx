@@ -96,35 +96,46 @@ export default function MyVisuals() {
     if (selectedVisual?.id === visual.id) setSelectedVisual(prev => ({ ...prev, is_favorite: newState }));
   };
 
-  // Get all possible categories from CATEGORIES
-  const getAllCategories = () => {
-    const categories = [];
+  // Main categories to display
+  const mainCategories = [
+    { id: 'logo_picto', name: language === 'fr' ? 'Logo Pictogramme' : 'Logo Pictogram' },
+    { id: 'logo_complet', name: language === 'fr' ? 'Logo complet' : 'Full Logo' },
+    { id: 'image', name: language === 'fr' ? 'Image réaliste' : 'Realistic Image' },
+    { id: 'print', name: language === 'fr' ? 'Design Print' : 'Print Design' },
+    { id: 'social', name: language === 'fr' ? 'Réseaux sociaux' : 'Social Media' },
+    { id: 'mockup', name: 'Mockups' },
+    { id: 'product', name: language === 'fr' ? 'Produit' : 'Product' },
+    { id: 'free_prompt', name: language === 'fr' ? 'Prompt 100% libre' : '100% Free Prompt' }
+  ];
+
+  // Map visual_type to main category
+  const getMainCategory = (visualType) => {
+    if (!visualType) return null;
     
-    CATEGORIES.forEach(cat => {
-      if (!cat.isFreePrompt) {
-        if (cat.hasSubmenu && cat.submenu) {
-          cat.submenu.forEach(sub => {
-            if (sub.orientations) {
-              sub.orientations.forEach(orientation => {
-                categories.push({ id: orientation.id, name: orientation.name[language] });
-              });
-            } else {
-              categories.push({ id: sub.id, name: sub.name[language] });
-            }
-          });
-        } else {
-          categories.push({ id: cat.id, name: cat.name[language] });
-        }
-      }
-    });
+    // Direct match
+    const direct = mainCategories.find(c => c.id === visualType);
+    if (direct) return direct.id;
     
-    return categories;
+    // Check if it's a subcategory of print
+    if (visualType.includes('carte') || visualType.includes('flyer') || visualType.includes('affiche') || 
+        visualType === 'business_card' || visualType === 'flyer_a5' || visualType === 'poster') {
+      return 'print';
+    }
+    
+    // Check if it's a subcategory of social
+    if (visualType.includes('instagram') || visualType.includes('facebook') || visualType.includes('linkedin') ||
+        visualType.includes('post') || visualType.includes('story') || visualType.includes('banner')) {
+      return 'social';
+    }
+    
+    return visualType;
   };
 
-  const allCategories = getAllCategories();
-  const visualTypesCounts = visuals.reduce((acc, v) => {
-    if (v.visual_type) {
-      acc[v.visual_type] = (acc[v.visual_type] || 0) + 1;
+  // Count visuals by main category
+  const categoryCounts = visuals.reduce((acc, v) => {
+    const mainCat = getMainCategory(v.visual_type);
+    if (mainCat) {
+      acc[mainCat] = (acc[mainCat] || 0) + 1;
     }
     return acc;
   }, {});
@@ -160,51 +171,49 @@ export default function MyVisuals() {
             </div>
 
             {/* Category Tags */}
-            {allCategories.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setTypeFilter('all')}
-                  className={cn(
-                    "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                    typeFilter === 'all' 
-                      ? "bg-violet-600 text-white" 
-                      : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
-                  )}
-                >
-                  {language === 'fr' ? 'Tous' : 'All'} ({filteredVisuals.length})
-                </button>
-                {allCategories.map(cat => {
-                  const count = visualTypesCounts[cat.id] || 0;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setTypeFilter(cat.id)}
-                      disabled={count === 0}
-                      className={cn(
-                        "px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5",
-                        typeFilter === cat.id 
-                          ? "bg-violet-600 text-white" 
-                          : count > 0
-                            ? "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
-                            : "bg-white/5 text-white/30 cursor-not-allowed"
-                      )}
-                    >
-                      {cat.name}
-                      <span className={cn(
-                        "px-1.5 py-0.5 rounded-full text-[10px]",
-                        typeFilter === cat.id
-                          ? "bg-white/20"
-                          : count > 0
-                            ? "bg-white/10"
-                            : "bg-white/5"
-                      )}>
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setTypeFilter('all')}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  typeFilter === 'all' 
+                    ? "bg-violet-600 text-white" 
+                    : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+                )}
+              >
+                {language === 'fr' ? 'Tous' : 'All'} ({visuals.length})
+              </button>
+              {mainCategories.map(cat => {
+                const count = categoryCounts[cat.id] || 0;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setTypeFilter(cat.id)}
+                    disabled={count === 0}
+                    className={cn(
+                      "px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5",
+                      typeFilter === cat.id 
+                        ? "bg-violet-600 text-white" 
+                        : count > 0
+                          ? "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+                          : "bg-white/5 text-white/30 cursor-not-allowed"
+                    )}
+                  >
+                    {cat.name}
+                    <span className={cn(
+                      "px-1.5 py-0.5 rounded-full text-[10px]",
+                      typeFilter === cat.id
+                        ? "bg-white/20"
+                        : count > 0
+                          ? "bg-white/10"
+                          : "bg-white/5"
+                    )}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Grid */}
