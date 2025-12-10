@@ -291,6 +291,7 @@ export default function MyVisuals() {
                     isRegenerating={false}
                     canDownload={true}
                     compact
+                    hideInfoMessage={true}
                   />
                 </div>
               ))}
