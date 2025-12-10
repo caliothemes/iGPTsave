@@ -443,44 +443,70 @@ export default function Store() {
               ref={(el) => {
                 if (el && !el.dataset.autoScrolling) {
                   el.dataset.autoScrolling = 'true';
-                  let scrollAmount = 0;
-                  const scroll = () => {
-                    if (el) {
-                      scrollAmount += 1;
-                      if (scrollAmount >= el.scrollWidth - el.clientWidth) {
-                        scrollAmount = 0;
-                      }
-                      el.scrollTo({ left: scrollAmount, behavior: 'auto' });
+                  let currentIndex = 0;
+                  let isPaused = false;
+
+                  const scrollToCard = (index) => {
+                    const cardWidth = 204; // 200px + 4px gap
+                    el.scrollTo({ left: index * cardWidth + 24, behavior: 'smooth' });
+                  };
+
+                  const autoScroll = () => {
+                    if (!isPaused && el) {
+                      const maxIndex = Math.floor((el.scrollWidth - el.clientWidth) / 204);
+                      currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+                      scrollToCard(currentIndex);
                     }
                   };
-                  setInterval(scroll, 30);
+
+                  el.addEventListener('mouseenter', () => { isPaused = true; });
+                  el.addEventListener('mouseleave', () => { isPaused = false; });
+
+                  setInterval(autoScroll, 2000);
                 }
               }}
               className="overflow-x-auto scrollbar-hide"
-              style={{ scrollBehavior: 'auto' }}
             >
               <div className="flex gap-4 px-6">
                 {/* All category */}
                 <button
                   onClick={() => setSelectedCategory('all')}
                   className={cn(
-                    "flex-shrink-0 rounded-xl overflow-hidden transition-all border-2",
-                    selectedCategory === 'all'
-                      ? "border-violet-500 shadow-lg shadow-violet-500/30 scale-105"
-                      : "border-white/10 hover:border-white/20"
+                    "flex-shrink-0 rounded-xl overflow-visible transition-all",
+                    selectedCategory === 'all' && "shadow-lg shadow-violet-500/30"
                   )}
                   style={{ width: '200px' }}
                 >
-                  <div className="relative h-40 bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl">iGPT</span>
-                  </div>
-                  <div className="bg-gradient-to-b from-gray-900/95 to-gray-900 backdrop-blur-sm px-4 py-4 border-t border-white/10">
-                    <p className="text-white font-bold text-base text-center mb-1">
-                      {language === 'fr' ? 'Tout' : 'All'}
-                    </p>
-                    <p className="text-violet-400 text-sm text-center font-semibold">
-                      {getCategoryCount('all')} {language === 'fr' ? 'visuels' : 'visuals'}
-                    </p>
+                  <div className={cn(
+                    "rounded-xl overflow-hidden border-2 transition-all",
+                    selectedCategory === 'all'
+                      ? "border-violet-500"
+                      : "border-white/10 hover:border-white/20"
+                  )}>
+                    <div className={cn(
+                      "relative h-40 flex items-center justify-center",
+                      selectedCategory === 'all' 
+                        ? "bg-violet-600"
+                        : "bg-gradient-to-br from-violet-600 to-purple-600"
+                    )}>
+                      <span className="text-white font-bold text-2xl">iGPT</span>
+                    </div>
+                    <div className={cn(
+                      "px-4 py-3 border-t",
+                      selectedCategory === 'all'
+                        ? "bg-violet-600 border-violet-500"
+                        : "bg-gradient-to-b from-gray-900/95 to-gray-900 border-white/10"
+                    )}>
+                      <p className="text-white text-sm text-center mb-0.5">
+                        {language === 'fr' ? 'Tout' : 'All'}
+                      </p>
+                      <p className={cn(
+                        "text-xs text-center",
+                        selectedCategory === 'all' ? "text-white/80" : "text-violet-400"
+                      )}>
+                        {getCategoryCount('all')} {language === 'fr' ? 'visuels' : 'visuals'}
+                      </p>
+                    </div>
                   </div>
                 </button>
 
@@ -490,36 +516,49 @@ export default function Store() {
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.slug)}
                     className={cn(
-                      "flex-shrink-0 rounded-xl overflow-hidden transition-all border-2",
-                      selectedCategory === cat.slug
-                        ? "border-violet-500 shadow-lg shadow-violet-500/30 scale-105"
-                        : "border-white/10 hover:border-white/20"
+                      "flex-shrink-0 rounded-xl overflow-visible transition-all",
+                      selectedCategory === cat.slug && "shadow-lg shadow-violet-500/30"
                     )}
                     style={{ width: '200px' }}
                   >
-                    <div className="relative h-40 bg-white/5">
-                      {cat.latestImage ? (
-                        <>
-                          <img
-                            src={cat.latestImage}
-                            alt={cat.name_fr}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        </>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                          <span className="text-white/30 text-xs">{language === 'fr' ? 'Aucun visuel' : 'No visual'}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="bg-gradient-to-b from-gray-900/95 to-gray-900 backdrop-blur-sm px-4 py-4 border-t border-white/10">
-                      <p className="text-white font-bold text-base text-center truncate mb-1">
-                        {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
-                      </p>
-                      <p className="text-violet-400 text-sm text-center font-semibold">
-                        {getCategoryCount(cat.slug)} {language === 'fr' ? 'visuels' : 'visuals'}
-                      </p>
+                    <div className={cn(
+                      "rounded-xl overflow-hidden border-2 transition-all",
+                      selectedCategory === cat.slug
+                        ? "border-violet-500"
+                        : "border-white/10 hover:border-white/20"
+                    )}>
+                      <div className="relative h-40 bg-white/5">
+                        {cat.latestImage ? (
+                          <>
+                            <img
+                              src={cat.latestImage}
+                              alt={cat.name_fr}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          </>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                            <span className="text-white/30 text-xs">{language === 'fr' ? 'Aucun visuel' : 'No visual'}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className={cn(
+                        "px-4 py-3 border-t",
+                        selectedCategory === cat.slug
+                          ? "bg-violet-600 border-violet-500"
+                          : "bg-gradient-to-b from-gray-900/95 to-gray-900 border-white/10"
+                      )}>
+                        <p className="text-white text-sm text-center truncate mb-0.5">
+                          {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
+                        </p>
+                        <p className={cn(
+                          "text-xs text-center",
+                          selectedCategory === cat.slug ? "text-white/80" : "text-violet-400"
+                        )}>
+                          {getCategoryCount(cat.slug)} {language === 'fr' ? 'visuels' : 'visuals'}
+                        </p>
+                      </div>
                     </div>
                   </button>
                 ))}
