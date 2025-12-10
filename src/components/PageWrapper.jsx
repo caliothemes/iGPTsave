@@ -8,7 +8,7 @@ import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
-export default function PageWrapper({ children, requireAuth = false }) {
+export default function PageWrapper({ children, requireAuth = false, fullWidth = false }) {
   const { t } = useLanguage();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -95,14 +95,14 @@ export default function PageWrapper({ children, requireAuth = false }) {
       )}>
         <main className="flex-1 flex flex-col pt-16 pb-8">
           <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
-            <div className="max-w-4xl mx-auto">
+            <div className={cn(fullWidth ? "w-full" : "max-w-4xl mx-auto")}>
               {typeof children === 'function' ? children({ user, credits, isAuthenticated }) : children}
             </div>
           </div>
 
           {/* Footer */}
           <div className="mt-auto px-4">
-            <div className="max-w-4xl mx-auto">
+            <div className={cn(fullWidth ? "w-full" : "max-w-4xl mx-auto")}>
               <div className="flex items-center justify-center gap-4 text-xs text-white/40 bg-[#0a0a0f]/90 backdrop-blur-sm px-4 py-3 rounded-lg border-t border-white/5">
                 <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">iGPT Store</a>
                 <span>•</span>
