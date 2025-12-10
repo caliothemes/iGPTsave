@@ -287,9 +287,15 @@ export default function VisualCard({
               <Button
                 size="sm"
                 onClick={handleDownloadClick}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-3"
+                disabled={!canDownload}
+                className={cn(
+                  "px-3",
+                  canDownload 
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                    : "bg-white/10 cursor-not-allowed"
+                )}
               >
-                <Download className="h-4 w-4" />
+                {!canDownload ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
               </Button>
             )}
           </div>
