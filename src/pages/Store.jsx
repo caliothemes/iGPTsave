@@ -784,9 +784,9 @@ export default function Store() {
                           }
                         }}
                       />
-                    {/* Watermark iGPT */}
+                    {/* Watermark iGPT - More visible */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                      <div className="text-white/20 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none">
+                      <div className="text-white/50 text-6xl md:text-8xl lg:text-9xl font-bold rotate-[-30deg] select-none drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 0 20px rgba(139,92,246,0.5), 0 0 40px rgba(139,92,246,0.3)' }}>
                         iGPT
                       </div>
                     </div>
