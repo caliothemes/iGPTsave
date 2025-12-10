@@ -77,7 +77,7 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // Convert to selected format
       const quality = format.id === 'jpg' ? 0.92 : 1;
