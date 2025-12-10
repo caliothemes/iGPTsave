@@ -30,6 +30,7 @@ import VisualEditor from '@/components/chat/VisualEditor';
 import ConfirmModal from '@/components/ConfirmModal';
 import FavoritesModal from '@/components/FavoritesModal';
 import LoginRequiredModal from '@/components/LoginRequiredModal';
+import NoCreditsModal from '@/components/NoCreditsModal';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -88,6 +89,7 @@ export default function Home() {
     return saved ? parseInt(saved) : 0;
   });
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -232,14 +234,7 @@ export default function Home() {
       const isAdmin = user?.role === 'admin';
       
       if (!isAdmin && !isUnlimited && totalCredits <= 0) {
-        setConfirmModal({
-          isOpen: true,
-          title: language === 'fr' ? '💳 Plus de crédits' : '💳 No credits left',
-          message: language === 'fr' 
-            ? 'Vous n\'avez plus de crédits pour générer des visuels. Rechargez vos crédits pour continuer.'
-            : 'You have no credits left to generate visuals. Recharge your credits to continue.',
-          action: 'recharge'
-        });
+        setShowNoCreditsModal(true);
         return;
       }
     }
@@ -462,14 +457,7 @@ export default function Home() {
       const isAdmin = user?.role === 'admin';
       
       if (!isAdmin && !isUnlimited && totalCredits <= 0) {
-        setConfirmModal({
-          isOpen: true,
-          title: language === 'fr' ? '💳 Plus de crédits' : '💳 No credits left',
-          message: language === 'fr' 
-            ? 'Vous n\'avez plus de crédits pour régénérer des visuels. Rechargez vos crédits pour continuer.'
-            : 'You have no credits left to regenerate visuals. Recharge your credits to continue.',
-          action: 'recharge'
-        });
+        setShowNoCreditsModal(true);
         return;
       }
     }
@@ -1213,6 +1201,13 @@ export default function Home() {
         onClose={() => setShowLoginModal(false)}
         onLogin={handleLogin}
         guestPromptsUsed={guestPrompts}
+      />
+
+      {/* No Credits Modal for Users */}
+      <NoCreditsModal
+        isOpen={showNoCreditsModal}
+        onClose={() => setShowNoCreditsModal(false)}
+        onRecharge={() => window.location.href = createPageUrl('Pricing')}
       />
 
       {/* Confirm Modal */}
