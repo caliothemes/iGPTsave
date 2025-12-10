@@ -436,9 +436,9 @@ export default function Store() {
           </div>
         </div>
 
-        {/* Categories Slider - Full Width */}
+        {/* Categories Slider - 4 Cards Centered */}
         <div className="mb-8 w-full">
-          <div className="relative">
+          <div className="max-w-4xl mx-auto relative px-6">
             <div 
               ref={(el) => {
                 if (el && !el.dataset.autoScrolling) {
@@ -448,7 +448,7 @@ export default function Store() {
 
                   const scrollToCard = (index) => {
                     const cardWidth = 204; // 200px + 4px gap
-                    el.scrollTo({ left: index * cardWidth + 24, behavior: 'smooth' });
+                    el.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
                   };
 
                   const autoScroll = () => {
@@ -467,7 +467,7 @@ export default function Store() {
               }}
               className="overflow-x-auto scrollbar-hide"
             >
-              <div className="flex gap-4 px-6">
+              <div className="flex gap-4">
                 {/* All category */}
                 <button
                   onClick={() => setSelectedCategory('all')}
