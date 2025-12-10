@@ -4,6 +4,7 @@ import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkl
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
+import { toast } from 'sonner';
 
 const getAspectRatio = (dimensions) => {
   if (!dimensions) return '1/1';
@@ -59,7 +60,15 @@ export default function VisualCard({
   };
 
   const handleDownloadClick = () => {
-    if (!canDownload) return;
+    if (!canDownload) {
+      toast.error(
+        language === 'fr' 
+          ? '💳 Rechargez vos crédits pour télécharger' 
+          : '💳 Recharge your credits to download',
+        { duration: 3000 }
+      );
+      return;
+    }
     setShowDownloadModal(true);
   };
 
@@ -287,15 +296,9 @@ export default function VisualCard({
               <Button
                 size="sm"
                 onClick={handleDownloadClick}
-                disabled={!canDownload}
-                className={cn(
-                  "px-3",
-                  canDownload 
-                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
-                    : "bg-white/10 cursor-not-allowed"
-                )}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-3"
               >
-                {!canDownload ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+                <Download className="h-4 w-4" />
               </Button>
             )}
           </div>

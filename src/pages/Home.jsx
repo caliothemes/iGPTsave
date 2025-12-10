@@ -574,7 +574,7 @@ export default function Home() {
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('Home'));
   const handleLogout = () => base44.auth.logout(createPageUrl('Home'));
 
-  const canDownload = user && credits && ((credits.free_downloads || 0) + (credits.paid_credits || 0) > 0 || credits.subscription_type === 'unlimited');
+  const canDownload = user && credits && ((credits.free_downloads || 0) + (credits.paid_credits || 0) > 0 || credits.subscription_type === 'unlimited' || user.role === 'admin');
   const hasWatermark = !user || !canDownload;
   const showInitialView = messages.length === 0 && !currentVisual;
 
