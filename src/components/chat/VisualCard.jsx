@@ -70,7 +70,7 @@ export default function VisualCard({
 
   return (
     <>
-      <div className="rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
+      <div className="rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
         {/* Image Container */}
         <div className="relative overflow-hidden bg-black/20" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}>
           <img 
