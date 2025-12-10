@@ -194,7 +194,7 @@ export default function MyVisuals() {
         <div className="space-y-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">{t.title}</h1>
-            <p className="text-white/60">{t.subtitle} ({filteredVisuals.length})</p>
+            <p className="text-white/60">{t.subtitle}</p>
           </div>
 
           {/* Filters */}
