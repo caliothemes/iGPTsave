@@ -17,7 +17,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
     title: '',
     description: '',
     price_credits: 10,
-    category_slug: '',
+    category_slugs: [],
     dimensions: '1080x1080',
     keywords: []
   });
@@ -54,7 +54,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             title: item.title,
             description: item.description || '',
             price_credits: item.price_credits,
-            category_slug: item.category_slug,
+            category_slugs: item.category_slugs || [],
             dimensions: item.dimensions || visual.dimensions || '1080x1080',
             keywords: item.keywords || []
           });
@@ -66,7 +66,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             title: visual.title || '',
             description: visual.original_prompt || '',
             price_credits: 10,
-            category_slug: visual.visual_type || '',
+            category_slugs: visual.visual_type ? [visual.visual_type] : [],
             dimensions: visualDimensions,
             keywords: []
           });
@@ -78,8 +78,8 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
   }, [visual, isOpen]);
 
   const handleSubmit = async () => {
-    if (!formData.title || !formData.price_credits || !formData.category_slug) {
-      toast.error('Tous les champs sont requis');
+    if (!formData.title || !formData.price_credits || formData.category_slugs.length === 0) {
+      toast.error('Titre, prix et au moins une catégorie sont requis');
       return;
     }
 
@@ -91,7 +91,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           title: formData.title,
           description: formData.description,
           price_credits: formData.price_credits,
-          category_slug: formData.category_slug,
+          category_slugs: formData.category_slugs,
           image_url: visual.image_url,
           dimensions: formData.dimensions,
           keywords: formData.keywords
@@ -104,7 +104,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           title: formData.title,
           description: formData.description,
           price_credits: formData.price_credits,
-          category_slug: formData.category_slug,
+          category_slugs: formData.category_slugs,
           image_url: visual.image_url,
           dimensions: formData.dimensions,
           keywords: formData.keywords,
@@ -178,22 +178,58 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="text-white/60 text-sm mb-2 block">Catégorie *</label>
+              <label className="text-white/60 text-sm mb-2 block">Catégories * (sélection multiple)</label>
               <Select 
-                value={formData.category_slug}
-                onValueChange={(value) => setFormData({ ...formData, category_slug: value })}
+                value="select_category"
+                onValueChange={(value) => {
+                  if (!formData.category_slugs.includes(value)) {
+                    setFormData({ ...formData, category_slugs: [...formData.category_slugs, value] });
+                  }
+                }}
               >
                 <SelectTrigger className="bg-white/5 border-white/10 text-white">
-                  <SelectValue placeholder="Sélectionner une catégorie" />
+                  <SelectValue placeholder="Ajouter une catégorie" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-900 border-white/10">
                   {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.slug} className="text-white">
+                    <SelectItem 
+                      key={cat.id} 
+                      value={cat.slug} 
+                      className="text-white"
+                      disabled={formData.category_slugs.includes(cat.slug)}
+                    >
                       {cat.name_fr}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {formData.category_slugs.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.category_slugs.map((slug, idx) => {
+                    const cat = categories.find(c => c.slug === slug);
+                    return (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs rounded-full"
+                      >
+                        {cat?.name_fr || slug}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              category_slugs: formData.category_slugs.filter((_, i) => i !== idx)
+                            });
+                          }}
+                          className="hover:text-white"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div>

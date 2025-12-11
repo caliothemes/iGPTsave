@@ -84,7 +84,9 @@ export default function Store() {
         // Get latest visual for each category
         const catsWithImages = await Promise.all(
           cats.map(async (cat) => {
-            const categoryItems = items.filter(item => item.category_slug === cat.slug);
+            const categoryItems = items.filter(item => 
+              item.category_slugs && item.category_slugs.includes(cat.slug)
+            );
             const latestItem = categoryItems.length > 0 ? categoryItems[0] : null;
             return { ...cat, latestImage: latestItem?.image_url };
           })
@@ -141,7 +143,9 @@ export default function Store() {
   // Calculate item counts per category
   const getCategoryCount = (categorySlug) => {
     if (categorySlug === 'all') return storeItems.length;
-    return storeItems.filter(item => item.category_slug === categorySlug).length;
+    return storeItems.filter(item => 
+      item.category_slugs && item.category_slugs.includes(categorySlug)
+    ).length;
   };
 
   useEffect(() => {
@@ -149,7 +153,9 @@ export default function Store() {
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      items = items.filter(item => item.category_slug === selectedCategory);
+      items = items.filter(item => 
+        item.category_slugs && item.category_slugs.includes(selectedCategory)
+      );
     }
 
     // Filter by search query
