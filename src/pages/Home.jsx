@@ -647,12 +647,12 @@ export default function Home() {
     const videoVisualData = {
       user_email: user?.email || 'anonymous',
       conversation_id: currentConversation?.id,
-      image_url: videoUrl, // Store video URL as image_url for now
+      image_url: videoUrl,
+      video_url: videoUrl,
       title: currentVisual.title + ' (Vidéo)',
       original_prompt: animationPrompt,
       dimensions: currentVisual.dimensions,
       visual_type: currentVisual.visual_type,
-      video_url: videoUrl,
       parent_visual_id: currentVisual.id
     };
 

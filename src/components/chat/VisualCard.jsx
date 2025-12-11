@@ -83,13 +83,24 @@ export default function VisualCard({
   return (
     <>
       <div className="rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
-        {/* Image Container */}
+        {/* Image/Video Container */}
         <div className="relative overflow-hidden bg-black/20" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}>
-          <img 
-          src={visual.image_url} 
-          alt={visual.title || 'Visuel généré'}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+          {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
+            <video 
+              src={visual.video_url || visual.image_url}
+              controls
+              autoPlay
+              loop
+              muted
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <img 
+              src={visual.image_url} 
+              alt={visual.title || 'Visuel généré'}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          )}
         
         {/* Top Right Buttons */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 items-center">
