@@ -150,6 +150,11 @@ export default function Store() {
     ).length;
   };
 
+  // Reset keyword when category changes
+  useEffect(() => {
+    setSelectedKeyword(null);
+  }, [selectedCategory]);
+
   useEffect(() => {
     let items = storeItems;
 
@@ -480,7 +485,7 @@ export default function Store() {
         </div>
 
         {/* Categories Slider - 4 Cards Centered */}
-        <div className="mb-16 w-full">
+        <div className="mb-6 w-full">
           <div className="max-w-4xl mx-auto relative px-6">
             <div 
               ref={(el) => {
@@ -625,9 +630,9 @@ export default function Store() {
 
         {/* Category Keywords Tags */}
         {categoryKeywords.length > 0 && (
-          <div className="px-6 mb-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex flex-wrap gap-2">
+          <div className="w-full mb-8 bg-white/[0.02] border-y border-white/5 py-4">
+            <div className="px-6 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-2 justify-center min-w-max mx-auto">
                 {categoryKeywords.map((keyword) => (
                   <button
                     key={keyword}
@@ -636,7 +641,7 @@ export default function Store() {
                       setSearchQuery('');
                     }}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap",
                       selectedKeyword === keyword
                         ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30"
                         : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10 hover:border-violet-500/30"
