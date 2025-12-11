@@ -642,6 +642,33 @@ export default function Home() {
     setEditingVisual(null);
   };
 
+  const handleVideoGenerated = async (videoUrl, animationPrompt) => {
+    // Create new visual with video
+    const videoVisualData = {
+      user_email: user?.email || 'anonymous',
+      conversation_id: currentConversation?.id,
+      image_url: videoUrl, // Store video URL as image_url for now
+      title: currentVisual.title + ' (Vidéo)',
+      original_prompt: animationPrompt,
+      dimensions: currentVisual.dimensions,
+      visual_type: currentVisual.visual_type,
+      video_url: videoUrl,
+      parent_visual_id: currentVisual.id
+    };
+
+    let newVisual = videoVisualData;
+    if (user) {
+      newVisual = await base44.entities.Visual.create(videoVisualData);
+      setSessionVisuals(prev => [newVisual, ...prev]);
+    }
+
+    setCurrentVisual(newVisual);
+    setMessages(prev => [...prev, { 
+      role: 'assistant', 
+      content: `✨ ${language === 'fr' ? 'Votre vidéo est prête !' : 'Your video is ready!'}`
+    }]);
+  };
+
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('Home'));
   const handleLogout = () => base44.auth.logout(createPageUrl('Home'));
 
@@ -830,6 +857,7 @@ export default function Home() {
                           }
                         }, 0);
                       }}
+                      onVideoGenerated={handleVideoGenerated}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}
