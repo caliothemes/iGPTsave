@@ -356,7 +356,7 @@ export default function Pricing() {
                     {/* Cost per message */}
                     {!sub.isFree && (
                       <p className="text-xs text-emerald-400 mb-3 text-center">
-                        {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/message
+                        {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/message/crédit
                       </p>
                     )}
                     {sub.isFree && (
@@ -429,7 +429,7 @@ export default function Pricing() {
                     <p className="text-white/60 mb-2">messages</p>
                     <p className="text-3xl font-bold text-white mb-2">{pack.price}€</p>
                     <p className="text-xs text-emerald-400 mb-4">
-                      {(pack.price / pack.credits).toFixed(2)}€/message
+                      {(pack.price / pack.credits).toFixed(2)}€/message/crédit
                     </p>
                     <Button 
                       onClick={() => handlePurchase(pack.priceId, user)} 
