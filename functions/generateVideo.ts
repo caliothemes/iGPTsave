@@ -32,8 +32,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Image URL is required' }, { status: 400 });
     }
 
+    if (!RUNWAY_API_KEY) {
+      console.error('RUNWAY_API_KEY not set');
+      return Response.json({ error: 'API key not configured' }, { status: 500 });
+    }
+
     console.log('Image URL:', image_url);
     console.log('API Key present:', !!RUNWAY_API_KEY);
+    console.log('API Key format check:', RUNWAY_API_KEY.startsWith('rw_'));
 
     // Convert image URL to base64 data URI
     console.log('Converting image to base64...');
