@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import { 
-  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles, Box
+  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles, Box, ShoppingBag
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -119,6 +119,10 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
   const { language } = useLanguage();
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [openNestedSubmenu, setOpenNestedSubmenu] = useState(null);
+
+  const handleStoreClick = () => {
+    window.location.href = '/Store';
+  };
   
   // Initialize expertMode with default values from categories
   const [expertMode, setExpertMode] = useState(() => {
@@ -348,6 +352,30 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
           </div>
         );
       })}
+
+      {/* iGPT Store Block */}
+      <div
+        onClick={handleStoreClick}
+        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 border-2 border-violet-500/30 hover:border-violet-500/50 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
+      >
+        <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
+          <ShoppingBag className="h-5 w-5 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-white text-sm font-bold">iGPT Store</span>
+            <span className="text-white/80 text-xs">✨</span>
+          </div>
+          <p className="text-white/80 text-xs">
+            {language === 'fr' 
+              ? 'Visuels prêts à l\'emploi' 
+              : 'Ready-to-use visuals'}
+          </p>
+        </div>
+        <svg className="h-5 w-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
     </div>
   );
 }
