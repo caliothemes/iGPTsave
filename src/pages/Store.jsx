@@ -63,6 +63,7 @@ export default function Store() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [popularKeywords, setPopularKeywords] = useState([]);
+  const [selectedKeyword, setSelectedKeyword] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [userVisuals, setUserVisuals] = useState([]);
@@ -170,8 +171,40 @@ export default function Store() {
       });
     }
 
+    // Filter by selected keyword
+    if (selectedKeyword) {
+      items = items.filter(item => 
+        item.keywords && item.keywords.includes(selectedKeyword)
+      );
+    }
+
     setFilteredItems(items);
-  }, [selectedCategory, storeItems, searchQuery]);
+  }, [selectedCategory, storeItems, searchQuery, selectedKeyword]);
+
+  // Extract unique keywords for current category
+  const categoryKeywords = React.useMemo(() => {
+    let items = storeItems;
+    
+    if (selectedCategory !== 'all') {
+      items = items.filter(item => 
+        item.category_slugs && item.category_slugs.includes(selectedCategory)
+      );
+    }
+    
+    const keywordCounts = {};
+    items.forEach(item => {
+      if (item.keywords && Array.isArray(item.keywords)) {
+        item.keywords.forEach(keyword => {
+          keywordCounts[keyword] = (keywordCounts[keyword] || 0) + 1;
+        });
+      }
+    });
+    
+    return Object.entries(keywordCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 25)
+      .map(([keyword]) => keyword);
+  }, [storeItems, selectedCategory]);
 
   const handlePurchase = async (item) => {
     if (!user) {
@@ -394,7 +427,10 @@ export default function Store() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setSelectedKeyword(null);
+                  }}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   placeholder={language === 'fr' ? 'Rechercher un visuel...' : 'Search for a visual...'}
@@ -586,6 +622,33 @@ export default function Store() {
             }
           `}</style>
         </div>
+
+        {/* Category Keywords Tags */}
+        {categoryKeywords.length > 0 && (
+          <div className="px-6 mb-8">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-wrap gap-2">
+                {categoryKeywords.map((keyword) => (
+                  <button
+                    key={keyword}
+                    onClick={() => {
+                      setSelectedKeyword(selectedKeyword === keyword ? null : keyword);
+                      setSearchQuery('');
+                    }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                      selectedKeyword === keyword
+                        ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30"
+                        : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10 hover:border-violet-500/30"
+                    )}
+                  >
+                    {keyword}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Masonry Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
