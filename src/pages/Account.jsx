@@ -473,11 +473,21 @@ export default function Account() {
                       href={createPageUrl('MyVisuals')}
                       className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-violet-500/50 transition-all group"
                     >
-                      <img 
-                        src={visual.image_url} 
-                        alt={visual.title || 'Visual'} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
+                        <video 
+                          src={visual.video_url || visual.image_url}
+                          muted
+                          loop
+                          autoPlay
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <img 
+                          src={visual.image_url} 
+                          alt={visual.title || 'Visual'} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      )}
                     </a>
                   ))}
                 </div>
