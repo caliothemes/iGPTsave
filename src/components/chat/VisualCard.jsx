@@ -114,12 +114,17 @@ export default function VisualCard({
           {onToggleFavorite && (
             <button
               onClick={() => onToggleFavorite(visual)}
-              className="hover:scale-110 transition-all"
+              className={cn(
+                "p-2.5 rounded-xl backdrop-blur-sm transition-all shadow-lg border",
+                visual.is_favorite 
+                  ? "bg-gradient-to-br from-red-600/90 to-rose-600/90 hover:from-red-500 hover:to-rose-500 shadow-red-500/30 border-red-400/30"
+                  : "bg-gradient-to-br from-gray-600/90 to-gray-700/90 hover:from-gray-500 hover:to-gray-600 shadow-gray-500/30 border-gray-400/30"
+              )}
             >
               <Heart 
                 className={cn(
-                  "h-6 w-6 transition-all drop-shadow-lg",
-                  visual.is_favorite ? "fill-red-500 text-red-500" : "text-white/90"
+                  "h-5 w-5 transition-all",
+                  visual.is_favorite ? "fill-white text-white" : "text-white"
                 )} 
               />
             </button>
