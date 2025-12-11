@@ -26,35 +26,63 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         duration: duration
       });
 
-      if (!response.data || !response.data.task_id) {
-        throw new Error('No task_id returned from server');
+      console.log('Generate video response:', response);
+
+      if (!response.data || response.data.error) {
+        throw new Error(response.data?.error || 'Erreur serveur');
+      }
+
+      if (!response.data.task_id) {
+        throw new Error('Pas de task_id retourné');
       }
 
       const { task_id } = response.data;
+      console.log('Task ID:', task_id);
 
       // Poll for status
       const pollInterval = setInterval(async () => {
-        const statusResponse = await base44.functions.invoke('checkVideoStatus', { task_id });
-        const { status, progress: currentProgress, video_url } = statusResponse.data;
+        try {
+          const statusResponse = await base44.functions.invoke('checkVideoStatus', { task_id });
+          console.log('Status response:', statusResponse);
 
-        setProgress(currentProgress || 0);
+          if (!statusResponse.data) {
+            clearInterval(pollInterval);
+            setIsGenerating(false);
+            alert(language === 'fr' ? 'Erreur: pas de données reçues' : 'Error: no data received');
+            return;
+          }
 
-        if (status === 'SUCCEEDED' && video_url) {
+          const { status, progress: currentProgress, video_url, failure } = statusResponse.data;
+
+          setProgress(currentProgress || 0);
+
+          if (status === 'SUCCEEDED' && video_url) {
+            clearInterval(pollInterval);
+            setIsGenerating(false);
+            onVideoGenerated(video_url, prompt);
+            onClose();
+          } else if (status === 'FAILED') {
+            clearInterval(pollInterval);
+            setIsGenerating(false);
+            alert(language === 'fr' 
+              ? `Erreur: ${failure || 'Échec de génération'}` 
+              : `Error: ${failure || 'Generation failed'}`);
+          }
+        } catch (pollError) {
+          console.error('Poll error:', pollError);
           clearInterval(pollInterval);
           setIsGenerating(false);
-          onVideoGenerated(video_url, prompt);
-          onClose();
-        } else if (status === 'FAILED') {
-          clearInterval(pollInterval);
-          setIsGenerating(false);
-          alert(language === 'fr' ? 'Erreur lors de la génération' : 'Generation failed');
+          alert(language === 'fr' ? `Erreur de vérification: ${pollError.message}` : `Status check error: ${pollError.message}`);
         }
       }, 3000);
 
     } catch (error) {
-      console.error(error);
+      console.error('Generation error:', error);
       setIsGenerating(false);
-      alert(language === 'fr' ? 'Erreur lors de la génération' : 'Generation failed');
+      const errorMsg = error.message || error.toString();
+      alert(language === 'fr' 
+        ? `Erreur lors de la génération: ${errorMsg}` 
+        : `Generation error: ${errorMsg}`);
     }
   };
 
