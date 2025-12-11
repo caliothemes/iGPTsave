@@ -30,20 +30,20 @@ export default function AdminStoreCategories() {
       const cats = await base44.entities.StoreCategory.list('order');
       setCategories(cats);
 
-      // Load latest visual for each category
+      // Load ALL active store items once
+      const allItems = await base44.entities.StoreItem.filter({ is_active: true }, '-created_date');
+
+      // Find latest visual for each category by filtering client-side
       const previews = {};
       for (const cat of cats) {
-        try {
-          const items = await base44.entities.StoreItem.filter(
-            { category_slugs: cat.slug, is_active: true },
-            '-created_date',
-            1
-          );
-          if (items.length > 0) {
-            previews[cat.slug] = items[0].image_url;
-          }
-        } catch (e) {
-          console.error('Error loading preview for', cat.slug, e);
+        // Find items that contain this category slug in their category_slugs array
+        const categoryItems = allItems.filter(item => 
+          item.category_slugs && item.category_slugs.includes(cat.slug)
+        );
+        
+        if (categoryItems.length > 0) {
+          // Items are already sorted by -created_date, so first is most recent
+          previews[cat.slug] = categoryItems[0].image_url;
         }
       }
       setCategoryPreviews(previews);
