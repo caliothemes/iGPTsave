@@ -359,7 +359,9 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
         className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 border-2 border-violet-500/30 hover:border-violet-500/50 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
       >
         <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-          <ShoppingBag className="h-5 w-5 text-white" />
+          <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">

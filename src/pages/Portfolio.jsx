@@ -262,7 +262,12 @@ export default function Portfolio() {
             <div className="bg-[#0a0a0f]/90 backdrop-blur-sm border-t border-white/5 py-4">
               <div className="flex items-center justify-center">
                 <p className="text-white/40 text-xs">
-                <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors">iGPT Store</a>
+                  <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors inline-flex items-center gap-1">
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    iGPT Store
+                  </a>
                 {' • '}
                 <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
                 {' • '}

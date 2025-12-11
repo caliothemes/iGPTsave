@@ -1181,7 +1181,10 @@ export default function Home() {
 
             {/* Footer Links */}
             <div className="flex items-center justify-center gap-4 mt-3 text-xs text-white/40 bg-[#0a0a0f]/90 backdrop-blur-sm -mx-4 px-4 py-3 rounded-lg border-t border-white/5">
-              <Link to={createPageUrl('Store')} className="hover:text-white/60 transition-colors">
+              <Link to={createPageUrl('Store')} className="hover:text-white/60 transition-colors flex items-center gap-1">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
                 iGPT Store
               </Link>
               <span>•</span>
