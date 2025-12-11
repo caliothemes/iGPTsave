@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 export default function AdminStoreCategories() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [categoryPreviews, setCategoryPreviews] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
@@ -28,6 +29,24 @@ export default function AdminStoreCategories() {
     try {
       const cats = await base44.entities.StoreCategory.list('order');
       setCategories(cats);
+
+      // Load latest visual for each category
+      const previews = {};
+      for (const cat of cats) {
+        try {
+          const items = await base44.entities.StoreItem.filter(
+            { category_slugs: cat.slug, is_active: true },
+            '-created_date',
+            1
+          );
+          if (items.length > 0) {
+            previews[cat.slug] = items[0].image_url;
+          }
+        } catch (e) {
+          console.error('Error loading preview for', cat.slug, e);
+        }
+      }
+      setCategoryPreviews(previews);
     } catch (e) {
       console.error(e);
     }
@@ -109,6 +128,7 @@ export default function AdminStoreCategories() {
           <table className="w-full">
             <thead className="bg-white/5">
               <tr>
+                <th className="px-4 py-3 text-left text-white/60 text-sm">Aperçu</th>
                 <th className="px-4 py-3 text-left text-white/60 text-sm">Nom FR</th>
                 <th className="px-4 py-3 text-left text-white/60 text-sm">Nom EN</th>
                 <th className="px-4 py-3 text-left text-white/60 text-sm">Slug</th>
@@ -120,6 +140,19 @@ export default function AdminStoreCategories() {
             <tbody>
               {categories.map(cat => (
                 <tr key={cat.id} className="border-t border-white/5">
+                  <td className="px-4 py-3">
+                    {categoryPreviews[cat.slug] ? (
+                      <img 
+                        src={categoryPreviews[cat.slug]} 
+                        alt={cat.name_fr}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-white/5 rounded-lg flex items-center justify-center">
+                        <span className="text-white/30 text-xs">Vide</span>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-white">{cat.name_fr}</td>
                   <td className="px-4 py-3 text-white/60">{cat.name_en || '-'}</td>
                   <td className="px-4 py-3 text-white/60 font-mono text-xs">{cat.slug}</td>
