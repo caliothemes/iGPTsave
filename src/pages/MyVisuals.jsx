@@ -125,6 +125,7 @@ export default function MyVisuals() {
   const mainCategories = [
     { id: 'logo_picto', name: language === 'fr' ? 'Logo Pictogramme' : 'Logo Pictogram' },
     { id: 'logo_complet', name: language === 'fr' ? 'Logo complet' : 'Full Logo' },
+    { id: 'design_3d', name: 'Design 3D' },
     { id: 'image', name: language === 'fr' ? 'Image réaliste' : 'Realistic Image' },
     { id: 'print', name: language === 'fr' ? 'Design Print' : 'Print Design' },
     { id: 'social', name: language === 'fr' ? 'Réseaux sociaux' : 'Social Media' },
