@@ -127,7 +127,11 @@ export default function Sidebar({
                       onClick={() => onSelectVisual(visual)}
                       className="aspect-square rounded overflow-hidden cursor-pointer border border-white/10 hover:border-violet-500/50 transition-colors w-[110px] h-[110px]"
                     >
-                      <img src={visual.image_url} alt={visual.title} className="w-full h-full object-cover" />
+                      {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
+                        <video src={visual.video_url || visual.image_url} muted loop autoPlay className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={visual.image_url} alt={visual.title} className="w-full h-full object-cover" />
+                      )}
                     </div>
                   ))}
                 </div>

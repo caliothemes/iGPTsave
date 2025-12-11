@@ -178,8 +178,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
             <p className="text-white/40 text-xs mt-2 text-center">
               {duration === 5 
-                ? (language === 'fr' ? '15 crédits' : '15 credits') 
-                : (language === 'fr' ? '25 crédits' : '25 credits')}
+                ? (language === 'fr' ? '20 crédits' : '20 credits') 
+                : (language === 'fr' ? '35 crédits' : '35 credits')}
             </p>
           </div>
 
@@ -226,6 +226,38 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 </>
               )}
             </Button>
+          </div>
+
+          {/* RunwayML Footer */}
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg className="h-8 w-8" viewBox="0 0 40 40" fill="none">
+                  <rect width="40" height="40" rx="8" fill="url(#gradient)" />
+                  <path d="M12 10h4l8 20h-4l-8-20zm12 0h4v20h-4V10z" fill="white" />
+                  <defs>
+                    <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#8B5CF6" />
+                      <stop offset="1" stopColor="#6366F1" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div>
+                  <p className="text-white/90 text-xs font-medium">Powered by RunwayML</p>
+                  <p className="text-white/50 text-[10px]">
+                    {language === 'fr' ? 'Vidéo HD • Gen-3 Alpha Turbo' : 'HD Video • Gen-3 Alpha Turbo'}
+                  </p>
+                </div>
+              </div>
+              <a 
+                href="https://runwayml.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-violet-400 hover:text-violet-300 text-xs transition-colors"
+              >
+                runwayml.com →
+              </a>
+            </div>
           </div>
         </motion.div>
       </motion.div>

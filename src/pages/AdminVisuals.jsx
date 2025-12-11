@@ -233,7 +233,16 @@ export default function AdminVisuals() {
               className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all"
             >
               <div className="relative" style={{ aspectRatio }}>
-                {visual.image_url ? (
+                {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
+                  <video 
+                    src={visual.video_url || visual.image_url}
+                    muted
+                    loop
+                    autoPlay
+                    className="block"
+                    style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : visual.image_url ? (
                   <img 
                     src={visual.image_url} 
                     alt={visual.title}
