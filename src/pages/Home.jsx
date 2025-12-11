@@ -739,7 +739,7 @@ export default function Home() {
                 {getHomeTitle()}
               </span>
             </h1>
-            <p className="text-base md:text-lg mb-12">
+            <p className="text-base md:text-lg mb-12 text-center">
               <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent font-medium">
                 {getHomeSubtitle()}
               </span>
@@ -1181,7 +1181,7 @@ export default function Home() {
             </div>
 
             {/* Footer Links */}
-            <div className="-mx-4">
+            <div className="-mx-4 mt-6 md:mt-3">
               <Footer />
             </div>
           </div>
