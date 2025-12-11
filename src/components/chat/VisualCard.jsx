@@ -93,23 +93,6 @@ export default function VisualCard({
         
         {/* Top Right Buttons */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 items-center">
-          {/* Animate Button */}
-          {onVideoGenerated && (
-            <button
-              onClick={() => setShowVideoModal(true)}
-              className="group relative p-2.5 rounded-xl bg-gradient-to-br from-pink-600/90 to-rose-600/90 backdrop-blur-sm hover:from-pink-500 hover:to-rose-500 transition-all shadow-lg shadow-pink-500/30 border border-pink-400/30"
-            >
-              <Video className="h-5 w-5 text-white" />
-              {/* Tooltip on hover */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900/95 backdrop-blur-sm border border-pink-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
-                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Animer ce visuel' : 'Animate this visual'}</p>
-                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Créer une vidéo animée' : 'Create animated video'}</p>
-                </div>
-              </div>
-            </button>
-          )}
-
           {/* Favorite Button */}
           {onToggleFavorite && (
             <button
@@ -142,6 +125,23 @@ export default function VisualCard({
                 <div className="bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
                   <p className="text-white text-xs font-medium">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</p>
                   <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Fond, texture, texte...' : 'Background, texture, text...'}</p>
+                </div>
+              </div>
+            </button>
+          )}
+
+          {/* Animate Button */}
+          {onVideoGenerated && (
+            <button
+              onClick={() => setShowVideoModal(true)}
+              className="group relative p-2.5 rounded-xl bg-gradient-to-br from-pink-600/90 to-rose-600/90 backdrop-blur-sm hover:from-pink-500 hover:to-rose-500 transition-all shadow-lg shadow-pink-500/30 border border-pink-400/30"
+            >
+              <Video className="h-5 w-5 text-white" />
+              {/* Tooltip on hover */}
+              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="bg-gray-900/95 backdrop-blur-sm border border-pink-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
+                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Animer ce visuel' : 'Animate this visual'}</p>
+                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Créer une vidéo animée' : 'Create animated video'}</p>
                 </div>
               </div>
             </button>

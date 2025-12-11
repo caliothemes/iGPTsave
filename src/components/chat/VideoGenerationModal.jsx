@@ -26,6 +26,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         duration: duration
       });
 
+      if (!response.data || !response.data.task_id) {
+        throw new Error('No task_id returned from server');
+      }
+
       const { task_id } = response.data;
 
       // Poll for status
