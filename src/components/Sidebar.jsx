@@ -91,7 +91,9 @@ export default function Sidebar({
                               <Image className="h-4 w-4" />
                             </a>
                             <a href={createPageUrl('Store')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors" title="iGPT Store">
-                              <ShoppingBag className="h-4 w-4" />
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                              </svg>
                             </a>
                             <a href={createPageUrl('Account')} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors" title={t('login')}>
                               <User className="h-4 w-4" />
