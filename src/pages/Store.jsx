@@ -444,7 +444,7 @@ export default function Store() {
         </div>
 
         {/* Categories Slider - 4 Cards Centered */}
-        <div className="mb-8 w-full">
+        <div className="mb-16 w-full">
           <div className="max-w-4xl mx-auto relative px-6">
             <div 
               ref={(el) => {
