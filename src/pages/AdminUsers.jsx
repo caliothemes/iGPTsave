@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, Edit2, Check, X, Crown, Zap } from 'lucide-react';
+import { Loader2, Search, Edit2, Check, X, Crown, Zap, Eye } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 
@@ -148,7 +148,7 @@ export default function AdminUsers() {
                   const isEditing = editingUser === user.email;
 
                   return (
-                    <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => window.location.href = createPageUrl('AdminUserDetail') + '?userId=' + user.id}>
                       <td className="p-4">
                         <div>
                           <p className="text-white font-medium">{user.full_name || 'Sans nom'}</p>
@@ -182,7 +182,7 @@ export default function AdminUsers() {
                           <span className="text-white">{credits?.paid_credits || 0}</span>
                         )}
                       </td>
-                      <td className="p-4">
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         {isEditing ? (
                           <div className="flex gap-2">
                             <Button
@@ -203,14 +203,29 @@ export default function AdminUsers() {
                             </Button>
                           </div>
                         ) : (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => handleEditUser(user)}
-                            className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => window.location.href = createPageUrl('AdminUserDetail') + '?userId=' + user.id}
+                              className="h-8 w-8 text-violet-400 hover:text-violet-300 hover:bg-violet-500/20"
+                              title="Voir détails"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditUser(user);
+                              }}
+                              className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
+                              title="Modifier crédits"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         )}
                       </td>
                     </tr>
