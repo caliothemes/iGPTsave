@@ -11,6 +11,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [duration, setDuration] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [autoPrompt, setAutoPrompt] = useState(true);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -38,6 +39,11 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
       const { task_id } = response.data;
       console.log('Task ID:', task_id);
+      
+      // Use auto-generated prompt if enabled
+      const finalPrompt = autoPrompt 
+        ? 'Subtle cinematic motion, elegant camera movement, smooth animation, professional quality, gentle transitions'
+        : prompt.trim();
 
       // Poll for status
       const pollInterval = setInterval(async () => {
@@ -59,7 +65,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           if (status === 'SUCCEEDED' && video_url) {
             clearInterval(pollInterval);
             setIsGenerating(false);
-            onVideoGenerated(video_url, prompt);
+            onVideoGenerated(video_url, finalPrompt);
             onClose();
           } else if (status === 'FAILED') {
             clearInterval(pollInterval);
@@ -128,24 +134,52 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             />
           </div>
 
-          {/* Prompt Input */}
+          {/* Auto Prompt Toggle */}
           <div className="mb-4">
-            <label className="text-white/80 text-sm mb-2 block">
-              {language === 'fr' 
-                ? 'Comment voulez-vous animer ce visuel ?' 
-                : 'How do you want to animate this visual?'}
-            </label>
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+            <button
+              onClick={() => setAutoPrompt(!autoPrompt)}
               disabled={isGenerating}
-              placeholder={language === 'fr' 
-                ? 'Ex: Zoom lent vers le logo, rotation douce, mouvement de caméra...' 
-                : 'Ex: Slow zoom on logo, gentle rotation, camera movement...'}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-violet-500/50 transition-all resize-none disabled:opacity-50"
-              rows={4}
-            />
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:border-violet-500/30 transition-all disabled:opacity-50"
+            >
+              <div className={`flex-shrink-0 w-11 h-6 rounded-full transition-all ${autoPrompt ? 'bg-violet-600' : 'bg-white/20'}`}>
+                <div className={`w-5 h-5 mt-0.5 rounded-full bg-white transition-transform ${autoPrompt ? 'translate-x-5.5 ml-0.5' : 'translate-x-0.5'}`} />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-white text-sm font-medium">
+                  {language === 'fr' ? 'Laissez iGPT gérer l\'animation' : 'Let iGPT handle the animation'}
+                </p>
+                <p className="text-white/50 text-xs">
+                  {language === 'fr' 
+                    ? 'iGPT choisira le meilleur mouvement cinématique' 
+                    : 'iGPT will choose the best cinematic motion'}
+                </p>
+              </div>
+              <svg className="h-5 w-5 text-violet-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </button>
           </div>
+
+          {/* Prompt Input - Only show if auto prompt is disabled */}
+          {!autoPrompt && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' 
+                  ? 'Comment voulez-vous animer ce visuel ?' 
+                  : 'How do you want to animate this visual?'}
+              </label>
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                disabled={isGenerating}
+                placeholder={language === 'fr' 
+                  ? 'Ex: Zoom lent vers le logo, rotation douce, mouvement de caméra...' 
+                  : 'Ex: Slow zoom on logo, gentle rotation, camera movement...'}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-violet-500/50 transition-all resize-none disabled:opacity-50"
+                rows={4}
+              />
+            </div>
+          )}
 
           {/* Duration Selector */}
           <div className="mb-6">
@@ -216,7 +250,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </Button>
             <Button
               onClick={handleGenerate}
-              disabled={!prompt.trim() || isGenerating}
+              disabled={(!autoPrompt && !prompt.trim()) || isGenerating}
               className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
             >
               {isGenerating ? (
