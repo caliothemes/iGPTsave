@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
 import { toast, Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import Footer from '@/components/Footer';
 
 // Format Badge Component
 function FormatBadge({ dimensions, language }) {
@@ -956,30 +957,9 @@ export default function Store() {
         {/* Footer */}
         <div className="fixed bottom-0 left-0 right-0 z-40">
           <div className={cn("transition-all duration-300", sidebarOpen && "md:ml-64")}>
-            <div className="bg-[#0a0a0f]/90 backdrop-blur-sm border-t border-white/5 py-4">
-              <div className="flex items-center justify-center">
-                <p className="text-white/40 text-xs">
-                  <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors text-violet-400 inline-flex items-center gap-1">
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    iGPT Store
-                  </a>
-                {' • '}
-                <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">
-                  {language === 'fr' ? 'Tarifs' : 'Pricing'}
-                </a>
-                {' • '}
-                <a href={createPageUrl('Portfolio')} className="hover:text-violet-400 transition-colors">Portfolio</a>
-                {' • '}
-                <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">
-                  {language === 'fr' ? 'Mentions légales' : 'Legal'}
-                </a>
-              </p>
-              </div>
-              </div>
-              </div>
-              </div>
+            <Footer />
+          </div>
+        </div>
       </div>
     </div>
   );

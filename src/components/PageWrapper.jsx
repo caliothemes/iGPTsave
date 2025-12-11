@@ -7,6 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import GlobalHeader from '@/components/GlobalHeader';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
+import Footer from '@/components/Footer';
 
 export default function PageWrapper({ children, requireAuth = false, fullWidth = false }) {
   const { t } = useLanguage();
@@ -103,20 +104,7 @@ export default function PageWrapper({ children, requireAuth = false, fullWidth =
           {/* Footer */}
           <div className="mt-auto px-4">
             <div className={cn(fullWidth ? "w-full" : "max-w-4xl mx-auto")}>
-              <div className="flex items-center justify-center gap-4 text-xs text-white/40 bg-[#0a0a0f]/90 backdrop-blur-sm px-4 py-3 rounded-lg border-t border-white/5">
-                <a href={createPageUrl('Store')} className="hover:text-violet-400 transition-colors inline-flex items-center gap-1">
-                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  iGPT Store
-                </a>
-                <span>•</span>
-                <a href={createPageUrl('Pricing')} className="hover:text-violet-400 transition-colors">{t('pricing')}</a>
-                <span>•</span>
-                <a href={createPageUrl('Portfolio')} className="hover:text-violet-400 transition-colors">Portfolio</a>
-                <span>•</span>
-                <a href={createPageUrl('Legal')} className="hover:text-violet-400 transition-colors">{t('legal')}</a>
-              </div>
+              <Footer />
             </div>
           </div>
         </main>

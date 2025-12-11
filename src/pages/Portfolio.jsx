@@ -8,6 +8,7 @@ import { useLanguage } from '@/components/LanguageContext';
 import { createPageUrl } from '@/utils';
 import { cn } from "@/lib/utils";
 import Masonry from 'react-masonry-css';
+import Footer from '@/components/Footer';
 
 export default function Portfolio() {
   const { language, t } = useLanguage();
