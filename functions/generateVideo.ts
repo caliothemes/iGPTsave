@@ -50,14 +50,13 @@ Deno.serve(async (req) => {
     
     console.log('Request body prepared (image converted to base64)');
 
-    // Start the video generation task - use dev API as per Runway docs
-    const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
+    // Start the video generation task - use production API
+    const createResponse = await fetch('https://api.runwayml.com/v1/image_to_video', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${RUNWAY_API_KEY}`,
         'Content-Type': 'application/json',
-        'X-Runway-Version': '2024-11-06',
-        'Accept': 'application/json'
+        'X-Runway-Version': '2024-11-06'
       },
       body: JSON.stringify(requestBody)
     });
