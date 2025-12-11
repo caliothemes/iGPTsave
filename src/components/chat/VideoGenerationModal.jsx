@@ -14,7 +14,12 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [autoPrompt, setAutoPrompt] = useState(true);
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+    // Define final prompt first
+    const finalPrompt = autoPrompt 
+      ? 'Subtle cinematic motion, elegant camera movement, smooth animation, professional quality, gentle transitions'
+      : prompt.trim();
+    
+    if (!finalPrompt) return;
 
     setIsGenerating(true);
     setProgress(0);
@@ -23,7 +28,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
       // Start video generation
       const response = await base44.functions.invoke('generateVideo', {
         image_url: visual.image_url,
-        prompt: prompt.trim(),
+        prompt: finalPrompt,
         duration: duration
       });
 
@@ -39,11 +44,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
       const { task_id } = response.data;
       console.log('Task ID:', task_id);
-      
-      // Use auto-generated prompt if enabled
-      const finalPrompt = autoPrompt 
-        ? 'Subtle cinematic motion, elegant camera movement, smooth animation, professional quality, gentle transitions'
-        : prompt.trim();
 
       // Poll for status
       const pollInterval = setInterval(async () => {
@@ -142,7 +142,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:border-violet-500/30 transition-all disabled:opacity-50"
             >
               <div className={`flex-shrink-0 w-11 h-6 rounded-full transition-all ${autoPrompt ? 'bg-violet-600' : 'bg-white/20'}`}>
-                <div className={`w-5 h-5 mt-0.5 rounded-full bg-white transition-transform ${autoPrompt ? 'translate-x-5.5 ml-0.5' : 'translate-x-0.5'}`} />
+                <div className={`w-5 h-5 mt-0.5 rounded-full bg-white transition-transform duration-200 ${autoPrompt ? 'translate-x-5 ml-0.5' : 'translate-x-0.5'}`} />
               </div>
               <div className="flex-1 text-left">
                 <p className="text-white text-sm font-medium">
