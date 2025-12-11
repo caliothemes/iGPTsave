@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import { 
-  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles
+  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles, Box
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -23,6 +23,20 @@ const CATEGORIES = [
     hasSubmenu: false,
     prompt: { fr: 'Crée un logo complet', en: 'Create a complete logo' },
     defaultExpertMode: true
+  },
+  {
+    id: 'design_3d',
+    icon: Box,
+    name: { fr: 'Design 3D', en: '3D Design' },
+    description: { fr: 'Designs avec textes en 3D volumétriques', en: 'Designs with volumetric 3D texts' },
+    hasSubmenu: true,
+    defaultExpertMode: false,
+    submenu: [
+      { id: 'design_3d_square', name: { fr: 'Carré 1:1', en: 'Square 1:1' }, prompt: { fr: 'Crée un design 3D pour ', en: 'Create a 3D design for ' }, dimensions: '1080x1080' },
+      { id: 'design_3d_story', name: { fr: 'Story 9:16', en: 'Story 9:16' }, prompt: { fr: 'Crée un design 3D pour ', en: 'Create a 3D design for ' }, dimensions: '1080x1920' },
+      { id: 'design_3d_portrait', name: { fr: 'Portrait 3:4', en: 'Portrait 3:4' }, prompt: { fr: 'Crée un design 3D pour ', en: 'Create a 3D design for ' }, dimensions: '1080x1350' },
+      { id: 'design_3d_landscape', name: { fr: 'Paysage 16:9', en: 'Landscape 16:9' }, prompt: { fr: 'Crée un design 3D pour ', en: 'Create a 3D design for ' }, dimensions: '1920x1080' },
+    ]
   },
   {
     id: 'image',
