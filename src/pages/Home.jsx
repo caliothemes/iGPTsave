@@ -1116,19 +1116,25 @@ export default function Home() {
                         );
                       })}
                     </div>
-                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuSeparator className="bg-white/10 my-2" />
                     <Link 
                       to={createPageUrl('Store')}
-                      className="px-3 py-2.5 flex items-center gap-3 hover:bg-violet-500/20 transition-colors"
+                      className="mx-2 mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
                     >
-                      <div className="p-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600">
-                        <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
+                        <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <span className="text-violet-300 text-xs font-medium">iGPT Store</span>
+                        <div className="text-white text-sm font-bold">iGPT Store</div>
+                        <div className="text-white/80 text-xs">
+                          {language === 'fr' ? 'Visuels prêts à l\'emploi' : 'Ready-to-use visuals'}
+                        </div>
                       </div>
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </Link>
                   </DropdownMenuContent>
                 </DropdownMenu>
