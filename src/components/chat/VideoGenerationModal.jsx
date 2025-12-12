@@ -29,7 +29,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
       const response = await base44.functions.invoke('generateVideo', {
         image_url: visual.image_url,
         prompt: finalPrompt,
-        duration: duration
+        duration: duration,
+        dimensions: visual.dimensions
       });
 
       console.log('Generate video response:', response);
