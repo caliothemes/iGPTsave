@@ -143,10 +143,15 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload, vid
             // Video: no format selection, direct download
             <>
               <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <p className="text-blue-200 text-sm">
+                <p className="text-blue-200 text-sm mb-2">
                   {language === 'fr' 
-                    ? 'La vidéo sera téléchargée dans son format original avec les dimensions du visuel source.'
-                    : 'The video will be downloaded in its original format with source visual dimensions.'}
+                    ? 'La vidéo sera téléchargée en format 16:9 (paysage).'
+                    : 'The video will be downloaded in 16:9 format (landscape).'}
+                </p>
+                <p className="text-blue-200/60 text-xs">
+                  {language === 'fr'
+                    ? 'Format HD optimisé pour tous les écrans et plateformes.'
+                    : 'HD format optimized for all screens and platforms.'}
                 </p>
               </div>
               <Button

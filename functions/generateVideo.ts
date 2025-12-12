@@ -46,37 +46,13 @@ Deno.serve(async (req) => {
     const base64Image = await imageUrlToBase64(image_url);
     console.log('Base64 image length:', base64Image.length);
 
-    // Detect aspect ratio from dimensions
-    let ratio = '16:9'; // default
-    if (dimensions) {
-      const [w, h] = dimensions.split('x').map(Number);
-      if (w && h) {
-        const aspectRatio = w / h;
-        // Determine closest supported ratio
-        if (Math.abs(aspectRatio - 16/9) < 0.1) {
-          ratio = '16:9';
-        } else if (Math.abs(aspectRatio - 9/16) < 0.1) {
-          ratio = '9:16';
-        } else if (Math.abs(aspectRatio - 1) < 0.1) {
-          ratio = '1:1';
-        } else if (aspectRatio > 1.5) {
-          ratio = '16:9'; // wide
-        } else if (aspectRatio < 0.7) {
-          ratio = '9:16'; // portrait
-        } else {
-          ratio = '1:1'; // square-ish
-        }
-      }
-    }
-    console.log('Detected aspect ratio:', ratio, 'from dimensions:', dimensions);
-
     // Build request body for Runway API with base64 image
+    // Note: Runway only supports 16:9 format
     const requestBody = {
       promptImage: base64Image,
       promptText: prompt || 'Subtle elegant motion, cinematic quality',
       model: 'gen3a_turbo',
-      duration: duration || 5,
-      ratio: ratio
+      duration: duration || 5
     };
     
     console.log('Request body prepared (image converted to base64)');
