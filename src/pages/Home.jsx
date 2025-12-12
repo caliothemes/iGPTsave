@@ -44,6 +44,7 @@ export default function Home() {
   const [conversations, setConversations] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [sessionVisuals, setSessionVisuals] = useState([]);
+  const [totalVisualsCount, setTotalVisualsCount] = useState(0);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -129,6 +130,10 @@ export default function Home() {
           
           const visuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10);
           setSessionVisuals(visuals);
+
+          // Get total count of all visuals
+          const allVisuals = await base44.entities.Visual.filter({ user_email: currentUser.email });
+          setTotalVisualsCount(allVisuals.length);
 
           // Load prompt templates
           const templates = await base44.entities.PromptTemplate.filter({ is_active: true });
@@ -809,7 +814,7 @@ export default function Home() {
             <CategorySelector 
               onSelect={handleCategorySelect}
               selectedCategory={selectedCategory}
-              visualsCount={sessionVisuals.length}
+              visualsCount={totalVisualsCount}
             />
           </div>
         ) : (
@@ -1194,9 +1199,9 @@ export default function Home() {
                           <span className="text-white text-sm font-bold">
                             {language === 'fr' ? 'Mes visuels' : 'My visuals'}
                           </span>
-                          {sessionVisuals.length > 0 && (
+                          {totalVisualsCount > 0 && (
                             <span className="px-2 py-0.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold">
-                              {sessionVisuals.length}
+                              {totalVisualsCount}
                             </span>
                           )}
                         </div>
