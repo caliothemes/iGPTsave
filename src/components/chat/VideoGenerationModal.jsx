@@ -16,7 +16,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const handleGenerate = async () => {
     // Define final prompt first
     const finalPrompt = autoPrompt 
-      ? 'Subtle cinematic motion, elegant camera movement, smooth animation, professional quality, gentle transitions'
+      ? 'Dynamic cinematic camera movement with slow zoom in, elegant smooth panning motion, professional color grading with rich contrast, dramatic lighting transitions, subtle depth of field effects, film-like motion blur, atmospheric glow and bokeh, sophisticated parallax effect, seamless fluid animation, premium production quality'
       : prompt.trim();
     
     if (!finalPrompt) return;
@@ -163,11 +163,16 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           {/* Prompt Input - Only show if auto prompt is disabled */}
           {!autoPrompt && (
             <div className="mb-4">
-              <label className="text-white/80 text-sm mb-2 block">
+              <label className="text-white/80 text-sm mb-1 block">
                 {language === 'fr' 
                   ? 'Comment voulez-vous animer ce visuel ?' 
                   : 'How do you want to animate this visual?'}
               </label>
+              <p className="text-white/40 text-xs mb-2">
+                {language === 'fr'
+                  ? '✨ Soyez détaillé et précis : décrivez le mouvement, la caméra, l\'ambiance, les effets pour des résultats époustouflants.'
+                  : '✨ Be detailed and precise: describe movement, camera, atmosphere, effects for stunning results.'}
+              </p>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -178,6 +183,49 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-violet-500/50 transition-all resize-none disabled:opacity-50"
                 rows={4}
               />
+
+              {/* Example Prompts */}
+              <div className="mt-2 space-y-1.5">
+                <p className="text-white/40 text-[10px] mb-1">
+                  {language === 'fr' ? 'Exemples de prompts :' : 'Prompt examples:'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setPrompt(language === 'fr' 
+                    ? 'Zoom cinématographique lent vers le centre, mouvement de caméra fluide, éclairage dramatique, effet bokeh subtil, transitions douces'
+                    : 'Slow cinematic zoom to center, smooth camera movement, dramatic lighting, subtle bokeh effect, soft transitions')}
+                  disabled={isGenerating}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
+                >
+                  {language === 'fr' 
+                    ? '📸 Zoom cinématographique lent vers le centre, mouvement de caméra fluide...'
+                    : '📸 Slow cinematic zoom to center, smooth camera movement...'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrompt(language === 'fr'
+                    ? 'Rotation douce dans le sens horaire, parallaxe sur les éléments, profondeur de champ progressive, lumières scintillantes, ambiance mystérieuse'
+                    : 'Gentle clockwise rotation, parallax on elements, progressive depth of field, twinkling lights, mysterious atmosphere')}
+                  disabled={isGenerating}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
+                >
+                  {language === 'fr'
+                    ? '🔄 Rotation douce dans le sens horaire, parallaxe sur les éléments...'
+                    : '🔄 Gentle clockwise rotation, parallax on elements...'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrompt(language === 'fr'
+                    ? 'Panoramique horizontal fluide de gauche à droite, flou de mouvement élégant, étalonnage des couleurs cinématique, effets de lumière dynamiques'
+                    : 'Smooth horizontal pan from left to right, elegant motion blur, cinematic color grading, dynamic light effects')}
+                  disabled={isGenerating}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
+                >
+                  {language === 'fr'
+                    ? '↔️ Panoramique horizontal fluide de gauche à droite, flou de mouvement...'
+                    : '↔️ Smooth horizontal pan from left to right, elegant motion blur...'}
+                </button>
+              </div>
             </div>
           )}
 
