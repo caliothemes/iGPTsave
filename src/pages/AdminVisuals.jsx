@@ -117,6 +117,88 @@ export default function AdminVisuals() {
     setStoreItems(fetchedStoreItems);
   };
 
+  const downloadImage = async (url, visual) => {
+    try {
+      // Create image element and wait for it to fully load
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          // Ensure dimensions are loaded
+          if (img.naturalWidth && img.naturalHeight) {
+            resolve();
+          } else {
+            reject(new Error('Image dimensions not available'));
+          }
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+
+      // Parse target dimensions from visual
+      const targetDimensions = visual.dimensions || '1080x1080';
+      const [targetWidth, targetHeight] = targetDimensions.split('x').map(n => parseInt(n));
+      
+      // Create canvas with target dimensions (not natural)
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Calculate intelligent crop (center crop from source image)
+      const sourceWidth = img.naturalWidth || img.width;
+      const sourceHeight = img.naturalHeight || img.height;
+      const targetRatio = targetWidth / targetHeight;
+      const sourceRatio = sourceWidth / sourceHeight;
+
+      let sx, sy, sw, sh;
+      
+      if (Math.abs(targetRatio - sourceRatio) < 0.01) {
+        // Same ratio, no crop needed
+        sx = 0;
+        sy = 0;
+        sw = sourceWidth;
+        sh = sourceHeight;
+      } else if (targetRatio > sourceRatio) {
+        // Target is wider (16:9 from square)
+        sw = sourceWidth;
+        sh = sourceWidth / targetRatio;
+        sx = 0;
+        sy = (sourceHeight - sh) / 2; // Center vertically
+      } else {
+        // Target is taller (9:16 from square)
+        sh = sourceHeight;
+        sw = sourceHeight * targetRatio;
+        sx = (sourceWidth - sw) / 2; // Center horizontally
+        sy = 0;
+      }
+
+      // Draw cropped image to target dimensions
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+
+      // Convert to selected format
+      const quality = 1;
+      const dataUrl = canvas.toDataURL('image/png', quality);
+
+      const link = document.createElement('a');
+      link.download = `${visual.title || 'visual'}.png`;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      // Fallback: direct download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${visual.title || 'visual'}.png`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const handleDownload = async (visual) => {
     setDownloadingId(visual.id);
     
@@ -138,81 +220,10 @@ export default function AdminVisuals() {
         return;
       }
 
-      // For images: load and crop
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      await new Promise((resolve, reject) => {
-        img.onload = () => {
-          if (img.naturalWidth && img.naturalHeight) {
-            resolve();
-          } else {
-            reject(new Error('Image dimensions not available'));
-          }
-        };
-        img.onerror = reject;
-        img.src = visual.image_url;
-      });
-
-      // Parse target dimensions
-      const targetDimensions = visual.dimensions || '1080x1080';
-      const [targetWidth, targetHeight] = targetDimensions.split('x').map(n => parseInt(n));
-      
-      // Create canvas with target dimensions
-      const canvas = document.createElement('canvas');
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      const ctx = canvas.getContext('2d');
-
-      // Calculate intelligent crop
-      const sourceWidth = img.naturalWidth || img.width;
-      const sourceHeight = img.naturalHeight || img.height;
-      const targetRatio = targetWidth / targetHeight;
-      const sourceRatio = sourceWidth / sourceHeight;
-
-      let sx, sy, sw, sh;
-      
-      if (Math.abs(targetRatio - sourceRatio) < 0.01) {
-        // Same ratio, no crop needed
-        sx = 0;
-        sy = 0;
-        sw = sourceWidth;
-        sh = sourceHeight;
-      } else if (targetRatio > sourceRatio) {
-        // Target is wider (16:9 from square)
-        sw = sourceWidth;
-        sh = sourceWidth / targetRatio;
-        sx = 0;
-        sy = (sourceHeight - sh) / 2;
-      } else {
-        // Target is taller (9:16 from square)
-        sh = sourceHeight;
-        sw = sourceHeight * targetRatio;
-        sx = (sourceWidth - sw) / 2;
-        sy = 0;
-      }
-
-      // Draw cropped image
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
-
-      // Download
-      const dataUrl = canvas.toDataURL('image/png', 1);
-      const link = document.createElement('a');
-      link.download = `${visual.title || 'visual'}.png`;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // For images: use same logic as client-side DownloadModal
+      await downloadImage(visual.image_url, visual);
     } catch (e) {
       console.error('Download error:', e);
-      // Fallback
-      const link = document.createElement('a');
-      link.href = visual.image_url;
-      link.download = `${visual.title || 'visual'}.png`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
     
     setDownloadingId(null);
