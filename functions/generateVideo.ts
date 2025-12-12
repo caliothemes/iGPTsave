@@ -24,8 +24,16 @@ async function imageUrlToBase64(url) {
   return `data:${contentType};base64,${base64}`;
 }
 
+// Helper to detect if text is in French
+function isFrench(text) {
+  const frenchIndicators = ['le ', 'la ', 'les ', 'un ', 'une ', 'des ', 'du ', 'de ', 'à ', 'au ', 'aux ', 'et ', 'ou ', 'où ', 'ce ', 'cette ', 'ces ', 'mon ', 'ma ', 'mes ', 'son ', 'sa ', 'ses ', 'dans ', 'pour ', 'par ', 'avec ', 'sans ', 'sur ', 'sous ', 'vers ', 'chez ', 'qui ', 'que ', 'quoi ', 'dont ', 'très ', 'plus ', 'moins ', 'bien ', 'aussi ', 'tout ', 'tous ', 'toute ', 'toutes ', 'même ', 'encore ', 'jamais ', 'toujours', 'être', 'avoir', 'faire', 'dire', 'aller', 'voir', 'savoir', 'pouvoir', 'falloir', 'vouloir', 'venir', 'prendre', 'donner', 'mettre'];
+  const lowerText = text.toLowerCase();
+  return frenchIndicators.some(indicator => lowerText.includes(indicator));
+}
+
 Deno.serve(async (req) => {
   try {
+    const base44 = createClientFromRequest(req);
     const { image_url, prompt, duration, dimensions } = await req.json();
 
     if (!image_url) {
@@ -41,6 +49,22 @@ Deno.serve(async (req) => {
     console.log('API Key present:', !!RUNWAY_API_KEY);
     console.log('API Key format check:', RUNWAY_API_KEY.startsWith('rw_'));
 
+    // Translate prompt to English if it's in French
+    let finalPrompt = prompt || 'Subtle elegant motion, cinematic quality';
+    if (isFrench(finalPrompt)) {
+      console.log('French prompt detected, translating to English...');
+      try {
+        const translation = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt: `Translate this video animation prompt from French to English. Keep it concise and focused on visual motion, camera movements, and cinematic effects. Only return the English translation, nothing else:\n\n${finalPrompt}`,
+          response_json_schema: null
+        });
+        finalPrompt = translation;
+        console.log('Translated prompt:', finalPrompt);
+      } catch (e) {
+        console.error('Translation failed, using original:', e);
+      }
+    }
+
     // Convert image URL to base64 data URI
     console.log('Converting image to base64...');
     const base64Image = await imageUrlToBase64(image_url);
@@ -50,7 +74,7 @@ Deno.serve(async (req) => {
     // Note: Runway only supports 16:9 format
     const requestBody = {
       promptImage: base64Image,
-      promptText: prompt || 'Subtle elegant motion, cinematic quality',
+      promptText: finalPrompt,
       model: 'gen3a_turbo',
       duration: duration || 5
     };
