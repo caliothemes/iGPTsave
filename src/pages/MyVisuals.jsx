@@ -10,6 +10,9 @@ import VisualCard from '@/components/chat/VisualCard';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 import { CATEGORIES } from '@/components/chat/CategorySelector';
+import VisualEditor from '@/components/chat/VisualEditor';
+import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
+import ADSModal from '@/components/chat/ADSModal';
 
 export default function MyVisuals() {
   const { language } = useLanguage();
@@ -26,6 +29,12 @@ export default function MyVisuals() {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingVisual, setEditingVisual] = useState(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [videoVisual, setVideoVisual] = useState(null);
+  const [showADSModal, setShowADSModal] = useState(false);
+  const [adsVisual, setAdsVisual] = useState(null);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -108,8 +117,51 @@ export default function MyVisuals() {
   };
 
   const handleEdit = (visual) => {
-    // Redirect to Home with visual ID to open in chat
-    window.location.href = createPageUrl('Home') + `?editVisual=${visual.id}`;
+    setEditingVisual(visual);
+    setShowEditor(true);
+  };
+
+  const handleOpenVideo = (visual) => {
+    setVideoVisual(visual);
+    setShowVideoModal(true);
+  };
+
+  const handleOpenADS = (visual) => {
+    setAdsVisual(visual);
+    setShowADSModal(true);
+  };
+
+  const handleEditorSave = async (newImageUrl, layers, originalImageUrl) => {
+    if (!editingVisual?.id) return;
+    
+    const updatedVisual = await base44.entities.Visual.update(editingVisual.id, {
+      image_url: newImageUrl,
+      editor_layers: layers,
+      original_image_url: originalImageUrl
+    });
+    
+    setVisuals(prev => prev.map(v => v.id === editingVisual.id ? updatedVisual : v));
+    setShowEditor(false);
+    setEditingVisual(null);
+  };
+
+  const handleVideoGenerated = async (videoUrl, animationPrompt) => {
+    if (!videoVisual) return;
+    
+    const newVisual = await base44.entities.Visual.create({
+      user_email: videoVisual.user_email,
+      image_url: videoUrl,
+      video_url: videoUrl,
+      title: videoVisual.title + ' (Vidéo)',
+      original_prompt: animationPrompt,
+      dimensions: videoVisual.dimensions,
+      visual_type: videoVisual.visual_type,
+      parent_visual_id: videoVisual.id
+    });
+    
+    setVisuals(prev => [newVisual, ...prev]);
+    setShowVideoModal(false);
+    setVideoVisual(null);
   };
 
 
@@ -191,6 +243,20 @@ export default function MyVisuals() {
     const matchesFormat = formatFilter === 'all' || aspectRatio === formatFilter;
     return matchesSearch && matchesFilter && matchesType && matchesFormat;
   });
+
+  // Editor view
+  if (showEditor && editingVisual) {
+    return (
+      <VisualEditor
+        visual={editingVisual}
+        onClose={() => {
+          setShowEditor(false);
+          setEditingVisual(null);
+        }}
+        onSave={handleEditorSave}
+      />
+    );
+  }
 
   return (
     <PageWrapper requireAuth fullWidth>
