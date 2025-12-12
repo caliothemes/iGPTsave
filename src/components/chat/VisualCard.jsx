@@ -34,7 +34,8 @@ export default function VisualCard({
   showValidation = false,
   onValidate,
   compact = false,
-  hideInfoMessage = false
+  hideInfoMessage = false,
+  onBackToImage
 }) {
   const { t, language } = useLanguage();
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -43,6 +44,9 @@ export default function VisualCard({
   const [showWatermarkBanner, setShowWatermarkBanner] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
   const [copiedColor, setCopiedColor] = useState(null);
+  
+  // Detect if this is a video
+  const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
 
   // Show watermark banner on mount if hasWatermark
   React.useEffect(() => {
@@ -85,7 +89,7 @@ export default function VisualCard({
       <div className="rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
         {/* Image/Video Container */}
         <div className="relative overflow-hidden bg-black/20" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}>
-          {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
+          {isVideo ? (
             <video 
               src={visual.video_url || visual.image_url}
               controls
@@ -124,8 +128,26 @@ export default function VisualCard({
             </button>
           )}
 
-          {/* Magic Editor Button (top) */}
-          {showValidation && onValidate && (
+          {/* Back to Image Button (only for videos) */}
+          {isVideo && onBackToImage && visual.parent_visual_id && (
+            <button
+              onClick={onBackToImage}
+              className="group relative p-2.5 rounded-xl bg-gradient-to-br from-blue-600/90 to-cyan-600/90 backdrop-blur-sm hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-500/30 border border-blue-400/30"
+            >
+              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              {/* Tooltip on hover */}
+              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="bg-gray-900/95 backdrop-blur-sm border border-blue-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
+                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Retour au visuel' : 'Back to image'}</p>
+                </div>
+              </div>
+            </button>
+          )}
+
+          {/* Magic Editor Button (top) - only for images */}
+          {!isVideo && showValidation && onValidate && (
             <button
               onClick={() => onValidate?.('edit')}
               className="group relative p-2.5 rounded-xl bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm hover:from-violet-500 hover:to-purple-500 transition-all shadow-lg shadow-violet-500/30 border border-violet-400/30"
@@ -141,8 +163,8 @@ export default function VisualCard({
             </button>
           )}
 
-          {/* Animate Button */}
-          {onVideoGenerated && (
+          {/* Animate Button - only for images */}
+          {!isVideo && onVideoGenerated && (
             <button
               onClick={() => setShowVideoModal(true)}
               className="group relative p-2.5 rounded-xl bg-gradient-to-br from-pink-600/90 to-rose-600/90 backdrop-blur-sm hover:from-pink-500 hover:to-rose-500 transition-all shadow-lg shadow-pink-500/30 border border-pink-400/30"
@@ -300,8 +322,8 @@ export default function VisualCard({
 
           {/* Action Buttons - Variation, Regenerate, Download on same line */}
           <div className="flex gap-2">
-            {/* Variation Button */}
-            {onVariation && (
+            {/* Variation Button - only for images */}
+            {!isVideo && onVariation && (
               <Button
                 size="sm"
                 onClick={() => onVariation(visual)}
@@ -313,8 +335,8 @@ export default function VisualCard({
               </Button>
             )}
 
-            {/* Regenerate Button */}
-            {onRegenerate && (
+            {/* Regenerate Button - only for images */}
+            {!isVideo && onRegenerate && (
               <Button
                 size="sm"
                 onClick={() => onRegenerate(visual)}
@@ -338,8 +360,8 @@ export default function VisualCard({
             )}
           </div>
 
-          {/* Magic Editor Button - Full width */}
-          {showValidation && (
+          {/* Magic Editor Button - Full width - only for images */}
+          {!isVideo && showValidation && (
             <div className="space-y-2">
               <button
                 onClick={() => onValidate?.('edit')}
@@ -355,18 +377,6 @@ export default function VisualCard({
                   </div>
                 </div>
               </button>
-              {/* Animation button temporarily hidden
-              {onAnimate && (
-                <Button
-                  size="sm"
-                  onClick={() => onAnimate(visual)}
-                  className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700"
-                >
-                  <Video className="h-4 w-4 mr-1.5" />
-                  <span className="text-xs">{language === 'fr' ? '✨ Animer ce visuel' : '✨ Animate this visual'}</span>
-                </Button>
-              )}
-              */}
             </div>
           )}
 
@@ -451,12 +461,13 @@ export default function VisualCard({
       )}
       </div>
 
-      {/* Download Modal */}
+      {/* Download Modal - video formats only for videos */}
       <DownloadModal
         isOpen={showDownloadModal}
         onClose={() => setShowDownloadModal(false)}
         visual={visual}
         onDownload={handleDownloadComplete}
+        videoOnly={isVideo}
       />
 
       {/* Video Generation Modal */}
