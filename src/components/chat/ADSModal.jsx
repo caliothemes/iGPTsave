@@ -16,11 +16,13 @@ export default function ADSModal({ isOpen, onClose, visual }) {
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [socialPost, setSocialPost] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [suggestedPrompts, setSuggestedPrompts] = useState([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const canvasRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  // Reset on open
+  // Reset on open and load suggestions
   useEffect(() => {
     if (isOpen) {
       setPrompt('');
@@ -28,8 +30,40 @@ export default function ADSModal({ isOpen, onClose, visual }) {
       setSelectedLayer(null);
       setSocialPost('');
       setShowPreview(false);
+      loadSuggestions();
     }
   }, [isOpen]);
+
+  const loadSuggestions = async () => {
+    setLoadingSuggestions(true);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze this image and suggest 6 SHORT advertising prompt ideas in ${language === 'fr' ? 'French' : 'English'}.
+        
+Return ONLY a JSON array of strings, each being a complete prompt suggestion.
+Examples:
+- "Ajoute 'SOLDES -50%' en gros, un CTA 'J'en profite' et un slogan"
+- "Crée une pub Instagram avec titre accrocheur et prix"
+- "Ajoute 'NOUVEAU' en badge, description produit et CTA"
+
+Return format: ["prompt1", "prompt2", "prompt3", "prompt4", "prompt5", "prompt6"]`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            prompts: { type: "array", items: { type: "string" } }
+          }
+        },
+        file_urls: [visual.image_url]
+      });
+      
+      if (response?.prompts && response.prompts.length > 0) {
+        setSuggestedPrompts(response.prompts);
+      }
+    } catch (e) {
+      console.error('Failed to load suggestions:', e);
+    }
+    setLoadingSuggestions(false);
+  };
 
   // Draw canvas
   useEffect(() => {
@@ -51,40 +85,73 @@ export default function ADSModal({ isOpen, onClose, visual }) {
         
         ctx.save();
         
-        // Background/frame
+        // Letter spacing
+        if (layer.letterSpacing) {
+          ctx.letterSpacing = layer.letterSpacing;
+        }
+        
+        // Background/frame with rounded corners
         if (layer.background) {
-          ctx.fillStyle = layer.background;
-          const padding = 20;
+          const padding = layer.backgroundPadding || 30;
           const metrics = ctx.measureText(layer.text);
           const textHeight = parseInt(layer.fontSize);
-          ctx.fillRect(
-            layer.x - padding,
-            layer.y - textHeight - padding / 2,
-            metrics.width + padding * 2,
-            textHeight + padding
-          );
+          const bgX = layer.x - padding;
+          const bgY = layer.y - textHeight - padding / 2;
+          const bgWidth = metrics.width + padding * 2;
+          const bgHeight = textHeight + padding;
+          const radius = 15;
+          
+          // Rounded rectangle
+          ctx.beginPath();
+          ctx.moveTo(bgX + radius, bgY);
+          ctx.lineTo(bgX + bgWidth - radius, bgY);
+          ctx.quadraticCurveTo(bgX + bgWidth, bgY, bgX + bgWidth, bgY + radius);
+          ctx.lineTo(bgX + bgWidth, bgY + bgHeight - radius);
+          ctx.quadraticCurveTo(bgX + bgWidth, bgY + bgHeight, bgX + bgWidth - radius, bgY + bgHeight);
+          ctx.lineTo(bgX + radius, bgY + bgHeight);
+          ctx.quadraticCurveTo(bgX, bgY + bgHeight, bgX, bgY + bgHeight - radius);
+          ctx.lineTo(bgX, bgY + radius);
+          ctx.quadraticCurveTo(bgX, bgY, bgX + radius, bgY);
+          ctx.closePath();
+          
+          // Gradient or solid
+          if (layer.background.includes('gradient')) {
+            // Parse gradient (simplified)
+            ctx.fillStyle = layer.background.replace('linear-gradient', '').replace(/[()]/g, '');
+            // For now use first color
+            const colors = layer.background.match(/rgba?\([^)]+\)/g);
+            if (colors && colors.length > 0) {
+              ctx.fillStyle = colors[0];
+            }
+          } else {
+            ctx.fillStyle = layer.background;
+          }
+          ctx.fill();
         }
         
         // Shadow
         if (layer.shadow) {
-          ctx.shadowColor = 'rgba(0,0,0,0.5)';
-          ctx.shadowBlur = 10;
-          ctx.shadowOffsetX = 3;
-          ctx.shadowOffsetY = 3;
+          ctx.shadowColor = 'rgba(0,0,0,0.8)';
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetX = 4;
+          ctx.shadowOffsetY = 4;
+        }
+        
+        // Font setup
+        ctx.font = `${layer.fontWeight || '900'} ${layer.fontSize} ${layer.fontFamily || 'Impact, Arial Black, sans-serif'}`;
+        ctx.textAlign = layer.align || 'left';
+        
+        // Stroke first (for better visibility)
+        if (layer.stroke) {
+          ctx.strokeStyle = layer.strokeColor || '#000000';
+          ctx.lineWidth = layer.strokeWidth || 4;
+          ctx.lineJoin = 'round';
+          ctx.strokeText(layer.text, layer.x, layer.y);
         }
         
         // Text
-        ctx.font = `${layer.fontWeight || 'bold'} ${layer.fontSize}px ${layer.fontFamily || 'Arial'}`;
         ctx.fillStyle = layer.color;
-        ctx.textAlign = layer.align || 'left';
         ctx.fillText(layer.text, layer.x, layer.y);
-        
-        // Stroke
-        if (layer.stroke) {
-          ctx.strokeStyle = layer.strokeColor || '#000';
-          ctx.lineWidth = layer.strokeWidth || 2;
-          ctx.strokeText(layer.text, layer.x, layer.y);
-        }
         
         ctx.restore();
         
@@ -111,39 +178,43 @@ export default function ADSModal({ isOpen, onClose, visual }) {
     try {
       // Call AI to analyze image and generate ad suggestions
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this visual and create professional advertising text based on this request: "${prompt}".
-        
-Generate 3-5 text elements (title, slogan, CTA, price, etc.) with optimal placement, styling, and a social media post caption.
+        prompt: `Analyze this visual and create STUNNING professional advertising design based on: "${prompt}".
 
-Return JSON with this structure:
+Generate 2-4 text elements strategically placed with PREMIUM styling.
+
+CRITICAL STYLING RULES:
+1. FONT SIZES: Titles 60-120px, subtitles 40-70px, text 30-50px, small 20-30px
+2. FONTS: Use "Impact", "Arial Black", "Helvetica" for impact
+3. COLORS: High contrast (white on dark bg, or dark on light bg)
+4. BACKGROUNDS: Use semi-transparent boxes (rgba) with blur effect OR gradient backgrounds
+5. EFFECTS: Combine shadow + stroke for maximum visibility
+6. SPACING: Leave margins, don't overlap text
+7. PLACEMENT: Avoid center unless justified, use rule of thirds
+
+Example PREMIUM text element:
 {
-  "texts": [
-    {
-      "text": "BLACK FRIDAY",
-      "x": 100,
-      "y": 150,
-      "fontSize": "72px",
-      "color": "#FFFFFF",
-      "fontWeight": "900",
-      "fontFamily": "Arial",
-      "background": "rgba(0,0,0,0.8)",
-      "shadow": true,
-      "stroke": false,
-      "align": "left",
-      "type": "title"
-    }
-  ],
-  "socialPost": "🔥 Profitez de nos offres exceptionnelles...",
-  "tips": ["Use contrast for readability", "CTA should be prominent"]
+  "text": "BLACK FRIDAY",
+  "x": 100,
+  "y": 200,
+  "fontSize": "90px",
+  "color": "#FFFFFF",
+  "fontWeight": "900",
+  "fontFamily": "Impact",
+  "background": "linear-gradient(135deg, rgba(255,0,100,0.9), rgba(255,100,0,0.9))",
+  "shadow": true,
+  "stroke": true,
+  "strokeColor": "#000000",
+  "strokeWidth": 4,
+  "align": "left",
+  "type": "title",
+  "letterSpacing": "2px"
 }
 
-IMPORTANT: 
-- x,y coordinates should avoid important image areas (faces, products)
-- Use complementary colors to image
-- fontSize in px (40-100 for titles, 20-40 for text)
-- Include background for better readability
-- CTA should be eye-catching
-- Social post in same language as request`,
+Return JSON:
+{
+  "texts": [...],
+  "socialPost": "..."
+}`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -360,17 +431,35 @@ IMPORTANT:
                   </div>
                 </div>
 
-                {/* Examples */}
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                  <p className="text-blue-200 text-sm font-medium mb-2">
-                    💡 {language === 'fr' ? 'Exemples de prompts' : 'Example prompts'}
-                  </p>
-                  <div className="space-y-1 text-xs text-blue-200/60">
-                    <p>• {language === 'fr' ? 'Ajoute un titre accrocheur et un prix en gros' : 'Add catchy title and big price'}</p>
-                    <p>• {language === 'fr' ? 'Crée une pub pour les soldes avec CTA' : 'Create sale ad with CTA'}</p>
-                    <p>• {language === 'fr' ? 'Pub Instagram avec slogan moderne' : 'Instagram ad with modern slogan'}</p>
+                {/* Smart Suggestions */}
+                {loadingSuggestions ? (
+                  <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 text-violet-400 animate-spin" />
+                      <p className="text-violet-200 text-sm">
+                        {language === 'fr' ? 'Analyse de votre visuel...' : 'Analyzing your visual...'}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                ) : suggestedPrompts.length > 0 && (
+                  <div className="bg-gradient-to-br from-violet-500/10 to-pink-500/10 border border-violet-500/20 rounded-lg p-4">
+                    <p className="text-violet-200 text-sm font-medium mb-3 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      {language === 'fr' ? 'Suggestions pour votre visuel' : 'Suggestions for your visual'}
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {suggestedPrompts.map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setPrompt(suggestion)}
+                          className="text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 rounded-lg transition-all text-xs text-white/80 hover:text-white"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               // Preview Phase
