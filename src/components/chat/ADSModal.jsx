@@ -387,7 +387,7 @@ Return JSON:
             {!showPreview ? (
               // Input Phase
               <div className="space-y-4">
-                <div className="aspect-video bg-white/5 rounded-lg overflow-hidden border border-white/10">
+                <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10" style={{ maxHeight: '280px' }}>
                   <img 
                     src={visual?.image_url} 
                     alt=""
@@ -464,7 +464,7 @@ Return JSON:
             ) : (
               // Preview Phase
               <div className="space-y-4">
-                <div className="relative bg-white/5 rounded-lg overflow-hidden border border-white/10">
+                <div className="relative bg-white/5 rounded-lg overflow-hidden border border-white/10" style={{ maxHeight: '460px' }}>
                   <canvas
                     ref={canvasRef}
                     onMouseDown={handleCanvasMouseDown}
@@ -472,6 +472,7 @@ Return JSON:
                     onMouseUp={handleCanvasMouseUp}
                     onMouseLeave={handleCanvasMouseUp}
                     className="w-full h-auto cursor-move"
+                    style={{ maxHeight: '460px', objectFit: 'contain' }}
                   />
                 </div>
 
