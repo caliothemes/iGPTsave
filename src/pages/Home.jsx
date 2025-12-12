@@ -1187,7 +1187,7 @@ export default function Home() {
                     </Link>
                     <Link 
                       to={createPageUrl('MyVisuals')}
-                      className="mx-2 mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-white/[0.03] to-blue-900/20 hover:from-white/[0.08] hover:to-blue-900/30 border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
+                      className="mx-2 mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-blue-900/40 to-white/[0.03] hover:from-blue-900/50 hover:to-white/[0.08] border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
                     >
                       <div className="p-2 rounded-lg bg-white/5">
                         <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
