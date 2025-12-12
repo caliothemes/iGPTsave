@@ -138,16 +138,23 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload, vid
       // Draw cropped image to target dimensions
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
 
-      // Convert to selected format
+      // Convert to blob (better mobile support)
       const quality = format.id === 'jpg' ? 0.92 : 1;
-      const dataUrl = canvas.toDataURL(format.mime, quality);
+      const blob = await new Promise((resolve) => {
+        canvas.toBlob(resolve, format.mime, quality);
+      });
 
+      // Create blob URL and download
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = `${visual.title || 'visual'}.${format.ext}`;
-      link.href = dataUrl;
+      link.href = blobUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      // Clean up blob URL after a delay
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } catch (e) {
       // Fallback: direct download
       const link = document.createElement('a');
