@@ -60,7 +60,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
           const { status, progress: currentProgress, video_url, failure } = statusResponse.data;
 
-          setProgress(currentProgress || 0);
+          // Progress is a decimal (0.0 to 1.0), convert to percentage
+          if (currentProgress !== undefined && currentProgress !== null) {
+            setProgress(currentProgress * 100);
+          }
 
           if (status === 'SUCCEEDED' && video_url) {
             clearInterval(pollInterval);
