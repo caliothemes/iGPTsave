@@ -27,22 +27,24 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload, vid
 
   const handleDownload = async () => {
     setDownloading(true);
-    const format = FORMATS.find(f => f.id === selectedFormat);
     
     try {
-      // For videos, direct download
+      // For videos, direct download (no conversion)
       if (videoOnly) {
         const videoUrl = visual.video_url || visual.image_url;
+        // Extract original extension from URL or default to mp4
+        const urlExt = videoUrl.split('.').pop().split('?')[0] || 'mp4';
         const link = document.createElement('a');
         link.href = videoUrl;
-        link.download = `${visual.title || 'video'}.${format.ext}`;
+        link.download = `${visual.title || 'video'}.${urlExt}`;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        onDownload?.(format);
+        onDownload?.();
         onClose();
       } else {
+        const format = FORMATS.find(f => f.id === selectedFormat);
         // For images
         let imageUrl = visual.image_url;
         
@@ -137,51 +139,79 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload, vid
         </DialogHeader>
 
         <div className="space-y-3">
-          <p className="text-white/60 text-sm">
-            {language === 'fr' ? 'Choisissez le format:' : 'Choose format:'}
-          </p>
-
-          <div className="space-y-2">
-            {FORMATS.map(format => (
-              <button
-                key={format.id}
-                onClick={() => setSelectedFormat(format.id)}
-                className={cn(
-                  "w-full p-3 rounded-lg flex items-center gap-3 transition-all text-left",
-                  selectedFormat === format.id
-                    ? "bg-emerald-500/20 border-2 border-emerald-500/50"
-                    : "bg-white/5 border-2 border-transparent hover:bg-white/10"
-                )}
+          {videoOnly ? (
+            // Video: no format selection, direct download
+            <>
+              <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                <p className="text-blue-200 text-sm">
+                  {language === 'fr' 
+                    ? 'La vidéo sera téléchargée dans son format original avec les dimensions du visuel source.'
+                    : 'The video will be downloaded in its original format with source visual dimensions.'}
+                </p>
+              </div>
+              <Button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               >
-                <format.icon className={cn("h-5 w-5", selectedFormat === format.id ? "text-emerald-400" : "text-white/50")} />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">{format.name}</span>
-                    {format.premium && (
-                      <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded">PRO</span>
-                    )}
-                  </div>
-                  <p className="text-white/50 text-xs">{format.desc[language]}</p>
-                </div>
-                {selectedFormat === format.id && (
-                  <Check className="h-4 w-4 text-emerald-400" />
+                {downloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
                 )}
-              </button>
-            ))}
-          </div>
+                {language === 'fr' ? 'Télécharger la vidéo' : 'Download video'}
+              </Button>
+            </>
+          ) : (
+            // Image: show format selection
+            <>
+              <p className="text-white/60 text-sm">
+                {language === 'fr' ? 'Choisissez le format:' : 'Choose format:'}
+              </p>
 
-          <Button
-            onClick={handleDownload}
-            disabled={downloading}
-            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-          >
-            {downloading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
-            )}
-            {language === 'fr' ? 'Télécharger' : 'Download'}
-          </Button>
+              <div className="space-y-2">
+                {FORMATS.map(format => (
+                  <button
+                    key={format.id}
+                    onClick={() => setSelectedFormat(format.id)}
+                    className={cn(
+                      "w-full p-3 rounded-lg flex items-center gap-3 transition-all text-left",
+                      selectedFormat === format.id
+                        ? "bg-emerald-500/20 border-2 border-emerald-500/50"
+                        : "bg-white/5 border-2 border-transparent hover:bg-white/10"
+                    )}
+                  >
+                    <format.icon className={cn("h-5 w-5", selectedFormat === format.id ? "text-emerald-400" : "text-white/50")} />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-medium">{format.name}</span>
+                        {format.premium && (
+                          <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded">PRO</span>
+                        )}
+                      </div>
+                      <p className="text-white/50 text-xs">{format.desc[language]}</p>
+                    </div>
+                    {selectedFormat === format.id && (
+                      <Check className="h-4 w-4 text-emerald-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              >
+                {downloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                {language === 'fr' ? 'Télécharger' : 'Download'}
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
