@@ -92,14 +92,14 @@ Return format: ["prompt1", "prompt2", "prompt3", "prompt4", "prompt5", "prompt6"
         
         // Background/frame with rounded corners
         if (layer.background) {
-          const padding = layer.backgroundPadding || 30;
+          const padding = layer.backgroundPadding || 50;
           const metrics = ctx.measureText(layer.text);
           const textHeight = parseInt(layer.fontSize);
           const bgX = layer.x - padding;
           const bgY = layer.y - textHeight - padding / 2;
           const bgWidth = metrics.width + padding * 2;
-          const bgHeight = textHeight + padding;
-          const radius = 15;
+          const bgHeight = textHeight + padding * 1.2;
+          const radius = 20;
           
           // Rounded rectangle
           ctx.beginPath();
@@ -176,38 +176,78 @@ Return format: ["prompt1", "prompt2", "prompt3", "prompt4", "prompt5", "prompt6"
 
     setGenerating(true);
     try {
+      // Deduct 1 credit
+      const user = await base44.auth.me();
+      const creditsData = await base44.entities.UserCredits.filter({ user_email: user.email });
+      const credits = creditsData[0];
+      
+      if (!credits) {
+        toast.error(language === 'fr' ? 'Erreur de crédits' : 'Credits error');
+        setGenerating(false);
+        return;
+      }
+
+      // Check if user has credits
+      if (credits.free_downloads <= 0 && credits.paid_credits <= 0 && credits.subscription_type !== 'unlimited') {
+        toast.error(language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available');
+        setGenerating(false);
+        return;
+      }
+
+      // Deduct credit
+      if (credits.subscription_type !== 'unlimited') {
+        if (credits.free_downloads > 0) {
+          await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+        } else if (credits.paid_credits > 0) {
+          await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+        }
+      }
+
+      // Get base prompt from settings
+      const settings = await base44.entities.AppSettings.filter({ key: 'ads_base_prompt' });
+      const basePrompt = settings[0]?.value || `Create ULTRA MODERN professional advertising design with BOLD, CONTEMPORARY styling.
+
+MODERN DESIGN PRINCIPLES:
+1. TYPOGRAPHY: Use bold sans-serif fonts (Impact, Arial Black, Helvetica) with large sizes (80-140px titles)
+2. COLORS: Vibrant gradients (neon, pastel, or bold contrasts), avoid plain colors
+3. BACKGROUNDS: Full-width colored boxes with gradients, semi-transparent overlays (rgba 0.85-0.95)
+4. EFFECTS: Strong shadows + thick strokes (5-8px) for maximum pop and readability
+5. LAYOUT: Asymmetric, dynamic placement - use corners and edges, avoid center
+6. SPACING: Generous padding (40-60px) in background boxes, leave breathing room
+7. STYLE: Instagram/TikTok aesthetic - punchy, eye-catching, trendy
+
+BACKGROUND BOX RULES:
+- Must extend FULL WIDTH or near-full width of text
+- Use backgroundPadding: 50-70 for generous spacing
+- Prefer gradient backgrounds over solid colors
+- Examples: "linear-gradient(135deg, rgba(255,20,147,0.95), rgba(138,43,226,0.95))"`;
+
       // Call AI to analyze image and generate ad suggestions
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this visual and create STUNNING professional advertising design based on: "${prompt}".
+        prompt: `${basePrompt}
 
-Generate 2-4 text elements strategically placed with PREMIUM styling.
+User request: "${prompt}"
 
-CRITICAL STYLING RULES:
-1. FONT SIZES: Titles 60-120px, subtitles 40-70px, text 30-50px, small 20-30px
-2. FONTS: Use "Impact", "Arial Black", "Helvetica" for impact
-3. COLORS: High contrast (white on dark bg, or dark on light bg)
-4. BACKGROUNDS: Use semi-transparent boxes (rgba) with blur effect OR gradient backgrounds
-5. EFFECTS: Combine shadow + stroke for maximum visibility
-6. SPACING: Leave margins, don't overlap text
-7. PLACEMENT: Avoid center unless justified, use rule of thirds
+Generate 2-4 text elements with MAXIMUM VISUAL IMPACT.
 
-Example PREMIUM text element:
+Example ULTRA MODERN text element:
 {
-  "text": "BLACK FRIDAY",
-  "x": 100,
-  "y": 200,
-  "fontSize": "90px",
+  "text": "SUPER PROMO",
+  "x": 80,
+  "y": 150,
+  "fontSize": "110px",
   "color": "#FFFFFF",
   "fontWeight": "900",
   "fontFamily": "Impact",
-  "background": "linear-gradient(135deg, rgba(255,0,100,0.9), rgba(255,100,0,0.9))",
+  "background": "linear-gradient(135deg, rgba(255,20,147,0.95), rgba(138,43,226,0.95))",
+  "backgroundPadding": 60,
   "shadow": true,
   "stroke": true,
   "strokeColor": "#000000",
-  "strokeWidth": 4,
+  "strokeWidth": 6,
   "align": "left",
   "type": "title",
-  "letterSpacing": "2px"
+  "letterSpacing": "3px"
 }
 
 Return JSON:
@@ -424,7 +464,7 @@ Return JSON:
                       ) : (
                         <>
                           <Sparkles className="h-4 w-4 mr-2" />
-                          {language === 'fr' ? 'Générer la pub' : 'Generate ad'}
+                          {language === 'fr' ? 'Générer la pub (1 crédit)' : 'Generate ad (1 credit)'}
                         </>
                       )}
                     </Button>
@@ -484,9 +524,13 @@ Return JSON:
                     {language === 'fr' ? 'Télécharger' : 'Download'}
                   </Button>
                   <Button
-                    onClick={() => setShowPreview(false)}
+                    onClick={() => {
+                      setShowPreview(false);
+                      setLayers([]);
+                      setPrompt('');
+                    }}
                     variant="outline"
-                    className="border-white/10 text-white hover:bg-white/5"
+                    className="flex-1 border-white/10 text-white hover:bg-white/5"
                   >
                     {language === 'fr' ? 'Nouvelle pub' : 'New ad'}
                   </Button>
