@@ -669,6 +669,19 @@ export default function Home() {
     }]);
   };
 
+  const handleBackToImage = async () => {
+    if (currentVisual?.parent_visual_id) {
+      try {
+        const parentVisuals = await base44.entities.Visual.filter({ id: currentVisual.parent_visual_id });
+        if (parentVisuals.length > 0) {
+          setCurrentVisual(parentVisuals[0]);
+        }
+      } catch (e) {
+        console.error('Failed to load parent visual:', e);
+      }
+    }
+  };
+
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('Home'));
   const handleLogout = () => base44.auth.logout(createPageUrl('Home'));
 
@@ -858,6 +871,7 @@ export default function Home() {
                         }, 0);
                       }}
                       onVideoGenerated={handleVideoGenerated}
+                      onBackToImage={handleBackToImage}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}

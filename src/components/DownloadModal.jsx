@@ -6,7 +6,7 @@ import { useLanguage } from './LanguageContext';
 import { cn } from "@/lib/utils";
 import { base44 } from '@/api/base44Client';
 
-const FORMATS = [
+const IMAGE_FORMATS = [
   { id: 'png', name: 'PNG', ext: 'png', mime: 'image/png', desc: { fr: 'Haute qualité avec fond', en: 'High quality with background' }, icon: FileImage },
   { id: 'png-transparent', name: 'PNG Transparent', ext: 'png', mime: 'image/png', transparent: true, removeBg: true, desc: { fr: 'Fond supprimé automatiquement', en: 'Background automatically removed' }, icon: Eraser },
   { id: 'jpg', name: 'JPG', ext: 'jpg', mime: 'image/jpeg', desc: { fr: 'Compressé, idéal web', en: 'Compressed, ideal for web' }, icon: FileImage },
@@ -14,9 +14,15 @@ const FORMATS = [
   { id: 'svg', name: 'SVG', ext: 'svg', mime: 'image/svg+xml', desc: { fr: 'Vectoriel, idéal impression', en: 'Vector, ideal for print' }, icon: FileType, premium: true },
 ];
 
-export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
+const VIDEO_FORMATS = [
+  { id: 'mp4', name: 'MP4', ext: 'mp4', mime: 'video/mp4', desc: { fr: 'Format vidéo universel', en: 'Universal video format' }, icon: FileImage },
+  { id: 'webm', name: 'WebM', ext: 'webm', mime: 'video/webm', desc: { fr: 'Optimisé pour le web', en: 'Optimized for web' }, icon: FileImage },
+];
+
+export default function DownloadModal({ isOpen, onClose, visual, onDownload, videoOnly = false }) {
   const { language } = useLanguage();
-  const [selectedFormat, setSelectedFormat] = useState('png');
+  const FORMATS = videoOnly ? VIDEO_FORMATS : IMAGE_FORMATS;
+  const [selectedFormat, setSelectedFormat] = useState(videoOnly ? 'mp4' : 'png');
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
@@ -24,25 +30,40 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload }) {
     const format = FORMATS.find(f => f.id === selectedFormat);
     
     try {
-      let imageUrl = visual.image_url;
-      
-      // If transparent format selected, call our backend removeBg function (uses Render API)
-      if (format.removeBg) {
-        try {
-          const response = await base44.functions.invoke('removeBg', { image_url: visual.image_url });
-          if (response.data?.success && response.data?.image_url) {
-            imageUrl = response.data.image_url;
-          } else {
-            console.error('Remove bg failed:', response.data?.error);
+      // For videos, direct download
+      if (videoOnly) {
+        const videoUrl = visual.video_url || visual.image_url;
+        const link = document.createElement('a');
+        link.href = videoUrl;
+        link.download = `${visual.title || 'video'}.${format.ext}`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        onDownload?.(format);
+        onClose();
+      } else {
+        // For images
+        let imageUrl = visual.image_url;
+        
+        // If transparent format selected, call our backend removeBg function (uses Render API)
+        if (format.removeBg) {
+          try {
+            const response = await base44.functions.invoke('removeBg', { image_url: visual.image_url });
+            if (response.data?.success && response.data?.image_url) {
+              imageUrl = response.data.image_url;
+            } else {
+              console.error('Remove bg failed:', response.data?.error);
+            }
+          } catch (bgError) {
+            console.error('Remove bg failed, using original:', bgError);
           }
-        } catch (bgError) {
-          console.error('Remove bg failed, using original:', bgError);
         }
+        
+        await downloadImage(imageUrl, format);
+        onDownload?.(format);
+        onClose();
       }
-      
-      await downloadImage(imageUrl, format);
-      onDownload?.(format);
-      onClose();
     } catch (e) {
       console.error(e);
     }
