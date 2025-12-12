@@ -633,6 +633,22 @@ export default function Store() {
           <div className="w-full mb-8 bg-white/[0.02] border-y border-white/5 py-4">
             <div className="px-6 overflow-x-auto scrollbar-hide">
               <div className="flex gap-2 justify-center min-w-max mx-auto">
+                {/* Tous button */}
+                <button
+                  onClick={() => {
+                    setSelectedKeyword(null);
+                    setSearchQuery('');
+                  }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap",
+                    !selectedKeyword
+                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30"
+                      : "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border border-blue-500/30"
+                  )}
+                >
+                  {language === 'fr' ? 'Tous' : 'All'}
+                </button>
+                
                 {categoryKeywords.map((keyword) => (
                   <button
                     key={keyword}
