@@ -293,8 +293,8 @@ IMPORTANT:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl h-[90vh] bg-gray-900 border-white/10 text-white p-0 overflow-hidden">
-        <div className="flex h-full">
+      <DialogContent className="max-w-6xl h-[90vh] bg-gray-900 border-white/10 text-white p-0">
+        <div className="flex h-full overflow-hidden">
           {/* Left Panel - Preview */}
           <div className="flex-1 bg-black/20 p-6 overflow-auto">
             <div className="flex items-center justify-between mb-4">
