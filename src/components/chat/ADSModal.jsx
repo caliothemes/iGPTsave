@@ -364,10 +364,10 @@ Return JSON:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl h-[90vh] bg-gray-900 border-white/10 text-white p-0">
-        <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+      <DialogContent className="max-w-7xl h-[90vh] bg-gray-900 border-white/10 text-white p-0">
+        <div className="flex h-full overflow-hidden flex-col md:flex-row">
           {/* Left Panel - Preview */}
-          <div className="flex-1 bg-black/20 p-4 lg:p-6 overflow-auto max-h-[60vh] lg:max-h-full">
+          <div className="flex-1 bg-black/20 p-4 md:p-6 overflow-auto">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-pink-500 to-orange-500">
@@ -387,7 +387,7 @@ Return JSON:
             {!showPreview ? (
               // Input Phase
               <div className="space-y-4">
-                <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10 h-48 lg:h-80">
+                <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10 h-64 md:h-96">
                   <img 
                     src={visual?.image_url} 
                     alt=""
@@ -464,7 +464,7 @@ Return JSON:
             ) : (
               // Preview Phase
               <div className="space-y-4">
-                <div className="relative bg-white/5 rounded-lg overflow-hidden border border-white/10 h-64 lg:h-[500px]">
+                <div className="relative bg-white/5 rounded-lg overflow-hidden border border-white/10 h-64 md:h-[600px]">
                   <canvas
                     ref={canvasRef}
                     onMouseDown={handleCanvasMouseDown}
@@ -518,7 +518,7 @@ Return JSON:
 
           {/* Right Panel - Layer Controls */}
           {showPreview && (
-            <div className="w-full lg:w-80 flex-shrink-0 bg-gray-900/50 border-t lg:border-t-0 lg:border-l border-white/10 p-4 overflow-auto">
+            <div className="w-full md:w-96 flex-shrink-0 bg-gray-900/50 border-t md:border-t-0 md:border-l border-white/10 p-4 overflow-auto">
               <h3 className="text-sm font-bold text-white/80 mb-3 flex items-center gap-2">
                 <Type className="h-4 w-4" />
                 {language === 'fr' ? 'Calques de texte' : 'Text layers'}
