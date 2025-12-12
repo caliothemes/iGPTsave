@@ -481,37 +481,36 @@ Return JSON:
                       )}
                     </Button>
                   </div>
-                </div>
 
-                {/* Smart Suggestions */}
-                {loadingSuggestions ? (
-                  <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-4">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 text-violet-400 animate-spin" />
-                      <p className="text-violet-200 text-sm">
-                        {language === 'fr' ? 'Analyse de votre visuel...' : 'Analyzing your visual...'}
+                  {/* Smart Suggestions */}
+                  {loadingSuggestions ? (
+                    <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-4">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 text-violet-400 animate-spin" />
+                        <p className="text-violet-200 text-sm">
+                          {language === 'fr' ? 'Analyse de votre visuel...' : 'Analyzing your visual...'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : suggestedPrompts.length > 0 && (
+                    <div className="bg-gradient-to-br from-violet-500/10 to-pink-500/10 border border-violet-500/20 rounded-lg p-4">
+                      <p className="text-violet-200 text-sm font-medium mb-3 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        {language === 'fr' ? 'Suggestions pour votre visuel' : 'Suggestions for your visual'}
                       </p>
+                      <div className="grid grid-cols-1 gap-2">
+                        {suggestedPrompts.map((suggestion, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setPrompt(suggestion)}
+                            className="text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 rounded-lg transition-all text-xs text-white/80 hover:text-white"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : suggestedPrompts.length > 0 && (
-                  <div className="bg-gradient-to-br from-violet-500/10 to-pink-500/10 border border-violet-500/20 rounded-lg p-4">
-                    <p className="text-violet-200 text-sm font-medium mb-3 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      {language === 'fr' ? 'Suggestions pour votre visuel' : 'Suggestions for your visual'}
-                    </p>
-                    <div className="grid grid-cols-1 gap-2">
-                      {suggestedPrompts.map((suggestion, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setPrompt(suggestion)}
-                          className="text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 rounded-lg transition-all text-xs text-white/80 hover:text-white"
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  )}
                 </div>
               </div>
             ) : (
