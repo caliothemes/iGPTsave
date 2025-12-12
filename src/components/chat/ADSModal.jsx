@@ -365,9 +365,9 @@ Return JSON:
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl h-[90vh] bg-gray-900 border-white/10 text-white p-0">
-        <div className="flex h-full overflow-hidden">
+        <div className="flex flex-col md:flex-row h-full overflow-hidden">
           {/* Left Panel - Preview */}
-          <div className="flex-1 bg-black/20 p-6 overflow-auto">
+          <div className="flex-1 bg-black/20 p-4 md:p-6 overflow-auto">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-pink-500 to-orange-500">
@@ -387,7 +387,7 @@ Return JSON:
             {!showPreview ? (
               // Input Phase
               <div className="space-y-4">
-                <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10" style={{ maxHeight: '280px' }}>
+                <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10 h-48 md:h-64">
                   <img 
                     src={visual?.image_url} 
                     alt=""
@@ -464,15 +464,14 @@ Return JSON:
             ) : (
               // Preview Phase
               <div className="space-y-4">
-                <div className="relative bg-white/5 rounded-lg overflow-hidden border border-white/10" style={{ maxHeight: '460px' }}>
+                <div className="relative bg-white/5 rounded-lg overflow-hidden border border-white/10 h-64 md:h-96">
                   <canvas
                     ref={canvasRef}
                     onMouseDown={handleCanvasMouseDown}
                     onMouseMove={handleCanvasMouseMove}
                     onMouseUp={handleCanvasMouseUp}
                     onMouseLeave={handleCanvasMouseUp}
-                    className="w-full h-auto cursor-move"
-                    style={{ maxHeight: '460px', objectFit: 'contain' }}
+                    className="w-full h-full object-contain cursor-move"
                   />
                 </div>
 
@@ -519,7 +518,7 @@ Return JSON:
 
           {/* Right Panel - Layer Controls */}
           {showPreview && (
-            <div className="w-80 bg-gray-900/50 border-l border-white/10 p-4 overflow-auto">
+            <div className="w-full md:w-80 bg-gray-900/50 border-t md:border-t-0 md:border-l border-white/10 p-4 overflow-auto">
               <h3 className="text-sm font-bold text-white/80 mb-3 flex items-center gap-2">
                 <Type className="h-4 w-4" />
                 {language === 'fr' ? 'Calques de texte' : 'Text layers'}
