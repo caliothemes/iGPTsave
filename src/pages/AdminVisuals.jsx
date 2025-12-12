@@ -121,7 +121,24 @@ export default function AdminVisuals() {
     setDownloadingId(visual.id);
     
     try {
-      // Load image
+      // Check if it's a video - direct download
+      const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
+      
+      if (isVideo) {
+        const videoUrl = visual.video_url || visual.image_url;
+        const urlExt = videoUrl.split('.').pop().split('?')[0] || 'mp4';
+        const link = document.createElement('a');
+        link.href = videoUrl;
+        link.download = `${visual.title || 'video'}.${urlExt}`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setDownloadingId(null);
+        return;
+      }
+
+      // For images: load and crop
       const img = new Image();
       img.crossOrigin = 'anonymous';
       
@@ -349,7 +366,7 @@ export default function AdminVisuals() {
                 </div>
 
                 {/* Action buttons */}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button
                     size="icon"
                     variant="ghost"
