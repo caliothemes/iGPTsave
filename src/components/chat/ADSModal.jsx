@@ -177,35 +177,34 @@ Return format: ["prompt1", "prompt2", "prompt3", "prompt4", "prompt5", "prompt6"
     setGenerating(true);
     try {
       // Deduct 1 credit
-      const user = await base44.auth.me();
-      const creditsData = await base44.entities.UserCredits.filter({ user_email: user.email });
-      const credits = creditsData[0];
-      
-      if (!credits) {
-        toast.error(language === 'fr' ? 'Erreur de crédits' : 'Credits error');
-        setGenerating(false);
-        return;
-      }
+      try {
+        const user = await base44.auth.me();
+        const creditsData = await base44.entities.UserCredits.filter({ user_email: user.email });
+        const credits = creditsData[0];
+        
+        if (credits) {
+          // Check if user has credits
+          if (credits.free_downloads <= 0 && credits.paid_credits <= 0 && credits.subscription_type !== 'unlimited') {
+            toast.error(language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available');
+            setGenerating(false);
+            return;
+          }
 
-      // Check if user has credits
-      if (credits.free_downloads <= 0 && credits.paid_credits <= 0 && credits.subscription_type !== 'unlimited') {
-        toast.error(language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available');
-        setGenerating(false);
-        return;
-      }
-
-      // Deduct credit
-      if (credits.subscription_type !== 'unlimited') {
-        if (credits.free_downloads > 0) {
-          await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
-        } else if (credits.paid_credits > 0) {
-          await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+          // Deduct credit
+          if (credits.subscription_type !== 'unlimited') {
+            if (credits.free_downloads > 0) {
+              await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+            } else if (credits.paid_credits > 0) {
+              await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+            }
+          }
         }
+      } catch (e) {
+        console.log('Credit deduction skipped:', e);
       }
 
       // Get base prompt from settings
-      const settings = await base44.entities.AppSettings.filter({ key: 'ads_base_prompt' });
-      const basePrompt = settings[0]?.value || `Create ULTRA MODERN professional advertising design with BOLD, CONTEMPORARY styling.
+      let basePrompt = `Create ULTRA MODERN professional advertising design with BOLD, CONTEMPORARY styling.
 
 MODERN DESIGN PRINCIPLES:
 1. TYPOGRAPHY: Use bold sans-serif fonts (Impact, Arial Black, Helvetica) with large sizes (80-140px titles)
@@ -221,6 +220,15 @@ BACKGROUND BOX RULES:
 - Use backgroundPadding: 50-70 for generous spacing
 - Prefer gradient backgrounds over solid colors
 - Examples: "linear-gradient(135deg, rgba(255,20,147,0.95), rgba(138,43,226,0.95))"`;
+
+      try {
+        const settings = await base44.entities.AppSettings.filter({ key: 'ads_base_prompt' });
+        if (settings[0]?.value) {
+          basePrompt = settings[0].value;
+        }
+      } catch (e) {
+        console.log('Using default base prompt');
+      }
 
       // Call AI to analyze image and generate ad suggestions
       const response = await base44.integrations.Core.InvokeLLM({
@@ -426,16 +434,20 @@ Return JSON:
 
             {!showPreview ? (
               // Input Phase
-              <div className="space-y-4">
-                <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10 h-64 md:h-96">
-                  <img 
-                    src={visual?.image_url} 
-                    alt=""
-                    className="w-full h-full object-contain"
-                  />
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Left: Image Preview */}
+                <div className="w-full md:w-1/2">
+                  <div className="bg-white/5 rounded-lg overflow-hidden border border-white/10 h-64 md:h-96 sticky top-4">
+                    <img 
+                      src={visual?.image_url} 
+                      alt=""
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-3">
+                {/* Right: Prompt and Options */}
+                <div className="w-full md:w-1/2 space-y-3">
                   <label className="text-sm font-medium text-white/80">
                     {language === 'fr' 
                       ? '✨ Décrivez votre publicité'
@@ -500,6 +512,7 @@ Return JSON:
                     </div>
                   </div>
                 )}
+                </div>
               </div>
             ) : (
               // Preview Phase
