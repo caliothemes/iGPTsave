@@ -50,6 +50,7 @@ export default function AdminVisuals() {
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [downloadingId, setDownloadingId] = useState(null);
   const itemsPerPage = 100;
 
   useEffect(() => {
@@ -114,6 +115,90 @@ export default function AdminVisuals() {
     ]);
     setVisuals(fetchedVisuals);
     setStoreItems(fetchedStoreItems);
+  };
+
+  const handleDownload = async (visual) => {
+    setDownloadingId(visual.id);
+    
+    try {
+      // Load image
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          if (img.naturalWidth && img.naturalHeight) {
+            resolve();
+          } else {
+            reject(new Error('Image dimensions not available'));
+          }
+        };
+        img.onerror = reject;
+        img.src = visual.image_url;
+      });
+
+      // Parse target dimensions
+      const targetDimensions = visual.dimensions || '1080x1080';
+      const [targetWidth, targetHeight] = targetDimensions.split('x').map(n => parseInt(n));
+      
+      // Create canvas with target dimensions
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Calculate intelligent crop
+      const sourceWidth = img.naturalWidth || img.width;
+      const sourceHeight = img.naturalHeight || img.height;
+      const targetRatio = targetWidth / targetHeight;
+      const sourceRatio = sourceWidth / sourceHeight;
+
+      let sx, sy, sw, sh;
+      
+      if (Math.abs(targetRatio - sourceRatio) < 0.01) {
+        // Same ratio, no crop needed
+        sx = 0;
+        sy = 0;
+        sw = sourceWidth;
+        sh = sourceHeight;
+      } else if (targetRatio > sourceRatio) {
+        // Target is wider (16:9 from square)
+        sw = sourceWidth;
+        sh = sourceWidth / targetRatio;
+        sx = 0;
+        sy = (sourceHeight - sh) / 2;
+      } else {
+        // Target is taller (9:16 from square)
+        sh = sourceHeight;
+        sw = sourceHeight * targetRatio;
+        sx = (sourceWidth - sw) / 2;
+        sy = 0;
+      }
+
+      // Draw cropped image
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+
+      // Download
+      const dataUrl = canvas.toDataURL('image/png', 1);
+      const link = document.createElement('a');
+      link.download = `${visual.title || 'visual'}.png`;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      console.error('Download error:', e);
+      // Fallback
+      const link = document.createElement('a');
+      link.href = visual.image_url;
+      link.download = `${visual.title || 'visual'}.png`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    
+    setDownloadingId(null);
   };
 
   const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
@@ -319,7 +404,7 @@ export default function AdminVisuals() {
               </div>
 
               <div className="p-2 border-t border-white/5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-xs text-white/40 px-2 py-0.5 rounded-full bg-white/5">
                     {visual.visual_type || 'autre'}
                   </span>
@@ -327,6 +412,19 @@ export default function AdminVisuals() {
                     v{visual.version || 1}
                   </span>
                 </div>
+                <Button
+                  size="sm"
+                  onClick={() => handleDownload(visual)}
+                  disabled={downloadingId === visual.id}
+                  className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs"
+                >
+                  {downloadingId === visual.id ? (
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                  ) : (
+                    <Download className="h-3 w-3 mr-1" />
+                  )}
+                  Télécharger
+                </Button>
               </div>
             </div>
           );
