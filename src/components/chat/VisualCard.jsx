@@ -40,6 +40,7 @@ export default function VisualCard({
   const { t, language } = useLanguage();
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showADSModal, setShowADSModal] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [showWatermarkBanner, setShowWatermarkBanner] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
