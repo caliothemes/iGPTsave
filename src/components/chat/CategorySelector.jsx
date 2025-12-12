@@ -382,7 +382,7 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
       {/* My Visuals Block */}
       <div
         onClick={() => window.location.href = '/MyVisuals'}
-        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20"
+        className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer bg-gradient-to-r from-white/[0.03] to-blue-900/20 hover:from-white/[0.08] hover:to-blue-900/30 border border-white/10 hover:border-blue-500/20"
       >
         <div className="p-2 rounded-lg bg-white/5">
           <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
