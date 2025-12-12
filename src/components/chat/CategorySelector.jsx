@@ -115,7 +115,7 @@ const CATEGORIES = [
   },
   ];
 
-export default function CategorySelector({ onSelect, selectedCategory }) {
+export default function CategorySelector({ onSelect, selectedCategory, visualsCount = 0 }) {
   const { language } = useLanguage();
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [openNestedSubmenu, setOpenNestedSubmenu] = useState(null);
@@ -394,6 +394,11 @@ export default function CategorySelector({ onSelect, selectedCategory }) {
             <span className="text-white text-sm font-bold">
               {language === 'fr' ? 'Mes visuels' : 'My visuals'}
             </span>
+            {visualsCount > 0 && (
+              <span className="px-2 py-0.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold">
+                {visualsCount}
+              </span>
+            )}
           </div>
           <p className="text-white/80 text-xs">
             {language === 'fr' 

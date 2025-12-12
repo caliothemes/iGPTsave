@@ -809,6 +809,7 @@ export default function Home() {
             <CategorySelector 
               onSelect={handleCategorySelect}
               selectedCategory={selectedCategory}
+              visualsCount={sessionVisuals.length}
             />
           </div>
         ) : (
@@ -1189,8 +1190,15 @@ export default function Home() {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <div className="text-white text-sm font-bold">
-                          {language === 'fr' ? 'Mes visuels' : 'My visuals'}
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm font-bold">
+                            {language === 'fr' ? 'Mes visuels' : 'My visuals'}
+                          </span>
+                          {sessionVisuals.length > 0 && (
+                            <span className="px-2 py-0.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold">
+                              {sessionVisuals.length}
+                            </span>
+                          )}
                         </div>
                         <div className="text-white/80 text-xs">
                           {language === 'fr' ? 'Tous vos visuels créés' : 'All your created visuals'}
