@@ -382,26 +382,6 @@ export default function VisualCard({
             )}
           </div>
 
-          {/* Magic Editor Button - Full width - only for images */}
-          {!isVideo && showValidation && (
-            <div className="space-y-2">
-              <button
-                onClick={() => onValidate?.('edit')}
-                className="w-full bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-500 hover:via-purple-500 hover:to-fuchsia-500 rounded-xl p-4 transition-all shadow-lg shadow-violet-500/20 border border-violet-400/20 group"
-              >
-                <div className="flex items-center justify-center gap-3">
-                  <div className="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-                    <Pencil className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-white font-semibold text-sm">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</p>
-                    <p className="text-white/70 text-[11px] leading-tight">{language === 'fr' ? 'Personnalisez votre visuel en ajoutant un fond, une texture, un texte etc...' : 'Customize your visual by adding a background, texture, text etc...'}</p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          )}
-
           {/* Download Button (when not in validation mode) */}
           {!showValidation && (
             <>
