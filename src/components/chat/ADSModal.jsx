@@ -179,23 +179,27 @@ Return format: ["prompt1", "prompt2", "prompt3", "prompt4", "prompt5", "prompt6"
       // Deduct 1 credit
       try {
         const user = await base44.auth.me();
-        const creditsData = await base44.entities.UserCredits.filter({ user_email: user.email });
-        const credits = creditsData[0];
+        const isAdmin = user?.role === 'admin';
         
-        if (credits) {
-          // Check if user has credits
-          if (credits.free_downloads <= 0 && credits.paid_credits <= 0 && credits.subscription_type !== 'unlimited') {
-            toast.error(language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available');
-            setGenerating(false);
-            return;
-          }
+        if (!isAdmin) {
+          const creditsData = await base44.entities.UserCredits.filter({ user_email: user.email });
+          const credits = creditsData[0];
+          
+          if (credits) {
+            // Check if user has credits
+            if (credits.free_downloads <= 0 && credits.paid_credits <= 0 && credits.subscription_type !== 'unlimited') {
+              toast.error(language === 'fr' ? 'Plus de crédits disponibles' : 'No credits available');
+              setGenerating(false);
+              return;
+            }
 
-          // Deduct credit
-          if (credits.subscription_type !== 'unlimited') {
-            if (credits.free_downloads > 0) {
-              await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
-            } else if (credits.paid_credits > 0) {
-              await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+            // Deduct credit
+            if (credits.subscription_type !== 'unlimited') {
+              if (credits.free_downloads > 0) {
+                await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+              } else if (credits.paid_credits > 0) {
+                await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+              }
             }
           }
         }
