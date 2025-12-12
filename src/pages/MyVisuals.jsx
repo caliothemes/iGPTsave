@@ -357,16 +357,43 @@ export default function MyVisuals() {
                     visual={visual}
                     onDownload={() => handleDownload(visual, credits)}
                     onToggleFavorite={handleToggleFavorite}
-                    onEdit={() => handleEdit(visual)}
+                    onValidate={(action) => {
+                      if (action === 'edit') handleEdit(visual);
+                      else if (action === 'video') handleOpenVideo(visual);
+                      else if (action === 'ads') handleOpenADS(visual);
+                    }}
                     isRegenerating={false}
                     canDownload={true}
                     compact
                     hideInfoMessage={true}
+                    showActions={true}
+                    showValidation={true}
+                    hideEditButton={true}
                   />
                 </div>
               ))}
             </div>
           )}
+
+          {/* Modals */}
+          <VideoGenerationModal
+            isOpen={showVideoModal}
+            onClose={() => {
+              setShowVideoModal(false);
+              setVideoVisual(null);
+            }}
+            visual={videoVisual}
+            onVideoGenerated={handleVideoGenerated}
+          />
+
+          <ADSModal
+            isOpen={showADSModal}
+            onClose={() => {
+              setShowADSModal(false);
+              setAdsVisual(null);
+            }}
+            visual={adsVisual}
+          />
         </div>
       )}
     </PageWrapper>
