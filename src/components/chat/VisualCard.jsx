@@ -36,7 +36,8 @@ export default function VisualCard({
   onValidate,
   compact = false,
   hideInfoMessage = false,
-  onBackToImage
+  onBackToImage,
+  hideEditButton = false
 }) {
   const { t, language } = useLanguage();
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -149,12 +150,12 @@ export default function VisualCard({
           )}
 
           {/* Magic Editor Button (top) - only for images */}
-          {!isVideo && showValidation && onValidate && (
+          {!isVideo && onValidate && (
             <button
               onClick={() => onValidate?.('edit')}
               className="group relative p-2.5 rounded-xl bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm hover:from-violet-500 hover:to-purple-500 transition-all shadow-lg shadow-violet-500/30 border border-violet-400/30"
             >
-              <Pencil className="h-5 w-5 text-white" />
+              <Wand2 className="h-5 w-5 text-white" />
               {/* Tooltip on hover */}
               <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 <div className="bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
@@ -166,9 +167,9 @@ export default function VisualCard({
           )}
 
           {/* Animate Button - only for images */}
-          {!isVideo && onVideoGenerated && (
+          {!isVideo && onValidate && (
             <button
-              onClick={() => setShowVideoModal(true)}
+              onClick={() => onValidate?.('video')}
               className="group relative p-2.5 rounded-xl bg-gradient-to-br from-pink-600/90 to-rose-600/90 backdrop-blur-sm hover:from-pink-500 hover:to-rose-500 transition-all shadow-lg shadow-pink-500/30 border border-pink-400/30"
             >
               <Video className="h-5 w-5 text-white" />
@@ -183,9 +184,9 @@ export default function VisualCard({
           )}
 
           {/* ADS Button - only for images */}
-          {!isVideo && (
+          {!isVideo && onValidate && (
             <button
-              onClick={() => setShowADSModal(true)}
+              onClick={() => onValidate?.('ads')}
               className="group relative p-2.5 rounded-xl bg-gradient-to-br from-orange-600/90 to-pink-600/90 backdrop-blur-sm hover:from-orange-500 hover:to-pink-500 transition-all shadow-lg shadow-orange-500/30 border border-orange-400/30"
             >
               <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -405,7 +406,7 @@ export default function VisualCard({
           {!showValidation && (
             <>
               {/* Edit Button - compact mode shows icon only in a row */}
-              {onEdit && compact ? (
+              {onEdit && !hideEditButton && compact ? (
                 <div className="flex gap-2">
                   <Button
                     size="sm"
@@ -435,9 +436,30 @@ export default function VisualCard({
                     )}
                   </Button>
                 </div>
+              ) : compact && hideEditButton ? (
+                <Button
+                  size="sm"
+                  onClick={handleDownloadClick}
+                  disabled={!canDownload}
+                  className={cn(
+                    "w-full transition-all",
+                    canDownload 
+                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                      : "bg-white/10 cursor-not-allowed"
+                  )}
+                >
+                  {downloaded ? (
+                    <Check className="h-4 w-4 mr-2" />
+                  ) : !canDownload ? (
+                    <Lock className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  <span className="text-xs">{downloaded ? t('downloaded') : t('download')}</span>
+                </Button>
               ) : (
                 <>
-                  {onEdit && (
+                  {onEdit && !hideEditButton && (
                     <Button
                       size="sm"
                       onClick={() => onEdit(visual)}
