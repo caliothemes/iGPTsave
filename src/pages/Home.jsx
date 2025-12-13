@@ -137,14 +137,6 @@ export default function Home() {
           const allVisuals = await base44.entities.Visual.filter({ user_email: currentUser.email });
           setTotalVisualsCount(allVisuals.length);
 
-          // Load prompt templates and examples
-          const [templates, examples] = await Promise.all([
-            base44.entities.PromptTemplate.filter({ is_active: true }),
-            base44.entities.PromptExample.filter({ is_active: true })
-          ]);
-          setPromptTemplates(templates);
-          setPromptExamples(examples);
-
           // Check if there's an editVisual parameter
           const urlParams = new URLSearchParams(window.location.search);
           const editVisualId = urlParams.get('editVisual');
