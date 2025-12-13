@@ -93,6 +93,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           price_credits: formData.price_credits,
           category_slugs: formData.category_slugs,
           image_url: visual.image_url,
+          video_url: visual.video_url || null,
           dimensions: formData.dimensions,
           keywords: formData.keywords
         });
@@ -106,6 +107,7 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
           price_credits: formData.price_credits,
           category_slugs: formData.category_slugs,
           image_url: visual.image_url,
+          video_url: visual.video_url || null,
           dimensions: formData.dimensions,
           keywords: formData.keywords,
           is_active: true
@@ -150,11 +152,22 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
         {visual && (
           <div className="space-y-4">
             <div className="aspect-video rounded-lg overflow-hidden bg-white/5">
-              <img 
-                src={visual.image_url} 
-                alt="Aperçu" 
-                className="w-full h-full object-cover"
-              />
+              {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
+                <video 
+                  src={visual.video_url || visual.image_url}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img 
+                  src={visual.image_url} 
+                  alt="Aperçu" 
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             <div>
