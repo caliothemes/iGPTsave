@@ -90,7 +90,11 @@ export default function Store() {
               item.category_slugs && item.category_slugs.includes(cat.slug)
             );
             const latestItem = categoryItems.length > 0 ? categoryItems[0] : null;
-            return { ...cat, latestImage: latestItem?.image_url };
+            return { 
+              ...cat, 
+              latestImage: latestItem?.image_url,
+              latestVideo: latestItem?.video_url
+            };
           })
         );
         
@@ -580,13 +584,24 @@ export default function Store() {
                         : "border-white/10 hover:border-white/20"
                     )}>
                       <div className="relative h-40 bg-white/5">
-                        {cat.latestImage ? (
+                        {cat.latestImage || cat.latestVideo ? (
                           <>
-                            <img
-                              src={cat.latestImage}
-                              alt={cat.name_fr}
-                              className="w-full h-full object-cover"
-                            />
+                            {cat.latestVideo || (cat.latestImage && (cat.latestImage.includes('.mp4') || cat.latestImage.includes('/video'))) ? (
+                              <video
+                                src={cat.latestVideo || cat.latestImage}
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img
+                                src={cat.latestImage}
+                                alt={cat.name_fr}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                           </>
                         ) : (
