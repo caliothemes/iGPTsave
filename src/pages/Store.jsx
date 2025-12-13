@@ -431,8 +431,34 @@ export default function Store() {
               "relative bg-white/5 backdrop-blur-xl border rounded-2xl transition-all duration-300",
               searchFocused ? "border-violet-500/50 shadow-lg shadow-violet-500/20" : "border-white/10"
             )}>
-              <div className="flex items-center gap-3 px-4 py-3">
-                <Search className="h-5 w-5 text-white/40" />
+              <div className="flex items-center gap-2 px-4 py-3 flex-wrap">
+                <Search className="h-5 w-5 text-white/40 flex-shrink-0" />
+                
+                {/* Active Filter Tags */}
+                {selectedCategory !== 'all' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-violet-600/30 border border-violet-500/50 text-violet-200 text-xs rounded-full">
+                    {categories.find(c => c.slug === selectedCategory)?.[language === 'fr' ? 'name_fr' : 'name_en'] || selectedCategory}
+                    <button
+                      onClick={() => setSelectedCategory('all')}
+                      className="hover:text-white"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                
+                {selectedKeyword && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600/30 border border-blue-500/50 text-blue-200 text-xs rounded-full">
+                    {selectedKeyword}
+                    <button
+                      onClick={() => setSelectedKeyword(null)}
+                      className="hover:text-white"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                
                 <input
                   type="text"
                   value={searchQuery}
@@ -443,12 +469,12 @@ export default function Store() {
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   placeholder={language === 'fr' ? 'Rechercher un visuel...' : 'Search for a visual...'}
-                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none"
+                  className="flex-1 min-w-[200px] bg-transparent text-white placeholder:text-white/30 outline-none"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
                   >
                     <X className="h-4 w-4 text-white/40" />
                   </button>
