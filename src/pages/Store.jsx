@@ -732,31 +732,48 @@ export default function Store() {
                         }}
                         style={{ aspectRatio }}
                       >
-                        <img
-                          src={item.image_url}
-                          alt={item.title}
-                          className="select-none pointer-events-none"
-                          style={{ 
-                            display: 'block', 
-                            width: '100%', 
-                            height: '100%', 
-                            objectFit: 'cover',
-                            userSelect: 'none',
-                            WebkitUserSelect: 'none',
-                            MozUserSelect: 'none',
-                            msUserSelect: 'none',
-                            WebkitTouchCallout: 'none'
-                          }}
-                          loading="lazy"
-                          draggable="false"
-                          onDragStart={(e) => !isAdmin && e.preventDefault()}
-                          onContextMenu={(e) => {
-                            if (!isAdmin) {
-                              e.preventDefault();
-                              return false;
-                            }
-                          }}
-                        />
+                        {item.video_url || (item.image_url && (item.image_url.includes('.mp4') || item.image_url.includes('/video'))) ? (
+                          <video 
+                            src={item.video_url || item.image_url}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="select-none pointer-events-none"
+                            style={{ 
+                              display: 'block', 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'cover'
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="select-none pointer-events-none"
+                            style={{ 
+                              display: 'block', 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'cover',
+                              userSelect: 'none',
+                              WebkitUserSelect: 'none',
+                              MozUserSelect: 'none',
+                              msUserSelect: 'none',
+                              WebkitTouchCallout: 'none'
+                            }}
+                            loading="lazy"
+                            draggable="false"
+                            onDragStart={(e) => !isAdmin && e.preventDefault()}
+                            onContextMenu={(e) => {
+                              if (!isAdmin) {
+                                e.preventDefault();
+                                return false;
+                              }
+                            }}
+                          />
+                        )}
                         {/* Transparent overlay to prevent long-press on mobile */}
                         {!isAdmin && (
                           <div 
@@ -957,32 +974,50 @@ export default function Store() {
                         aspectRatio: `${w} / ${h}`
                       }}
                     >
-                      <img
-                        src={enlargedImage.image_url}
-                        alt={enlargedImage.title}
-                        className="rounded-lg shadow-2xl select-none pointer-events-none"
-                        style={{ 
-                          display: 'block',
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          userSelect: 'none',
-                          WebkitUserSelect: 'none',
-                          MozUserSelect: 'none',
-                          msUserSelect: 'none',
-                          WebkitTouchCallout: 'none',
-                          pointerEvents: 'none',
-                          aspectRatio: `${w} / ${h}`
-                        }}
-                        draggable="false"
-                        onDragStart={(e) => e.preventDefault()}
-                        onContextMenu={(e) => {
-                          if (!isAdmin) {
-                            e.preventDefault();
-                            return false;
-                          }
-                        }}
-                      />
+                      {enlargedImage.video_url || (enlargedImage.image_url && (enlargedImage.image_url.includes('.mp4') || enlargedImage.image_url.includes('/video'))) ? (
+                        <video
+                          src={enlargedImage.video_url || enlargedImage.image_url}
+                          controls
+                          autoPlay
+                          loop
+                          muted
+                          className="rounded-lg shadow-2xl"
+                          style={{ 
+                            display: 'block',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            aspectRatio: `${w} / ${h}`
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={enlargedImage.image_url}
+                          alt={enlargedImage.title}
+                          className="rounded-lg shadow-2xl select-none pointer-events-none"
+                          style={{ 
+                            display: 'block',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            userSelect: 'none',
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            msUserSelect: 'none',
+                            WebkitTouchCallout: 'none',
+                            pointerEvents: 'none',
+                            aspectRatio: `${w} / ${h}`
+                          }}
+                          draggable="false"
+                          onDragStart={(e) => e.preventDefault()}
+                          onContextMenu={(e) => {
+                            if (!isAdmin) {
+                              e.preventDefault();
+                              return false;
+                            }
+                          }}
+                        />
+                      )}
                     {/* Watermark iGPT + diagonal lines */}
                     <div className="absolute inset-0 pointer-events-none z-20">
                       {/* Diagonal lines pattern */}
