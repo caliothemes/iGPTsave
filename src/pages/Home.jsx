@@ -52,7 +52,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [promptTemplates, setPromptTemplates] = useState([]);
   const [promptExamples, setPromptExamples] = useState([]);
-  const [currentPromptExample, setCurrentPromptExample] = useState(null);
+  const [currentPromptExamples, setCurrentPromptExamples] = useState([]);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
   
   // Format & Style selectors
@@ -217,10 +217,10 @@ export default function Home() {
     setOpenSubmenu(null);
     setOpenNestedSubmenu(null);
     
-    // Load corresponding prompt example
+    // Load all prompt examples for this category
     const categoryId = category.id;
-    const example = promptExamples.find(e => e.category === categoryId);
-    setCurrentPromptExample(example || null);
+    const examples = promptExamples.filter(e => e.category === categoryId);
+    setCurrentPromptExamples(examples);
     
     setTimeout(() => inputRef.current?.focus(), 100);
   };
@@ -985,34 +985,39 @@ export default function Home() {
                           }
                         </p>
 
-{/* Example prompt cliquable */}
-{currentPromptExample && (
+{/* Example prompts cliquables */}
+{currentPromptExamples.length > 0 && (
   <div className="mt-3 pt-3 border-t border-violet-500/20">
     <p className="text-violet-300 text-[11px] font-medium mb-1.5">
-      {language === 'fr' ? '💡 Exemple :' : '💡 Example:'}
+      {language === 'fr' ? '💡 Exemples :' : '💡 Examples:'}
     </p>
-    <button
-      onClick={() => {
-        const example = language === 'fr' 
-          ? currentPromptExample.example_text_fr 
-          : (currentPromptExample.example_text_en || currentPromptExample.example_text_fr);
-        setInputValue(prev => prev + ' ' + example);
-        setTimeout(() => {
-          if (inputRef.current) {
-            inputRef.current.style.height = 'auto';
-            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-            inputRef.current.focus();
-          }
-        }, 0);
-      }}
-      className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all"
-    >
-      "{language === 'fr' 
-        ? currentPromptExample.example_text_fr 
-        : (currentPromptExample.example_text_en || currentPromptExample.example_text_fr)}"
-    </button>
+    <div className="space-y-2">
+      {currentPromptExamples.map((example, idx) => (
+        <button
+          key={idx}
+          onClick={() => {
+            const exampleText = language === 'fr' 
+              ? example.example_text_fr 
+              : (example.example_text_en || example.example_text_fr);
+            setInputValue(prev => prev + ' ' + exampleText);
+            setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.style.height = 'auto';
+                inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                inputRef.current.focus();
+              }
+            }, 0);
+          }}
+          className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all"
+        >
+          "{language === 'fr' 
+            ? example.example_text_fr 
+            : (example.example_text_en || example.example_text_fr)}"
+        </button>
+      ))}
+    </div>
     <p className="text-violet-300/60 text-[10px] mt-1.5">
-      {language === 'fr' ? '👆 Cliquez pour ajouter cet exemple' : '👆 Click to add this example'}
+      {language === 'fr' ? '👆 Cliquez pour ajouter un exemple' : '👆 Click to add an example'}
     </p>
   </div>
 )}
