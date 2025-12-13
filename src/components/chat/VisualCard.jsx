@@ -183,8 +183,8 @@ export default function VisualCard({
             </button>
           )}
 
-          {/* ADS Button - only for images */}
-          {!isVideo && onValidate && (
+          {/* ADS Button - temporarily hidden */}
+          {false && !isVideo && onValidate && (
             <button
               onClick={() => onValidate?.('ads')}
               className="group relative p-2.5 rounded-xl bg-gradient-to-br from-orange-600/90 to-pink-600/90 backdrop-blur-sm hover:from-orange-500 hover:to-pink-500 transition-all shadow-lg shadow-orange-500/30 border border-orange-400/30"
