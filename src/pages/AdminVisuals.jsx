@@ -68,11 +68,16 @@ export default function AdminVisuals() {
           return;
         }
 
-        // Get all admins
-        const allUsers = await base44.asServiceRole.entities.User.list('-created_date', 10000);
-        const admins = allUsers.filter(u => u.role === 'admin');
-        const adminEmailList = admins.map(a => a.email);
-        setAdminEmails(adminEmailList);
+        // Get all admins (non-blocking)
+        try {
+          const allUsers = await base44.asServiceRole.entities.User.list('-created_date', 10000);
+          const admins = allUsers.filter(u => u.role === 'admin');
+          const adminEmailList = admins.map(a => a.email);
+          setAdminEmails(adminEmailList);
+        } catch (e) {
+          console.error('Error loading admins:', e);
+          setAdminEmails([]);
+        }
 
         // Get total count first
         const allVisuals = await base44.entities.Visual.list('-updated_date', 10000);
@@ -86,10 +91,11 @@ export default function AdminVisuals() {
         setVisuals(fetchedVisuals);
         setStoreItems(fetchedStoreItems);
         setStoreCategories(fetchedStoreCategories);
+        setLoading(false);
       } catch (e) {
-        window.location.href = createPageUrl('Home');
+        console.error('Error in AdminVisuals init:', e);
+        setLoading(false);
       }
-      setLoading(false);
     };
     init();
   }, []);
