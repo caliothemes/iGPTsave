@@ -372,6 +372,39 @@ BACKGROUND BOX RULES:
                 />
               </div>
 
+              <div className="border-t border-white/10 pt-4">
+                <label className="text-white/60 text-sm mb-2 block flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Exemple de prompt (cliquable pour l'utilisateur) FR
+                </label>
+                <Input
+                  value={editingPrompt.example_prompt_fr || ''}
+                  onChange={(e) => setEditingPrompt({ ...editingPrompt, example_prompt_fr: e.target.value })}
+                  placeholder="Ex: pour un restaurant italien moderne avec une ambiance chaleureuse"
+                  className="bg-white/5 border-white/10 text-white"
+                />
+                <p className="text-xs text-white/40 mt-1">
+                  Cet exemple s'ajoutera au prompt de l'utilisateur s'il clique dessus
+                </p>
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-2 block flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Exemple de prompt (cliquable pour l'utilisateur) EN
+                </label>
+                <Input
+                  value={editingPrompt.example_prompt_en || ''}
+                  onChange={(e) => setEditingPrompt({ ...editingPrompt, example_prompt_en: e.target.value })}
+                  placeholder="Ex: for a modern Italian restaurant with a warm atmosphere"
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input

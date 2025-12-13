@@ -51,6 +51,7 @@ export default function Home() {
   const [currentVisual, setCurrentVisual] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [promptTemplates, setPromptTemplates] = useState([]);
+  const [currentPromptTemplate, setCurrentPromptTemplate] = useState(null);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
   
   // Format & Style selectors
@@ -201,7 +202,7 @@ export default function Home() {
     }
   };
 
-  const handleCategorySelect = (category) => {
+  const handleCategorySelect = async (category) => {
     setSelectedCategory(category);
     const prompt = category.selectedSubmenu 
       ? category.selectedSubmenu.prompt[language]
@@ -210,6 +211,15 @@ export default function Home() {
     setCategoryDropdownOpen(false);
     setOpenSubmenu(null);
     setOpenNestedSubmenu(null);
+    
+    // Load corresponding prompt template
+    const categoryId = category.selectedSubmenu?.id || category.id;
+    const template = promptTemplates.find(t => 
+      t.category === category.id && 
+      (!t.subcategory || t.subcategory === categoryId)
+    );
+    setCurrentPromptTemplate(template || null);
+    
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -960,44 +970,50 @@ export default function Home() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className="text-violet-300 text-sm font-semibold">
-                            {language === 'fr' ? '✨ Assistant IA' : '✨ AI Assistant'}
+                            {language === 'fr' ? '✨ Assistant iGPT' : '✨ iGPT Assistant'}
                           </span>
                           <span className="px-2 py-0.5 bg-violet-500/20 text-violet-300 text-[10px] font-medium rounded-full">
                             {language === 'fr' ? 'CONSEIL' : 'TIP'}
                           </span>
                         </div>
-                        <p className="text-violet-200 text-xs leading-relaxed mb-2">
+                        <p className="text-violet-200 text-xs leading-relaxed">
                           {language === 'fr' 
-                            ? 'Pour des résultats optimaux, enrichissez votre description avec :'
-                            : 'For optimal results, enrich your description with:'
+                            ? 'Pour des résultats optimaux, ajoutez un style (moderne, vintage...), des couleurs précises, une ambiance (élégante, dynamique...) et des détails spécifiques à votre création.'
+                            : 'For optimal results, add a style (modern, vintage...), precise colors, a mood (elegant, dynamic...) and specific details to your creation.'
                           }
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="px-2.5 py-1 bg-violet-500/20 border border-violet-400/30 text-violet-200 text-[11px] rounded-lg flex items-center gap-1.5">
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                            </svg>
-                            {language === 'fr' ? 'Style (moderne, vintage, minimaliste...)' : 'Style (modern, vintage, minimalist...)'}
-                          </span>
-                          <span className="px-2.5 py-1 bg-blue-500/20 border border-blue-400/30 text-blue-200 text-[11px] rounded-lg flex items-center gap-1.5">
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                            </svg>
-                            {language === 'fr' ? 'Couleurs (palette, ambiance...)' : 'Colors (palette, mood...)'}
-                          </span>
-                          <span className="px-2.5 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-200 text-[11px] rounded-lg flex items-center gap-1.5">
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                            {language === 'fr' ? 'Ambiance (élégante, dynamique, douce...)' : 'Mood (elegant, dynamic, soft...)'}
-                          </span>
-                          <span className="px-2.5 py-1 bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] rounded-lg flex items-center gap-1.5">
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                            </svg>
-                            {language === 'fr' ? 'Détails spécifiques (textures, éléments...)' : 'Specific details (textures, elements...)'}
-                          </span>
-                        </div>
+
+                        {/* Example prompt cliquable */}
+                        {currentPromptTemplate && (currentPromptTemplate.example_prompt_fr || currentPromptTemplate.example_prompt_en) && (
+                          <div className="mt-3 pt-3 border-t border-violet-500/20">
+                            <p className="text-violet-300 text-[11px] font-medium mb-1.5">
+                              {language === 'fr' ? '💡 Exemple :' : '💡 Example:'}
+                            </p>
+                            <button
+                              onClick={() => {
+                                const example = language === 'fr' 
+                                  ? currentPromptTemplate.example_prompt_fr 
+                                  : (currentPromptTemplate.example_prompt_en || currentPromptTemplate.example_prompt_fr);
+                                setInputValue(prev => prev + ' ' + example);
+                                setTimeout(() => {
+                                  if (inputRef.current) {
+                                    inputRef.current.style.height = 'auto';
+                                    inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                                    inputRef.current.focus();
+                                  }
+                                }, 0);
+                              }}
+                              className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all"
+                            >
+                              "{language === 'fr' 
+                                ? currentPromptTemplate.example_prompt_fr 
+                                : (currentPromptTemplate.example_prompt_en || currentPromptTemplate.example_prompt_fr)}"
+                            </button>
+                            <p className="text-violet-300/60 text-[10px] mt-1.5">
+                              {language === 'fr' ? '👆 Cliquez pour ajouter cet exemple' : '👆 Click to add this example'}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
