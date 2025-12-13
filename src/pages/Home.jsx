@@ -938,6 +938,73 @@ export default function Home() {
               )}
             </AnimatePresence>
 
+            {/* AI Assistant Suggestions */}
+            <AnimatePresence>
+              {selectedCategory && selectedCategory.id !== 'free_prompt' && inputValue.trim().length > 10 && !isGenerating && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="mb-3"
+                >
+                  <div className="relative bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-blue-500/10 backdrop-blur-md border border-violet-500/20 rounded-xl overflow-hidden">
+                    {/* Animated gradient border effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-blue-500/20 animate-pulse" style={{ opacity: 0.3 }} />
+
+                    <div className="relative flex items-start gap-3 px-4 py-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/20 flex-shrink-0">
+                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-violet-300 text-sm font-semibold">
+                            {language === 'fr' ? '✨ Assistant IA' : '✨ AI Assistant'}
+                          </span>
+                          <span className="px-2 py-0.5 bg-violet-500/20 text-violet-300 text-[10px] font-medium rounded-full">
+                            {language === 'fr' ? 'CONSEIL' : 'TIP'}
+                          </span>
+                        </div>
+                        <p className="text-violet-200 text-xs leading-relaxed mb-2">
+                          {language === 'fr' 
+                            ? 'Pour des résultats optimaux, enrichissez votre description avec :'
+                            : 'For optimal results, enrich your description with:'
+                          }
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-2.5 py-1 bg-violet-500/20 border border-violet-400/30 text-violet-200 text-[11px] rounded-lg flex items-center gap-1.5">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                            {language === 'fr' ? 'Style (moderne, vintage, minimaliste...)' : 'Style (modern, vintage, minimalist...)'}
+                          </span>
+                          <span className="px-2.5 py-1 bg-blue-500/20 border border-blue-400/30 text-blue-200 text-[11px] rounded-lg flex items-center gap-1.5">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                            {language === 'fr' ? 'Couleurs (palette, ambiance...)' : 'Colors (palette, mood...)'}
+                          </span>
+                          <span className="px-2.5 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-200 text-[11px] rounded-lg flex items-center gap-1.5">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            {language === 'fr' ? 'Ambiance (élégante, dynamique, douce...)' : 'Mood (elegant, dynamic, soft...)'}
+                          </span>
+                          <span className="px-2.5 py-1 bg-pink-500/20 border border-pink-400/30 text-pink-200 text-[11px] rounded-lg flex items-center gap-1.5">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                            {language === 'fr' ? 'Détails spécifiques (textures, éléments...)' : 'Specific details (textures, elements...)'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Format Selector */}
             <AnimatePresence>
               {showFormatSelector && (
