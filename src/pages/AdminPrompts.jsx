@@ -563,11 +563,11 @@ BACKGROUND BOX RULES:
 
               <div>
                 <label className="text-white/60 text-sm mb-2 block">Texte d'exemple FR *</label>
-                <Input
+                <Textarea
                   value={editingExample.example_text_fr}
                   onChange={(e) => setEditingExample({ ...editingExample, example_text_fr: e.target.value })}
                   placeholder="Ex: pour un restaurant italien moderne avec une ambiance chaleureuse, tons orangés et dorés"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-white/5 border-white/10 text-white min-h-20"
                 />
                 <p className="text-xs text-white/40 mt-1">
                   Ce texte s'ajoutera au prompt de l'utilisateur s'il clique dessus
@@ -576,11 +576,11 @@ BACKGROUND BOX RULES:
 
               <div>
                 <label className="text-white/60 text-sm mb-2 block">Texte d'exemple EN</label>
-                <Input
+                <Textarea
                   value={editingExample.example_text_en || ''}
                   onChange={(e) => setEditingExample({ ...editingExample, example_text_en: e.target.value })}
                   placeholder="Ex: for a modern Italian restaurant with a warm atmosphere, orange and gold tones"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-white/5 border-white/10 text-white min-h-20"
                 />
               </div>
 
