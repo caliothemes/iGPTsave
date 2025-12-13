@@ -22,9 +22,12 @@ import {
 
 export default function AdminPrompts() {
   const [prompts, setPrompts] = useState([]);
+  const [examples, setExamples] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingPrompt, setEditingPrompt] = useState(null);
+  const [editingExample, setEditingExample] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showExampleDialog, setShowExampleDialog] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
   const [adsPrompt, setAdsPrompt] = useState('');
   const [savingAds, setSavingAds] = useState(false);
@@ -37,16 +40,32 @@ export default function AdminPrompts() {
     { value: 'image', label: 'Image réaliste', mode: 'modifiable' }
   ];
 
+  const exampleCategories = [
+    { value: 'logo_picto', label: 'Logo Pictogramme' },
+    { value: 'logo_complet', label: 'Logo Complet' },
+    { value: 'print', label: 'Design Print' },
+    { value: 'social', label: 'Réseaux sociaux' },
+    { value: 'image', label: 'Image réaliste' },
+    { value: 'mockup', label: 'Mockups' },
+    { value: 'product', label: 'Produit' },
+    { value: 'design_3d', label: 'Design 3D' },
+    { value: 'textures', label: 'Textures' },
+    { value: 'illustrations', label: 'Illustrations' },
+    { value: 'icones_picto', label: 'Icônes Picto' }
+  ];
+
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
-    const [promptData, settings] = await Promise.all([
+    const [promptData, exampleData, settings] = await Promise.all([
       base44.entities.PromptTemplate.list('order'),
+      base44.entities.PromptExample.list(),
       base44.entities.AppSettings.list()
     ]);
     setPrompts(promptData);
+    setExamples(exampleData);
     
     const adsSetting = settings.find(s => s.key === 'ads_base_prompt');
     setAdsPrompt(adsSetting?.value || '');
@@ -107,6 +126,39 @@ export default function AdminPrompts() {
     }
     
     setSavingAds(false);
+  };
+
+  const handleCreateExample = () => {
+    setEditingExample({
+      category: 'logo_picto',
+      example_text_fr: '',
+      example_text_en: '',
+      is_active: true
+    });
+    setShowExampleDialog(true);
+  };
+
+  const handleEditExample = (example) => {
+    setEditingExample({ ...example });
+    setShowExampleDialog(true);
+  };
+
+  const handleSaveExample = async () => {
+    if (editingExample.id) {
+      await base44.entities.PromptExample.update(editingExample.id, editingExample);
+    } else {
+      await base44.entities.PromptExample.create(editingExample);
+    }
+    await loadData();
+    setShowExampleDialog(false);
+    setEditingExample(null);
+  };
+
+  const handleDeleteExample = async (id) => {
+    if (confirm('Confirmer la suppression ?')) {
+      await base44.entities.PromptExample.delete(id);
+      await loadData();
+    }
   };
 
   const filteredPrompts = filterCategory === 'all' 
@@ -285,6 +337,76 @@ BACKGROUND BOX RULES:
             </div>
           )}
         </div>
+
+        {/* Prompt Examples Section */}
+        <div className="border-t border-white/10 pt-8 mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Exemples de prompts cliquables</h2>
+              <p className="text-white/60">Suggestions affichées dans l'assistant iGPT par catégorie</p>
+            </div>
+            <Button onClick={handleCreateExample} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvel exemple
+            </Button>
+          </div>
+
+          <div className="grid gap-3">
+            {examples.map((example) => (
+              <div key={example.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 text-xs font-medium">
+                        {exampleCategories.find(c => c.value === example.category)?.label || example.category}
+                      </span>
+                      {!example.is_active && (
+                        <span className="px-3 py-1 rounded-full bg-red-600/20 text-red-300 text-xs">
+                          Inactif
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-white text-sm mb-1">
+                      <span className="text-white/40 text-xs">FR: </span>
+                      {example.example_text_fr}
+                    </p>
+                    {example.example_text_en && (
+                      <p className="text-white text-sm">
+                        <span className="text-white/40 text-xs">EN: </span>
+                        {example.example_text_en}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEditExample(example)}
+                      className="text-white/60 hover:text-white"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteExample(example.id)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {examples.length === 0 && (
+              <div className="text-center py-12 text-white/40">
+                <Wand2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Aucun exemple configuré</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Edit Dialog */}
@@ -435,6 +557,86 @@ BACKGROUND BOX RULES:
               Annuler
             </Button>
             <Button onClick={handleSave} className="bg-violet-600 hover:bg-violet-700">
+              <Save className="h-4 w-4 mr-2" />
+              Enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Example Dialog */}
+      <Dialog open={showExampleDialog} onOpenChange={setShowExampleDialog}>
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingExample?.id ? 'Modifier l\'exemple' : 'Nouvel exemple'}
+            </DialogTitle>
+          </DialogHeader>
+
+          {editingExample && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-white/60 text-sm mb-2 block">Catégorie *</label>
+                <Select
+                  value={editingExample.category}
+                  onValueChange={(value) => setEditingExample({ ...editingExample, category: value })}
+                >
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {exampleCategories.map(cat => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-2 block">Texte d'exemple FR *</label>
+                <Input
+                  value={editingExample.example_text_fr}
+                  onChange={(e) => setEditingExample({ ...editingExample, example_text_fr: e.target.value })}
+                  placeholder="Ex: pour un restaurant italien moderne avec une ambiance chaleureuse, tons orangés et dorés"
+                  className="bg-white/5 border-white/10 text-white"
+                />
+                <p className="text-xs text-white/40 mt-1">
+                  Ce texte s'ajoutera au prompt de l'utilisateur s'il clique dessus
+                </p>
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-2 block">Texte d'exemple EN</label>
+                <Input
+                  value={editingExample.example_text_en || ''}
+                  onChange={(e) => setEditingExample({ ...editingExample, example_text_en: e.target.value })}
+                  placeholder="Ex: for a modern Italian restaurant with a warm atmosphere, orange and gold tones"
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingExample.is_active}
+                    onChange={(e) => setEditingExample({ ...editingExample, is_active: e.target.checked })}
+                    className="rounded"
+                  />
+                  <span className="text-white/80 text-sm">Actif</span>
+                </label>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setShowExampleDialog(false)}>
+              <X className="h-4 w-4 mr-2" />
+              Annuler
+            </Button>
+            <Button onClick={handleSaveExample} className="bg-blue-600 hover:bg-blue-700">
               <Save className="h-4 w-4 mr-2" />
               Enregistrer
             </Button>

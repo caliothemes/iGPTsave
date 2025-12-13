@@ -51,7 +51,8 @@ export default function Home() {
   const [currentVisual, setCurrentVisual] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [promptTemplates, setPromptTemplates] = useState([]);
-  const [currentPromptTemplate, setCurrentPromptTemplate] = useState(null);
+  const [promptExamples, setPromptExamples] = useState([]);
+  const [currentPromptExample, setCurrentPromptExample] = useState(null);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
   
   // Format & Style selectors
@@ -136,9 +137,13 @@ export default function Home() {
           const allVisuals = await base44.entities.Visual.filter({ user_email: currentUser.email });
           setTotalVisualsCount(allVisuals.length);
 
-          // Load prompt templates
-          const templates = await base44.entities.PromptTemplate.filter({ is_active: true });
+          // Load prompt templates and examples
+          const [templates, examples] = await Promise.all([
+            base44.entities.PromptTemplate.filter({ is_active: true }),
+            base44.entities.PromptExample.filter({ is_active: true })
+          ]);
           setPromptTemplates(templates);
+          setPromptExamples(examples);
 
           // Check if there's an editVisual parameter
           const urlParams = new URLSearchParams(window.location.search);
@@ -212,13 +217,10 @@ export default function Home() {
     setOpenSubmenu(null);
     setOpenNestedSubmenu(null);
     
-    // Load corresponding prompt template
-    const categoryId = category.selectedSubmenu?.id || category.id;
-    const template = promptTemplates.find(t => 
-      t.category === category.id && 
-      (!t.subcategory || t.subcategory === categoryId)
-    );
-    setCurrentPromptTemplate(template || null);
+    // Load corresponding prompt example
+    const categoryId = category.id;
+    const example = promptExamples.find(e => e.category === categoryId);
+    setCurrentPromptExample(example || null);
     
     setTimeout(() => inputRef.current?.focus(), 100);
   };
@@ -983,37 +985,37 @@ export default function Home() {
                           }
                         </p>
 
-                        {/* Example prompt cliquable */}
-                        {currentPromptTemplate && (currentPromptTemplate.example_prompt_fr || currentPromptTemplate.example_prompt_en) && (
-                          <div className="mt-3 pt-3 border-t border-violet-500/20">
-                            <p className="text-violet-300 text-[11px] font-medium mb-1.5">
-                              {language === 'fr' ? '💡 Exemple :' : '💡 Example:'}
-                            </p>
-                            <button
-                              onClick={() => {
-                                const example = language === 'fr' 
-                                  ? currentPromptTemplate.example_prompt_fr 
-                                  : (currentPromptTemplate.example_prompt_en || currentPromptTemplate.example_prompt_fr);
-                                setInputValue(prev => prev + ' ' + example);
-                                setTimeout(() => {
-                                  if (inputRef.current) {
-                                    inputRef.current.style.height = 'auto';
-                                    inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-                                    inputRef.current.focus();
-                                  }
-                                }, 0);
-                              }}
-                              className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all"
-                            >
-                              "{language === 'fr' 
-                                ? currentPromptTemplate.example_prompt_fr 
-                                : (currentPromptTemplate.example_prompt_en || currentPromptTemplate.example_prompt_fr)}"
-                            </button>
-                            <p className="text-violet-300/60 text-[10px] mt-1.5">
-                              {language === 'fr' ? '👆 Cliquez pour ajouter cet exemple' : '👆 Click to add this example'}
-                            </p>
-                          </div>
-                        )}
+{/* Example prompt cliquable */}
+{currentPromptExample && (
+  <div className="mt-3 pt-3 border-t border-violet-500/20">
+    <p className="text-violet-300 text-[11px] font-medium mb-1.5">
+      {language === 'fr' ? '💡 Exemple :' : '💡 Example:'}
+    </p>
+    <button
+      onClick={() => {
+        const example = language === 'fr' 
+          ? currentPromptExample.example_text_fr 
+          : (currentPromptExample.example_text_en || currentPromptExample.example_text_fr);
+        setInputValue(prev => prev + ' ' + example);
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+            inputRef.current.focus();
+          }
+        }, 0);
+      }}
+      className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all"
+    >
+      "{language === 'fr' 
+        ? currentPromptExample.example_text_fr 
+        : (currentPromptExample.example_text_en || currentPromptExample.example_text_fr)}"
+    </button>
+    <p className="text-violet-300/60 text-[10px] mt-1.5">
+      {language === 'fr' ? '👆 Cliquez pour ajouter cet exemple' : '👆 Click to add this example'}
+    </p>
+  </div>
+)}
                       </div>
                     </div>
                   </div>
