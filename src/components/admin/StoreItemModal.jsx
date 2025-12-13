@@ -151,7 +151,16 @@ export default function StoreItemModal({ visual, isOpen, onClose, onSuccess }) {
         
         {visual && (
           <div className="space-y-4">
-            <div className="aspect-video rounded-lg overflow-hidden bg-white/5">
+            <div 
+              className="rounded-lg overflow-hidden bg-white/5 max-w-full"
+              style={{ 
+                aspectRatio: (() => {
+                  const dims = formData.dimensions || visual.dimensions || '1080x1080';
+                  const [w, h] = dims.split('x').map(n => parseInt(n));
+                  return w && h ? `${w} / ${h}` : '1 / 1';
+                })()
+              }}
+            >
               {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
                 <video 
                   src={visual.video_url || visual.image_url}
