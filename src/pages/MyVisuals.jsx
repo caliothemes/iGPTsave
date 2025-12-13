@@ -147,7 +147,7 @@ export default function MyVisuals() {
 
   const handleVideoGenerated = async (videoUrl, animationPrompt) => {
     if (!videoVisual) return;
-    
+
     const newVisual = await base44.entities.Visual.create({
       user_email: videoVisual.user_email,
       image_url: videoUrl,
@@ -158,10 +158,13 @@ export default function MyVisuals() {
       visual_type: videoVisual.visual_type,
       parent_visual_id: videoVisual.id
     });
-    
+
     setVisuals(prev => [newVisual, ...prev]);
     setShowVideoModal(false);
     setVideoVisual(null);
+
+    // Scroll to top to see the new video
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
 
