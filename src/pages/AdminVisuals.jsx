@@ -43,16 +43,20 @@ export default function AdminVisuals() {
   const [visuals, setVisuals] = useState([]);
   const [allVisualsCount, setAllVisualsCount] = useState(0);
   const [storeItems, setStoreItems] = useState([]);
+  const [storeCategories, setStoreCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [storeCategoryFilter, setStoreCategoryFilter] = useState('all');
   const [portfolioFilter, setPortfolioFilter] = useState(false);
   const [storeFilter, setStoreFilter] = useState(false);
+  const [userFilter, setUserFilter] = useState('admins'); // 'all' or 'admins'
   const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [visualToDownload, setVisualToDownload] = useState(null);
+  const [adminEmails, setAdminEmails] = useState([]);
   const itemsPerPage = 100;
 
   useEffect(() => {
@@ -64,16 +68,24 @@ export default function AdminVisuals() {
           return;
         }
 
+        // Get all admins
+        const allUsers = await base44.asServiceRole.entities.User.list('-created_date', 10000);
+        const admins = allUsers.filter(u => u.role === 'admin');
+        const adminEmailList = admins.map(a => a.email);
+        setAdminEmails(adminEmailList);
+
         // Get total count first
         const allVisuals = await base44.entities.Visual.list('-updated_date', 10000);
         setAllVisualsCount(allVisuals.length);
 
-        const [fetchedVisuals, fetchedStoreItems] = await Promise.all([
+        const [fetchedVisuals, fetchedStoreItems, fetchedStoreCategories] = await Promise.all([
           base44.entities.Visual.list('-updated_date', itemsPerPage, 0),
-          base44.entities.StoreItem.list()
+          base44.entities.StoreItem.list(),
+          base44.entities.StoreCategory.list('order')
         ]);
         setVisuals(fetchedVisuals);
         setStoreItems(fetchedStoreItems);
+        setStoreCategories(fetchedStoreCategories);
       } catch (e) {
         window.location.href = createPageUrl('Home');
       }
@@ -111,12 +123,14 @@ export default function AdminVisuals() {
 
   const loadVisuals = async () => {
     const skip = (currentPage - 1) * itemsPerPage;
-    const [fetchedVisuals, fetchedStoreItems] = await Promise.all([
+    const [fetchedVisuals, fetchedStoreItems, fetchedStoreCategories] = await Promise.all([
       base44.entities.Visual.list('-updated_date', itemsPerPage, skip),
-      base44.entities.StoreItem.list()
+      base44.entities.StoreItem.list(),
+      base44.entities.StoreCategory.list('order')
     ]);
     setVisuals(fetchedVisuals);
     setStoreItems(fetchedStoreItems);
+    setStoreCategories(fetchedStoreCategories);
   };
 
   const handleDownload = (visual) => {
@@ -124,17 +138,55 @@ export default function AdminVisuals() {
     setDownloadModalOpen(true);
   };
 
+  // Main categories
+  const mainCategories = [
+    { id: 'logo_picto', name: 'Logo Pictogramme' },
+    { id: 'logo_complet', name: 'Logo complet' },
+    { id: 'image', name: 'Image réaliste' },
+    { id: 'print', name: 'Design Print' },
+    { id: 'social', name: 'Réseaux sociaux' },
+    { id: 'mockup', name: 'Mockups' },
+    { id: 'product', name: 'Produit' },
+    { id: 'design_3d', name: 'Design 3D' },
+    { id: 'textures', name: 'Textures' },
+    { id: 'illustrations', name: 'Illustrations' },
+    { id: 'icones_picto', name: 'Icônes Picto' },
+    { id: 'free_prompt', name: 'Prompt 100% libre' }
+  ];
+
   const visualTypes = [...new Set(visuals.map(v => v.visual_type).filter(Boolean))];
 
   const storeVisualIds = new Set(storeItems.map(item => item.visual_id));
+  
+  // Map store items to their categories
+  const visualToStoreCategories = {};
+  storeItems.forEach(item => {
+    visualToStoreCategories[item.visual_id] = item.category_slugs || [];
+  });
 
   const filteredVisuals = visuals.filter(v => {
-    const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase()) ||
-                         v.user_email?.toLowerCase().includes(search.toLowerCase());
+    // Multi-word intelligent search
+    const searchWords = search.toLowerCase().trim().split(/\s+/);
+    const matchesSearch = search.trim() === '' || searchWords.every(word => {
+      const titleMatch = v.title?.toLowerCase().includes(word);
+      const emailMatch = v.user_email?.toLowerCase().includes(word);
+      const typeMatch = v.visual_type?.toLowerCase().includes(word);
+      return titleMatch || emailMatch || typeMatch;
+    });
+    
     const matchesType = typeFilter === 'all' || v.visual_type === typeFilter;
     const matchesPortfolio = !portfolioFilter || v.in_portfolio;
     const matchesStore = !storeFilter || storeVisualIds.has(v.id);
-    return matchesSearch && matchesType && matchesPortfolio && matchesStore;
+    
+    // Filter by store category
+    const matchesStoreCategory = storeCategoryFilter === 'all' || 
+      (visualToStoreCategories[v.id] && visualToStoreCategories[v.id].includes(storeCategoryFilter));
+    
+    // Filter by user type (all or admins only)
+    const matchesUserFilter = userFilter === 'all' || 
+      (userFilter === 'admins' && adminEmails.includes(v.user_email));
+    
+    return matchesSearch && matchesType && matchesPortfolio && matchesStore && matchesStoreCategory && matchesUserFilter;
   });
 
   const totalPages = Math.ceil(allVisualsCount / itemsPerPage);
@@ -154,9 +206,37 @@ export default function AdminVisuals() {
     <AdminLayout currentPage="visuals">
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Visuels</h1>
-          <p className="text-white/60">{allVisualsCount} visuels générés • Page {currentPage}/{totalPages}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Visuels</h1>
+            <p className="text-white/60">{allVisualsCount} visuels générés • Page {currentPage}/{totalPages}</p>
+          </div>
+          
+          {/* User Filter Toggle */}
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setUserFilter('admins')}
+              variant={userFilter === 'admins' ? 'default' : 'outline'}
+              className={cn(
+                userFilter === 'admins' 
+                  ? 'bg-violet-600 text-white hover:bg-violet-700' 
+                  : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+              )}
+            >
+              Tous les visuels iGPT admins
+            </Button>
+            <Button
+              onClick={() => setUserFilter('all')}
+              variant={userFilter === 'all' ? 'default' : 'outline'}
+              className={cn(
+                userFilter === 'all' 
+                  ? 'bg-violet-600 text-white hover:bg-violet-700' 
+                  : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+              )}
+            >
+              Tous les visuels iGPT
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -176,8 +256,19 @@ export default function AdminVisuals() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les types</SelectItem>
-              {visualTypes.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
+              {mainCategories.map(cat => (
+                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={storeCategoryFilter} onValueChange={setStoreCategoryFilter}>
+            <SelectTrigger className="w-52 bg-white/5 border-white/10 text-white">
+              <SelectValue placeholder="Catégorie Store" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les catégories Store</SelectItem>
+              {storeCategories.filter(c => c.is_active).map(cat => (
+                <SelectItem key={cat.slug} value={cat.slug}>{cat.name_fr}</SelectItem>
               ))}
             </SelectContent>
           </Select>
