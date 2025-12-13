@@ -156,11 +156,24 @@ export default function Home() {
               console.error('Failed to load visual:', e);
             }
           }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      setIsLoading(false);
+          }
+          } catch (e) {
+          console.error(e);
+          }
+
+          // Load prompt templates and examples (for all users, including guests)
+          try {
+          const [templates, examples] = await Promise.all([
+          base44.entities.PromptTemplate.filter({ is_active: true }),
+          base44.entities.PromptExample.filter({ is_active: true })
+          ]);
+          setPromptTemplates(templates);
+          setPromptExamples(examples);
+          } catch (e) {
+          console.error('Failed to load prompt templates/examples:', e);
+          }
+
+          setIsLoading(false);
     };
     init();
   }, []);
