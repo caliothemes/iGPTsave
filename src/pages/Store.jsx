@@ -169,14 +169,17 @@ export default function Store() {
       );
     }
 
-    // Filter by search query
+    // Filter by search query - intelligent multi-word search
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const searchWords = searchQuery.toLowerCase().trim().split(/\s+/);
       items = items.filter(item => {
-        const titleMatch = item.title?.toLowerCase().includes(query);
-        const descMatch = item.description?.toLowerCase().includes(query);
-        const keywordsMatch = item.keywords?.some(k => k.toLowerCase().includes(query));
-        return titleMatch || descMatch || keywordsMatch;
+        // All search words must be found somewhere in the item
+        return searchWords.every(word => {
+          const titleMatch = item.title?.toLowerCase().includes(word);
+          const descMatch = item.description?.toLowerCase().includes(word);
+          const keywordsMatch = item.keywords?.some(k => k.toLowerCase().includes(word));
+          return titleMatch || descMatch || keywordsMatch;
+        });
       });
     }
 
