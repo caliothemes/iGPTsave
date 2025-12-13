@@ -69,11 +69,12 @@ export default function AdminVisuals() {
           return;
         }
 
-        // Get all admins (non-blocking)
+        // Get all admins first
+        let adminEmailList = [];
         try {
           const allUsers = await base44.asServiceRole.entities.User.list('-created_date', 10000);
           const admins = allUsers.filter(u => u.role === 'admin');
-          const adminEmailList = admins.map(a => a.email);
+          adminEmailList = admins.map(a => a.email);
           setAdminEmails(adminEmailList);
         } catch (e) {
           console.error('Error loading admins:', e);
@@ -84,6 +85,10 @@ export default function AdminVisuals() {
         const allVisuals = await base44.entities.Visual.list('-updated_date', 10000);
         setAllVisualsCount(allVisuals.length);
 
+        // Load all admin visuals for the filter
+        const allAdminVisuals = allVisuals.filter(v => adminEmailList.includes(v.user_email));
+        setAdminVisuals(allAdminVisuals);
+
         const [fetchedVisuals, fetchedStoreItems, fetchedStoreCategories] = await Promise.all([
           base44.entities.Visual.list('-updated_date', itemsPerPage, 0),
           base44.entities.StoreItem.list(),
@@ -92,10 +97,6 @@ export default function AdminVisuals() {
         setVisuals(fetchedVisuals);
         setStoreItems(fetchedStoreItems);
         setStoreCategories(fetchedStoreCategories);
-        
-        // Load all admin visuals for the filter
-        const allAdminVisuals = allVisuals.filter(v => adminEmailList.includes(v.user_email));
-        setAdminVisuals(allAdminVisuals);
         
         setLoading(false);
       } catch (e) {
