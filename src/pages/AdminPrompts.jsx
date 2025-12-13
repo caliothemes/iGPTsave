@@ -26,6 +26,8 @@ export default function AdminPrompts() {
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
+  const [adsPrompt, setAdsPrompt] = useState('');
+  const [savingAds, setSavingAds] = useState(false);
 
   const categories = [
     { value: 'logo_picto', label: 'Logo Pictogramme', mode: 'assisté' },
@@ -36,13 +38,25 @@ export default function AdminPrompts() {
   ];
 
   useEffect(() => {
-    loadPrompts();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    const [promptData, settings] = await Promise.all([
+      base44.entities.PromptTemplate.list('order'),
+      base44.entities.AppSettings.list()
+    ]);
+    setPrompts(promptData);
+    
+    const adsSetting = settings.find(s => s.key === 'ads_base_prompt');
+    setAdsPrompt(adsSetting?.value || '');
+    
+    setLoading(false);
+  };
 
   const loadPrompts = async () => {
     const data = await base44.entities.PromptTemplate.list('order');
     setPrompts(data);
-    setLoading(false);
   };
 
   const handleCreate = () => {
@@ -81,6 +95,20 @@ export default function AdminPrompts() {
     }
   };
 
+  const handleSaveAdsPrompt = async () => {
+    setSavingAds(true);
+    const allSettings = await base44.entities.AppSettings.list();
+    const existing = allSettings.find(s => s.key === 'ads_base_prompt');
+    
+    if (existing) {
+      await base44.entities.AppSettings.update(existing.id, { value: adsPrompt });
+    } else {
+      await base44.entities.AppSettings.create({ key: 'ads_base_prompt', value: adsPrompt });
+    }
+    
+    setSavingAds(false);
+  };
+
   const filteredPrompts = filterCategory === 'all' 
     ? prompts 
     : prompts.filter(p => p.category === filterCategory);
@@ -100,13 +128,65 @@ export default function AdminPrompts() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Templates de Prompts</h1>
-            <p className="text-white/60">Gérez les prompts de génération par catégorie</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Prompts IA</h1>
+            <p className="text-white/60">Gérez les prompts de génération par catégorie et le prompt de base pour les publicités</p>
           </div>
           <Button onClick={handleCreate} className="bg-violet-600 hover:bg-violet-700">
             <Plus className="h-4 w-4 mr-2" />
             Nouveau prompt
           </Button>
+        </div>
+
+        {/* ADS Base Prompt Section */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-orange-600/20">
+                <Wand2 className="h-5 w-5 text-orange-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-white">Prompt de base - Créateur de Pub IA</h2>
+                <p className="text-sm text-white/50">Instructions ajoutées automatiquement avant la demande utilisateur</p>
+              </div>
+            </div>
+            <Button
+              onClick={handleSaveAdsPrompt}
+              disabled={savingAds}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {savingAds ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Enregistrer
+            </Button>
+          </div>
+          
+          <Textarea
+            value={adsPrompt}
+            onChange={(e) => setAdsPrompt(e.target.value)}
+            placeholder={`Create ULTRA MODERN professional advertising design with BOLD, CONTEMPORARY styling.
+
+MODERN DESIGN PRINCIPLES:
+1. TYPOGRAPHY: Use bold sans-serif fonts (Impact, Arial Black, Helvetica) with large sizes (80-140px titles)
+2. COLORS: Vibrant gradients (neon, pastel, or bold contrasts), avoid plain colors
+3. BACKGROUNDS: Full-width colored boxes with gradients, semi-transparent overlays (rgba 0.85-0.95)
+4. EFFECTS: Strong shadows + thick strokes (5-8px) for maximum pop and readability
+5. LAYOUT: Asymmetric, dynamic placement - use corners and edges, avoid center
+6. SPACING: Generous padding (40-60px) in background boxes, leave breathing room
+7. STYLE: Instagram/TikTok aesthetic - punchy, eye-catching, trendy
+
+BACKGROUND BOX RULES:
+- Must extend FULL WIDTH or near-full width of text
+- Use backgroundPadding: 50-70 for generous spacing
+- Prefer gradient backgrounds over solid colors
+- Examples: "linear-gradient(135deg, rgba(255,20,147,0.95), rgba(138,43,226,0.95))"`}
+            className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-64 font-mono text-xs"
+          />
+          <p className="text-xs text-white/40 mt-2">
+            Ce prompt définit le style et les règles de génération des publicités dans l'outil de création de pub.
+          </p>
         </div>
 
         {/* Filter */}
