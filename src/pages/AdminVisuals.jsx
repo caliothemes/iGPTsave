@@ -96,12 +96,16 @@ export default function AdminVisuals() {
 
   const loadPage = async (page) => {
     setLoadingMore(true);
-    const skip = (page - 1) * itemsPerPage;
-    const fetchedVisuals = await base44.entities.Visual.list('-updated_date', itemsPerPage, skip);
-    setVisuals(fetchedVisuals);
-    setCurrentPage(page);
+    try {
+      const skip = (page - 1) * itemsPerPage;
+      const fetchedVisuals = await base44.entities.Visual.list('-updated_date', itemsPerPage, skip);
+      setVisuals(fetchedVisuals);
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      console.error('Error loading page:', e);
+    }
     setLoadingMore(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (visualId) => {
