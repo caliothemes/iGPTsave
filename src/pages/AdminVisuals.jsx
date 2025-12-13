@@ -50,6 +50,7 @@ export default function AdminVisuals() {
   const [portfolioFilter, setPortfolioFilter] = useState(false);
   const [storeFilter, setStoreFilter] = useState(false);
   const [userFilter, setUserFilter] = useState('admins'); // 'all' or 'admins'
+  const [adminVisuals, setAdminVisuals] = useState([]); // All admin visuals when filter is active
   const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -91,6 +92,11 @@ export default function AdminVisuals() {
         setVisuals(fetchedVisuals);
         setStoreItems(fetchedStoreItems);
         setStoreCategories(fetchedStoreCategories);
+        
+        // Load all admin visuals for the filter
+        const allAdminVisuals = allVisuals.filter(v => adminEmailList.includes(v.user_email));
+        setAdminVisuals(allAdminVisuals);
+        
         setLoading(false);
       } catch (e) {
         console.error('Error in AdminVisuals init:', e);
@@ -174,7 +180,10 @@ export default function AdminVisuals() {
     visualToStoreCategories[item.visual_id] = item.category_slugs || [];
   });
 
-  const filteredVisuals = visuals.filter(v => {
+  // Use admin visuals when filter is active, otherwise use paginated visuals
+  const visualsToFilter = userFilter === 'admins' ? adminVisuals : visuals;
+  
+  const filteredVisuals = visualsToFilter.filter(v => {
     // Multi-word intelligent search
     const searchWords = search.toLowerCase().trim().split(/\s+/);
     const matchesSearch = search.trim() === '' || searchWords.every(word => {
@@ -192,15 +201,11 @@ export default function AdminVisuals() {
     const matchesStoreCategory = storeCategoryFilter === 'all' || 
       (visualToStoreCategories[v.id] && visualToStoreCategories[v.id].includes(storeCategoryFilter));
     
-    // Filter by user type (all or admins only)
-    const matchesUserFilter = userFilter === 'all' || 
-      (userFilter === 'admins' && adminEmails.includes(v.user_email));
-    
-    return matchesSearch && matchesType && matchesPortfolio && matchesStore && matchesStoreCategory && matchesUserFilter;
+    return matchesSearch && matchesType && matchesPortfolio && matchesStore && matchesStoreCategory;
   });
 
   const totalPages = Math.ceil(allVisualsCount / itemsPerPage);
-  const showPagination = totalPages > 1;
+  const showPagination = totalPages > 1 && userFilter !== 'admins'; // Hide pagination when filtering by admins
 
   if (loading) {
     return (
