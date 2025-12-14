@@ -3206,22 +3206,9 @@ Réponds en JSON avec:
         </div>
         
         {/* Canvas Container */}
-        <div className="relative flex-1 flex items-center justify-center">
-          {/* Zoom Controls */}
-          <div className="absolute top-4 right-4 z-50 flex flex-col gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
-            <button
-              onClick={() => setZoom(Math.min(3, zoom + 0.25))}
-              disabled={zoom >= 3}
-              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              title={language === 'fr' ? 'Zoom +' : 'Zoom in'}
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-              </svg>
-            </button>
-            <span className="text-white/70 text-xs text-center font-medium px-1">
-              {Math.round(zoom * 100)}%
-            </span>
+        <div className="relative flex-1 flex flex-col items-center justify-center">
+          {/* Zoom Controls - Horizontal */}
+          <div className="mb-3 flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
             <button
               onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
               disabled={zoom <= 0.5}
@@ -3232,10 +3219,24 @@ Réponds en JSON avec:
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
               </svg>
             </button>
+            <span className="text-white/70 text-xs font-medium px-2 min-w-[50px] text-center">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              onClick={() => setZoom(Math.min(3, zoom + 0.25))}
+              disabled={zoom >= 3}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              title={language === 'fr' ? 'Zoom +' : 'Zoom in'}
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+              </svg>
+            </button>
+            <div className="w-px h-6 bg-white/10 mx-1" />
             <button
               onClick={() => setZoom(1)}
               disabled={zoom === 1}
-              className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-xs font-medium"
+              className="px-3 py-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-xs font-medium"
               title={language === 'fr' ? 'Réinitialiser' : 'Reset'}
             >
               100%
