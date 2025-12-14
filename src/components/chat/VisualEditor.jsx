@@ -14,7 +14,8 @@ import {
   Pentagon, Octagon, Diamond, Loader2, ImagePlus,
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
-  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors, Frame
+  PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors, Frame,
+  SlidersHorizontal
 } from 'lucide-react';
 import {
   DropdownMenu,
