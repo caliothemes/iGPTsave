@@ -358,9 +358,12 @@ export default function Home() {
               enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
             }
             enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
-            } else if (['print', 'social'].includes(activeCategory?.id)) {
-              // Design plein écran pour print et social - AUCUN cadre, AUCUNE bordure
-              enhancedPrompt = `full bleed graphic design for ${userMessage}, edge to edge composition, design fills entire frame from corner to corner, complete coverage wall to wall, 100% surface filled with design elements, seamless border to border layout, full frame design without margins, professional print-ready artwork bleeding to edges --no text --no letters --no typography --no white border --no frame --no mockup --no margin --no padding --no white space --no centered card --no floating design --no background --no canvas --no mat --no mount --no edge --no border --no outline --no cutout --no perspective --no shadow --no 3d`;
+            } else if (activeCategory?.id === 'print') {
+              // Design PRINT plein écran - AUCUN cadre, étalement total du design
+              enhancedPrompt = `${userMessage}, complete full bleed design filling entire canvas edge to edge, total surface coverage with design elements spreading to all corners and borders, wallpaper style layout covering 100% of area, seamless infinity pattern extending beyond frame, continuous design with no empty margins or white space, professional print-ready full bleed artwork --no border --no white space --no frame --no margin --no padding --no mockup --no card --no centered element --no floating object --no canvas --no mat --no mount --no white background --no empty area --no negative space around design --no perspective --no 3d --no shadow --no text --no letters --no typography`;
+            } else if (activeCategory?.id === 'social') {
+              // Design réseaux sociaux - même style que print
+              enhancedPrompt = `${userMessage}, complete full bleed design filling entire canvas edge to edge, total surface coverage with design elements spreading to all corners and borders, wallpaper style layout covering 100% of area, seamless infinity pattern extending beyond frame, continuous design with no empty margins or white space, professional social media ready full bleed artwork --no border --no white space --no frame --no margin --no padding --no mockup --no card --no centered element --no floating object --no canvas --no mat --no mount --no white background --no empty area --no negative space around design --no perspective --no 3d --no shadow --no text --no letters --no typography`;
             } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
