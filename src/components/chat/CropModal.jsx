@@ -136,13 +136,19 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       ctx.setLineDash([]);
     }
 
-    // Draw resize handles
+    // Draw resize handles (corners + sides)
     const handleSize = 12;
     const handles = [
+      // Corners
       { x: scaledRect.x, y: scaledRect.y, cursor: 'nw-resize', pos: 'tl' },
       { x: scaledRect.x + scaledRect.width, y: scaledRect.y, cursor: 'ne-resize', pos: 'tr' },
       { x: scaledRect.x, y: scaledRect.y + scaledRect.height, cursor: 'sw-resize', pos: 'bl' },
-      { x: scaledRect.x + scaledRect.width, y: scaledRect.y + scaledRect.height, cursor: 'se-resize', pos: 'br' }
+      { x: scaledRect.x + scaledRect.width, y: scaledRect.y + scaledRect.height, cursor: 'se-resize', pos: 'br' },
+      // Sides
+      { x: scaledRect.x, y: scaledRect.y + scaledRect.height / 2, cursor: 'w-resize', pos: 'l' },
+      { x: scaledRect.x + scaledRect.width, y: scaledRect.y + scaledRect.height / 2, cursor: 'e-resize', pos: 'r' },
+      { x: scaledRect.x + scaledRect.width / 2, y: scaledRect.y, cursor: 'n-resize', pos: 't' },
+      { x: scaledRect.x + scaledRect.width / 2, y: scaledRect.y + scaledRect.height, cursor: 's-resize', pos: 'b' }
     ];
 
     handles.forEach(handle => {
@@ -172,10 +178,16 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
 
     const handleSize = 12;
     const handles = [
+      // Corners
       { x: scaledRect.x, y: scaledRect.y, pos: 'tl' },
       { x: scaledRect.x + scaledRect.width, y: scaledRect.y, pos: 'tr' },
       { x: scaledRect.x, y: scaledRect.y + scaledRect.height, pos: 'bl' },
-      { x: scaledRect.x + scaledRect.width, y: scaledRect.y + scaledRect.height, pos: 'br' }
+      { x: scaledRect.x + scaledRect.width, y: scaledRect.y + scaledRect.height, pos: 'br' },
+      // Sides
+      { x: scaledRect.x, y: scaledRect.y + scaledRect.height / 2, pos: 'l' },
+      { x: scaledRect.x + scaledRect.width, y: scaledRect.y + scaledRect.height / 2, pos: 'r' },
+      { x: scaledRect.x + scaledRect.width / 2, y: scaledRect.y, pos: 't' },
+      { x: scaledRect.x + scaledRect.width / 2, y: scaledRect.y + scaledRect.height, pos: 'b' }
     ];
 
     // Check if clicking on a handle
@@ -210,6 +222,7 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       setCropRect(prev => {
         let newRect = { ...prev };
         
+        // Corners
         if (resizeHandle === 'tl') {
           const newX = Math.max(0, Math.min(prev.x + prev.width - 50, prev.x + dx));
           const newY = Math.max(0, Math.min(prev.y + prev.height - 50, prev.y + dy));
@@ -229,6 +242,20 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
           newRect.x = newX;
         } else if (resizeHandle === 'br') {
           newRect.width = Math.max(50, Math.min(image.width - prev.x, prev.width + dx));
+          newRect.height = Math.max(50, Math.min(image.height - prev.y, prev.height + dy));
+        }
+        // Sides
+        else if (resizeHandle === 'l') {
+          const newX = Math.max(0, Math.min(prev.x + prev.width - 50, prev.x + dx));
+          newRect.width = prev.width + (prev.x - newX);
+          newRect.x = newX;
+        } else if (resizeHandle === 'r') {
+          newRect.width = Math.max(50, Math.min(image.width - prev.x, prev.width + dx));
+        } else if (resizeHandle === 't') {
+          const newY = Math.max(0, Math.min(prev.y + prev.height - 50, prev.y + dy));
+          newRect.height = prev.height + (prev.y - newY);
+          newRect.y = newY;
+        } else if (resizeHandle === 'b') {
           newRect.height = Math.max(50, Math.min(image.height - prev.y, prev.height + dy));
         }
 
