@@ -3206,9 +3206,9 @@ Réponds en JSON avec:
         </div>
         
         {/* Canvas Container */}
-        <div className="relative flex-1 flex flex-col items-center justify-center">
-          {/* Zoom Controls - Horizontal */}
-          <div className="mb-3 flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
+        <div className="relative flex-1 flex items-center justify-center overflow-auto">
+          {/* Zoom Controls - Horizontal - Fixed at top */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
             <button
               onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
               disabled={zoom <= 0.5}
@@ -3245,7 +3245,7 @@ Réponds en JSON avec:
           
           {/* Message de suppression de fond */}
           {removingBg && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-pink-600/95 backdrop-blur-sm px-6 py-3 rounded-xl border border-pink-400/50 shadow-2xl animate-pulse">
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 bg-pink-600/95 backdrop-blur-sm px-6 py-3 rounded-xl border border-pink-400/50 shadow-2xl animate-pulse">
               <p className="text-white text-sm font-semibold flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 {language === 'fr' 
