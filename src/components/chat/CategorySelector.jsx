@@ -43,11 +43,12 @@ const CATEGORIES = [
     name: { fr: 'Design Print', en: 'Print Design' },
     description: { fr: 'Carte de visite, Flyer, Affiche', en: 'Business card, Flyer, Poster' },
     hasSubmenu: true,
+    isPrint: true,
     submenu: [
-      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design print format carré pour', en: 'Create a square format print design for' }, dimensions: '1080x1080' },
-      { id: 'print_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design print format story pour', en: 'Create a story format print design for' }, dimensions: '1080x1920' },
-      { id: 'print_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design print format portrait pour', en: 'Create a portrait format print design for' }, dimensions: '1080x1350' },
-      { id: 'print_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design print format paysage pour', en: 'Create a landscape format print design for' }, dimensions: '1920x1080' },
+      { id: 'print_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design print format carré pour', en: 'Create a square format print design for' }, dimensions: '2100x2100' },
+      { id: 'print_story', name: { fr: 'Story (9:16)', en: 'Story (9:16)' }, prompt: { fr: 'Crée un design print format story pour', en: 'Create a story format print design for' }, dimensions: '2100x3600' },
+      { id: 'print_portrait', name: { fr: 'Portrait (4:5)', en: 'Portrait (4:5)' }, prompt: { fr: 'Crée un design print format portrait pour', en: 'Create a portrait format print design for' }, dimensions: '2400x3000' },
+      { id: 'print_paysage', name: { fr: 'Paysage (16:9)', en: 'Landscape (16:9)' }, prompt: { fr: 'Crée un design print format paysage pour', en: 'Create a landscape format print design for' }, dimensions: '3600x2100' },
     ]
   },
   {
@@ -185,6 +186,7 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
         const isOpen = openSubmenu === category.id;
         const isSelected = selectedCategory?.id === category.id;
         const isFreePrompt = category.isFreePrompt;
+        const isPrint = category.isPrint;
 
         return (
           <div key={category.id} className="relative">
@@ -206,6 +208,11 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-1">
                     <span className="text-white text-sm font-medium">{category.name[language]}</span>
+                    {isPrint && (
+                      <span className="px-2 py-0.5 bg-green-600/20 border border-green-500/30 text-green-300 text-[10px] font-bold rounded-full">
+                        300 DPI
+                      </span>
+                    )}
                     {category.hasSubmenu && (
                       <ChevronDown className={cn(
                         "h-4 w-4 text-white/40 transition-transform",
