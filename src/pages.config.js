@@ -17,6 +17,8 @@ import AdminPrompts from './pages/AdminPrompts';
 import Store from './pages/Store';
 import AdminStoreCategories from './pages/AdminStoreCategories';
 import AdminUserDetail from './pages/AdminUserDetail';
+import Support from './pages/Support';
+import AdminSupport from './pages/AdminSupport';
 import __Layout from './Layout.jsx';
 
 
@@ -40,6 +42,8 @@ export const PAGES = {
     "Store": Store,
     "AdminStoreCategories": AdminStoreCategories,
     "AdminUserDetail": AdminUserDetail,
+    "Support": Support,
+    "AdminSupport": AdminSupport,
 }
 
 export const pagesConfig = {
