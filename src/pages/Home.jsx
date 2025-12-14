@@ -993,10 +993,19 @@ export default function Home() {
                             </span>
                           </div>
                           <p className="text-violet-200 text-xs leading-relaxed">
-                            {language === 'fr' 
-                              ? 'Pour des résultats optimaux, ajoutez un style (moderne, vintage...), des couleurs précises, une ambiance (élégante, dynamique...) et des détails spécifiques à votre création.'
-                              : 'For optimal results, add a style (modern, vintage...), precise colors, a mood (elegant, dynamic...) and specific details to your creation.'
-                            }
+                            {(() => {
+                              const categoryId = selectedCategory?.id;
+                              const categoryTemplates = promptTemplates.filter(t => t.category === categoryId && !t.subcategory);
+                              const template = categoryTemplates.length > 0 ? categoryTemplates[0] : null;
+                              
+                              if (template && (language === 'fr' ? template.assistant_text_fr : template.assistant_text_en)) {
+                                return language === 'fr' ? template.assistant_text_fr : (template.assistant_text_en || template.assistant_text_fr);
+                              }
+                              
+                              return language === 'fr' 
+                                ? 'Pour des résultats optimaux, ajoutez un style (moderne, vintage...), des couleurs précises, une ambiance (élégante, dynamique...) et des détails spécifiques à votre création.'
+                                : 'For optimal results, add a style (modern, vintage...), precise colors, a mood (elegant, dynamic...) and specific details to your creation.';
+                            })()}
                           </p>
 
 {/* Example prompts cliquables */}

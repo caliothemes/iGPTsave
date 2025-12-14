@@ -494,6 +494,40 @@ BACKGROUND BOX RULES:
                 />
               </div>
 
+              <div className="border-t border-white/10 pt-4">
+                <h3 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  Texte Assistant iGPT
+                </h3>
+                <p className="text-white/40 text-xs mb-3">
+                  Texte personnalisé affiché dans l'assistant pour cette catégorie. Si vide, le texte par défaut sera utilisé.
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-white/60 text-sm mb-2 block">Texte Assistant FR</label>
+                    <Textarea
+                      value={editingPrompt.assistant_text_fr || ''}
+                      onChange={(e) => setEditingPrompt({ ...editingPrompt, assistant_text_fr: e.target.value })}
+                      placeholder="Pour des résultats optimaux, ajoutez un style (moderne, vintage...), des couleurs précises..."
+                      className="bg-white/5 border-white/10 text-white text-sm min-h-20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white/60 text-sm mb-2 block">Texte Assistant EN</label>
+                    <Textarea
+                      value={editingPrompt.assistant_text_en || ''}
+                      onChange={(e) => setEditingPrompt({ ...editingPrompt, assistant_text_en: e.target.value })}
+                      placeholder="For optimal results, add a style (modern, vintage...), precise colors..."
+                      className="bg-white/5 border-white/10 text-white text-sm min-h-20"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
