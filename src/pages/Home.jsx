@@ -183,6 +183,13 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, currentVisual]);
 
+  // Auto-open assistant when conditions are met
+  useEffect(() => {
+    if (selectedCategory && selectedCategory.id !== 'free_prompt' && inputValue.trim().length > 10 && !isGenerating) {
+      setAssistantOpen(true);
+    }
+  }, [selectedCategory, inputValue, isGenerating]);
+
   const getUserName = () => {
     if (!user) return '';
     return user.full_name?.split(' ')[0] || user.email?.split('@')[0] || '';
