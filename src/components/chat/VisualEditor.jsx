@@ -3205,8 +3205,12 @@ Réponds en JSON avec:
           
         </div>
         
-        {/* Canvas Container */}
-        <div className="relative flex-1 flex items-center justify-center overflow-auto p-8">
+        {/* Canvas Container - Scrollable with padding for zoom */}
+        <div className="relative flex-1 overflow-auto">
+          <div className="min-h-full flex items-center justify-center p-16" style={{ 
+            minWidth: `${canvasSize.width * zoom}px`,
+            minHeight: `${canvasSize.height * zoom}px`
+          }}>
           {/* Zoom Controls - Horizontal - Fixed at top */}
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
             <button
