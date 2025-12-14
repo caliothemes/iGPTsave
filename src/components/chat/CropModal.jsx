@@ -66,6 +66,9 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     }
   }, [isOpen, visual]);
 
+  // Store scale factor for converting between display and original coordinates
+  const [scale, setScale] = useState(1);
+
   // Draw canvas
   useEffect(() => {
     if (!imageLoaded || !image || !canvasRef.current || !containerRef.current) return;
@@ -94,7 +97,8 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     canvas.width = displayWidth;
     canvas.height = displayHeight;
     
-    const scale = displayWidth / image.width;
+    const displayScale = displayWidth / image.width;
+    setScale(displayScale);
 
     // Draw image
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -105,10 +109,10 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
 
     // Clear crop area
     const scaledRect = {
-      x: cropRect.x * scale,
-      y: cropRect.y * scale,
-      width: cropRect.width * scale,
-      height: cropRect.height * scale
+      x: cropRect.x * displayScale,
+      y: cropRect.y * displayScale,
+      width: cropRect.width * displayScale,
+      height: cropRect.height * displayScale
     };
     ctx.clearRect(scaledRect.x, scaledRect.y, scaledRect.width, scaledRect.height);
     ctx.drawImage(
@@ -128,10 +132,10 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       ctx.lineWidth = 1;
       ctx.setLineDash([5, 5]);
       ctx.strokeRect(
-        scaledRect.x - bleed * scale,
-        scaledRect.y - bleed * scale,
-        scaledRect.width + 2 * bleed * scale,
-        scaledRect.height + 2 * bleed * scale
+        scaledRect.x - bleed * displayScale,
+        scaledRect.y - bleed * displayScale,
+        scaledRect.width + 2 * bleed * displayScale,
+        scaledRect.height + 2 * bleed * displayScale
       );
       ctx.setLineDash([]);
     }
@@ -277,22 +281,23 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     setIsCropping(true);
 
     try {
-      // Create a temporary canvas for cropping
+      // Create a temporary canvas at ORIGINAL image resolution
       const tempCanvas = document.createElement('canvas');
       const ctx = tempCanvas.getContext('2d');
       
-      // Add bleed to crop area
+      // Calculate crop area in ORIGINAL image coordinates (not display coordinates)
       const cropWithBleed = {
         x: Math.max(0, cropRect.x - bleed),
         y: Math.max(0, cropRect.y - bleed),
-        width: Math.min(image.width - cropRect.x + bleed, cropRect.width + 2 * bleed),
-        height: Math.min(image.height - cropRect.y + bleed, cropRect.height + 2 * bleed)
+        width: Math.min(image.width - (cropRect.x - bleed), cropRect.width + 2 * bleed),
+        height: Math.min(image.height - (cropRect.y - bleed), cropRect.height + 2 * bleed)
       };
       
+      // Set canvas to crop size at ORIGINAL resolution (no downscaling)
       tempCanvas.width = cropWithBleed.width;
       tempCanvas.height = cropWithBleed.height;
       
-      // Draw cropped image
+      // Draw cropped portion at full original resolution
       ctx.drawImage(
         image,
         cropWithBleed.x,
@@ -305,18 +310,16 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
         cropWithBleed.height
       );
 
-      // Convert to blob
-      const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/png'));
+      // Convert to blob with maximum quality
+      const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/png', 1.0));
       const file = new File([blob], 'cropped.png', { type: 'image/png' });
 
-      // For print, ensure 300 DPI by using high-res dimensions
-      // The crop is already at the original image resolution
-      // Upload cropped image
+      // Upload cropped image at full resolution
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
 
       // Update visual in database
       if (visual.id) {
-        const updated = await base44.entities.Visual.update(visual.id, {
+        await base44.entities.Visual.update(visual.id, {
           image_url: file_url,
           original_image_url: visual.original_image_url || visual.image_url
         });
