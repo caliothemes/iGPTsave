@@ -809,11 +809,28 @@ export default function Home() {
                 {getHomeTitle()}
               </span>
             </h1>
-            <p className="text-base md:text-lg mb-12 text-center">
+            <p className="text-base md:text-lg mb-3 text-center">
               <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 bg-clip-text text-transparent font-medium">
                 {getHomeSubtitle()}
               </span>
             </p>
+            {(settings.home_text3_fr || settings.home_text3_en) && (
+              <p className="text-sm md:text-base mb-2 text-center">
+                <span className="text-white/70">
+                  {language === 'fr' ? (settings.home_text3_fr || '') : (settings.home_text3_en || settings.home_text3_fr || '')}
+                </span>
+              </p>
+            )}
+            {(settings.home_text4_fr || settings.home_text4_en) && (
+              <p className="text-xs md:text-sm mb-12 text-center">
+                <span className="text-white/50">
+                  {language === 'fr' ? (settings.home_text4_fr || '') : (settings.home_text4_en || settings.home_text4_fr || '')}
+                </span>
+              </p>
+            )}
+            {!settings.home_text3_fr && !settings.home_text3_en && !settings.home_text4_fr && !settings.home_text4_en && (
+              <div className="mb-12" />
+            )}
 
             {/* Welcome Message Bubble */}
             <div className="w-full max-w-2xl mb-8">

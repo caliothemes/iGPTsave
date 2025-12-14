@@ -17,6 +17,10 @@ export default function AdminSettings() {
     home_title_en: '',
     home_subtitle_fr: '',
     home_subtitle_en: '',
+    home_text3_fr: '',
+    home_text3_en: '',
+    home_text4_fr: '',
+    home_text4_en: '',
     sidebar_title: '',
     welcome_message_fr: '',
     welcome_message_en: '',
@@ -260,6 +264,46 @@ export default function AdminSettings() {
                   value={settings.home_subtitle_en}
                   onChange={(e) => setSettings(prev => ({ ...prev, home_subtitle_en: e.target.value }))}
                   placeholder="Logos, business cards..."
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Texte 3 - moyen (Français)</label>
+                <Input
+                  value={settings.home_text3_fr}
+                  onChange={(e) => setSettings(prev => ({ ...prev, home_text3_fr: e.target.value }))}
+                  placeholder="Texte supplémentaire..."
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Texte 3 - moyen (English)</label>
+                <Input
+                  value={settings.home_text3_en}
+                  onChange={(e) => setSettings(prev => ({ ...prev, home_text3_en: e.target.value }))}
+                  placeholder="Additional text..."
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Texte 4 - petit (Français)</label>
+                <Input
+                  value={settings.home_text4_fr}
+                  onChange={(e) => setSettings(prev => ({ ...prev, home_text4_fr: e.target.value }))}
+                  placeholder="Petit texte..."
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Texte 4 - petit (English)</label>
+                <Input
+                  value={settings.home_text4_en}
+                  onChange={(e) => setSettings(prev => ({ ...prev, home_text4_en: e.target.value }))}
+                  placeholder="Small text..."
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
