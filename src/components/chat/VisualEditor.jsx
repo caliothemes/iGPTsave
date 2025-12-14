@@ -171,6 +171,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 400 });
   const [dragging, setDragging] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [resizing, setResizing] = useState(null);
+  const [resizeHandle, setResizeHandle] = useState(null);
   const [generatingTexture, setGeneratingTexture] = useState(null);
   const [generatingIllustration, setGeneratingIllustration] = useState(null);
   const [removingBg, setRemovingBg] = useState(false);
@@ -1157,7 +1159,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             ctx.restore();
           }
           
-          // Draw selection indicators
+          // Draw selection indicators with resize handles
           layers.forEach((layer, idx) => {
             ctx.save();
             
@@ -1168,14 +1170,55 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               ctx.setLineDash([5, 5]);
               if (layer.type === 'text') {
                 ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
-                const metrics = ctx.measureText(layer.text);
-                const textX = layer.x - (layer.align === 'center' ? metrics.width/2 : layer.align === 'right' ? metrics.width : 0);
-                ctx.strokeRect(textX - 5, layer.y - layer.fontSize, metrics.width + 10, layer.fontSize + 10);
+                const lines = layer.text.split('\n');
+                let maxWidth = 0;
+                lines.forEach(line => {
+                  const metrics = ctx.measureText(line);
+                  maxWidth = Math.max(maxWidth, metrics.width);
+                });
+                const effectiveWidth = layer.maxWidth || maxWidth;
+                const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
+                const textHeight = layer.fontSize * 1.2 * lines.length;
+                const boxX = textX - 5;
+                const boxY = layer.y - layer.fontSize - 5;
+                const boxWidth = effectiveWidth + 10;
+                const boxHeight = textHeight + 10;
+                
+                ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+                
+                // Draw resize handles for text
+                const handleSize = 8;
+                ctx.fillStyle = '#8B5CF6';
+                // Top-left
+                ctx.fillRect(boxX - handleSize/2, boxY - handleSize/2, handleSize, handleSize);
+                // Top-right
+                ctx.fillRect(boxX + boxWidth - handleSize/2, boxY - handleSize/2, handleSize, handleSize);
+                // Bottom-left
+                ctx.fillRect(boxX - handleSize/2, boxY + boxHeight - handleSize/2, handleSize, handleSize);
+                // Bottom-right
+                ctx.fillRect(boxX + boxWidth - handleSize/2, boxY + boxHeight - handleSize/2, handleSize, handleSize);
+                // Middle-right (for width only)
+                ctx.fillRect(boxX + boxWidth - handleSize/2, boxY + boxHeight/2 - handleSize/2, handleSize, handleSize);
               } else if (layer.type !== 'background') {
                 ctx.strokeRect(layer.x - 5, layer.y - 5, layer.width + 10, layer.height + 10);
+                
+                // Draw resize handles for shapes/images
+                const handleSize = 8;
+                ctx.fillStyle = '#8B5CF6';
+                const boxX = layer.x - 5;
+                const boxY = layer.y - 5;
+                const boxWidth = layer.width + 10;
+                const boxHeight = layer.height + 10;
+                // Corners
+                ctx.fillRect(boxX - handleSize/2, boxY - handleSize/2, handleSize, handleSize);
+                ctx.fillRect(boxX + boxWidth - handleSize/2, boxY - handleSize/2, handleSize, handleSize);
+                ctx.fillRect(boxX - handleSize/2, boxY + boxHeight - handleSize/2, handleSize, handleSize);
+                ctx.fillRect(boxX + boxWidth - handleSize/2, boxY + boxHeight - handleSize/2, handleSize, handleSize);
               }
               ctx.setLineDash([]);
             }
+            
+            ctx.restore();
           });
         };
 
@@ -1635,6 +1678,13 @@ Réponds en JSON avec:
 
   const deleteLayer = (index) => { setLayers(layers.filter((_, i) => i !== index)); setSelectedLayer(null); };
   
+  const duplicateLayer = (index) => {
+    const layer = layers[index];
+    const newLayer = { ...layer, x: layer.x + 10, y: layer.y + 10 };
+    setLayers([...layers, newLayer]);
+    setSelectedLayer(layers.length);
+  };
+  
   const moveLayer = (index, direction) => {
     const newLayers = [...layers];
     const newIndex = direction === 'up' ? index + 1 : index - 1;
@@ -1642,6 +1692,49 @@ Réponds en JSON avec:
     [newLayers[index], newLayers[newIndex]] = [newLayers[newIndex], newLayers[index]];
     setLayers(newLayers);
     setSelectedLayer(newIndex);
+  };
+
+  const getResizeHandle = (x, y, layer, layerIndex) => {
+    if (layerIndex !== selectedLayer) return null;
+    
+    const handleSize = 8;
+    const threshold = 10;
+    
+    if (layer.type === 'text') {
+      const ctx = canvasRef.current.getContext('2d');
+      ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
+      const lines = layer.text.split('\n');
+      let maxWidth = 0;
+      lines.forEach(line => {
+        const metrics = ctx.measureText(line);
+        maxWidth = Math.max(maxWidth, metrics.width);
+      });
+      const effectiveWidth = layer.maxWidth || maxWidth;
+      const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
+      const textHeight = layer.fontSize * 1.2 * lines.length;
+      const boxX = textX - 5;
+      const boxY = layer.y - layer.fontSize - 5;
+      const boxWidth = effectiveWidth + 10;
+      const boxHeight = textHeight + 10;
+      
+      // Check middle-right handle (width only for text)
+      if (Math.abs(x - (boxX + boxWidth)) < threshold && Math.abs(y - (boxY + boxHeight/2)) < threshold) {
+        return 'mr';
+      }
+    } else if (layer.type !== 'background') {
+      const boxX = layer.x - 5;
+      const boxY = layer.y - 5;
+      const boxWidth = layer.width + 10;
+      const boxHeight = layer.height + 10;
+      
+      // Check corners
+      if (Math.abs(x - boxX) < threshold && Math.abs(y - boxY) < threshold) return 'tl';
+      if (Math.abs(x - (boxX + boxWidth)) < threshold && Math.abs(y - boxY) < threshold) return 'tr';
+      if (Math.abs(x - boxX) < threshold && Math.abs(y - (boxY + boxHeight)) < threshold) return 'bl';
+      if (Math.abs(x - (boxX + boxWidth)) < threshold && Math.abs(y - (boxY + boxHeight)) < threshold) return 'br';
+    }
+    
+    return null;
   };
 
   const handleCanvasMouseDown = async (e) => {
@@ -1730,6 +1823,17 @@ Réponds en JSON avec:
       return;
     }
     
+    // Check for resize handles first
+    for (let i = layers.length - 1; i >= 0; i--) {
+      const handle = getResizeHandle(x, y, layers[i], i);
+      if (handle) {
+        setResizing(i);
+        setResizeHandle(handle);
+        setDragOffset({ x, y });
+        return;
+      }
+    }
+    
     for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
       let hit = false;
@@ -1768,6 +1872,48 @@ Réponds en JSON avec:
     // Brush mode - draw stroke
     if (isBrushing && currentBrushStroke.length > 0) {
       setCurrentBrushStroke(prev => [...prev, { x, y }]);
+      return;
+    }
+    
+    // Handle resizing
+    if (resizing !== null) {
+      const layer = layers[resizing];
+      const dx = x - dragOffset.x;
+      const dy = y - dragOffset.y;
+      
+      if (layer.type === 'text') {
+        // For text, only resize width (maxWidth)
+        if (resizeHandle === 'mr') {
+          const ctx = canvasRef.current.getContext('2d');
+          ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
+          const metrics = ctx.measureText(layer.text);
+          const currentWidth = layer.maxWidth || metrics.width;
+          const textX = layer.x - (layer.align === 'center' ? currentWidth/2 : layer.align === 'right' ? currentWidth : 0);
+          const newWidth = Math.max(50, x - textX);
+          updateLayer(resizing, { maxWidth: newWidth });
+        }
+      } else if (layer.type !== 'background') {
+        // For shapes/images, resize from corners
+        let updates = {};
+        
+        if (resizeHandle === 'br') {
+          updates = { width: Math.max(20, x - layer.x), height: Math.max(20, y - layer.y) };
+        } else if (resizeHandle === 'tr') {
+          const newHeight = Math.max(20, layer.y + layer.height - y);
+          updates = { width: Math.max(20, x - layer.x), y, height: newHeight };
+        } else if (resizeHandle === 'bl') {
+          const newWidth = Math.max(20, layer.x + layer.width - x);
+          updates = { x, width: newWidth, height: Math.max(20, y - layer.y) };
+        } else if (resizeHandle === 'tl') {
+          const newWidth = Math.max(20, layer.x + layer.width - x);
+          const newHeight = Math.max(20, layer.y + layer.height - y);
+          updates = { x, y, width: newWidth, height: newHeight };
+        }
+        
+        updateLayer(resizing, updates);
+      }
+      
+      setDragOffset({ x, y });
       return;
     }
     
@@ -1836,6 +1982,8 @@ Réponds en JSON avec:
     }
     
     setDragging(null);
+    setResizing(null);
+    setResizeHandle(null);
     setGuides({ showVertical: false, showHorizontal: false });
   };
   
@@ -3069,29 +3217,71 @@ Réponds en JSON avec:
             </div>
           )}
           <div className="relative">
-            <canvas 
-              ref={canvasRef} 
-              width={canvasSize.width} 
-              height={canvasSize.height} 
-              className={cn(
-                "rounded-lg shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain",
-                mockupSelectionMode ? "cursor-crosshair" : (isErasing || isBrushing) ? "cursor-none" : "cursor-move"
+            <div className="relative">
+              <canvas 
+                ref={canvasRef} 
+                width={canvasSize.width} 
+                height={canvasSize.height} 
+                className={cn(
+                  "rounded-lg shadow-2xl max-w-full max-h-[40vh] md:max-h-[50vh] object-contain",
+                  mockupSelectionMode ? "cursor-crosshair" : (isErasing || isBrushing) ? "cursor-none" : "cursor-move"
+                )}
+                style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
+                onMouseDown={handleCanvasMouseDown} 
+                onMouseMove={handleCanvasMouseMove} 
+                onMouseUp={handleCanvasMouseUp} 
+                onMouseLeave={handleCanvasMouseUp} 
+                onTouchStart={(e) => {
+                  const touch = e.touches[0];
+                  handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+                }}
+                onTouchMove={(e) => {
+                  const touch = e.touches[0];
+                  handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+                }}
+                onTouchEnd={handleCanvasMouseUp}
+              />
+              
+              {/* Mini toolbar for text layers */}
+              {selectedLayer !== null && currentLayer?.type === 'text' && (
+                <div 
+                  className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
+                  style={{
+                    top: `${currentLayer.y - currentLayer.fontSize - 45}px`,
+                    left: `${currentLayer.x}px`,
+                    transform: 'translateX(-50%)'
+                  }}
+                >
+                  <button
+                    onClick={() => duplicateLayer(selectedLayer)}
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors"
+                    title={language === 'fr' ? 'Dupliquer' : 'Duplicate'}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const propertiesSection = document.querySelector('[data-properties-section]');
+                      if (propertiesSection) {
+                        propertiesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        setTextAccordion('properties');
+                      }
+                    }}
+                    className="p-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 hover:text-violet-200 transition-colors"
+                    title={language === 'fr' ? 'Propriétés' : 'Properties'}
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => deleteLayer(selectedLayer)}
+                    className="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-colors"
+                    title={language === 'fr' ? 'Supprimer' : 'Delete'}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               )}
-              style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '50vh' }}
-              onMouseDown={handleCanvasMouseDown} 
-              onMouseMove={handleCanvasMouseMove} 
-              onMouseUp={handleCanvasMouseUp} 
-              onMouseLeave={handleCanvasMouseUp} 
-              onTouchStart={(e) => {
-                const touch = e.touches[0];
-                handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
-              }}
-              onTouchMove={(e) => {
-                const touch = e.touches[0];
-                handleCanvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
-              }}
-              onTouchEnd={handleCanvasMouseUp}
-            />
+            </div>
             
             {mockupSelectionMode && (
               <div className="absolute inset-0 border-4 border-dashed border-cyan-400/60 rounded-lg pointer-events-none animate-pulse">
@@ -3383,7 +3573,7 @@ Réponds en JSON avec:
           {currentLayer.type === 'text' && (
             <div className="space-y-2">
               {/* ACCORDION: Propriétés */}
-              <div className="border border-white/10 rounded-lg overflow-hidden">
+              <div className="border border-white/10 rounded-lg overflow-hidden" data-properties-section>
                 <button 
                   onClick={() => setTextAccordion(textAccordion === 'properties' ? '' : 'properties')} 
                   className="w-full px-3 py-2 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors"
