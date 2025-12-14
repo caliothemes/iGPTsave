@@ -359,9 +359,9 @@ export default function Home() {
             }
             enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
             } else if (['print', 'social'].includes(activeCategory?.id)) {
-            // Design à plat pour print et social
-            enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
-          } else {
+              // Design plein écran pour print et social - AUCUN cadre, AUCUNE bordure
+              enhancedPrompt = `full bleed graphic design for ${userMessage}, edge to edge composition, design fills entire frame from corner to corner, complete coverage wall to wall, 100% surface filled with design elements, seamless border to border layout, full frame design without margins, professional print-ready artwork bleeding to edges --no text --no letters --no typography --no white border --no frame --no mockup --no margin --no padding --no white space --no centered card --no floating design --no background --no canvas --no mat --no mount --no edge --no border --no outline --no cutout --no perspective --no shadow --no 3d`;
+            } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
           console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
