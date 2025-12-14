@@ -3340,6 +3340,7 @@ Réponds en JSON avec:
               </div>
             )}
           </div>
+          </div>
           {/* Center guides overlay */}
           {guides.showVertical && (
             <div 
