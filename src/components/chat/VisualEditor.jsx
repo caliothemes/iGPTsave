@@ -315,11 +315,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
     init();
   }, [visual.id]);
 
-  // Load base image - always use original
+  // Load base image - use current image (can be cropped)
       useEffect(() => {
-        // Set the original URL on first load
-        const baseUrl = visual.original_image_url || visual.image_url;
-        setOriginalImageUrl(baseUrl);
+        // Use current image_url (cropped or not), save original separately
+        const baseUrl = visual.image_url;
+        const originalUrl = visual.original_image_url || visual.image_url;
+        setOriginalImageUrl(originalUrl);
         
         // If we have saved layers, preload their images first
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
