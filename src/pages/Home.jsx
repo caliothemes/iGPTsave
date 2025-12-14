@@ -1004,7 +1004,7 @@ export default function Home() {
             const exampleText = language === 'fr' 
               ? example.example_text_fr 
               : (example.example_text_en || example.example_text_fr);
-            setInputValue(prev => prev + ' ' + exampleText);
+            setInputValue(exampleText);
             setTimeout(() => {
               if (inputRef.current) {
                 inputRef.current.style.height = 'auto';
