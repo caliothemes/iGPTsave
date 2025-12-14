@@ -92,7 +92,7 @@ const CATEGORIES = [
   {
     id: 'design_3d',
     icon: Box,
-    name: { fr: 'Design 3D', en: '3D Design' },
+    name: { fr: 'Design Texte 3D', en: '3D Text Design' },
     description: { fr: 'Designs avec textes en 3D volumétriques', en: 'Designs with volumetric 3D texts' },
     hasSubmenu: true,
     defaultExpertMode: false,
