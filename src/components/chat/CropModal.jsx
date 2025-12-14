@@ -122,18 +122,6 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     ctx.lineWidth = 2;
     ctx.strokeRect(scaledRect.x, scaledRect.y, scaledRect.width, scaledRect.height);
 
-    // Draw dimensions label
-    ctx.fillStyle = '#8b5cf6';
-    ctx.font = 'bold 14px sans-serif';
-    const dimText = `${Math.round(cropRect.width)}×${Math.round(cropRect.height)}px | ${pxToMm(cropRect.width)}×${pxToMm(cropRect.height)}mm`;
-    const textMetrics = ctx.measureText(dimText);
-    const labelX = scaledRect.x + scaledRect.width / 2 - textMetrics.width / 2;
-    const labelY = scaledRect.y - 10;
-    ctx.fillStyle = 'rgba(139, 92, 246, 0.9)';
-    ctx.fillRect(labelX - 4, labelY - 16, textMetrics.width + 8, 20);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(dimText, labelX, labelY);
-
     // Draw bleed zone if bleed > 0
     if (bleed > 0) {
       ctx.strokeStyle = '#ef4444';
