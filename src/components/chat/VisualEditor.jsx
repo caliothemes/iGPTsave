@@ -3206,7 +3206,7 @@ Réponds en JSON avec:
         </div>
         
         {/* Canvas Container */}
-        <div className="relative flex-1 flex items-center justify-center overflow-auto">
+        <div className="relative flex-1 flex items-center justify-center overflow-auto p-8">
           {/* Zoom Controls - Horizontal - Fixed at top */}
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
             <button
@@ -3254,7 +3254,12 @@ Réponds en JSON avec:
               </p>
             </div>
           )}
-          <div className="relative" style={{ transform: `scale(${zoom})`, transformOrigin: 'center', transition: 'transform 0.2s ease-out' }}>
+          <div className="relative flex-shrink-0" style={{ 
+            transform: `scale(${zoom})`, 
+            transformOrigin: 'center', 
+            transition: 'transform 0.2s ease-out',
+            willChange: 'transform'
+          }}>
             <div className="relative">
               <canvas 
                 ref={canvasRef} 
