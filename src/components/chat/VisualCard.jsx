@@ -19,6 +19,8 @@ const getAspectRatio = (dimensions) => {
   return `${w / divisor}/${h / divisor}`;
 };
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 export default function VisualCard({ 
   visual, 
   onRegenerate, 
@@ -46,6 +48,7 @@ export default function VisualCard({
   const [downloaded, setDownloaded] = useState(false);
   const [showWatermarkBanner, setShowWatermarkBanner] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
+  const [showPromptModal, setShowPromptModal] = useState(false);
   const [copiedColor, setCopiedColor] = useState(null);
   
   // Detect if this is a video
