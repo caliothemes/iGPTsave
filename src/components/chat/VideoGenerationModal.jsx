@@ -132,7 +132,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           {/* Preview Image */}
           <div className="mb-4 rounded-xl overflow-hidden bg-black/20">
             <img 
-              src={visual.image_url} 
+              src={visual.image_url}
               alt="Preview"
               className="w-full h-auto object-cover"
             />
