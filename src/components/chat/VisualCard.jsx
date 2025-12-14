@@ -31,6 +31,7 @@ export default function VisualCard({
   onEdit,
   onPromptClick,
   onVideoGenerated,
+  onCropComplete,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -93,9 +94,11 @@ export default function VisualCard({
   };
 
   const handleCropComplete = (newImageUrl) => {
-    // Update visual image locally without reload
-    visual.image_url = newImageUrl;
     setShowCropModal(false);
+    // Notify parent to update visual
+    if (onCropComplete) {
+      onCropComplete(newImageUrl);
+    }
   };
 
   return (

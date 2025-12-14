@@ -675,6 +675,19 @@ export default function Home() {
     setEditingVisual(null);
   };
 
+  const handleCropComplete = (newImageUrl) => {
+    // Update current visual with cropped image
+    if (currentVisual) {
+      const updatedVisual = {
+        ...currentVisual,
+        image_url: newImageUrl,
+        original_image_url: currentVisual.original_image_url || currentVisual.image_url
+      };
+      setCurrentVisual(updatedVisual);
+      setSessionVisuals(prev => prev.map(v => v.id === updatedVisual.id ? updatedVisual : v));
+    }
+  };
+
   const handleVideoGenerated = async (videoUrl, animationPrompt) => {
     // Create new visual with video
     const videoVisualData = {
@@ -923,6 +936,7 @@ export default function Home() {
                       }}
                       onVideoGenerated={handleVideoGenerated}
                       onBackToImage={handleBackToImage}
+                      onCropComplete={handleCropComplete}
                       isRegenerating={isGenerating}
                       canDownload={canDownload}
                       hasWatermark={hasWatermark}

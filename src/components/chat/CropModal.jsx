@@ -12,7 +12,6 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
   const containerRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [image, setImage] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [resizeHandle, setResizeHandle] = useState(null);
   const [bleed, setBleed] = useState(0); // Fonds perdus en pixels
@@ -184,21 +183,10 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
         return;
       }
     }
-
-    // Check if clicking inside crop area
-    if (
-      x >= scaledRect.x &&
-      x <= scaledRect.x + scaledRect.width &&
-      y >= scaledRect.y &&
-      y <= scaledRect.y + scaledRect.height
-    ) {
-      setIsDragging(true);
-      setDragStart({ x, y });
-    }
   };
 
   const handleMouseMove = (e) => {
-    if (!canvasRef.current || !image || (!isDragging && !isResizing)) return;
+    if (!canvasRef.current || !image || !isResizing) return;
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -209,13 +197,7 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     const dx = (x - dragStart.x) / scale;
     const dy = (y - dragStart.y) / scale;
 
-    if (isDragging) {
-      setCropRect(prev => ({
-        ...prev,
-        x: Math.max(0, Math.min(image.width - prev.width, prev.x + dx)),
-        y: Math.max(0, Math.min(image.height - prev.height, prev.y + dy))
-      }));
-    } else if (isResizing) {
+    if (isResizing) {
       setCropRect(prev => {
         let newRect = { ...prev };
         
@@ -249,7 +231,6 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
     setIsResizing(false);
     setResizeHandle(null);
   };
@@ -353,8 +334,8 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              className="max-w-full max-h-full cursor-move"
-              style={{ cursor: isDragging ? 'move' : isResizing ? 'nwse-resize' : 'default' }}
+              className="max-w-full max-h-full"
+              style={{ cursor: isResizing ? 'nwse-resize' : 'default' }}
             />
           </div>
 
