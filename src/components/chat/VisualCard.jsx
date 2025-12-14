@@ -32,6 +32,7 @@ export default function VisualCard({
   onPromptClick,
   onVideoGenerated,
   onCropComplete,
+  onCropOpen,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -302,6 +303,28 @@ export default function VisualCard({
             className="w-full px-4 py-2.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 relative overflow-hidden group"
           >
             {/* Animated shine effect */}
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" 
+                 style={{ animation: 'shine 3s ease-in-out infinite' }} />
+            <svg className="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+            </svg>
+            {language === 'fr' ? 'Finaliser la découpe pour l\'impression' : 'Finalize crop for printing'}
+          </button>
+          <style>{`
+            @keyframes shine {
+              0% { transform: translateX(-100%); }
+              50% { transform: translateX(-100%); }
+              100% { transform: translateX(200%); }
+            }
+          `}</style>
+        </div>
+      )}
+      {visual.visual_type === 'print' && compact && onCropOpen && (
+        <div className="px-3 pt-3">
+          <button
+            onClick={() => onCropOpen(visual)}
+            className="w-full px-4 py-2.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 relative overflow-hidden group"
+          >
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" 
                  style={{ animation: 'shine 3s ease-in-out infinite' }} />
             <svg className="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
