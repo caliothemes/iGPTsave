@@ -3465,6 +3465,7 @@ Réponds en JSON avec:
               </div>
             </div>
           )}
+          </div>
         </div>
         
         {/* Right Toolbar - Drawing Tools */}
