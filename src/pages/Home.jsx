@@ -96,6 +96,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(true);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -958,37 +959,38 @@ export default function Home() {
             {/* AI Assistant Suggestions */}
             <AnimatePresence>
               {selectedCategory && selectedCategory.id !== 'free_prompt' && inputValue.trim().length > 10 && !isGenerating && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="mb-3"
-                >
-                  <div className="relative bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-blue-500/10 backdrop-blur-md border border-violet-500/20 rounded-xl overflow-hidden">
-                    {/* Animated gradient border effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-blue-500/20 animate-pulse" style={{ opacity: 0.3 }} />
+                assistantOpen ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    className="mb-3"
+                  >
+                    <div className="relative bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-blue-500/10 backdrop-blur-md border border-violet-500/20 rounded-xl overflow-hidden">
+                      {/* Animated gradient border effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-blue-500/20 animate-pulse" style={{ opacity: 0.3 }} />
 
-                    <div className="relative flex items-start gap-3 px-4 py-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/20 flex-shrink-0">
-                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-violet-300 text-sm font-semibold">
-                            {language === 'fr' ? '✨ Assistant iGPT' : '✨ iGPT Assistant'}
-                          </span>
-                          <span className="px-2 py-0.5 bg-violet-500/20 text-violet-300 text-[10px] font-medium rounded-full">
-                            {language === 'fr' ? 'CONSEIL' : 'TIP'}
-                          </span>
+                      <div className="relative flex items-start gap-3 px-4 py-3">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/20 flex-shrink-0">
+                          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
                         </div>
-                        <p className="text-violet-200 text-xs leading-relaxed">
-                          {language === 'fr' 
-                            ? 'Pour des résultats optimaux, ajoutez un style (moderne, vintage...), des couleurs précises, une ambiance (élégante, dynamique...) et des détails spécifiques à votre création.'
-                            : 'For optimal results, add a style (modern, vintage...), precise colors, a mood (elegant, dynamic...) and specific details to your creation.'
-                          }
-                        </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-violet-300 text-sm font-semibold">
+                              {language === 'fr' ? '✨ Assistant iGPT' : '✨ iGPT Assistant'}
+                            </span>
+                            <span className="px-2 py-0.5 bg-violet-500/20 text-violet-300 text-[10px] font-medium rounded-full">
+                              {language === 'fr' ? 'CONSEIL' : 'TIP'}
+                            </span>
+                          </div>
+                          <p className="text-violet-200 text-xs leading-relaxed">
+                            {language === 'fr' 
+                              ? 'Pour des résultats optimaux, ajoutez un style (moderne, vintage...), des couleurs précises, une ambiance (élégante, dynamique...) et des détails spécifiques à votre création.'
+                              : 'For optimal results, add a style (modern, vintage...), precise colors, a mood (elegant, dynamic...) and specific details to your creation.'
+                            }
+                          </p>
 
 {/* Example prompts cliquables */}
 {currentPromptExamples.length > 0 && (
@@ -1026,10 +1028,39 @@ export default function Home() {
     </p>
   </div>
 )}
+                        </div>
+                        <button
+                          onClick={() => setAssistantOpen(false)}
+                          className="p-1 rounded-lg hover:bg-violet-500/20 text-violet-300 hover:text-white transition-colors"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    className="mb-3"
+                  >
+                    <button
+                      onClick={() => setAssistantOpen(true)}
+                      className="w-full px-4 py-2 bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-blue-500/10 backdrop-blur-md border border-violet-500/20 rounded-xl hover:border-violet-500/40 transition-all flex items-center gap-2"
+                    >
+                      <div className="p-1.5 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/20">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <span className="text-violet-300 text-xs font-medium">
+                        {language === 'fr' ? '✨ Assistant iGPT' : '✨ iGPT Assistant'}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-violet-300 ml-auto" />
+                    </button>
+                  </motion.div>
+                )
               )}
             </AnimatePresence>
 
