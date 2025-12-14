@@ -4,10 +4,11 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store, ChevronLeft, ChevronRight, Wand2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StoreItemModal from '@/components/admin/StoreItemModal';
 import DownloadModal from '@/components/DownloadModal';
+import VisualEditor from '@/components/chat/VisualEditor';
 import { cn } from "@/lib/utils";
 
 function StoreStatsBlock({ storeCount, isActive, onClick }) {
@@ -58,6 +59,8 @@ export default function AdminVisuals() {
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [visualToDownload, setVisualToDownload] = useState(null);
   const [adminEmails, setAdminEmails] = useState([]);
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingVisual, setEditingVisual] = useState(null);
   const itemsPerPage = 100;
 
   useEffect(() => {
@@ -155,6 +158,22 @@ export default function AdminVisuals() {
     setDownloadModalOpen(true);
   };
 
+  const handleEdit = (visual) => {
+    setEditingVisual(visual);
+    setShowEditor(true);
+  };
+
+  const handleEditorSave = async (newImageUrl, layers, originalImageUrl) => {
+    // Update visual in state
+    setVisuals(prev => prev.map(v => 
+      v.id === editingVisual.id 
+        ? { ...v, image_url: newImageUrl, editor_layers: layers, original_image_url: originalImageUrl }
+        : v
+    ));
+    setShowEditor(false);
+    setEditingVisual(null);
+  };
+
   // Main categories
   const mainCategories = [
     { id: 'logo_picto', name: 'Logo Pictogramme' },
@@ -215,6 +234,22 @@ export default function AdminVisuals() {
           <Loader2 className="h-8 w-8 text-violet-400 animate-spin" />
         </div>
       </AdminLayout>
+    );
+  }
+
+  // Editor view
+  if (showEditor && editingVisual) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+        <VisualEditor
+          visual={editingVisual}
+          onClose={() => {
+            setShowEditor(false);
+            setEditingVisual(null);
+          }}
+          onSave={handleEditorSave}
+        />
+      </div>
     );
   }
 
@@ -380,6 +415,15 @@ export default function AdminVisuals() {
 
                 {/* Action buttons */}
                 <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleEdit(visual)}
+                    className="h-8 w-8 bg-black/50 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                    title="Éditer"
+                  >
+                    <Wand2 className="h-4 w-4" />
+                  </Button>
                   <Button
                     size="icon"
                     variant="ghost"
