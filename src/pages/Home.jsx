@@ -250,6 +250,39 @@ export default function Home() {
     }
   };
 
+  // Clean print prompts - remove problematic keywords that trigger mockups/frames
+  const cleanPrintPrompt = (message) => {
+    let cleaned = message;
+
+    // Remove print-related keywords that trigger mockups
+    const wordsToRemove = [
+      /\bprint\b/gi,
+      /\bcarte de visite\b/gi,
+      /\bcartes de visite\b/gi,
+      /\baffiche\b/gi,
+      /\baffiches\b/gi,
+      /\bflyer\b/gi,
+      /\bflyers\b/gi,
+      /\bposter\b/gi,
+      /\bposters\b/gi,
+      /\bA4\b/gi,
+      /\bA3\b/gi,
+      /\bA5\b/gi,
+      /\bformat A4\b/gi,
+      /\bformat A3\b/gi,
+      /\bformat A5\b/gi
+    ];
+
+    wordsToRemove.forEach(pattern => {
+      cleaned = cleaned.replace(pattern, '');
+    });
+
+    // Clean up extra spaces
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+    return cleaned;
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
@@ -331,6 +364,13 @@ export default function Home() {
       const dimensions = activeCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
       const isExpertMode = activeCategory?.expertMode || activeCategory?.id === 'free_prompt';
 
+      // Clean prompt for print category to avoid mockup/frame generation
+      let processedMessage = userMessage;
+      if (activeCategory?.id === 'print' && !isExpertMode) {
+        processedMessage = cleanPrintPrompt(userMessage);
+        console.log('🧹 Print prompt cleaned:', { original: userMessage, cleaned: processedMessage });
+      }
+
       // MODE EXPERT : Prompt brut, aucun template, aucun enrichissement
       if (isExpertMode) {
         enhancedPrompt = userMessage;
@@ -347,25 +387,25 @@ export default function Home() {
         if (template) {
           // Template admin personnalisé
           const templateText = language === 'fr' ? template.prompt_fr : (template.prompt_en || template.prompt_fr);
-          enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
+          enhancedPrompt = templateText.replace('{userMessage}', processedMessage).replace('{message}', processedMessage);
           console.log('✨ MODE ASSISTÉ - Template admin appliqué:', template.description);
         } else {
           // Prompts par défaut
           if (['logo', 'logo_picto', 'logo_complet'].includes(activeCategory?.id)) {
             if (activeCategory?.id === 'logo' || activeCategory?.id === 'logo_picto') {
-              enhancedPrompt = `minimalist icon symbol ${userMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
+              enhancedPrompt = `minimalist icon symbol ${processedMessage}, abstract geometric emblem, simple pictogram, flat design mark, clean vector icon`;
             } else {
-              enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
+              enhancedPrompt = `visual background design for ${processedMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
             }
             enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
             } else if (activeCategory?.id === 'print') {
               // Design PRINT plein écran - AUCUN cadre, étalement total du design
-              enhancedPrompt = `${userMessage}, complete full bleed design filling entire canvas edge to edge, total surface coverage with design elements spreading to all corners and borders, wallpaper style layout covering 100% of area, seamless infinity pattern extending beyond frame, continuous design with no empty margins or white space, professional print-ready full bleed artwork --no border --no white space --no frame --no margin --no padding --no mockup --no card --no centered element --no floating object --no canvas --no mat --no mount --no white background --no empty area --no negative space around design --no perspective --no 3d --no shadow --no text --no letters --no typography`;
+              enhancedPrompt = `${processedMessage}, complete full bleed design filling entire canvas edge to edge, total surface coverage with design elements spreading to all corners and borders, wallpaper style layout covering 100% of area, seamless infinity pattern extending beyond frame, continuous design with no empty margins or white space, professional print-ready full bleed artwork --no border --no white space --no frame --no margin --no padding --no mockup --no card --no centered element --no floating object --no canvas --no mat --no mount --no white background --no empty area --no negative space around design --no perspective --no 3d --no shadow --no text --no letters --no typography`;
             } else if (activeCategory?.id === 'social') {
               // Design à plat pour social (NE PAS MODIFIER - fonctionne bien)
-              enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
+              enhancedPrompt = `flat graphic design for ${processedMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
             } else {
-            enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
+            enhancedPrompt = `${processedMessage}, photorealistic, detailed, high quality`;
           }
           console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
         }
