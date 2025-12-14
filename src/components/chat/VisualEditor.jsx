@@ -1036,7 +1036,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               ctx.save();
 
               const textHeight = layer.fontSize;
-              const reflectionGap = 4;
+              const reflectionGap = 0;
               const reflectY = layer.y + reflectionGap;
               const reflectionHeight = textHeight * 1.2;
 
@@ -2383,7 +2383,7 @@ Réponds en JSON avec:
                 exportCtx.save();
 
                 const textHeight = layer.fontSize;
-                const reflectionGap = 4;
+                const reflectionGap = 0;
                 const reflectY = layer.y + reflectionGap;
                 const reflectionHeight = textHeight * 1.2;
 
