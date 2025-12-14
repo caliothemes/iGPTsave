@@ -6,6 +6,7 @@ import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import ADSModal from '@/components/chat/ADSModal';
+import CropModal from '@/components/chat/CropModal';
 import { toast } from 'sonner';
 
 const getAspectRatio = (dimensions) => {
