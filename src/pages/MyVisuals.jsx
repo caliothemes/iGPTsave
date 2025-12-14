@@ -13,6 +13,7 @@ import { CATEGORIES } from '@/components/chat/CategorySelector';
 import VisualEditor from '@/components/chat/VisualEditor';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import ADSModal from '@/components/chat/ADSModal';
+import CropModal from '@/components/chat/CropModal';
 
 export default function MyVisuals() {
   const { language } = useLanguage();
@@ -35,6 +36,8 @@ export default function MyVisuals() {
   const [videoVisual, setVideoVisual] = useState(null);
   const [showADSModal, setShowADSModal] = useState(false);
   const [adsVisual, setAdsVisual] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropVisual, setCropVisual] = useState(null);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -165,6 +168,24 @@ export default function MyVisuals() {
 
     // Scroll to top to see the new video
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCropComplete = async (newImageUrl) => {
+    if (!cropVisual?.id) return;
+    
+    await base44.entities.Visual.update(cropVisual.id, {
+      image_url: newImageUrl,
+      original_image_url: cropVisual.original_image_url || cropVisual.image_url
+    });
+    
+    setVisuals(prev => prev.map(v => 
+      v.id === cropVisual.id 
+        ? { ...v, image_url: newImageUrl, original_image_url: cropVisual.original_image_url || cropVisual.image_url }
+        : v
+    ));
+    
+    setShowCropModal(false);
+    setCropVisual(null);
   };
 
 
@@ -365,6 +386,10 @@ export default function MyVisuals() {
                       else if (action === 'video') handleOpenVideo(visual);
                       else if (action === 'ads') handleOpenADS(visual);
                     }}
+                    onCropOpen={(v) => {
+                      setCropVisual(v);
+                      setShowCropModal(true);
+                    }}
                     isRegenerating={false}
                     canDownload={true}
                     compact
@@ -396,6 +421,16 @@ export default function MyVisuals() {
               setAdsVisual(null);
             }}
             visual={adsVisual}
+          />
+
+          <CropModal
+            isOpen={showCropModal}
+            onClose={() => {
+              setShowCropModal(false);
+              setCropVisual(null);
+            }}
+            visual={cropVisual}
+            onCropComplete={handleCropComplete}
           />
         </div>
       )}
