@@ -411,7 +411,7 @@ BACKGROUND BOX RULES:
 
       {/* Edit Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-2xl">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingPrompt?.id ? 'Modifier le prompt' : 'Nouveau prompt'}
