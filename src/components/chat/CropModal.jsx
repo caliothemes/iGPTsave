@@ -21,6 +21,11 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
   const [cropRect, setCropRect] = useState({ x: 50, y: 50, width: 300, height: 300 });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+  // Convert pixels to mm at 300 DPI (1 inch = 25.4mm, 300 DPI)
+  const pxToMm = (px) => {
+    return Math.round((px * 25.4) / 300);
+  };
+
   const t = {
     fr: {
       title: "Finaliser la découpe pour l'impression",
@@ -63,29 +68,33 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
 
   // Draw canvas
   useEffect(() => {
-    if (!imageLoaded || !image || !canvasRef.current) return;
+    if (!imageLoaded || !image || !canvasRef.current || !containerRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const container = containerRef.current;
     
-    // Set canvas size to fit container while maintaining image aspect ratio
-    const containerWidth = container.clientWidth - 40; // padding
+    // Set canvas to match image aspect ratio, fitting in container
+    const containerWidth = container.clientWidth - 40;
     const containerHeight = container.clientHeight - 40;
     const imageAspect = image.width / image.height;
     const containerAspect = containerWidth / containerHeight;
     
-    let scale;
+    let displayWidth, displayHeight;
     if (imageAspect > containerAspect) {
-      // Image is wider than container
-      scale = containerWidth / image.width;
+      // Image is wider - fit to width
+      displayWidth = containerWidth;
+      displayHeight = containerWidth / imageAspect;
     } else {
-      // Image is taller than container
-      scale = containerHeight / image.height;
+      // Image is taller - fit to height
+      displayHeight = containerHeight;
+      displayWidth = containerHeight * imageAspect;
     }
     
-    canvas.width = image.width * scale;
-    canvas.height = image.height * scale;
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+    
+    const scale = displayWidth / image.width;
 
     // Draw image
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -112,6 +121,18 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     ctx.strokeStyle = '#8b5cf6';
     ctx.lineWidth = 2;
     ctx.strokeRect(scaledRect.x, scaledRect.y, scaledRect.width, scaledRect.height);
+
+    // Draw dimensions label
+    ctx.fillStyle = '#8b5cf6';
+    ctx.font = 'bold 14px sans-serif';
+    const dimText = `${Math.round(cropRect.width)}×${Math.round(cropRect.height)}px | ${pxToMm(cropRect.width)}×${pxToMm(cropRect.height)}mm`;
+    const textMetrics = ctx.measureText(dimText);
+    const labelX = scaledRect.x + scaledRect.width / 2 - textMetrics.width / 2;
+    const labelY = scaledRect.y - 10;
+    ctx.fillStyle = 'rgba(139, 92, 246, 0.9)';
+    ctx.fillRect(labelX - 4, labelY - 16, textMetrics.width + 8, 20);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(dimText, labelX, labelY);
 
     // Draw bleed zone if bleed > 0
     if (bleed > 0) {
@@ -143,7 +164,7 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       ctx.lineWidth = 2;
       ctx.strokeRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
     });
-  }, [imageLoaded, image, cropRect, bleed]);
+  }, [imageLoaded, image, cropRect, bleed, pxToMm]);
 
   const handleMouseDown = (e) => {
     if (!canvasRef.current || !image) return;
@@ -273,6 +294,8 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       const blob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/png'));
       const file = new File([blob], 'cropped.png', { type: 'image/png' });
 
+      // For print, ensure 300 DPI by using high-res dimensions
+      // The crop is already at the original image resolution
       // Upload cropped image
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
 
