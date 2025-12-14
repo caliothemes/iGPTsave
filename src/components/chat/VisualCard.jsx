@@ -317,9 +317,9 @@ export default function VisualCard({
           {/* Original Prompt - Clickable */}
           {visual.original_prompt && (
             <button
-              onClick={() => onPromptClick?.(visual.original_prompt)}
+              onClick={() => setShowPromptModal(true)}
               className="w-full text-left p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all group"
-              title={language === 'fr' ? 'Cliquer pour réutiliser ce prompt' : 'Click to reuse this prompt'}
+              title={language === 'fr' ? 'Cliquer pour voir le prompt complet' : 'Click to see full prompt'}
             >
               <p className="text-white/60 text-xs line-clamp-4 group-hover:text-white/80 transition-colors">
                 {visual.original_prompt}
@@ -512,6 +512,53 @@ export default function VisualCard({
         onClose={() => setShowADSModal(false)}
         visual={visual}
       />
+
+      {/* Prompt Modal */}
+      <Dialog open={showPromptModal} onOpenChange={setShowPromptModal}>
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              {language === 'fr' ? 'Prompt complet' : 'Full Prompt'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 max-h-96 overflow-y-auto">
+              <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
+                {visual.original_prompt}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(visual.original_prompt);
+                  toast.success(language === 'fr' ? 'Prompt copié' : 'Prompt copied');
+                }}
+                className="flex-1 bg-violet-600 hover:bg-violet-700"
+              >
+                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                {language === 'fr' ? 'Copier le prompt' : 'Copy prompt'}
+              </Button>
+              {onPromptClick && (
+                <Button
+                  onClick={() => {
+                    onPromptClick(visual.original_prompt);
+                    setShowPromptModal(false);
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {language === 'fr' ? 'Réutiliser' : 'Reuse'}
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Color Palette Modal - Outside the card */}
       {showColorModal && visual.color_palette && (
