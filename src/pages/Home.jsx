@@ -815,14 +815,14 @@ export default function Home() {
               </span>
             </p>
             {(settings.home_text3_fr || settings.home_text3_en) && (
-              <p className="text-sm md:text-base mb-2 text-center">
+              <p className="text-xs md:text-sm mb-2 text-center">
                 <span className="text-white/70">
                   {language === 'fr' ? (settings.home_text3_fr || '') : (settings.home_text3_en || settings.home_text3_fr || '')}
                 </span>
               </p>
             )}
             {(settings.home_text4_fr || settings.home_text4_en) && (
-              <p className="text-xs md:text-sm mb-12 text-center">
+              <p className="text-[10px] md:text-xs mb-12 text-center">
                 <span className="text-white/50">
                   {language === 'fr' ? (settings.home_text4_fr || '') : (settings.home_text4_en || settings.home_text4_fr || '')}
                 </span>
