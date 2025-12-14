@@ -49,13 +49,13 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       img.onload = () => {
         setImage(img);
         setImageLoaded(true);
-        // Initialize crop rect to center of image
-        const initialSize = Math.min(img.width, img.height) * 0.8;
+        // Initialize crop rect to 80% of image, centered, maintaining aspect
+        const margin = 0.1; // 10% margin on each side
         setCropRect({
-          x: (img.width - initialSize) / 2,
-          y: (img.height - initialSize) / 2,
-          width: initialSize,
-          height: initialSize
+          x: img.width * margin,
+          y: img.height * margin,
+          width: img.width * 0.8,
+          height: img.height * 0.8
         });
       };
       img.src = visual.image_url;
@@ -70,10 +70,20 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     const ctx = canvas.getContext('2d');
     const container = containerRef.current;
     
-    // Set canvas size to fit container while maintaining aspect ratio
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const scale = Math.min(containerWidth / image.width, containerHeight / image.height);
+    // Set canvas size to fit container while maintaining image aspect ratio
+    const containerWidth = container.clientWidth - 40; // padding
+    const containerHeight = container.clientHeight - 40;
+    const imageAspect = image.width / image.height;
+    const containerAspect = containerWidth / containerHeight;
+    
+    let scale;
+    if (imageAspect > containerAspect) {
+      // Image is wider than container
+      scale = containerWidth / image.width;
+    } else {
+      // Image is taller than container
+      scale = containerHeight / image.height;
+    }
     
     canvas.width = image.width * scale;
     canvas.height = image.height * scale;
@@ -210,26 +220,26 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
         let newRect = { ...prev };
         
         if (resizeHandle === 'tl') {
-          newRect.x = Math.max(0, prev.x + dx);
-          newRect.y = Math.max(0, prev.y + dy);
-          newRect.width = Math.max(50, prev.width - dx);
-          newRect.height = Math.max(50, prev.height - dy);
+          const newX = Math.max(0, Math.min(prev.x + prev.width - 50, prev.x + dx));
+          const newY = Math.max(0, Math.min(prev.y + prev.height - 50, prev.y + dy));
+          newRect.width = prev.width + (prev.x - newX);
+          newRect.height = prev.height + (prev.y - newY);
+          newRect.x = newX;
+          newRect.y = newY;
         } else if (resizeHandle === 'tr') {
-          newRect.y = Math.max(0, prev.y + dy);
-          newRect.width = Math.max(50, prev.width + dx);
-          newRect.height = Math.max(50, prev.height - dy);
+          const newY = Math.max(0, Math.min(prev.y + prev.height - 50, prev.y + dy));
+          newRect.width = Math.max(50, Math.min(image.width - prev.x, prev.width + dx));
+          newRect.height = prev.height + (prev.y - newY);
+          newRect.y = newY;
         } else if (resizeHandle === 'bl') {
-          newRect.x = Math.max(0, prev.x + dx);
-          newRect.width = Math.max(50, prev.width - dx);
-          newRect.height = Math.max(50, prev.height + dy);
+          const newX = Math.max(0, Math.min(prev.x + prev.width - 50, prev.x + dx));
+          newRect.width = prev.width + (prev.x - newX);
+          newRect.height = Math.max(50, Math.min(image.height - prev.y, prev.height + dy));
+          newRect.x = newX;
         } else if (resizeHandle === 'br') {
-          newRect.width = Math.max(50, prev.width + dx);
-          newRect.height = Math.max(50, prev.height + dy);
+          newRect.width = Math.max(50, Math.min(image.width - prev.x, prev.width + dx));
+          newRect.height = Math.max(50, Math.min(image.height - prev.y, prev.height + dy));
         }
-
-        // Constrain to image bounds
-        if (newRect.x + newRect.width > image.width) newRect.width = image.width - newRect.x;
-        if (newRect.y + newRect.height > image.height) newRect.height = image.height - newRect.y;
 
         return newRect;
       });
@@ -285,16 +295,16 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
       // Upload cropped image
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
 
-      // Update visual
+      // Update visual in database
       if (visual.id) {
-        await base44.entities.Visual.update(visual.id, {
+        const updated = await base44.entities.Visual.update(visual.id, {
           image_url: file_url,
           original_image_url: visual.original_image_url || visual.image_url
         });
       }
 
+      // Call callback with new URL
       onCropComplete(file_url);
-      onClose();
     } catch (error) {
       console.error('Crop failed:', error);
     } finally {

@@ -93,8 +93,9 @@ export default function VisualCard({
   };
 
   const handleCropComplete = (newImageUrl) => {
-    // Refresh page to show updated visual
-    window.location.reload();
+    // Update visual image locally without reload
+    visual.image_url = newImageUrl;
+    setShowCropModal(false);
   };
 
   return (
@@ -213,21 +214,6 @@ export default function VisualCard({
           )}
         </div>
 
-        {/* Crop Badge for Print */}
-        {visual.visual_type === 'print' && !compact && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
-            <button
-              onClick={() => setShowCropModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white text-xs font-medium rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
-              </svg>
-              {language === 'fr' ? 'Finaliser la découpe pour l\'impression' : 'Finalize crop for printing'}
-            </button>
-          </div>
-        )}
-
         {/* Version Badge */}
         {visual.version > 1 && (
           <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-violet-600/80 backdrop-blur-sm text-white text-xs">
@@ -304,6 +290,21 @@ export default function VisualCard({
         )}
 
       </div>
+
+      {/* Crop Button for Print */}
+      {visual.visual_type === 'print' && !compact && (
+        <div className="px-3 pt-3">
+          <button
+            onClick={() => setShowCropModal(true)}
+            className="w-full px-4 py-2.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+            </svg>
+            {language === 'fr' ? 'Finaliser la découpe pour l\'impression' : 'Finalize crop for printing'}
+          </button>
+        </div>
+      )}
 
       {/* Color Palette Bar - Just under image */}
       {visual.color_palette && visual.color_palette.length > 0 && (
