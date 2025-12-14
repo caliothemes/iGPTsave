@@ -9,6 +9,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import StoreItemModal from '@/components/admin/StoreItemModal';
 import DownloadModal from '@/components/DownloadModal';
 import VisualEditor from '@/components/chat/VisualEditor';
+import CropModal from '@/components/chat/CropModal';
 import { cn } from "@/lib/utils";
 
 function StoreStatsBlock({ storeCount, isActive, onClick }) {
@@ -61,6 +62,8 @@ export default function AdminVisuals() {
   const [adminEmails, setAdminEmails] = useState([]);
   const [showEditor, setShowEditor] = useState(false);
   const [editingVisual, setEditingVisual] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropVisual, setCropVisual] = useState(null);
   const itemsPerPage = 100;
 
   useEffect(() => {
@@ -172,6 +175,24 @@ export default function AdminVisuals() {
     ));
     setShowEditor(false);
     setEditingVisual(null);
+  };
+
+  const handleCropComplete = async (newImageUrl) => {
+    if (!cropVisual?.id) return;
+    
+    await base44.entities.Visual.update(cropVisual.id, {
+      image_url: newImageUrl,
+      original_image_url: cropVisual.original_image_url || cropVisual.image_url
+    });
+    
+    setVisuals(prev => prev.map(v => 
+      v.id === cropVisual.id 
+        ? { ...v, image_url: newImageUrl, original_image_url: cropVisual.original_image_url || cropVisual.image_url }
+        : v
+    ));
+    
+    setShowCropModal(false);
+    setCropVisual(null);
   };
 
   // Main categories
@@ -366,7 +387,7 @@ export default function AdminVisuals() {
         />
 
         {/* Visuals Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {filteredVisuals.map((visual) => {
             // Calculate aspect ratio from dimensions
             let aspectRatio = '1 / 1'; // default square
@@ -486,6 +507,21 @@ export default function AdminVisuals() {
                     v{visual.version || 1}
                   </span>
                 </div>
+                {visual.visual_type === 'print' && (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setCropVisual(visual);
+                      setShowCropModal(true);
+                    }}
+                    className="w-full mt-2 bg-violet-600 hover:bg-violet-700 text-white h-7 text-xs"
+                  >
+                    <svg className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+                    </svg>
+                    Découpe
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   onClick={() => handleDownload(visual)}
@@ -583,6 +619,16 @@ export default function AdminVisuals() {
         visual={visualToDownload}
         onDownload={() => {}}
         videoOnly={visualToDownload?.video_url || (visualToDownload?.image_url && (visualToDownload?.image_url.includes('.mp4') || visualToDownload?.image_url.includes('/video')))}
+      />
+
+      <CropModal
+        isOpen={showCropModal}
+        onClose={() => {
+          setShowCropModal(false);
+          setCropVisual(null);
+        }}
+        visual={cropVisual}
+        onCropComplete={handleCropComplete}
       />
     </AdminLayout>
   );
