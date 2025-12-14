@@ -12,6 +12,7 @@ export default function Footer() {
     { href: createPageUrl('Store'), label: 'iGPT Store', icon: true },
     { href: createPageUrl('Pricing'), label: language === 'fr' ? 'Tarifs' : 'Pricing' },
     { href: createPageUrl('Portfolio'), label: 'Portfolio' },
+    { href: createPageUrl('Support'), label: language === 'fr' ? 'Support et FAQ' : 'Support & FAQ' },
     { href: createPageUrl('Legal'), label: language === 'fr' ? 'Mentions légales' : 'Legal' },
   ];
 

@@ -14,7 +14,8 @@ import {
   Wand2,
   Store,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  HelpCircle
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -28,6 +29,7 @@ const navItems = [
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
   { id: 'presentation', label: 'Présentation', icon: LayoutDashboard, page: 'AdminPresentation' },
   { id: 'pricing', label: 'Tarification', icon: CreditCard, page: 'AdminPricing' },
+  { id: 'support', label: 'Support & FAQ', icon: HelpCircle, page: 'AdminSupport' },
   { id: 'legal', label: 'Mentions légales', icon: Scale, page: 'AdminLegal' },
   { id: 'settings', label: 'Paramètres', icon: Settings, page: 'AdminSettings' },
 ];
