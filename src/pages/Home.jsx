@@ -629,10 +629,10 @@ export default function Home() {
 
     // Load ALL visuals associated with this conversation for history
     try {
-      const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, '-created_date');
+      const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, 'created_date'); // Oldest first
       if (visuals.length > 0) {
         setVisualsHistory(visuals);
-        setCurrentVisual(visuals[0]); // Most recent as current
+        setCurrentVisual(visuals[visuals.length - 1]); // Most recent as current
 
         // Reconstruct messages with visuals attached
         const baseMessages = conv.messages || [];
@@ -649,8 +649,8 @@ export default function Home() {
                baseMessages[i].content.includes('ready') ||
                baseMessages[i].content.includes('version') ||
                baseMessages[i].content.includes('✨'))) {
-            // Add visual in reverse order (oldest first in messages)
-            const visualToAdd = visuals[visuals.length - 1 - visualIdx];
+            // Add visual in chronological order
+            const visualToAdd = visuals[visualIdx];
             if (visualToAdd) {
               reconstructedMessages.push({
                 role: 'assistant',
