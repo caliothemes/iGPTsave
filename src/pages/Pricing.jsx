@@ -21,8 +21,8 @@ const STRIPE_PRODUCTS = {
                     gradient: 'from-slate-600 to-gray-600',
                     isFree: true,
                     features: { 
-                      fr: ['25 crédits offerts / mois', 'Support'],
-                      en: ['25 free credits / month', 'Support']
+                      fr: ['25 crédits offerts / mois', 'Visuels HD', 'Support'],
+                      en: ['25 free credits / month', 'HD visuals', 'Support']
                     }
                   },
       { 
@@ -91,8 +91,8 @@ const STRIPE_PRODUCTS = {
                     gradient: 'from-slate-600 to-gray-600',
                     isFree: true,
                     features: { 
-                      fr: ['25 crédits offerts / mois', 'Support'],
-                      en: ['25 free credits / month', 'Support']
+                      fr: ['25 crédits offerts / mois', 'Visuels HD', 'Support'],
+                      en: ['25 free credits / month', 'HD visuals', 'Support']
                     }
                   },
       { 
