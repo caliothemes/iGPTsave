@@ -784,6 +784,13 @@ export default function Home() {
         }}
         onSelectVisual={(v) => {
           setCurrentVisual(v);
+          setVisualsHistory([v]);
+          // Add visual to chat messages
+          setMessages([{ 
+            role: 'assistant', 
+            content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.'),
+            visual: v
+          }]);
           // Set category based on visual type to enable editing prompt
           if (v.visual_type) {
             setSelectedCategory({ id: v.visual_type });
