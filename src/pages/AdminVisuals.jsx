@@ -412,9 +412,10 @@ export default function AdminVisuals() {
                 {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
                   <video 
                     src={visual.video_url || visual.image_url}
-                    muted
-                    loop
                     autoPlay
+                    loop
+                    muted
+                    playsInline
                     className="block"
                     style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
                   />
@@ -678,6 +679,8 @@ export default function AdminVisuals() {
                 controls
                 autoPlay
                 loop
+                muted
+                playsInline
                 className="w-full h-full object-contain max-h-[90vh]"
               />
             ) : (
