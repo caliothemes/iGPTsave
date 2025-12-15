@@ -2008,13 +2008,31 @@ Réponds en JSON avec:
         // Wait a frame to ensure canvas is fully rendered with all effects
         await new Promise(resolve => setTimeout(resolve, 200));
 
-        // Create a high-resolution canvas for export
-        const scale = 2; // Export at 2x resolution
+        // Calculate original dimensions from visual metadata or from original image
+        let originalWidth = canvasSize.width;
+        let originalHeight = canvasSize.height;
+        
+        if (visual.dimensions) {
+          const [w, h] = visual.dimensions.split('x').map(Number);
+          if (w && h) {
+            originalWidth = w;
+            originalHeight = h;
+          }
+        } else if (loadedImages[originalImageUrl]) {
+          const img = loadedImages[originalImageUrl];
+          originalWidth = img.width;
+          originalHeight = img.height;
+        }
+
+        // Calculate scale factor from display size to original size
+        const scaleToOriginal = originalWidth / canvasSize.width;
+
+        // Create a canvas at ORIGINAL resolution
         const exportCanvas = document.createElement('canvas');
-        exportCanvas.width = canvasSize.width * scale;
-        exportCanvas.height = canvasSize.height * scale;
+        exportCanvas.width = originalWidth;
+        exportCanvas.height = originalHeight;
         const exportCtx = exportCanvas.getContext('2d');
-        exportCtx.scale(scale, scale);
+        exportCtx.scale(scaleToOriginal, scaleToOriginal);
 
         // Draw all layers in order (same as rendering)
         for (const layer of layers) {
@@ -2431,11 +2449,8 @@ Réponds en JSON avec:
               exportCtx.restore();
         }
 
-        const dataUrl = exportCanvas.toDataURL('image/png');
-    
-    // Convert dataUrl to blob and upload
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
+        // Convert to blob with maximum quality
+        const blob = await new Promise(resolve => exportCanvas.toBlob(resolve, 'image/png', 1.0));
     const file = new File([blob], `${visual.title || 'visual'}-edited.png`, { type: 'image/png' });
     
     try {
