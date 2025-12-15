@@ -433,16 +433,16 @@ export default function Home() {
         }
 
         setCurrentVisual(savedVisual);
+        setVisualsHistory(prev => [...prev, savedVisual]); // Add to history
 
         const successMessage = `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`;
-        setMessages(prev => {
-          const newMsgs = [...prev];
-          newMsgs[newMsgs.length - 1] = { 
-            role: 'assistant', 
-            content: successMessage
-          };
-          return newMsgs;
-        });
+        
+        // Add both text message AND visual card
+        setMessages(prev => [
+          ...prev.slice(0, -1), // Remove "generating" message
+          { role: 'assistant', content: successMessage },
+          { role: 'assistant', content: '', visual: savedVisual } // Separate visual card
+        ]);
 
         // Update conversation with new messages and visual_id
         if (activeConversation && user) {
@@ -994,7 +994,7 @@ export default function Home() {
                                 setCurrentVisual({ ...msg.visual, image_url: newUrl });
                               }
                             }}
-                            isRegenerating={isGenerating && idx === messages.length - 1}
+                            isRegenerating={isGenerating && msg.visual?.id === currentVisual?.id}
                             canDownload={canDownload}
                             hasWatermark={hasWatermark}
                             showValidation={true}
