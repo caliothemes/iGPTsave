@@ -578,15 +578,13 @@ export default function Home() {
 
         setCurrentVisual(newVisual);
         setVisualsHistory(prev => [...prev, newVisual]); // Add regenerated to history
-        setMessages(prev => {
-          const newMsgs = [...prev];
-          newMsgs[newMsgs.length - 1] = { 
-            role: 'assistant', 
-            content: t('newVersion'),
-            visual: newVisual // Attach visual to message
-          };
-          return newMsgs;
-        });
+
+        // Add new version message + visual card
+        setMessages(prev => [
+          ...prev.slice(0, -1), // Remove "generating" message
+          { role: 'assistant', content: t('newVersion') },
+          { role: 'assistant', content: '', visual: newVisual } // Separate visual message
+        ]);
       }
     } catch (error) {
       console.error(error);
@@ -712,11 +710,11 @@ export default function Home() {
 
     setCurrentVisual(newVisual);
     setVisualsHistory(prev => [...prev, newVisual]);
-    setMessages(prev => [...prev, { 
-      role: 'assistant', 
-      content: `✨ ${language === 'fr' ? 'Votre vidéo est prête !' : 'Your video is ready!'}`,
-      visual: newVisual
-    }]);
+    setMessages(prev => [
+      ...prev,
+      { role: 'assistant', content: `✨ ${language === 'fr' ? 'Votre vidéo est prête !' : 'Your video is ready!'}` },
+      { role: 'assistant', content: '', visual: newVisual }
+    ]);
   };
 
   const handleBackToImage = async () => {
