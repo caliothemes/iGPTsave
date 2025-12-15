@@ -33,6 +33,7 @@ import LoginRequiredModal from '@/components/LoginRequiredModal';
 import NoCreditsModal from '@/components/NoCreditsModal';
 import GuestCreditsModal from '@/components/GuestCreditsModal';
 import Footer from '@/components/Footer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -98,6 +99,7 @@ export default function Home() {
   const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(true);
+  const [showExamplesModal, setShowExamplesModal] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -1106,14 +1108,14 @@ export default function Home() {
                             })()}
                           </p>
 
-{/* Example prompts cliquables */}
+{/* Example prompts cliquables - Max 2 */}
 {currentPromptExamples.length > 0 && (
   <div className="mt-3 pt-3 border-t border-violet-500/20">
     <p className="text-violet-300 text-[11px] font-medium mb-1.5">
       {language === 'fr' ? '💡 Exemples :' : '💡 Examples:'}
     </p>
     <div className="space-y-2">
-      {currentPromptExamples.map((example, idx) => (
+      {currentPromptExamples.slice(0, 2).map((example, idx) => (
         <button
           key={idx}
           onClick={() => {
@@ -1137,6 +1139,17 @@ export default function Home() {
         </button>
       ))}
     </div>
+    {currentPromptExamples.length > 2 && (
+      <button
+        onClick={() => setShowExamplesModal(true)}
+        className="w-full mt-2 px-3 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 rounded-lg text-violet-200 text-xs font-medium transition-all flex items-center justify-center gap-2"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        {language === 'fr' ? 'Voir d\'autres exemples de prompt' : 'See more prompt examples'}
+      </button>
+    )}
     <p className="text-violet-300/60 text-[10px] mt-1.5">
       {language === 'fr' ? '👆 Cliquez pour ajouter un exemple' : '👆 Click to add an example'}
     </p>
@@ -1565,6 +1578,47 @@ export default function Home() {
         favorites={favoriteVisuals}
         onSelectVisual={(visual) => setCurrentVisual(visual)}
       />
+
+      {/* Examples Modal */}
+      <Dialog open={showExamplesModal} onOpenChange={setShowExamplesModal}>
+        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-violet-500/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              {language === 'fr' ? '💡 Exemples de prompts' : '💡 Prompt Examples'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-4">
+            {currentPromptExamples.map((example, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  const exampleText = language === 'fr' 
+                    ? example.example_text_fr 
+                    : (example.example_text_en || example.example_text_fr);
+                  setInputValue(exampleText);
+                  setShowExamplesModal(false);
+                  setTimeout(() => {
+                    if (inputRef.current) {
+                      inputRef.current.style.height = 'auto';
+                      inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                      inputRef.current.focus();
+                    }
+                  }, 100);
+                }}
+                className="text-left w-full px-4 py-3 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-sm transition-all"
+              >
+                <span className="text-violet-300 text-xs font-medium">#{idx + 1}</span>
+                <p className="mt-1">"{language === 'fr' 
+                  ? example.example_text_fr 
+                  : (example.example_text_en || example.example_text_fr)}"</p>
+              </button>
+            ))}
+          </div>
+          <p className="text-violet-300/60 text-xs text-center mt-4">
+            {language === 'fr' ? '👆 Cliquez sur un exemple pour l\'utiliser' : '👆 Click on an example to use it'}
+          </p>
+        </DialogContent>
+      </Dialog>
       </div>
       );
       }
