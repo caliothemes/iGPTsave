@@ -511,7 +511,8 @@ export default function Home() {
     }
 
     setIsGenerating(true);
-    setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
+    // Add typing indicator message
+    setMessages(prev => [...prev, { role: 'assistant', content: t('generating'), isStreaming: true }]);
 
     try {
       // Deduct credit before generation
@@ -623,7 +624,6 @@ export default function Home() {
   
   const handleSelectConversation = async (conv) => {
     setCurrentConversation(conv);
-    setMessages(conv.messages || []);
     setCurrentVisual(null);
     setVisualsHistory([]);
 
@@ -634,13 +634,45 @@ export default function Home() {
         setVisualsHistory(visuals);
         setCurrentVisual(visuals[0]); // Most recent as current
 
+        // Reconstruct messages with visuals attached
+        const baseMessages = conv.messages || [];
+        const reconstructedMessages = [];
+
+        // Map visuals to their corresponding messages
+        // Typically: user message, assistant success message, then visual
+        for (let i = 0; i < baseMessages.length; i++) {
+          reconstructedMessages.push(baseMessages[i]);
+
+          // If this is an assistant message indicating success, attach the corresponding visual
+          if (baseMessages[i].role === 'assistant' && 
+              (baseMessages[i].content.includes('prêt') || 
+               baseMessages[i].content.includes('ready') ||
+               baseMessages[i].content.includes('version'))) {
+            // Find the visual that was created around this time
+            const visualIndex = Math.floor((i + 1) / 2) - 1;
+            if (visuals[visuals.length - 1 - visualIndex]) {
+              reconstructedMessages.push({
+                role: 'assistant',
+                content: '',
+                visual: visuals[visuals.length - 1 - visualIndex]
+              });
+            }
+          }
+        }
+
+        setMessages(reconstructedMessages);
+
         // Set category based on visual type
         if (visuals[0]?.visual_type) {
           setSelectedCategory({ id: visuals[0].visual_type });
         }
+      } else {
+        // No visuals, just show messages
+        setMessages(conv.messages || []);
       }
     } catch (e) {
       console.error('Failed to load visuals for conversation:', e);
+      setMessages(conv.messages || []);
     }
   };
 
