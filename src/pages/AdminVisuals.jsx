@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store, ChevronLeft, ChevronRight, Wand2 } from 'lucide-react';
+import { Loader2, Search, Trash2, Download, Image, Star, ShoppingBag, Store, ChevronLeft, ChevronRight, Wand2, Eye } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StoreItemModal from '@/components/admin/StoreItemModal';
 import DownloadModal from '@/components/DownloadModal';
@@ -406,12 +406,8 @@ export default function AdminVisuals() {
               className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all"
             >
               <div 
-                className="relative cursor-pointer"
+                className="relative"
                 style={{ aspectRatio }}
-                onClick={() => {
-                  setSelectedImage(visual);
-                  setImageModalOpen(true);
-                }}
               >
                 {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
                   <video 
@@ -445,6 +441,18 @@ export default function AdminVisuals() {
 
                 {/* Action buttons */}
                 <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      setSelectedImage(visual);
+                      setImageModalOpen(true);
+                    }}
+                    className="h-8 w-8 bg-black/50 text-white hover:text-white hover:bg-white/20"
+                    title="Voir en grand"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                   <Button
                     size="icon"
                     variant="ghost"
@@ -649,21 +657,20 @@ export default function AdminVisuals() {
             setSelectedImage(null);
           }}
         >
+          <button
+            onClick={() => {
+              setImageModalOpen(false);
+              setSelectedImage(null);
+            }}
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-lg"
+          >
+            ✕ Fermer
+          </button>
+          
           <div 
             className="relative max-w-7xl max-h-[90vh] w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => {
-                setImageModalOpen(false);
-                setSelectedImage(null);
-              }}
-              className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors"
-            >
-              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
             
             {selectedImage.video_url || (selectedImage.image_url && (selectedImage.image_url.includes('.mp4') || selectedImage.image_url.includes('/video'))) ? (
               <video 
