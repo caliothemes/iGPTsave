@@ -49,6 +49,7 @@ export default function Home() {
   const [inputValue, setInputValue] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentVisual, setCurrentVisual] = useState(null);
+  const [visualsHistory, setVisualsHistory] = useState([]); // All visuals generated in this conversation
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [promptTemplates, setPromptTemplates] = useState([]);
   const [promptExamples, setPromptExamples] = useState([]);
@@ -142,20 +143,25 @@ export default function Home() {
           const urlParams = new URLSearchParams(window.location.search);
           const editVisualId = urlParams.get('editVisual');
           if (editVisualId) {
-            try {
-              const visualToEditArray = await base44.entities.Visual.filter({ id: editVisualId });
-              if (visualToEditArray.length > 0) {
-                const visualToEdit = visualToEditArray[0];
-                setCurrentVisual(visualToEdit);
-                setMessages([{ role: 'assistant', content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.') }]);
-                // Set category based on visual type to enable prompt
-                if (visualToEdit.visual_type) {
-                  setSelectedCategory({ id: visualToEdit.visual_type });
-                }
+          try {
+            const visualToEditArray = await base44.entities.Visual.filter({ id: editVisualId });
+            if (visualToEditArray.length > 0) {
+              const visualToEdit = visualToEditArray[0];
+              setCurrentVisual(visualToEdit);
+              setVisualsHistory([visualToEdit]);
+              setMessages([{ 
+                role: 'assistant', 
+                content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.'),
+                visual: visualToEdit
+              }]);
+              // Set category based on visual type to enable prompt
+              if (visualToEdit.visual_type) {
+                setSelectedCategory({ id: visualToEdit.visual_type });
               }
-            } catch (e) {
-              console.error('Failed to load visual:', e);
             }
+          } catch (e) {
+            console.error('Failed to load visual:', e);
+          }
           }
           }
           } catch (e) {
@@ -571,9 +577,14 @@ export default function Home() {
         }
 
         setCurrentVisual(newVisual);
+        setVisualsHistory(prev => [...prev, newVisual]); // Add regenerated to history
         setMessages(prev => {
           const newMsgs = [...prev];
-          newMsgs[newMsgs.length - 1] = { role: 'assistant', content: t('newVersion') };
+          newMsgs[newMsgs.length - 1] = { 
+            role: 'assistant', 
+            content: t('newVersion'),
+            visual: newVisual // Attach visual to message
+          };
           return newMsgs;
         });
       }
@@ -603,6 +614,7 @@ export default function Home() {
 
   const handleNewChat = () => {
     setCurrentVisual(null);
+    setVisualsHistory([]);
     setCurrentConversation(null);
     setSelectedCategory(null);
     setSelectedFormat(null);
@@ -614,44 +626,23 @@ export default function Home() {
   const handleSelectConversation = async (conv) => {
     setCurrentConversation(conv);
     setMessages(conv.messages || []);
-    setCurrentVisual(null); // Reset visual first
-    
-    // Load the visual associated with this conversation
-    let loadedVisual = null;
-    
-    if (conv.visual_id) {
-      try {
-        const visuals = await base44.entities.Visual.filter({ id: conv.visual_id });
-        if (visuals.length > 0) {
-          loadedVisual = visuals[0];
-          setCurrentVisual(loadedVisual);
+    setCurrentVisual(null);
+    setVisualsHistory([]);
+
+    // Load ALL visuals associated with this conversation for history
+    try {
+      const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, '-created_date');
+      if (visuals.length > 0) {
+        setVisualsHistory(visuals);
+        setCurrentVisual(visuals[0]); // Most recent as current
+
+        // Set category based on visual type
+        if (visuals[0]?.visual_type) {
+          setSelectedCategory({ id: visuals[0].visual_type });
         }
-      } catch (e) {
-        console.error('Failed to load visual by visual_id:', e);
       }
-    }
-    
-    // Fallback: try to find visual by conversation_id if visual_id not found
-    if (!loadedVisual) {
-      try {
-        const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, '-created_date', 1);
-        if (visuals.length > 0) {
-          loadedVisual = visuals[0];
-          setCurrentVisual(loadedVisual);
-        } else {
-          setCurrentVisual(null);
-        }
-      } catch (e) {
-        console.error('Failed to load visual by conversation_id:', e);
-        setCurrentVisual(null);
-      }
-    }
-    
-    // Set category based on visual type to allow continuing the conversation
-    if (loadedVisual?.visual_type) {
-      setSelectedCategory({ id: loadedVisual.visual_type });
-    } else {
-      setSelectedCategory(null);
+    } catch (e) {
+      console.error('Failed to load visuals for conversation:', e);
     }
   };
 
@@ -668,7 +659,12 @@ export default function Home() {
       editor_layers: layers,
       original_image_url: originalImageUrl
     };
-    
+
+    // Update in messages history
+    setMessages(prev => prev.map(m => 
+      m.visual?.id === updatedVisual.id ? { ...m, visual: updatedVisual } : m
+    ));
+
     setCurrentVisual(updatedVisual);
     setSessionVisuals(prev => prev.map(v => v.id === updatedVisual.id ? updatedVisual : v));
     setShowEditor(false);
@@ -683,6 +679,12 @@ export default function Home() {
         image_url: newImageUrl,
         original_image_url: currentVisual.original_image_url || currentVisual.image_url
       };
+
+      // Update in messages history
+      setMessages(prev => prev.map(m => 
+        m.visual?.id === updatedVisual.id ? { ...m, visual: updatedVisual } : m
+      ));
+
       setCurrentVisual(updatedVisual);
       setSessionVisuals(prev => prev.map(v => v.id === updatedVisual.id ? updatedVisual : v));
     }
@@ -709,9 +711,11 @@ export default function Home() {
     }
 
     setCurrentVisual(newVisual);
+    setVisualsHistory(prev => [...prev, newVisual]);
     setMessages(prev => [...prev, { 
       role: 'assistant', 
-      content: `✨ ${language === 'fr' ? 'Votre vidéo est prête !' : 'Your video is ready!'}`
+      content: `✨ ${language === 'fr' ? 'Votre vidéo est prête !' : 'Your video is ready!'}`,
+      visual: newVisual
     }]);
   };
 
@@ -891,66 +895,86 @@ export default function Home() {
                 ))}
               </AnimatePresence>
 
-              {currentVisual && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex justify-center"
-                >
-                  <div className="w-full max-w-md relative">
-                    {/* Favorites Button - Outside card, top right of image */}
-                    <button
-                      onClick={() => setShowFavoritesModal(true)}
-                      className="absolute -right-3 top-3 z-40 flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
-                    >
-                      <Heart className={cn("h-3.5 w-3.5", favoriteVisuals.length > 0 && "fill-white")} />
-                      <span className="text-xs font-medium whitespace-nowrap">
-                        {language === 'fr' ? 'Mes favoris' : 'My favorites'}
-                      </span>
-                      {favoriteVisuals.length > 0 && (
-                        <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
-                          {favoriteVisuals.length}
-                        </span>
+              {/* Display all visuals from messages history */}
+              {messages.map((msg, idx) => (
+                msg.visual && (
+                  <motion.div
+                    key={`visual-${idx}`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex justify-center"
+                  >
+                    <div className="w-full max-w-md relative">
+                      {/* Favorites Button - Only on last visual */}
+                      {idx === messages.length - 1 && (
+                        <button
+                          onClick={() => setShowFavoritesModal(true)}
+                          className="absolute -right-3 top-3 z-40 flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
+                        >
+                          <Heart className={cn("h-3.5 w-3.5", favoriteVisuals.length > 0 && "fill-white")} />
+                          <span className="text-xs font-medium whitespace-nowrap">
+                            {language === 'fr' ? 'Mes favoris' : 'My favorites'}
+                          </span>
+                          {favoriteVisuals.length > 0 && (
+                            <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
+                              {favoriteVisuals.length}
+                            </span>
+                          )}
+                        </button>
                       )}
-                    </button>
 
-                    <VisualCard
-                      visual={currentVisual}
-                      onRegenerate={handleRegenerate}
-                      onDownload={handleDownload}
-                      onToggleFavorite={async (v) => {
-                        if (user && v.id) {
-                          await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
-                          setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
-                        }
-                      }}
-                      onPromptClick={(prompt) => {
-                        setInputValue(prompt);
-                        setTimeout(() => {
-                          if (inputRef.current) {
-                            inputRef.current.style.height = 'auto';
-                            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-                            inputRef.current.focus();
+                      <VisualCard
+                        visual={msg.visual}
+                        onRegenerate={handleRegenerate}
+                        onDownload={handleDownload}
+                        onToggleFavorite={async (v) => {
+                          if (user && v.id) {
+                            await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
+                            // Update in history
+                            setMessages(prev => prev.map((m, i) => 
+                              i === idx && m.visual ? { ...m, visual: { ...m.visual, is_favorite: !v.is_favorite } } : m
+                            ));
+                            if (currentVisual?.id === v.id) {
+                              setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
+                            }
                           }
-                        }, 0);
-                      }}
-                      onVideoGenerated={handleVideoGenerated}
-                      onBackToImage={handleBackToImage}
-                      onCropComplete={handleCropComplete}
-                      isRegenerating={isGenerating}
-                      canDownload={canDownload}
-                      hasWatermark={hasWatermark}
-                      showValidation={true}
-                      showActions={true}
-                      onValidate={(action) => {
-                        if (action === 'edit') {
-                          handleOpenEditor(currentVisual);
-                        }
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              )}
+                        }}
+                        onPromptClick={(prompt) => {
+                          setInputValue(prompt);
+                          setTimeout(() => {
+                            if (inputRef.current) {
+                              inputRef.current.style.height = 'auto';
+                              inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                              inputRef.current.focus();
+                            }
+                          }, 0);
+                        }}
+                        onVideoGenerated={handleVideoGenerated}
+                        onBackToImage={handleBackToImage}
+                        onCropComplete={(newUrl) => {
+                          // Update visual in messages
+                          setMessages(prev => prev.map((m, i) => 
+                            i === idx && m.visual ? { ...m, visual: { ...m.visual, image_url: newUrl } } : m
+                          ));
+                          if (currentVisual?.id === msg.visual.id) {
+                            setCurrentVisual({ ...msg.visual, image_url: newUrl });
+                          }
+                        }}
+                        isRegenerating={isGenerating && idx === messages.length - 1}
+                        canDownload={canDownload}
+                        hasWatermark={hasWatermark}
+                        showValidation={true}
+                        showActions={true}
+                        onValidate={(action) => {
+                          if (action === 'edit') {
+                            handleOpenEditor(msg.visual);
+                          }
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                )
+              ))}
 
               <div ref={messagesEndRef} />
             </div>
