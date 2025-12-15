@@ -297,7 +297,7 @@ export default function Home() {
     setIsGenerating(true);
     setCurrentVisual(null);
 
-    setMessages(prev => [...prev, { role: 'assistant', content: '', isStreaming: true }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: t('generating'), isStreaming: true }]);
 
     // Create conversation if it doesn't exist
     let activeConversation = currentConversation;
@@ -637,25 +637,27 @@ export default function Home() {
         // Reconstruct messages with visuals attached
         const baseMessages = conv.messages || [];
         const reconstructedMessages = [];
+        let visualIdx = 0;
 
-        // Map visuals to their corresponding messages
-        // Typically: user message, assistant success message, then visual
+        // For each message, attach visuals after assistant success messages
         for (let i = 0; i < baseMessages.length; i++) {
           reconstructedMessages.push(baseMessages[i]);
 
-          // If this is an assistant message indicating success, attach the corresponding visual
+          // If this is an assistant message indicating success, add the next visual
           if (baseMessages[i].role === 'assistant' && 
               (baseMessages[i].content.includes('prêt') || 
                baseMessages[i].content.includes('ready') ||
-               baseMessages[i].content.includes('version'))) {
-            // Find the visual that was created around this time
-            const visualIndex = Math.floor((i + 1) / 2) - 1;
-            if (visuals[visuals.length - 1 - visualIndex]) {
+               baseMessages[i].content.includes('version') ||
+               baseMessages[i].content.includes('✨'))) {
+            // Add visual in reverse order (oldest first in messages)
+            const visualToAdd = visuals[visuals.length - 1 - visualIdx];
+            if (visualToAdd) {
               reconstructedMessages.push({
                 role: 'assistant',
                 content: '',
-                visual: visuals[visuals.length - 1 - visualIndex]
+                visual: visualToAdd
               });
+              visualIdx++;
             }
           }
         }
