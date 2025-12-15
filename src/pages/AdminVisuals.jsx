@@ -64,6 +64,8 @@ export default function AdminVisuals() {
   const [editingVisual, setEditingVisual] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropVisual, setCropVisual] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const itemsPerPage = 100;
 
   useEffect(() => {
@@ -403,7 +405,14 @@ export default function AdminVisuals() {
               key={visual.id}
               className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all"
             >
-              <div className="relative" style={{ aspectRatio }}>
+              <div 
+                className="relative cursor-pointer"
+                style={{ aspectRatio }}
+                onClick={() => {
+                  setSelectedImage(visual);
+                  setImageModalOpen(true);
+                }}
+              >
                 {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
                   <video 
                     src={visual.video_url || visual.image_url}
@@ -630,6 +639,55 @@ export default function AdminVisuals() {
         visual={cropVisual}
         onCropComplete={handleCropComplete}
       />
+
+      {/* Image Modal */}
+      {imageModalOpen && selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => {
+            setImageModalOpen(false);
+            setSelectedImage(null);
+          }}
+        >
+          <div 
+            className="relative max-w-7xl max-h-[90vh] w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setImageModalOpen(false);
+                setSelectedImage(null);
+              }}
+              className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors"
+            >
+              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {selectedImage.video_url || (selectedImage.image_url && (selectedImage.image_url.includes('.mp4') || selectedImage.image_url.includes('/video'))) ? (
+              <video 
+                src={selectedImage.video_url || selectedImage.image_url}
+                controls
+                autoPlay
+                loop
+                className="w-full h-full object-contain max-h-[90vh]"
+              />
+            ) : (
+              <img 
+                src={selectedImage.image_url}
+                alt={selectedImage.title}
+                className="w-full h-full object-contain max-h-[90vh] rounded-lg"
+              />
+            )}
+            
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+              <p className="text-white font-medium">{selectedImage.title}</p>
+              <p className="text-white/60 text-sm">{selectedImage.user_email}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
