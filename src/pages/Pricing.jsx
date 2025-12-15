@@ -34,8 +34,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Zap',
         gradient: 'from-blue-600 to-cyan-600',
         features: { 
-          fr: ['100 messages/mois', 'Visuels HD', 'Support'],
-          en: ['100 messages/month', 'HD visuals', 'Support']
+          fr: ['100 crédits/mois', 'Visuels HD', 'Support'],
+          en: ['100 credits/month', 'HD visuals', 'Support']
         }
       },
       { 
@@ -48,8 +48,8 @@ const STRIPE_PRODUCTS = {
         gradient: 'from-violet-600 to-purple-600',
         is_popular: true,
         features: { 
-          fr: ['250 messages/mois', 'Visuels HD', 'Support'],
-          en: ['250 messages/month', 'HD visuals', 'Support']
+          fr: ['250 crédits/mois', 'Visuels HD', 'Support'],
+          en: ['250 credits/month', 'HD visuals', 'Support']
         }
       },
       { 
@@ -61,8 +61,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Crown',
         gradient: 'from-amber-600 to-orange-600',
         features: { 
-          fr: ['500 messages/mois', 'Visuels HD & Print', 'Support'],
-          en: ['500 messages/month', 'HD & Print visuals', 'Support']
+          fr: ['500 crédits/mois', 'Visuels HD & Print', 'Support'],
+          en: ['500 credits/month', 'HD & Print visuals', 'Support']
         }
       },
       { 
@@ -74,8 +74,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Gem',
         gradient: 'from-rose-600 to-pink-600',
         features: { 
-          fr: ['1000 messages/mois', 'Visuels HD & Print', 'Support'],
-          en: ['1000 messages/month', 'HD & Print visuals', 'Support']
+          fr: ['1000 crédits/mois', 'Visuels HD & Print', 'Support'],
+          en: ['1000 credits/month', 'HD & Print visuals', 'Support']
         }
       }
     ],
@@ -106,8 +106,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Zap',
         gradient: 'from-blue-600 to-cyan-600',
         features: { 
-          fr: ['100 messages/mois', '1200/an', 'Visuels HD'],
-          en: ['100 messages/month', '1200/year', 'HD visuals']
+          fr: ['100 crédits/mois', '1200/an', 'Visuels HD'],
+          en: ['100 credits/month', '1200/year', 'HD visuals']
         }
       },
       { 
@@ -122,8 +122,8 @@ const STRIPE_PRODUCTS = {
         gradient: 'from-violet-600 to-purple-600',
         is_popular: true,
         features: { 
-          fr: ['250 messages/mois', '3000/an', 'Support'],
-          en: ['250 messages/month', '3000/year', 'Support']
+          fr: ['250 crédits/mois', '3000/an', 'Support'],
+          en: ['250 credits/month', '3000/year', 'Support']
         }
       },
       { 
@@ -137,8 +137,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Crown',
         gradient: 'from-amber-600 to-orange-600',
         features: { 
-          fr: ['500 messages/mois', '6000/an', 'Support'],
-          en: ['500 messages/month', '6000/year', 'Support']
+          fr: ['500 crédits/mois', '6000/an', 'Support'],
+          en: ['500 credits/month', '6000/year', 'Support']
         }
       },
       { 
@@ -152,8 +152,8 @@ const STRIPE_PRODUCTS = {
         icon: 'Gem',
         gradient: 'from-rose-600 to-pink-600',
         features: { 
-          fr: ['1000 messages/mois', '12000/an', 'Support'],
-          en: ['1000 messages/month', '12000/year', 'Support']
+          fr: ['1000 crédits/mois', '12000/an', 'Support'],
+          en: ['1000 credits/month', '12000/year', 'Support']
         }
       }
     ]
@@ -253,6 +253,16 @@ export default function Pricing() {
               </div>
             )}
 
+            {/* Info Block */}
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 text-amber-200">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium">
+                1 {language === 'fr' ? 'message prompt' : 'prompt message'} = 1 {language === 'fr' ? 'crédit' : 'credit'}
+              </span>
+            </div>
+
           </div>
 
           {/* Billing Toggle */}
@@ -336,27 +346,27 @@ export default function Pricing() {
                       </div>
                     )}
 
-                    {/* Messages */}
+                    {/* Credits */}
                                               <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
                                                 {sub.isFree ? (
                                                   <>
                                                     <span className="text-white font-medium">{sub.credits}</span>
-                                                    <span className="text-white/60 text-sm"> {language === 'fr' ? 'messages offerts / mois' : 'free messages / month'}</span>
+                                                    <span className="text-white/60 text-sm"> {language === 'fr' ? 'crédits offerts / mois' : 'free credits / month'}</span>
                                                   </>
                                                 ) : (
                         <>
                           <span className="text-white font-medium">
                             {billingCycle === 'yearly' ? sub.creditsPerMonth : sub.credits}
                           </span>
-                          <span className="text-white/60 text-sm"> messages/{language === 'fr' ? 'mois' : 'mo'}</span>
+                          <span className="text-white/60 text-sm"> {language === 'fr' ? 'crédits/mois' : 'credits/mo'}</span>
                         </>
                       )}
                     </div>
 
-                    {/* Cost per message */}
+                    {/* Cost per credit */}
                     {!sub.isFree && (
                       <p className="text-xs text-emerald-400 mb-3 text-center">
-                        {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/message/crédit
+                        {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                       </p>
                     )}
                     {sub.isFree && (
@@ -426,10 +436,10 @@ export default function Pricing() {
                   )}
                   <div className="text-center">
                     <p className="text-4xl font-bold text-white mb-1">{pack.credits}</p>
-                    <p className="text-white/60 mb-2">messages</p>
+                    <p className="text-white/60 mb-2">{language === 'fr' ? 'crédits' : 'credits'}</p>
                     <p className="text-3xl font-bold text-white mb-2">{pack.price}€</p>
                     <p className="text-xs text-emerald-400 mb-4">
-                      {(pack.price / pack.credits).toFixed(2)}€/message/crédit
+                      {(pack.price / pack.credits).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                     </p>
                     <Button 
                       onClick={() => handlePurchase(pack.priceId, user)} 
