@@ -244,12 +244,12 @@ export default function Pricing() {
                 ? 'Débloquez tout le potentiel de iGPT avec nos offres flexibles' 
                 : 'Unlock the full potential of iGPT with our flexible plans'}
             </p>
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-3 mt-8">
               {credits && (
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80">
                   <MessageSquare className="h-4 w-4" />
                   <span>
-                    {language === 'fr' ? 'Messages restants' : 'Messages left'}: {credits.subscription_type === 'unlimited' ? '∞' : (credits.free_downloads || 0) + (credits.paid_credits || 0)}
+                    {language === 'fr' ? 'Crédits restants' : 'Credits left'}: {credits.subscription_type === 'unlimited' ? '∞' : (credits.free_downloads || 0) + (credits.paid_credits || 0)}
                   </span>
                 </div>
               )}
