@@ -874,11 +874,13 @@ export default function Home() {
               </span>
             </p>
             {(settings.home_text3_fr || settings.home_text3_en) && (
-              <p className="text-xs md:text-sm mb-2 text-center">
-                <span className="text-white/70">
-                  {language === 'fr' ? (settings.home_text3_fr || '') : (settings.home_text3_en || settings.home_text3_fr || '')}
-                </span>
-              </p>
+              <div className="flex justify-center mb-2">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border border-emerald-400/30 backdrop-blur-sm shadow-lg shadow-emerald-500/10">
+                  <span className="text-xs md:text-sm bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent font-medium">
+                    {language === 'fr' ? (settings.home_text3_fr || '') : (settings.home_text3_en || settings.home_text3_fr || '')}
+                  </span>
+                </div>
+              </div>
             )}
             {(settings.home_text4_fr || settings.home_text4_en) && (
               <p className="text-[10px] md:text-xs mb-12 text-center">
