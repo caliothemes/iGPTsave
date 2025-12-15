@@ -613,31 +613,32 @@ export default function Store() {
                         : "border-white/10 hover:border-white/20"
                     )}>
                       <div className="relative h-40 bg-white/5">
-                        {cat.latestImage || cat.latestVideo ? (
-                          <>
-                            {cat.latestVideo || (cat.latestImage && (cat.latestImage.includes('.mp4') || cat.latestImage.includes('/video'))) ? (
-                              <video
-                                src={cat.latestVideo || cat.latestImage}
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <img
-                                src={cat.latestImage}
-                                alt={cat.name_fr}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                          </>
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                            <span className="text-white/30 text-xs">{language === 'fr' ? 'Aucun visuel' : 'No visual'}</span>
-                          </div>
-                        )}
+                       {cat.latestImage || cat.latestVideo ? (
+                         <>
+                           {cat.latestVideo || (cat.latestImage && (cat.latestImage.includes('.mp4') || cat.latestImage.includes('/video'))) ? (
+                             <video
+                               src={cat.latestVideo || cat.latestImage}
+                               autoPlay
+                               loop
+                               muted
+                               playsInline
+                               className="w-full h-full object-cover"
+                               style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+                             />
+                           ) : (
+                             <img
+                               src={cat.latestImage}
+                               alt={cat.name_fr}
+                               className="w-full h-full object-cover"
+                             />
+                           )}
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                         </>
+                       ) : (
+                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                           <span className="text-white/30 text-xs">{language === 'fr' ? 'Aucun visuel' : 'No visual'}</span>
+                         </div>
+                       )}
                       </div>
                       <div className={cn(
                         "px-4 py-3 border-t",
@@ -783,12 +784,13 @@ export default function Store() {
                             loop
                             muted
                             playsInline
-                            className="select-none pointer-events-none"
+                            className="select-none"
                             style={{ 
                               display: 'block', 
                               width: '100%', 
                               height: '100%', 
-                              objectFit: 'cover'
+                              objectFit: 'cover',
+                              pointerEvents: isAdmin ? 'auto' : 'none'
                             }}
                           />
                         ) : (
@@ -1030,8 +1032,9 @@ export default function Store() {
                             display: 'block',
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover',
-                            aspectRatio: `${w} / ${h}`
+                            objectFit: 'contain',
+                            aspectRatio: `${w} / ${h}`,
+                            pointerEvents: 'auto'
                           }}
                         />
                       ) : (
