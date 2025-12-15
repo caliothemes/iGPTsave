@@ -889,97 +889,96 @@ export default function Home() {
             <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <MessageBubble message={msg} isStreaming={msg.isStreaming} user={user} />
-                  </motion.div>
+                  <React.Fragment key={idx}>
+                    {/* Message bubble */}
+                    {msg.content && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <MessageBubble message={msg} isStreaming={msg.isStreaming} user={user} />
+                      </motion.div>
+                    )}
+
+                    {/* Visual card - right after the message if it has one */}
+                    {msg.visual && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex justify-center"
+                      >
+                        <div className="w-full max-w-md relative">
+                          {/* Favorites Button - Only on last visual */}
+                          {idx === messages.length - 1 && (
+                            <button
+                              onClick={() => setShowFavoritesModal(true)}
+                              className="absolute -right-3 top-3 z-40 flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
+                            >
+                              <Heart className={cn("h-3.5 w-3.5", favoriteVisuals.length > 0 && "fill-white")} />
+                              <span className="text-xs font-medium whitespace-nowrap">
+                                {language === 'fr' ? 'Mes favoris' : 'My favorites'}
+                              </span>
+                              {favoriteVisuals.length > 0 && (
+                                <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
+                                  {favoriteVisuals.length}
+                                </span>
+                              )}
+                            </button>
+                          )}
+
+                          <VisualCard
+                            visual={msg.visual}
+                            onRegenerate={handleRegenerate}
+                            onDownload={handleDownload}
+                            onToggleFavorite={async (v) => {
+                              if (user && v.id) {
+                                await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
+                                setMessages(prev => prev.map((m, i) => 
+                                  i === idx && m.visual ? { ...m, visual: { ...m.visual, is_favorite: !v.is_favorite } } : m
+                                ));
+                                if (currentVisual?.id === v.id) {
+                                  setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
+                                }
+                              }
+                            }}
+                            onPromptClick={(prompt) => {
+                              setInputValue(prompt);
+                              setTimeout(() => {
+                                if (inputRef.current) {
+                                  inputRef.current.style.height = 'auto';
+                                  inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                                  inputRef.current.focus();
+                                }
+                              }, 0);
+                            }}
+                            onVideoGenerated={handleVideoGenerated}
+                            onBackToImage={handleBackToImage}
+                            onCropComplete={(newUrl) => {
+                              setMessages(prev => prev.map((m, i) => 
+                                i === idx && m.visual ? { ...m, visual: { ...m.visual, image_url: newUrl } } : m
+                              ));
+                              if (currentVisual?.id === msg.visual.id) {
+                                setCurrentVisual({ ...msg.visual, image_url: newUrl });
+                              }
+                            }}
+                            isRegenerating={isGenerating && idx === messages.length - 1}
+                            canDownload={canDownload}
+                            hasWatermark={hasWatermark}
+                            showValidation={true}
+                            showActions={true}
+                            onValidate={(action) => {
+                              if (action === 'edit') {
+                                handleOpenEditor(msg.visual);
+                              }
+                            }}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </React.Fragment>
                 ))}
               </AnimatePresence>
-
-              {/* Display all visuals from messages history */}
-              {messages.map((msg, idx) => (
-                msg.visual && (
-                  <motion.div
-                    key={`visual-${idx}`}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex justify-center"
-                  >
-                    <div className="w-full max-w-md relative">
-                      {/* Favorites Button - Only on last visual */}
-                      {idx === messages.length - 1 && (
-                        <button
-                          onClick={() => setShowFavoritesModal(true)}
-                          className="absolute -right-3 top-3 z-40 flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
-                        >
-                          <Heart className={cn("h-3.5 w-3.5", favoriteVisuals.length > 0 && "fill-white")} />
-                          <span className="text-xs font-medium whitespace-nowrap">
-                            {language === 'fr' ? 'Mes favoris' : 'My favorites'}
-                          </span>
-                          {favoriteVisuals.length > 0 && (
-                            <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
-                              {favoriteVisuals.length}
-                            </span>
-                          )}
-                        </button>
-                      )}
-
-                      <VisualCard
-                        visual={msg.visual}
-                        onRegenerate={handleRegenerate}
-                        onDownload={handleDownload}
-                        onToggleFavorite={async (v) => {
-                          if (user && v.id) {
-                            await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
-                            // Update in history
-                            setMessages(prev => prev.map((m, i) => 
-                              i === idx && m.visual ? { ...m, visual: { ...m.visual, is_favorite: !v.is_favorite } } : m
-                            ));
-                            if (currentVisual?.id === v.id) {
-                              setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
-                            }
-                          }
-                        }}
-                        onPromptClick={(prompt) => {
-                          setInputValue(prompt);
-                          setTimeout(() => {
-                            if (inputRef.current) {
-                              inputRef.current.style.height = 'auto';
-                              inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-                              inputRef.current.focus();
-                            }
-                          }, 0);
-                        }}
-                        onVideoGenerated={handleVideoGenerated}
-                        onBackToImage={handleBackToImage}
-                        onCropComplete={(newUrl) => {
-                          // Update visual in messages
-                          setMessages(prev => prev.map((m, i) => 
-                            i === idx && m.visual ? { ...m, visual: { ...m.visual, image_url: newUrl } } : m
-                          ));
-                          if (currentVisual?.id === msg.visual.id) {
-                            setCurrentVisual({ ...msg.visual, image_url: newUrl });
-                          }
-                        }}
-                        isRegenerating={isGenerating && idx === messages.length - 1}
-                        canDownload={canDownload}
-                        hasWatermark={hasWatermark}
-                        showValidation={true}
-                        showActions={true}
-                        onValidate={(action) => {
-                          if (action === 'edit') {
-                            handleOpenEditor(msg.visual);
-                          }
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                )
-              ))}
 
               <div ref={messagesEndRef} />
             </div>
