@@ -875,8 +875,8 @@ export default function Home() {
             </p>
             {(settings.home_text3_fr || settings.home_text3_en) && (
               <div className="flex justify-center mb-2">
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border border-emerald-400/30 backdrop-blur-sm shadow-lg shadow-emerald-500/10">
-                  <span className="text-xs md:text-sm bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent font-medium">
+                <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+                  <span className="text-xs md:text-sm text-white/60 font-normal">
                     {language === 'fr' ? (settings.home_text3_fr || '') : (settings.home_text3_en || settings.home_text3_fr || '')}
                   </span>
                 </div>
