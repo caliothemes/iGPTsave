@@ -244,23 +244,25 @@ export default function Pricing() {
                 ? 'Débloquez tout le potentiel de iGPT avec nos offres flexibles' 
                 : 'Unlock the full potential of iGPT with our flexible plans'}
             </p>
-            {credits && (
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80">
-                <MessageSquare className="h-4 w-4" />
-                <span>
-                  {language === 'fr' ? 'Messages restants' : 'Messages left'}: {credits.subscription_type === 'unlimited' ? '∞' : (credits.free_downloads || 0) + (credits.paid_credits || 0)}
+            <div className="flex flex-col items-center gap-3">
+              {credits && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/80">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>
+                    {language === 'fr' ? 'Messages restants' : 'Messages left'}: {credits.subscription_type === 'unlimited' ? '∞' : (credits.free_downloads || 0) + (credits.paid_credits || 0)}
+                  </span>
+                </div>
+              )}
+
+              {/* Info Block */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 text-amber-200">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium">
+                  1 {language === 'fr' ? 'message prompt' : 'prompt message'} = 1 {language === 'fr' ? 'crédit' : 'credit'}
                 </span>
               </div>
-            )}
-
-            {/* Info Block */}
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 text-amber-200">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-sm font-medium">
-                1 {language === 'fr' ? 'message prompt' : 'prompt message'} = 1 {language === 'fr' ? 'crédit' : 'credit'}
-              </span>
             </div>
 
           </div>
