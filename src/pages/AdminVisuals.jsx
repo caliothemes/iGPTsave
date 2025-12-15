@@ -651,55 +651,106 @@ export default function AdminVisuals() {
       />
 
       {/* Image Modal */}
-      {imageModalOpen && selectedImage && (
-        <div 
-          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => {
-            setImageModalOpen(false);
-            setSelectedImage(null);
-          }}
-        >
-          <button
+      {imageModalOpen && selectedImage && (() => {
+        const dims = selectedImage.dimensions || '1080x1080';
+        const [w, h] = dims.split('x').map(n => parseInt(n));
+
+        if (!w || !h) {
+          console.error('Invalid dimensions:', dims);
+          return null;
+        }
+
+        const aspectRatio = w / h;
+
+        // Calculate max dimensions based on viewport
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = window.innerHeight * 0.9;
+
+        let displayWidth, displayHeight;
+        if (aspectRatio > maxWidth / maxHeight) {
+          // Width-constrained
+          displayWidth = maxWidth;
+          displayHeight = maxWidth / aspectRatio;
+        } else {
+          // Height-constrained
+          displayHeight = maxHeight;
+          displayWidth = maxHeight * aspectRatio;
+        }
+
+        return (
+          <div 
+            className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50"
             onClick={() => {
               setImageModalOpen(false);
               setSelectedImage(null);
             }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-lg"
           >
-            ✕ Fermer
-          </button>
-          
-          <div 
-            className="relative max-w-7xl max-h-[90vh] w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            
-            {selectedImage.video_url || (selectedImage.image_url && (selectedImage.image_url.includes('.mp4') || selectedImage.image_url.includes('/video'))) ? (
-              <video 
-                controls
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-contain max-h-[90vh]"
+            <div className="relative w-full h-full flex items-center justify-center p-4 md:p-8">
+              <div 
+                className="relative"
+                style={{
+                  width: `${displayWidth}px`,
+                  height: `${displayHeight}px`,
+                  aspectRatio: `${w} / ${h}`
+                }}
+                onClick={(e) => e.stopPropagation()}
               >
-                <source src={selectedImage.video_url || selectedImage.image_url} type="video/mp4" />
-              </video>
-            ) : (
-              <img 
-                src={selectedImage.image_url}
-                alt={selectedImage.title}
-                className="w-full h-full object-contain max-h-[90vh] rounded-lg"
-              />
-            )}
-            
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-              <p className="text-white font-medium">{selectedImage.title}</p>
-              <p className="text-white/60 text-sm">{selectedImage.user_email}</p>
+                {selectedImage.video_url || (selectedImage.image_url && (selectedImage.image_url.includes('.mp4') || selectedImage.image_url.includes('/video'))) ? (
+                  <video
+                    controls
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="rounded-lg shadow-2xl"
+                    style={{ 
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      aspectRatio: `${w} / ${h}`
+                    }}
+                  >
+                    <source src={selectedImage.video_url || selectedImage.image_url} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img
+                    src={selectedImage.image_url}
+                    alt={selectedImage.title}
+                    className="rounded-lg shadow-2xl"
+                    style={{ 
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      aspectRatio: `${w} / ${h}`
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Close button */}
+              <button
+                onClick={() => {
+                  setImageModalOpen(false);
+                  setSelectedImage(null);
+                }}
+                className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all z-10 shadow-2xl"
+              >
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Info bar */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 max-w-xl">
+                <p className="text-white font-medium text-center truncate">{selectedImage.title}</p>
+                <p className="text-white/60 text-sm text-center">{selectedImage.user_email}</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </AdminLayout>
   );
 }
