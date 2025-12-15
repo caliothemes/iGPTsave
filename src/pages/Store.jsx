@@ -617,14 +617,15 @@ export default function Store() {
                          <>
                            {cat.latestVideo || (cat.latestImage && (cat.latestImage.includes('.mp4') || cat.latestImage.includes('/video'))) ? (
                              <video
-                               src={cat.latestVideo || cat.latestImage}
                                autoPlay
                                loop
                                muted
                                playsInline
                                className="w-full h-full object-cover"
                                style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
-                             />
+                             >
+                               <source src={cat.latestVideo || cat.latestImage} type="video/mp4" />
+                             </video>
                            ) : (
                              <img
                                src={cat.latestImage}
@@ -779,7 +780,6 @@ export default function Store() {
                       >
                         {item.video_url || (item.image_url && (item.image_url.includes('.mp4') || item.image_url.includes('/video'))) ? (
                           <video 
-                            src={item.video_url || item.image_url}
                             autoPlay
                             loop
                             muted
@@ -792,7 +792,9 @@ export default function Store() {
                               objectFit: 'cover',
                               pointerEvents: isAdmin ? 'auto' : 'none'
                             }}
-                          />
+                          >
+                            <source src={item.video_url || item.image_url} type="video/mp4" />
+                          </video>
                         ) : (
                           <img
                             src={item.image_url}
@@ -1022,11 +1024,11 @@ export default function Store() {
                     >
                       {enlargedImage.video_url || (enlargedImage.image_url && (enlargedImage.image_url.includes('.mp4') || enlargedImage.image_url.includes('/video'))) ? (
                         <video
-                          src={enlargedImage.video_url || enlargedImage.image_url}
                           controls
                           autoPlay
                           loop
                           muted
+                          playsInline
                           className="rounded-lg shadow-2xl"
                           style={{ 
                             display: 'block',
@@ -1036,7 +1038,9 @@ export default function Store() {
                             aspectRatio: `${w} / ${h}`,
                             pointerEvents: 'auto'
                           }}
-                        />
+                        >
+                          <source src={enlargedImage.video_url || enlargedImage.image_url} type="video/mp4" />
+                        </video>
                       ) : (
                         <img
                           src={enlargedImage.image_url}

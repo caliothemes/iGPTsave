@@ -411,14 +411,15 @@ export default function AdminVisuals() {
               >
                 {visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video'))) ? (
                   <video 
-                    src={visual.video_url || visual.image_url}
                     autoPlay
                     loop
                     muted
                     playsInline
                     className="block"
                     style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                  >
+                    <source src={visual.video_url || visual.image_url} type="video/mp4" />
+                  </video>
                 ) : visual.image_url ? (
                   <img 
                     src={visual.image_url} 
@@ -675,14 +676,15 @@ export default function AdminVisuals() {
             
             {selectedImage.video_url || (selectedImage.image_url && (selectedImage.image_url.includes('.mp4') || selectedImage.image_url.includes('/video'))) ? (
               <video 
-                src={selectedImage.video_url || selectedImage.image_url}
                 controls
                 autoPlay
                 loop
                 muted
                 playsInline
                 className="w-full h-full object-contain max-h-[90vh]"
-              />
+              >
+                <source src={selectedImage.video_url || selectedImage.image_url} type="video/mp4" />
+              </video>
             ) : (
               <img 
                 src={selectedImage.image_url}
