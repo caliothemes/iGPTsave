@@ -19,6 +19,8 @@ import AdminStoreCategories from './pages/AdminStoreCategories';
 import AdminUserDetail from './pages/AdminUserDetail';
 import Support from './pages/Support';
 import AdminSupport from './pages/AdminSupport';
+import AdminNewsletters from './pages/AdminNewsletters';
+import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +46,8 @@ export const PAGES = {
     "AdminUserDetail": AdminUserDetail,
     "Support": Support,
     "AdminSupport": AdminSupport,
+    "AdminNewsletters": AdminNewsletters,
+    "AdminNewsletterTemplates": AdminNewsletterTemplates,
 }
 
 export const pagesConfig = {
