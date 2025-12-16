@@ -3310,7 +3310,7 @@ Réponds en JSON avec:
                 <div 
                   className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
                   style={{
-                    top: `${currentLayer.y - currentLayer.fontSize - 45}px`,
+                    top: `${currentLayer.y - currentLayer.fontSize - 60}px`,
                     left: `${currentLayer.x}px`,
                     transform: 'translateX(-50%)'
                   }}
