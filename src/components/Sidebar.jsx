@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   PanelLeftClose, PanelLeft, Plus, MessageSquare, Image, 
-  User, CreditCard, Crown, LogOut, LogIn, ChevronDown, Trash2, Shield, Home, ShoppingBag, Pencil, Check, X
+  User, CreditCard, Crown, LogOut, LogIn, ChevronDown, Trash2, Shield, Home, ShoppingBag, Pencil
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { createPageUrl } from '@/utils';
@@ -13,6 +13,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Sidebar({ 
   isOpen, 
@@ -34,7 +36,8 @@ export default function Sidebar({
   const { t } = useLanguage();
   const [visualsOpen, setVisualsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(true);
-  const [editingId, setEditingId] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingConv, setEditingConv] = useState(null);
   const [editTitle, setEditTitle] = useState('');
 
   const getTotalCredits = () => {
@@ -167,89 +170,42 @@ export default function Sidebar({
                   <div
                     key={conv.id}
                     className={cn(
-                      "group relative flex items-center gap-2 py-2 rounded-lg transition-all",
+                      "group relative flex items-center gap-2 py-2 rounded-lg transition-all cursor-pointer px-2",
                       currentConversationId === conv.id 
                         ? "bg-violet-500/20 text-white" 
-                        : "text-white/70 hover:bg-white/5 hover:text-white",
-                      editingId === conv.id ? "cursor-default px-2" : "cursor-pointer px-2"
+                        : "text-white/70 hover:bg-white/5 hover:text-white"
                     )}
-                    onClick={() => editingId !== conv.id && onSelectConversation(conv)}
+                    onClick={() => onSelectConversation(conv)}
                   >
                     {/* Edit Button - appears on left when hovering */}
-                    {editingId !== conv.id && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingId(conv.id);
-                          setEditTitle(conv.title || 'Conversation');
-                        }}
-                        className="absolute left-0 opacity-0 group-hover:opacity-100 transition-all p-1 hover:bg-white/10 rounded"
-                      >
-                        <Pencil className="h-3 w-3 text-amber-400 hover:text-amber-300" />
-                      </button>
-                    )}
-                    
-                    {/* Action Buttons on left when editing */}
-                    {editingId === conv.id && (
-                      <div className="flex gap-1 flex-shrink-0">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (onUpdateConversation) {
-                              onUpdateConversation(conv.id, { title: editTitle });
-                            }
-                            setEditingId(null);
-                            setEditTitle('');
-                          }}
-                          className="p-1 hover:bg-white/10 rounded transition-all"
-                        >
-                          <Check className="h-3 w-3 text-green-400" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingId(null);
-                            setEditTitle('');
-                          }}
-                          className="p-1 hover:bg-white/10 rounded transition-all"
-                        >
-                          <X className="h-3 w-3 text-red-400" />
-                        </button>
-                      </div>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingConv(conv);
+                        setEditTitle(conv.title || 'Conversation');
+                        setEditModalOpen(true);
+                      }}
+                      className="absolute left-0 opacity-0 group-hover:opacity-100 transition-all p-1 hover:bg-white/10 rounded"
+                    >
+                      <Pencil className="h-3 w-3 text-amber-400 hover:text-amber-300" />
+                    </button>
                     
                     {/* Main Content - shifts right on hover */}
-                    <div className={cn(
-                      "flex items-center gap-2 flex-1 min-w-0 transition-all",
-                      editingId !== conv.id && "group-hover:translate-x-6"
-                    )}>
+                    <div className="flex items-center gap-2 flex-1 min-w-0 transition-all group-hover:translate-x-6">
                       <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                      {editingId === conv.id ? (
-                        <input
-                          type="text"
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                          autoFocus
-                          className="flex-1 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none w-full"
-                        />
-                      ) : (
-                        <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
-                      )}
+                      <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
                     </div>
                     
-                    {/* Delete Button on right when not editing */}
-                    {editingId !== conv.id && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteConversation(conv.id);
-                        }}
-                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
-                      >
-                        <Trash2 className="h-3 w-3 text-white/50 hover:text-red-400" />
-                      </button>
-                    )}
+                    {/* Delete Button on right */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteConversation(conv.id);
+                      }}
+                      className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
+                    >
+                      <Trash2 className="h-3 w-3 text-white/50 hover:text-red-400" />
+                    </button>
                   </div>
                 ))
               )}
@@ -327,6 +283,52 @@ export default function Sidebar({
           onClick={onToggle}
         />
       )}
+
+      {/* Edit Modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              {t('language') === 'fr' ? 'Modifier le titre' : 'Edit title'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder={t('language') === 'fr' ? 'Titre de la conversation...' : 'Conversation title...'}
+              className="bg-white/10 text-white border-white/20 focus:border-violet-500 min-h-[100px] resize-none"
+              autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditModalOpen(false);
+                  setEditingConv(null);
+                  setEditTitle('');
+                }}
+                className="bg-white/5 text-white border-white/20 hover:bg-white/10"
+              >
+                {t('language') === 'fr' ? 'Annuler' : 'Cancel'}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (onUpdateConversation && editingConv) {
+                    onUpdateConversation(editingConv.id, { title: editTitle });
+                  }
+                  setEditModalOpen(false);
+                  setEditingConv(null);
+                  setEditTitle('');
+                }}
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+              >
+                {t('language') === 'fr' ? 'Valider' : 'Confirm'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
