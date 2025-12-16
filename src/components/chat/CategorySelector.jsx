@@ -10,7 +10,7 @@ const CATEGORIES = [
     id: 'logo_picto',
     icon: Gem,
     name: { fr: 'Logo Pictogramme', en: 'Logo Icon' },
-    description: { fr: 'Icône seule, symbole, pictogramme', en: 'Icon only, symbol, pictogram' },
+    description: { fr: 'Logo pictogramme sans texte, icône seule, palette d\'icônes, illustrations, symboles...', en: 'Logo icon without text, icon only, icon palette, illustrations, symbols...' },
     hasSubmenu: false,
     prompt: { fr: 'Crée un logo pictogramme', en: 'Create a logo icon' },
     defaultExpertMode: false
@@ -28,7 +28,7 @@ const CATEGORIES = [
     id: 'image',
     icon: Image,
     name: { fr: 'Image réaliste', en: 'Realistic Image' },
-    description: { fr: 'Photos IA, portraits, paysages', en: 'AI photos, portraits, landscapes' },
+    description: { fr: 'Images époustouflantes réalistes ou pas', en: 'Stunning realistic images or not' },
     hasSubmenu: true,
     submenu: [
       { id: 'image_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une image réaliste format carré', en: 'Create a realistic image in square format' }, dimensions: '1080x1080' },
@@ -68,7 +68,7 @@ const CATEGORIES = [
     id: 'mockup',
     icon: Image,
     name: { fr: 'Mockups', en: 'Mockups' },
-    description: { fr: 'Mises en scène réalistes', en: 'Realistic mockups' },
+    description: { fr: 'Mise en scène réaliste avec mockup', en: 'Realistic staging with mockup' },
     hasSubmenu: true,
     submenu: [
       { id: 'mockup_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un mockup carré', en: 'Create a square mockup' }, dimensions: '1080x1080' },
@@ -372,8 +372,8 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
           </div>
           <p className="text-white/80 text-xs">
             {language === 'fr' 
-              ? 'Visuels prêts à l\'emploi' 
-              : 'Ready-to-use visuals'}
+              ? 'Visuels prêts à l\'emploi promptés par notre équipe' 
+              : 'Ready-to-use visuals prompted by our team'}
           </p>
         </div>
         <svg className="h-5 w-5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
