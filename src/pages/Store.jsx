@@ -159,46 +159,36 @@ export default function Store() {
 
   // Typing animation for placeholder
   useEffect(() => {
-    if (popularKeywords.length === 0 || userTyping) return;
-
-    let timeout;
-    let charIndex = 0;
-    const currentKeyword = popularKeywords[currentKeywordIndex];
-    
-    if (isTyping) {
-      // Typing forward
-      if (charIndex <= currentKeyword.length) {
-        timeout = setTimeout(() => {
-          setPlaceholderText(currentKeyword.slice(0, charIndex));
-          charIndex++;
-          
-          if (charIndex > currentKeyword.length) {
-            // Finished typing, wait then start deleting
-            setTimeout(() => {
-              setIsTyping(false);
-            }, 2000);
-          }
-        }, 100);
-      }
-    } else {
-      // Deleting backward
-      charIndex = placeholderText.length;
-      if (charIndex > 0) {
-        timeout = setTimeout(() => {
-          setPlaceholderText(placeholderText.slice(0, -1));
-          charIndex--;
-        }, 50);
-      } else {
-        // Finished deleting, move to next keyword
-        setTimeout(() => {
-          setCurrentKeywordIndex((prev) => (prev + 1) % popularKeywords.length);
-          setIsTyping(true);
-        }, 500);
-      }
+    if (popularKeywords.length === 0 || userTyping) {
+      setPlaceholderText('');
+      return;
     }
 
+    const currentKeyword = popularKeywords[currentKeywordIndex];
+    let charIndex = 0;
+    let isDeleting = false;
+    let timeout;
+
+    const type = () => {
+      if (!isDeleting && charIndex <= currentKeyword.length) {
+        setPlaceholderText(currentKeyword.slice(0, charIndex));
+        charIndex++;
+        timeout = setTimeout(type, charIndex === currentKeyword.length + 1 ? 2000 : 100);
+      } else if (!isDeleting && charIndex > currentKeyword.length) {
+        isDeleting = true;
+        timeout = setTimeout(type, 50);
+      } else if (isDeleting && charIndex > 0) {
+        charIndex--;
+        setPlaceholderText(currentKeyword.slice(0, charIndex));
+        timeout = setTimeout(type, 50);
+      } else {
+        setCurrentKeywordIndex((prev) => (prev + 1) % popularKeywords.length);
+      }
+    };
+
+    timeout = setTimeout(type, 1000);
     return () => clearTimeout(timeout);
-  }, [popularKeywords, currentKeywordIndex, isTyping, placeholderText, userTyping]);
+  }, [popularKeywords, currentKeywordIndex, userTyping]);
 
   // Calculate item counts per category
   const getCategoryCount = (categorySlug) => {
