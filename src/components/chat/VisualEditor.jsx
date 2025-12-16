@@ -1173,19 +1173,42 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               ctx.setLineDash([5, 5]);
               if (layer.type === 'text') {
                 ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
-                const lines = layer.text.split('\n');
+                
+                // Use same wrapping logic as rendering
+                const wrapText = (text, maxWidth) => {
+                  if (!maxWidth || maxWidth <= 0) return [text];
+                  const words = text.split(' ');
+                  const lines = [];
+                  let currentLine = '';
+                  
+                  for (const word of words) {
+                    const testLine = currentLine ? `${currentLine} ${word}` : word;
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine) {
+                      lines.push(currentLine);
+                      currentLine = word;
+                    } else {
+                      currentLine = testLine;
+                    }
+                  }
+                  if (currentLine) lines.push(currentLine);
+                  return lines;
+                };
+                
+                const lines = wrapText(layer.text, layer.maxWidth || 0);
                 let maxWidth = 0;
                 lines.forEach(line => {
                   const metrics = ctx.measureText(line);
                   maxWidth = Math.max(maxWidth, metrics.width);
                 });
                 const effectiveWidth = layer.maxWidth || maxWidth;
+                const lineHeight = layer.fontSize * 1.2;
+                const totalHeight = lines.length * lineHeight;
                 const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
-                const textHeight = layer.fontSize * 1.2 * lines.length;
                 const boxX = textX - 5;
                 const boxY = layer.y - layer.fontSize - 5;
                 const boxWidth = effectiveWidth + 10;
-                const boxHeight = textHeight + 10;
+                const boxHeight = totalHeight + 10;
                 
                 ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
                 
@@ -1706,15 +1729,38 @@ Réponds en JSON avec:
     if (layer.type === 'text') {
       const ctx = canvasRef.current.getContext('2d');
       ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
-      const lines = layer.text.split('\n');
+      
+      // Use same wrapping logic as rendering
+      const wrapText = (text, maxWidth) => {
+        if (!maxWidth || maxWidth <= 0) return [text];
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine ? `${currentLine} ${word}` : word;
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) lines.push(currentLine);
+        return lines;
+      };
+      
+      const lines = wrapText(layer.text, layer.maxWidth || 0);
       let maxWidth = 0;
       lines.forEach(line => {
         const metrics = ctx.measureText(line);
         maxWidth = Math.max(maxWidth, metrics.width);
       });
       const effectiveWidth = layer.maxWidth || maxWidth;
+      const lineHeight = layer.fontSize * 1.2;
+      const textHeight = lineHeight * lines.length;
       const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
-      const textHeight = layer.fontSize * 1.2 * lines.length;
       const boxX = textX - 5;
       const boxY = layer.y - layer.fontSize - 5;
       const boxWidth = effectiveWidth + 10;
@@ -1841,9 +1887,40 @@ Réponds en JSON avec:
       if (layer.type === 'text') {
         const ctx = canvasRef.current.getContext('2d');
         ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
-        const metrics = ctx.measureText(layer.text);
-        const textX = layer.x - (layer.align === 'center' ? metrics.width/2 : layer.align === 'right' ? metrics.width : 0);
-        hit = x >= textX && x <= textX + metrics.width && y >= layer.y - layer.fontSize && y <= layer.y;
+        
+        // Use same wrapping logic for hit detection
+        const wrapText = (text, maxWidth) => {
+          if (!maxWidth || maxWidth <= 0) return [text];
+          const words = text.split(' ');
+          const lines = [];
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine ? `${currentLine} ${word}` : word;
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) lines.push(currentLine);
+          return lines;
+        };
+        
+        const lines = wrapText(layer.text, layer.maxWidth || 0);
+        let maxWidth = 0;
+        lines.forEach(line => {
+          const metrics = ctx.measureText(line);
+          maxWidth = Math.max(maxWidth, metrics.width);
+        });
+        const effectiveWidth = layer.maxWidth || maxWidth;
+        const lineHeight = layer.fontSize * 1.2;
+        const textHeight = lineHeight * lines.length;
+        const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
+        
+        hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y + textHeight - layer.fontSize;
       } else {
         hit = x >= layer.x && x <= layer.x + layer.width && y >= layer.y && y <= layer.y + layer.height;
       }
@@ -3306,9 +3383,8 @@ Réponds en JSON avec:
                 <div 
                   className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
                   style={{
-                    top: `${currentLayer.y - currentLayer.fontSize - 80}px`,
-                    left: `${currentLayer.x}px`,
-                    transform: 'translateX(-50%)'
+                    top: `${currentLayer.y - currentLayer.fontSize - 100}px`,
+                    left: `${currentLayer.x - (currentLayer.align === 'center' ? (currentLayer.maxWidth || 100)/2 : currentLayer.align === 'right' ? (currentLayer.maxWidth || 100) : 0) - 5}px`
                   }}
                 >
                   <button
