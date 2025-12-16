@@ -230,6 +230,9 @@ export default function Sidebar({
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
+                          onFocus={(e) => {
+                            e.target.setSelectionRange(0, 0);
+                          }}
                           autoFocus
                           className="flex-1 min-w-0 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
                         />
