@@ -191,7 +191,7 @@ export default function Sidebar({
                     
                     {/* Main Content - shifts right on hover */}
                     <div className={cn(
-                      "flex items-center gap-2 flex-1 transition-all",
+                      "flex items-center gap-2 flex-1 min-w-0 transition-all",
                       editingId !== conv.id && "group-hover:translate-x-6"
                     )}>
                       <MessageSquare className="h-4 w-4 flex-shrink-0" />
@@ -202,7 +202,7 @@ export default function Sidebar({
                           onChange={(e) => setEditTitle(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
                           autoFocus
-                          className="flex-1 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
+                          className="flex-1 min-w-0 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
                         />
                       ) : (
                         <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
