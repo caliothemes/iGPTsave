@@ -58,9 +58,18 @@ export default function AdminNewsletters() {
 
     let visualsByCategory = {};
     categories.forEach(cat => {
+      // Exclure les catégories vidéo
+      if (cat.slug && cat.slug.toLowerCase().includes('video')) return;
+      
       const categoryItems = storeItems
-        .filter(item => item.category_slugs && item.category_slugs.includes(cat.slug))
-        .slice(0, 6);
+        .filter(item => {
+          // Exclure les items avec vidéo
+          if (item.video_url || (item.image_url && (item.image_url.includes('.mp4') || item.image_url.includes('/video')))) {
+            return false;
+          }
+          return item.category_slugs && item.category_slugs.includes(cat.slug);
+        })
+        .slice(0, 4); // 4 items (2x2)
       if (categoryItems.length > 0) {
         visualsByCategory[cat.slug] = {
           name: cat.name_fr,
@@ -81,10 +90,10 @@ export default function AdminNewsletters() {
           <h2 style="color: #8b5cf6; font-size: 24px; margin-bottom: 20px; font-weight: bold;">${category.name}</h2>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
-              ${category.items.slice(0, 3).map(item => `
-                <td width="33%" style="padding: 10px;" valign="top">
+              ${category.items.slice(0, 2).map(item => `
+                <td width="50%" style="padding: 10px;" valign="top">
                   <div style="background: #1f2937; border-radius: 12px; overflow: hidden; border: 1px solid #374151;">
-                    <img src="${item.image_url}" alt="${item.title}" style="width: 100%; height: 200px; object-fit: cover; display: block;" />
+                    <img src="${item.image_url}" alt="${item.title}" style="width: 100%; height: 250px; object-fit: cover; display: block;" />
                     <div style="padding: 15px;">
                       <h3 style="color: #fff; font-size: 14px; margin: 0 0 8px 0; font-weight: 600;">${item.title}</h3>
                       <div style="display: flex; align-items: center; gap: 5px;">
@@ -96,12 +105,12 @@ export default function AdminNewsletters() {
                 </td>
               `).join('')}
             </tr>
-            ${category.items.length > 3 ? `
+            ${category.items.length > 2 ? `
             <tr>
-              ${category.items.slice(3, 6).map(item => `
-                <td width="33%" style="padding: 10px;" valign="top">
+              ${category.items.slice(2, 4).map(item => `
+                <td width="50%" style="padding: 10px;" valign="top">
                   <div style="background: #1f2937; border-radius: 12px; overflow: hidden; border: 1px solid #374151;">
-                    <img src="${item.image_url}" alt="${item.title}" style="width: 100%; height: 200px; object-fit: cover; display: block;" />
+                    <img src="${item.image_url}" alt="${item.title}" style="width: 100%; height: 250px; object-fit: cover; display: block;" />
                     <div style="padding: 15px;">
                       <h3 style="color: #fff; font-size: 14px; margin: 0 0 8px 0; font-weight: 600;">${item.title}</h3>
                       <div style="display: flex; align-items: center; gap: 5px;">
