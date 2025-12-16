@@ -87,17 +87,19 @@ export default function Store() {
           base44.entities.StoreItem.filter({ is_active: true }, '-created_date')
         ]);
         
-        // Get latest visual for each category
+        // Get random visual for each category
         const catsWithImages = await Promise.all(
           cats.map(async (cat) => {
             const categoryItems = items.filter(item => 
               item.category_slugs && item.category_slugs.includes(cat.slug)
             );
-            const latestItem = categoryItems.length > 0 ? categoryItems[0] : null;
+            const randomItem = categoryItems.length > 0 
+              ? categoryItems[Math.floor(Math.random() * categoryItems.length)] 
+              : null;
             return { 
               ...cat, 
-              latestImage: latestItem?.image_url,
-              latestVideo: latestItem?.video_url
+              latestImage: randomItem?.image_url,
+              latestVideo: randomItem?.video_url
             };
           })
         );
