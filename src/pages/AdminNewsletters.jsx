@@ -7,8 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AnimatedBackground from '@/components/AnimatedBackground';
 import { toast } from 'sonner';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { createPageUrl } from '@/utils';
 
 export default function AdminNewsletters() {
   const [newsletters, setNewsletters] = useState([]);
@@ -197,19 +198,15 @@ export default function AdminNewsletters() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <AnimatedBackground />
+      <AdminLayout currentPage="newsletters">
         <div className="text-white">Chargement...</div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen relative">
-      <AnimatedBackground />
-      
-      <div className="relative z-10 p-6">
-        <div className="max-w-7xl mx-auto">
+    <AdminLayout currentPage="newsletters">
+      <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -218,7 +215,7 @@ export default function AdminNewsletters() {
             </div>
             <div className="flex gap-3">
               <Button
-                onClick={() => window.location.href = '/admin/newsletter-templates'}
+                onClick={() => window.location.href = createPageUrl('AdminNewsletterTemplates')}
                 variant="outline"
                 className="bg-white/5 text-white border-white/20"
               >
@@ -347,7 +344,6 @@ export default function AdminNewsletters() {
             ))}
           </div>
         </div>
-      </div>
 
       {/* Create Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
@@ -411,6 +407,6 @@ export default function AdminNewsletters() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 }

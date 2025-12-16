@@ -5,8 +5,9 @@ import { Plus, Eye, Edit, Trash2, ArrowLeft } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import AnimatedBackground from '@/components/AnimatedBackground';
 import { toast } from 'sonner';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { createPageUrl } from '@/utils';
 
 export default function AdminNewsletterTemplates() {
   const [templates, setTemplates] = useState([]);
@@ -92,24 +93,20 @@ export default function AdminNewsletterTemplates() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <AnimatedBackground />
+      <AdminLayout currentPage="newsletters">
         <div className="text-white">Chargement...</div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen relative">
-      <AnimatedBackground />
-      
-      <div className="relative z-10 p-6">
-        <div className="max-w-7xl mx-auto">
+    <AdminLayout currentPage="newsletters">
+      <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Button
-                onClick={() => window.location.href = '/admin/newsletters'}
+                onClick={() => window.location.href = createPageUrl('AdminNewsletters')}
                 variant="outline"
                 size="icon"
                 className="bg-white/5 text-white border-white/20"
@@ -176,7 +173,6 @@ export default function AdminNewsletterTemplates() {
             ))}
           </div>
         </div>
-      </div>
 
       {/* Edit/Create Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
@@ -237,6 +233,6 @@ export default function AdminNewsletterTemplates() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 }
