@@ -602,15 +602,7 @@ export default function Home() {
   };
 
   const handleDownload = async () => {
-    if (credits && user) {
-      if (credits.free_downloads > 0) {
-        await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
-        setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
-      } else if (credits.paid_credits > 0) {
-        await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
-        setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
-      }
-    }
+    // Download is now free - no credit deduction
   };
 
   const handleNewChat = () => {
@@ -816,6 +808,13 @@ export default function Home() {
           setConversations(prev => prev.filter(c => c.id !== id));
           if (currentConversation?.id === id) {
             handleNewChat();
+          }
+        }}
+        onUpdateConversation={async (id, updates) => {
+          await base44.entities.Conversation.update(id, updates);
+          setConversations(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+          if (currentConversation?.id === id) {
+            setCurrentConversation(prev => ({ ...prev, ...updates }));
           }
         }}
         onSelectVisual={(v) => {
