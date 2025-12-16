@@ -15,7 +15,8 @@ import {
   Store,
   ChevronLeft,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Mail
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -25,6 +26,7 @@ const navItems = [
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
+  { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
   { id: 'prompts', label: 'Prompts IA', icon: Wand2, page: 'AdminPrompts' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
   { id: 'presentation', label: 'Présentation', icon: LayoutDashboard, page: 'AdminPresentation' },
