@@ -87,7 +87,7 @@ export default function AdminNewsletters() {
     Object.values(visualsByCategory).forEach(category => {
       visualsHtml += `
         <div style="margin-bottom: 40px;">
-          <h2 style="color: #8b5cf6; font-size: 24px; margin-bottom: 20px; font-weight: bold;">${category.name}</h2>
+          <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px; font-weight: bold; background: linear-gradient(to right, #a78bfa, #f0abfc, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: #a78bfa;">${category.name}</h2>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               ${category.items.slice(0, 2).map(item => `
