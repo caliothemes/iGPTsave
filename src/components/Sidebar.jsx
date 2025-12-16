@@ -189,28 +189,8 @@ export default function Sidebar({
                       </button>
                     )}
                     
-                    {/* Main Content - shifts right on hover */}
-                    <div className={cn(
-                      "flex items-center gap-2 flex-1 min-w-0 transition-all",
-                      editingId !== conv.id && "group-hover:translate-x-6"
-                    )}>
-                      <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                      {editingId === conv.id ? (
-                        <input
-                          type="text"
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                          autoFocus
-                          className="flex-1 min-w-0 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
-                        />
-                      ) : (
-                        <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
-                      )}
-                    </div>
-                    
-                    {/* Action Buttons on right */}
-                    {editingId === conv.id ? (
+                    {/* Action Buttons on left when editing */}
+                    {editingId === conv.id && (
                       <div className="flex gap-1 flex-shrink-0">
                         <button
                           onClick={(e) => {
@@ -236,7 +216,30 @@ export default function Sidebar({
                           <X className="h-3 w-3 text-red-400" />
                         </button>
                       </div>
-                    ) : (
+                    )}
+                    
+                    {/* Main Content - shifts right on hover */}
+                    <div className={cn(
+                      "flex items-center gap-2 flex-1 min-w-0 transition-all",
+                      editingId !== conv.id && "group-hover:translate-x-6"
+                    )}>
+                      <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                      {editingId === conv.id ? (
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                          className="flex-1 min-w-0 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
+                        />
+                      ) : (
+                        <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
+                      )}
+                    </div>
+                    
+                    {/* Delete Button on right when not editing */}
+                    {editingId !== conv.id && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
