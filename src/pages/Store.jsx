@@ -64,6 +64,10 @@ export default function Store() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [popularKeywords, setPopularKeywords] = useState([]);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
+  const [placeholderText, setPlaceholderText] = useState('');
+  const [currentKeywordIndex, setCurrentKeywordIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+  const [userTyping, setUserTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [userVisuals, setUserVisuals] = useState([]);
@@ -117,6 +121,13 @@ export default function Store() {
           .map(([keyword]) => keyword);
         setPopularKeywords(sorted);
 
+        // Start placeholder animation after keywords are loaded
+        if (sorted.length > 0) {
+          setTimeout(() => {
+            setIsTyping(true);
+          }, 1000);
+        }
+
         // Load user-specific data only if authenticated
         if (auth) {
           const currentUser = await base44.auth.me();
@@ -145,6 +156,49 @@ export default function Store() {
     };
     init();
   }, []);
+
+  // Typing animation for placeholder
+  useEffect(() => {
+    if (popularKeywords.length === 0 || userTyping) return;
+
+    let timeout;
+    let charIndex = 0;
+    const currentKeyword = popularKeywords[currentKeywordIndex];
+    
+    if (isTyping) {
+      // Typing forward
+      if (charIndex <= currentKeyword.length) {
+        timeout = setTimeout(() => {
+          setPlaceholderText(currentKeyword.slice(0, charIndex));
+          charIndex++;
+          
+          if (charIndex > currentKeyword.length) {
+            // Finished typing, wait then start deleting
+            setTimeout(() => {
+              setIsTyping(false);
+            }, 2000);
+          }
+        }, 100);
+      }
+    } else {
+      // Deleting backward
+      charIndex = placeholderText.length;
+      if (charIndex > 0) {
+        timeout = setTimeout(() => {
+          setPlaceholderText(placeholderText.slice(0, -1));
+          charIndex--;
+        }, 50);
+      } else {
+        // Finished deleting, move to next keyword
+        setTimeout(() => {
+          setCurrentKeywordIndex((prev) => (prev + 1) % popularKeywords.length);
+          setIsTyping(true);
+        }, 500);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [popularKeywords, currentKeywordIndex, isTyping, placeholderText, userTyping]);
 
   // Calculate item counts per category
   const getCategoryCount = (categorySlug) => {
@@ -468,10 +522,17 @@ export default function Store() {
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSelectedKeyword(null);
+                    setUserTyping(e.target.value.length > 0);
                   }}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-                  placeholder={language === 'fr' ? 'Rechercher un visuel...' : 'Search for a visual...'}
+                  onFocus={() => {
+                    setSearchFocused(true);
+                    if (!searchQuery) setUserTyping(true);
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setSearchFocused(false), 200);
+                    if (!searchQuery) setUserTyping(false);
+                  }}
+                  placeholder={placeholderText || (language === 'fr' ? 'Rechercher un visuel...' : 'Search for a visual...')}
                   className="flex-1 min-w-[200px] bg-transparent text-white placeholder:text-white/30 outline-none"
                 />
                 {searchQuery && (
