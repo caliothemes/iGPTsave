@@ -1742,8 +1742,8 @@ Réponds en JSON avec:
 
   const handleCanvasMouseDown = async (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / zoom;
-    const y = (e.clientY - rect.top) / zoom;
+    const x = (e.clientX - rect.left) * (canvasSize.width / rect.width);
+    const y = (e.clientY - rect.top) * (canvasSize.height / rect.height);
     
     // Mockup selection mode
     if (mockupSelectionMode) {
@@ -1854,8 +1854,8 @@ Réponds en JSON avec:
 
   const handleCanvasMouseMove = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / zoom;
-    const y = (e.clientY - rect.top) / zoom;
+    const x = (e.clientX - rect.left) * (canvasSize.width / rect.width);
+    const y = (e.clientY - rect.top) * (canvasSize.height / rect.height);
     
     // Track mouse position for eraser/brush cursor
     if (isErasing || isBrushing) {
