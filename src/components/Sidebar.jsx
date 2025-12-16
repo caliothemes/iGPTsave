@@ -167,30 +167,51 @@ export default function Sidebar({
                   <div
                     key={conv.id}
                     className={cn(
-                      "group flex items-center gap-2 px-2 py-2 rounded-lg transition-colors",
+                      "group relative flex items-center gap-2 py-2 rounded-lg transition-all",
                       currentConversationId === conv.id 
                         ? "bg-violet-500/20 text-white" 
                         : "text-white/70 hover:bg-white/5 hover:text-white",
-                      editingId === conv.id ? "cursor-default" : "cursor-pointer"
+                      editingId === conv.id ? "cursor-default px-2" : "cursor-pointer px-2"
                     )}
                     onClick={() => editingId !== conv.id && onSelectConversation(conv)}
                   >
-                    <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                    {editingId === conv.id ? (
-                      <input
-                        type="text"
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                        autoFocus
-                        className="flex-1 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
-                      />
-                    ) : (
-                      <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
+                    {/* Edit Button - appears on left when hovering */}
+                    {editingId !== conv.id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingId(conv.id);
+                          setEditTitle(conv.title || 'Conversation');
+                        }}
+                        className="absolute left-0 opacity-0 group-hover:opacity-100 transition-all p-1 hover:bg-white/10 rounded"
+                      >
+                        <Pencil className="h-3 w-3 text-amber-400 hover:text-amber-300" />
+                      </button>
                     )}
                     
+                    {/* Main Content - shifts right on hover */}
+                    <div className={cn(
+                      "flex items-center gap-2 flex-1 transition-all",
+                      editingId !== conv.id && "group-hover:translate-x-6"
+                    )}>
+                      <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                      {editingId === conv.id ? (
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                          className="flex-1 bg-white/10 text-white text-sm px-2 py-1 rounded border border-white/20 focus:border-violet-500 outline-none"
+                        />
+                      ) : (
+                        <span className="flex-1 truncate text-sm">{conv.title || 'Conversation'}</span>
+                      )}
+                    </div>
+                    
+                    {/* Action Buttons on right */}
                     {editingId === conv.id ? (
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-shrink-0">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -216,27 +237,15 @@ export default function Sidebar({
                         </button>
                       </div>
                     ) : (
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingId(conv.id);
-                            setEditTitle(conv.title || 'Conversation');
-                          }}
-                          className="p-1 hover:bg-white/10 rounded transition-all"
-                        >
-                          <Pencil className="h-3 w-3 text-white/50 hover:text-violet-400" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteConversation(conv.id);
-                          }}
-                          className="p-1 hover:bg-white/10 rounded transition-all"
-                        >
-                          <Trash2 className="h-3 w-3 text-white/50 hover:text-red-400" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteConversation(conv.id);
+                        }}
+                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
+                      >
+                        <Trash2 className="h-3 w-3 text-white/50 hover:text-red-400" />
+                      </button>
                     )}
                   </div>
                 ))
