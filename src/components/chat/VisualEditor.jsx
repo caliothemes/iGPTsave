@@ -1742,10 +1742,8 @@ Réponds en JSON avec:
 
   const handleCanvasMouseDown = async (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const scaleX = canvasSize.width / (rect.width / zoom);
-    const scaleY = canvasSize.height / (rect.height / zoom);
-    const x = (e.clientX - rect.left) / zoom * scaleX / zoom;
-    const y = (e.clientY - rect.top) / zoom * scaleY / zoom;
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
     
     // Mockup selection mode
     if (mockupSelectionMode) {
@@ -1856,10 +1854,8 @@ Réponds en JSON avec:
 
   const handleCanvasMouseMove = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const scaleX = canvasSize.width / (rect.width / zoom);
-    const scaleY = canvasSize.height / (rect.height / zoom);
-    const x = (e.clientX - rect.left) / zoom * scaleX / zoom;
-    const y = (e.clientY - rect.top) / zoom * scaleY / zoom;
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
     
     // Track mouse position for eraser/brush cursor
     if (isErasing || isBrushing) {
@@ -3310,7 +3306,7 @@ Réponds en JSON avec:
                 <div 
                   className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
                   style={{
-                    top: `${currentLayer.y - currentLayer.fontSize - 60}px`,
+                    top: `${currentLayer.y - currentLayer.fontSize - 80}px`,
                     left: `${currentLayer.x}px`,
                     transform: 'translateX(-50%)'
                   }}
