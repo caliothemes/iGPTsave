@@ -1203,12 +1203,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 });
                 const effectiveWidth = layer.maxWidth || maxWidth;
                 const lineHeight = layer.fontSize * 1.2;
-                const totalHeight = lines.length * lineHeight;
+                const totalHeight = layer.fontSize + (lines.length - 1) * lineHeight;
                 const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
                 const boxX = textX - 5;
                 const boxY = layer.y - layer.fontSize * 0.85 - 5;
                 const boxWidth = effectiveWidth + 10;
-                const boxHeight = totalHeight + layer.fontSize * 0.2 + 10;
+                const boxHeight = totalHeight + 10;
                 
                 ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
                 
@@ -1759,12 +1759,12 @@ Réponds en JSON avec:
       });
       const effectiveWidth = layer.maxWidth || maxWidth;
       const lineHeight = layer.fontSize * 1.2;
-      const textHeight = lineHeight * lines.length;
+      const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
       const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
       const boxX = textX - 5;
       const boxY = layer.y - layer.fontSize * 0.85 - 5;
       const boxWidth = effectiveWidth + 10;
-      const boxHeight = textHeight + layer.fontSize * 0.2 + 10;
+      const boxHeight = textHeight + 10;
       
       // Check middle-right handle (width only for text)
       if (Math.abs(x - (boxX + boxWidth)) < threshold && Math.abs(y - (boxY + boxHeight/2)) < threshold) {
@@ -1917,10 +1917,10 @@ Réponds en JSON avec:
         });
         const effectiveWidth = layer.maxWidth || maxWidth;
         const lineHeight = layer.fontSize * 1.2;
-        const textHeight = lineHeight * lines.length;
+        const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
         const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
         
-        hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y + textHeight;
+        hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y - layer.fontSize + textHeight;
       } else {
         hit = x >= layer.x && x <= layer.x + layer.width && y >= layer.y && y <= layer.y + layer.height;
       }
