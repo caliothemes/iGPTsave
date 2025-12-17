@@ -21,6 +21,8 @@ import Support from './pages/Support';
 import AdminSupport from './pages/AdminSupport';
 import AdminNewsletters from './pages/AdminNewsletters';
 import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
+import StoryStudio from './pages/StoryStudio';
+import AdminStoryAnimations from './pages/AdminStoryAnimations';
 import __Layout from './Layout.jsx';
 
 
@@ -48,6 +50,8 @@ export const PAGES = {
     "AdminSupport": AdminSupport,
     "AdminNewsletters": AdminNewsletters,
     "AdminNewsletterTemplates": AdminNewsletterTemplates,
+    "StoryStudio": StoryStudio,
+    "AdminStoryAnimations": AdminStoryAnimations,
 }
 
 export const pagesConfig = {
