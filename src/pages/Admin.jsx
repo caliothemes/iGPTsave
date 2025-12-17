@@ -99,6 +99,7 @@ export default function Admin() {
   const [registrationsView, setRegistrationsView] = useState('day');
   const [activityData, setActivityData] = useState([]);
   const [visualTypesData, setVisualTypesData] = useState([]);
+  const [storeItems, setStoreItems] = useState([]);
   const [storeStats, setStoreStats] = useState({
     visitsToday: 0,
     visitsYesterday: 0,
@@ -400,6 +401,9 @@ export default function Admin() {
           .slice(0, 50);
 
         setTopRequests(topRequestsList);
+
+        // Save store items to state
+        setStoreItems(allStoreItems);
 
         // Store Statistics
         const storeVisits = allVisits.filter(v => v.page === 'Store');
@@ -853,7 +857,7 @@ export default function Admin() {
               </p>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {storeStats.recentPurchases.map((p, idx) => {
-                  const item = allStoreItems.find(i => i.id === p.store_item_id);
+                  const item = storeItems.find(i => i.id === p.store_item_id);
                   if (!item) return null;
                   return (
                     <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors flex items-center gap-3">
