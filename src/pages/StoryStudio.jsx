@@ -198,7 +198,7 @@ export default function StoryStudio() {
       
       {/* Header */}
       <div className={cn(
-        "relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300",
+        "relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300 mt-16",
         sidebarOpen && "md:ml-64"
       )}>
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -513,11 +513,12 @@ export default function StoryStudio() {
                       alt={visual.title}
                       className="w-full aspect-square object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                      <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
-                    </div>
-                  </button>
-                ))}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                        <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

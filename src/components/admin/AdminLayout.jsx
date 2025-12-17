@@ -26,6 +26,7 @@ const navItems = [
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
+  { id: 'story-animations', label: 'Story Animations', icon: Wand2, page: 'AdminStoryAnimations' },
   { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
   { id: 'prompts', label: 'Prompts IA', icon: Wand2, page: 'AdminPrompts' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
