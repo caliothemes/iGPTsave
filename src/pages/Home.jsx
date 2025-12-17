@@ -1512,7 +1512,7 @@ export default function Home() {
                 </DropdownMenu>
 
                 {/* Tags Catégories - Couleur prompt */}
-                {CATEGORIES.filter(c => ['logo', 'print', 'social', 'product', 'design_3d', 'free_prompt'].includes(c.id)).map(cat => (
+                {CATEGORIES.filter(c => ['logo_picto', 'logo_complet', 'image', 'print', 'social', 'mockup', 'product', 'design_3d', 'free_prompt'].includes(c.id)).map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
