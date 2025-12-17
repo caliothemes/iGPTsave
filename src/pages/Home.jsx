@@ -1562,7 +1562,7 @@ export default function Home() {
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
                     )}
                   >
-                    {cat.name?.[language] || cat.name?.fr || 'N/A'}
+                    {(cat.name && cat.name[language]) || (cat.name && cat.name.fr) || 'N/A'}
                   </button>
                 ))}
 
