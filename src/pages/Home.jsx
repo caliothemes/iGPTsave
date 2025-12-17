@@ -1484,9 +1484,10 @@ export default function Home() {
                     }
                   }}
                   placeholder={language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...'}
-                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden"
-                  rows={2}
+                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px]"
+                  rows={1}
                   disabled={isGenerating}
+                  style={{ height: '24px' }}
                 />
 
                 <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
