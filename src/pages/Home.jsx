@@ -917,7 +917,7 @@ export default function Home() {
 
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4 py-6 pb-96">
+          <div className="flex-1 overflow-y-auto px-4 py-6 pb-[500px]">
             <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
@@ -1035,20 +1035,20 @@ export default function Home() {
                   exit={{ opacity: 0, y: 20 }}
                   className="mb-3"
                 >
-                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 border border-orange-500 rounded-xl">
-                    <div className="p-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex-shrink-0">
+                  <div className="flex items-start gap-3 px-4 py-3 bg-gradient-to-r from-orange-800/80 to-red-900/80 border border-orange-700/50 rounded-xl">
+                    <div className="p-1.5 rounded-lg bg-gradient-to-r from-orange-700 to-red-800 flex-shrink-0">
                       <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <p className="text-orange-300 text-sm font-medium mb-1">
+                      <p className="text-orange-200 text-sm font-medium mb-1">
                         {language === 'fr' ? 'Mode Prompt 100% libre activé' : '100% Free Prompt mode activated'}
                       </p>
-                      <p className="text-orange-200 text-xs leading-relaxed">
+                      <p className="text-orange-300/90 text-xs leading-relaxed">
                         {language === 'fr' 
-                          ? 'Vous n\'avez pas sélectionné de format ci-dessus ou dans l\'icône + de ce prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez un format adapté et optimisé à votre besoin.'
-                          : 'You haven\'t selected a format above or in the + icon of this prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable format.'
+                          ? 'Vous n\'avez pas sélectionné de format dans les tags sous ce prompt ou dans l\'icône +. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez un format adapté à votre besoin.'
+                          : 'You haven\'t selected a format in the tags below this prompt or in the + icon. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable format.'
                         }
                       </p>
                     </div>
@@ -1475,11 +1475,14 @@ export default function Home() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className={cn(
-                      "px-2 py-1 rounded-md text-[11px] font-medium transition-all border",
+                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
                       selectedFormat
                         ? "bg-gradient-to-r from-amber-600/30 to-orange-600/30 border-amber-500/50 text-amber-200"
                         : "bg-amber-600/10 border-amber-500/20 text-amber-300 hover:bg-amber-600/20"
                     )}>
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                      </svg>
                       {selectedFormat ? selectedFormat.name : (language === 'fr' ? 'Format' : 'Format')}
                     </button>
                   </DropdownMenuTrigger>
@@ -1517,7 +1520,7 @@ export default function Home() {
                     key={cat.id}
                     onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
                     className={cn(
-                      "px-2 py-1 rounded-md text-[11px] font-medium transition-all border",
+                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border",
                       selectedCategory?.id === cat.id
                         ? "bg-gradient-to-r from-violet-600/40 to-purple-600/40 border-violet-500/60 text-white shadow-lg shadow-violet-500/20"
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
@@ -1530,7 +1533,7 @@ export default function Home() {
                 {/* Tag iGPT Store */}
                 <Link
                   to={createPageUrl('Store')}
-                  className="px-2 py-1 rounded-md text-[11px] font-medium transition-all bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md"
+                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md"
                 >
                   {language === 'fr' ? 'iGPT Store' : 'iGPT Store'}
                 </Link>
@@ -1538,11 +1541,11 @@ export default function Home() {
                 {/* Tag Mes visuels */}
                 <Link
                   to={createPageUrl('MyVisuals')}
-                  className="px-2 py-1 rounded-md text-[11px] font-medium transition-all bg-blue-900/90 hover:bg-blue-900 border border-white/10 hover:border-white/20 text-white shadow-md flex items-center gap-1"
+                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-blue-900/90 hover:bg-blue-900 border border-white/10 hover:border-white/20 text-white shadow-md flex items-center gap-1"
                 >
                   {language === 'fr' ? 'Mes visuels' : 'My visuals'}
                   {totalVisualsCount > 0 && (
-                    <span className="px-1 py-0.5 bg-white/20 rounded text-[9px]">
+                    <span className="px-1 py-0.5 bg-white/20 rounded-full text-[9px]">
                       {totalVisualsCount}
                     </span>
                   )}
