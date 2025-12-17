@@ -1514,7 +1514,7 @@ export default function Home() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className={cn(
-                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border",
+                      "px-2 py-1 rounded-md text-[11px] font-medium transition-all border",
                       selectedFormat
                         ? "bg-gradient-to-r from-amber-600/30 to-orange-600/30 border-amber-500/50 text-amber-200"
                         : "bg-amber-600/10 border-amber-500/20 text-amber-300 hover:bg-amber-600/20"
@@ -1523,16 +1523,28 @@ export default function Home() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10">
-                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Carré 1:1' : 'Square 1:1', dimensions: '1080x1080' })}>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Carré 1:1' : 'Square 1:1', dimensions: '1080x1080' })} className="text-white">
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="6" y="6" width="12" height="12" />
+                      </svg>
                       {language === 'fr' ? 'Carré 1:1' : 'Square 1:1'}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Story 9:16' : 'Story 9:16', dimensions: '1080x1920' })}>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Story 9:16' : 'Story 9:16', dimensions: '1080x1920' })} className="text-white">
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="8" y="3" width="8" height="18" />
+                      </svg>
                       {language === 'fr' ? 'Story 9:16' : 'Story 9:16'}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Portrait 3:4' : 'Portrait 3:4', dimensions: '1080x1440' })}>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Portrait 3:4' : 'Portrait 3:4', dimensions: '1080x1440' })} className="text-white">
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="7" y="4" width="10" height="16" />
+                      </svg>
                       {language === 'fr' ? 'Portrait 3:4' : 'Portrait 3:4'}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Paysage 16:9' : 'Landscape 16:9', dimensions: '1920x1080' })}>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Paysage 16:9' : 'Landscape 16:9', dimensions: '1920x1080' })} className="text-white">
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="8" width="18" height="8" />
+                      </svg>
                       {language === 'fr' ? 'Paysage 16:9' : 'Landscape 16:9'}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -1544,7 +1556,7 @@ export default function Home() {
                     key={cat.id}
                     onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
                     className={cn(
-                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border",
+                      "px-2 py-1 rounded-md text-[11px] font-medium transition-all border",
                       selectedCategory?.id === cat.id
                         ? "bg-gradient-to-r from-violet-600/40 to-purple-600/40 border-violet-500/60 text-white shadow-lg shadow-violet-500/20"
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
@@ -1557,7 +1569,7 @@ export default function Home() {
                 {/* Tag iGPT Store */}
                 <Link
                   to={createPageUrl('Store')}
-                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all border bg-gradient-to-r from-violet-600/20 to-purple-600/20 border-violet-500/30 text-violet-200 hover:from-violet-600/30 hover:to-purple-600/30"
+                  className="px-2 py-1 rounded-md text-[11px] font-medium transition-all bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md"
                 >
                   {language === 'fr' ? 'iGPT Store' : 'iGPT Store'}
                 </Link>
@@ -1565,11 +1577,11 @@ export default function Home() {
                 {/* Tag Mes visuels */}
                 <Link
                   to={createPageUrl('MyVisuals')}
-                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all border bg-gradient-to-r from-blue-900/20 to-blue-600/20 border-blue-500/30 text-blue-200 hover:from-blue-900/30 hover:to-blue-600/30 flex items-center gap-1"
+                  className="px-2 py-1 rounded-md text-[11px] font-medium transition-all bg-blue-900/90 hover:bg-blue-900 border border-white/10 hover:border-white/20 text-white shadow-md flex items-center gap-1"
                 >
                   {language === 'fr' ? 'Mes visuels' : 'My visuals'}
                   {totalVisualsCount > 0 && (
-                    <span className="px-1 py-0.5 bg-blue-500/30 rounded-full text-[9px]">
+                    <span className="px-1 py-0.5 bg-white/20 rounded text-[9px]">
                       {totalVisualsCount}
                     </span>
                   )}
