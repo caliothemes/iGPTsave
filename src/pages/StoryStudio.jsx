@@ -502,17 +502,24 @@ export default function StoryStudio() {
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-3 gap-4">
-                {myVisuals.map(visual => (
-                  <button
-                    key={visual.id}
-                    onClick={() => handleSelectFromVisuals(visual)}
-                    className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
-                  >
-                    <img
-                      src={visual.image_url}
-                      alt={visual.title}
-                      className="w-full aspect-square object-cover"
-                    />
+                {myVisuals.map(visual => {
+                  const dims = visual.dimensions || '1080x1080';
+                  const [w, h] = dims.split('x').map(n => parseInt(n));
+                  const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
+                  
+                  return (
+                    <button
+                      key={visual.id}
+                      onClick={() => handleSelectFromVisuals(visual)}
+                      className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                    >
+                      <div style={{ aspectRatio }}>
+                        <img
+                          src={visual.image_url}
+                          alt={visual.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
                         <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
                       </div>
