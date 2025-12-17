@@ -1311,7 +1311,7 @@ export default function Home() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-white text-xs font-medium">{category.name[language]}</span>
+                                  <span className="text-white text-xs font-medium">{(category.name && category.name[language]) || (category.name && category.name.fr) || 'N/A'}</span>
                                   {category.hasSubmenu && (
                                     <ChevronDown className={cn(
                                       "h-3 w-3 text-white/40 transition-transform",
@@ -1387,7 +1387,7 @@ export default function Home() {
                                       }}
                                       className="w-full px-6 py-2 text-left text-white/70 text-xs hover:bg-white/10 transition-colors flex items-center justify-between"
                                     >
-                                      {item.name[language]}
+                                      {(item.name && item.name[language]) || (item.name && item.name.fr) || 'N/A'}
                                       {item.orientations && (
                                         <ChevronRight className={cn(
                                           "h-3 w-3 text-white/40 transition-transform",
@@ -1405,7 +1405,7 @@ export default function Home() {
                                             onClick={() => handleCategorySelect({ ...category, selectedSubmenu: { ...item, ...orientation }, expertMode: expertMode[category.id] || false })}
                                             className="w-full px-8 py-1.5 text-left text-white/60 text-xs hover:bg-white/10 transition-colors"
                                           >
-                                            {orientation.name[language]}
+                                            {(orientation.name && orientation.name[language]) || (orientation.name && orientation.name.fr) || 'N/A'}
                                           </button>
                                         ))}
                                       </div>
