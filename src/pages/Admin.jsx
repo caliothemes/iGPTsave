@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
-import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3, ChevronLeft, ChevronRight, Search, Star, X } from 'lucide-react';
+import { Loader2, DollarSign, Download, MessageSquare, Users, TrendingUp, Eye, Activity, Calendar, CalendarDays, UserPlus, CreditCard, Image, Clock, BarChart3, ChevronLeft, ChevronRight, Search, Star, X, ShoppingBag, Sparkles, TrendingDown } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import StatCard from '@/components/admin/StatCard';
 import { 
@@ -99,6 +99,22 @@ export default function Admin() {
   const [registrationsView, setRegistrationsView] = useState('day');
   const [activityData, setActivityData] = useState([]);
   const [visualTypesData, setVisualTypesData] = useState([]);
+  const [storeStats, setStoreStats] = useState({
+    visitsToday: 0,
+    visitsYesterday: 0,
+    visitsThisWeek: 0,
+    visitsLastWeek: 0,
+    visitsThisMonth: 0,
+    visitsLastMonth: 0,
+    visitsThisYear: 0,
+    purchasesToday: 0,
+    purchasesThisWeek: 0,
+    purchasesThisMonth: 0,
+    purchasesThisYear: 0,
+    totalRevenue: 0,
+    topPurchased: [],
+    recentPurchases: []
+  });
 
   useEffect(() => {
     const init = async () => {
@@ -109,13 +125,15 @@ export default function Admin() {
           return;
         }
 
-        const [users, allCredits, allVisuals, allTransactions, allConversations, allVisits] = await Promise.all([
+        const [users, allCredits, allVisuals, allTransactions, allConversations, allVisits, allStorePurchases, allStoreItems] = await Promise.all([
           base44.entities.User.list(),
           base44.entities.UserCredits.list(),
           base44.entities.Visual.list('-created_date', 2000),
           base44.entities.Transaction.list(),
           base44.entities.Conversation.list(),
-          base44.entities.Visit.list('-created_date', 5000)
+          base44.entities.Visit.list('-created_date', 5000),
+          base44.entities.StorePurchase.list(),
+          base44.entities.StoreItem.list()
         ]);
 
         // Calculate stats
@@ -382,6 +400,57 @@ export default function Admin() {
           .slice(0, 50);
 
         setTopRequests(topRequestsList);
+
+        // Store Statistics
+        const storeVisits = allVisits.filter(v => v.page === 'Store');
+        const storeVisitsToday = countVisits(storeVisits, todayStart);
+        const storeVisitsYesterday = countVisits(storeVisits, yesterdayStart, yesterdayEnd);
+        const storeVisitsThisWeek = countVisits(storeVisits, weekAgo);
+        const storeVisitsLastWeek = countVisits(storeVisits, lastWeekStart, weekAgo);
+        const storeVisitsThisMonth = countVisits(storeVisits, monthAgo);
+        const storeVisitsLastMonth = countVisits(storeVisits, lastMonthStart, monthAgo);
+        const storeVisitsThisYear = countVisits(storeVisits, yearAgo);
+
+        const purchasesToday = allStorePurchases.filter(p => p.created_date?.startsWith(todayStr)).length;
+        const purchasesThisWeek = allStorePurchases.filter(p => new Date(p.created_date) > weekAgo).length;
+        const purchasesThisMonth = allStorePurchases.filter(p => new Date(p.created_date) > monthAgo).length;
+        const purchasesThisYear = allStorePurchases.filter(p => new Date(p.created_date) > yearAgo).length;
+        const storeRevenue = allStorePurchases.reduce((sum, p) => sum + (p.price_paid || 0), 0);
+
+        // Top purchased items
+        const purchaseCounts = {};
+        allStorePurchases.forEach(p => {
+          purchaseCounts[p.store_item_id] = (purchaseCounts[p.store_item_id] || 0) + 1;
+        });
+        const topPurchased = Object.entries(purchaseCounts)
+          .map(([itemId, count]) => {
+            const item = allStoreItems.find(i => i.id === itemId);
+            return { item, count };
+          })
+          .filter(p => p.item)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+
+        const recentPurchases = allStorePurchases
+          .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+          .slice(0, 10);
+
+        setStoreStats({
+          visitsToday: storeVisitsToday,
+          visitsYesterday: storeVisitsYesterday,
+          visitsThisWeek: storeVisitsThisWeek,
+          visitsLastWeek: storeVisitsLastWeek,
+          visitsThisMonth: storeVisitsThisMonth,
+          visitsLastMonth: storeVisitsLastMonth,
+          visitsThisYear: storeVisitsThisYear,
+          purchasesToday,
+          purchasesThisWeek,
+          purchasesThisMonth,
+          purchasesThisYear,
+          totalRevenue: storeRevenue,
+          topPurchased,
+          recentPurchases
+        });
 
         // Build chart data helper
         const buildChartData = (items, dateField, valueField, aggregateType = 'count') => {
@@ -663,6 +732,163 @@ export default function Admin() {
             <div className="p-3 rounded-xl bg-orange-600/20 border border-orange-500/30">
               <p className="text-orange-300 text-xs mb-1">Revenu moy/client</p>
               <p className="text-xl font-bold text-white">{userStats.avgRevenuePerUser.toFixed(2)}€</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Store Statistics */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+            <ShoppingBag className="h-5 w-5 text-violet-400" />
+            Statistiques du Store iGPT
+          </h3>
+          <p className="text-white/40 text-sm mb-4">Visites, achats et produits populaires</p>
+          
+          {/* Visites Store */}
+          <div className="mb-6">
+            <p className="text-white/60 text-xs mb-3 font-semibold">🏪 Visites de la page Store</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+              <div className="p-3 rounded-xl bg-violet-600/20 border border-violet-500/30">
+                <p className="text-violet-300 text-xs mb-1">Aujourd'hui</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsToday}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Hier</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsYesterday}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Cette semaine</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsThisWeek}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Sem. dernière</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsLastWeek}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Ce mois</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsThisMonth}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Mois dernier</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsLastMonth}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Cette année</p>
+                <p className="text-xl font-bold text-white">{storeStats.visitsThisYear}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Achats Store */}
+          <div className="mb-6">
+            <p className="text-white/60 text-xs mb-3 font-semibold">💳 Achats de visuels Store</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="p-3 rounded-xl bg-green-600/20 border border-green-500/30">
+                <p className="text-green-300 text-xs mb-1">Revenus Store</p>
+                <p className="text-xl font-bold text-white">{storeStats.totalRevenue} <Sparkles className="inline h-4 w-4 text-amber-400" /></p>
+              </div>
+              <div className="p-3 rounded-xl bg-blue-600/20 border border-blue-500/30">
+                <p className="text-blue-300 text-xs mb-1">Aujourd'hui</p>
+                <p className="text-xl font-bold text-white">{storeStats.purchasesToday}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Cette semaine</p>
+                <p className="text-xl font-bold text-white">{storeStats.purchasesThisWeek}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Ce mois</p>
+                <p className="text-xl font-bold text-white">{storeStats.purchasesThisMonth}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Cette année</p>
+                <p className="text-xl font-bold text-white">{storeStats.purchasesThisYear}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Top Produits & Achats Récents */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Top 10 Produits */}
+            <div>
+              <p className="text-white/60 text-xs mb-3 font-semibold flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-amber-400" />
+                Top 10 Produits les plus achetés
+              </p>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {storeStats.topPurchased.map((p, idx) => (
+                  <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors flex items-center gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-600/30 to-orange-600/30 border border-amber-500/30 flex items-center justify-center">
+                      <span className="text-amber-300 text-xs font-bold">#{idx + 1}</span>
+                    </div>
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-white/10 flex-shrink-0">
+                      {p.item.video_url || (p.item.image_url && (p.item.image_url.includes('.mp4') || p.item.image_url.includes('/video'))) ? (
+                        <video 
+                          src={p.item.video_url || p.item.image_url} 
+                          className="w-full h-full object-cover"
+                          muted
+                          loop
+                          playsInline
+                        />
+                      ) : (
+                        <img src={p.item.image_url} alt={p.item.title} className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-medium truncate">{p.item.title}</p>
+                      <p className="text-white/40 text-xs">{p.count} achats • {p.item.price_credits} crédits</p>
+                    </div>
+                  </div>
+                ))}
+                {storeStats.topPurchased.length === 0 && (
+                  <p className="text-white/40 text-center py-8 text-sm">Aucun achat pour le moment</p>
+                )}
+              </div>
+            </div>
+
+            {/* Achats Récents */}
+            <div>
+              <p className="text-white/60 text-xs mb-3 font-semibold flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-400" />
+                10 Derniers achats
+              </p>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {storeStats.recentPurchases.map((p, idx) => {
+                  const item = allStoreItems.find(i => i.id === p.store_item_id);
+                  if (!item) return null;
+                  return (
+                    <div key={idx} className="p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden border border-white/10 flex-shrink-0">
+                        {item.video_url || (item.image_url && (item.image_url.includes('.mp4') || item.image_url.includes('/video'))) ? (
+                          <video 
+                            src={item.video_url || item.image_url} 
+                            className="w-full h-full object-cover"
+                            muted
+                            loop
+                            playsInline
+                          />
+                        ) : (
+                          <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-medium truncate">{item.title}</p>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-white/40 text-xs">{p.user_email}</span>
+                          <span className="text-white/30 text-xs">
+                            {new Date(p.created_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0 px-2 py-1 bg-amber-600/20 rounded-lg">
+                        <span className="text-amber-300 text-xs font-bold">{p.price_paid}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                {storeStats.recentPurchases.length === 0 && (
+                  <p className="text-white/40 text-center py-8 text-sm">Aucun achat pour le moment</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
