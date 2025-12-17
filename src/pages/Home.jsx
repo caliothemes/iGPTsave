@@ -1269,8 +1269,99 @@ export default function Home() {
 
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3">
-                {/* Plus Category Menu */}
+              {/* Textarea - 2 lignes par défaut */}
+              <div className="px-4 pt-3 pb-2">
+                <textarea
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  placeholder={language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...'}
+                  className="w-full bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden"
+                  rows={2}
+                  disabled={isGenerating}
+                />
+              </div>
+
+              {/* Tags sous le prompt */}
+              <div className="px-4 pb-3 flex items-center gap-2 flex-wrap border-t border-white/5 pt-3">
+                {/* Tag Format - Couleur spéciale */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
+                      selectedFormat
+                        ? "bg-gradient-to-r from-amber-600/30 to-orange-600/30 border-amber-500/50 text-amber-200"
+                        : "bg-amber-600/10 border-amber-500/20 text-amber-300 hover:bg-amber-600/20"
+                    )}>
+                      📐 {selectedFormat ? selectedFormat.name : (language === 'fr' ? 'Format' : 'Format')}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10">
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Carré 1:1' : 'Square 1:1', dimensions: '1080x1080' })}>
+                      📐 {language === 'fr' ? 'Carré 1:1' : 'Square 1:1'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Story 9:16' : 'Story 9:16', dimensions: '1080x1920' })}>
+                      📱 {language === 'fr' ? 'Story 9:16' : 'Story 9:16'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Portrait 3:4' : 'Portrait 3:4', dimensions: '1080x1440' })}>
+                      🖼️ {language === 'fr' ? 'Portrait 3:4' : 'Portrait 3:4'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSelectedFormat({ name: language === 'fr' ? 'Paysage 16:9' : 'Landscape 16:9', dimensions: '1920x1080' })}>
+                      🖼️ {language === 'fr' ? 'Paysage 16:9' : 'Landscape 16:9'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Tags Catégories - Couleur prompt */}
+                {CATEGORIES.filter(c => !c.isFreePrompt).slice(0, 6).map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
+                      selectedCategory?.id === cat.id
+                        ? "bg-gradient-to-r from-violet-600/40 to-purple-600/40 border-violet-500/60 text-white shadow-lg shadow-violet-500/20"
+                        : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
+                    )}
+                  >
+                    {cat.name[language]}
+                  </button>
+                ))}
+
+                {/* Tag iGPT Store */}
+                <Link
+                  to={createPageUrl('Store')}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border bg-gradient-to-r from-pink-600/10 to-rose-600/10 border-pink-500/20 text-pink-300 hover:bg-pink-600/20"
+                >
+                  🛍️ {language === 'fr' ? 'iGPT Store' : 'iGPT Store'}
+                </Link>
+
+                {/* Tag Mes visuels */}
+                <Link
+                  to={createPageUrl('MyVisuals')}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border-blue-500/20 text-blue-300 hover:bg-blue-600/20 flex items-center gap-1"
+                >
+                  🖼️ {language === 'fr' ? 'Mes visuels' : 'My visuals'}
+                  {totalVisualsCount > 0 && (
+                    <span className="px-1.5 py-0.5 bg-blue-500/30 rounded-full text-[10px]">
+                      {totalVisualsCount}
+                    </span>
+                  )}
+                </Link>
+
+                <div className="flex-1" />
+
+                {/* Boutons d'action */}
                 <DropdownMenu open={categoryDropdownOpen} onOpenChange={setCategoryDropdownOpen}>
                   <DropdownMenuTrigger asChild>
                     <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
@@ -1467,27 +1558,6 @@ export default function Home() {
                     </Link>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                
-                <textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  placeholder={language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...'}
-                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px]"
-                  rows={1}
-                  disabled={isGenerating}
-                  style={{ height: '24px' }}
-                />
 
                 <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
                   <Mic className="h-5 w-5" />

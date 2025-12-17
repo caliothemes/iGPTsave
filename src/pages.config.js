@@ -23,6 +23,7 @@ import AdminNewsletters from './pages/AdminNewsletters';
 import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
 import StoryStudio from './pages/StoryStudio';
 import AdminStoryAnimations from './pages/AdminStoryAnimations';
+import homeBackup from './pages/Home_backup';
 import __Layout from './Layout.jsx';
 
 
@@ -52,6 +53,7 @@ export const PAGES = {
     "AdminNewsletterTemplates": AdminNewsletterTemplates,
     "StoryStudio": StoryStudio,
     "AdminStoryAnimations": AdminStoryAnimations,
+    "Home_backup": homeBackup,
 }
 
 export const pagesConfig = {
