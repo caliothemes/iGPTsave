@@ -914,15 +914,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Category Selector */}
-            <CategorySelector 
-              onSelect={handleCategorySelect}
-              selectedCategory={selectedCategory}
-              visualsCount={totalVisualsCount}
-            />
+
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 md:pb-48">
+          <div className="flex-1 overflow-y-auto px-4 py-6 pb-96">
             <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
@@ -1231,41 +1226,7 @@ export default function Home() {
               )}
             </AnimatePresence>
 
-            {/* Selected Tags */}
-            {(selectedFormat || selectedStyle || selectedPalette) && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {selectedFormat && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-300 text-xs border border-blue-500/30">
-                    <SlidersHorizontal className="h-3 w-3" />
-                    {selectedFormat.name}
-                    <button onClick={() => setSelectedFormat(null)} className="ml-1 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-                {selectedStyle && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-500/20 text-violet-300 text-xs border border-violet-500/30">
-                    {selectedStyle.name[language]}
-                    <button onClick={() => setSelectedStyle(null)} className="ml-1 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-                {selectedPalette && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/20 text-pink-300 text-xs border border-pink-500/30">
-                    <div className="flex gap-0.5">
-                      {selectedPalette.colors.slice(0, 3).map((c, i) => (
-                        <div key={i} className="w-2 h-2 rounded-full" style={{ backgroundColor: c }} />
-                      ))}
-                    </div>
-                    {selectedPalette.name[language]}
-                    <button onClick={() => setSelectedPalette(null)} className="ml-1 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                )}
-              </div>
-            )}
+
 
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
@@ -1551,7 +1512,7 @@ export default function Home() {
                 </DropdownMenu>
 
                 {/* Tags Catégories - Couleur prompt */}
-                {CATEGORIES.filter(c => !c.isFreePrompt).slice(0, 6).map(cat => (
+                {CATEGORIES.filter(c => ['logo', 'print', 'social', 'product', 'design_3d', 'free_prompt'].includes(c.id)).map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
