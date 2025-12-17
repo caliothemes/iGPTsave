@@ -15,15 +15,23 @@ import {
   Sparkles,
   Video,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createPageUrl } from '@/utils';
 import AnimatedBackground from '@/components/AnimatedBackground';
-import { toast } from 'sonner';
+import GlobalHeader from '@/components/GlobalHeader';
+import Sidebar from '@/components/Sidebar';
+import Footer from '@/components/Footer';
+import { useLanguage } from '@/components/LanguageContext';
+import { toast, Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function StoryStudio() {
+  const { language } = useLanguage();
   const [user, setUser] = useState(null);
+  const [credits, setCredits] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImages, setSelectedImages] = useState([]);
   const [myVisuals, setMyVisuals] = useState([]);
@@ -31,9 +39,15 @@ export default function StoryStudio() {
   const [animations, setAnimations] = useState([]);
   const [textLayers, setTextLayers] = useState([]);
   const [showTextModal, setShowTextModal] = useState(false);
-  const [currentStep, setCurrentStep] = useState('select'); // select, edit, preview, export
+  const [showTransitionsModal, setShowTransitionsModal] = useState(false);
+  const [selectedTransitionIndex, setSelectedTransitionIndex] = useState(null);
+  const [editingTextId, setEditingTextId] = useState(null);
+  const [currentStep, setCurrentStep] = useState('select');
   const [exporting, setExporting] = useState(false);
   const [previewPlaying, setPreviewPlaying] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [conversations, setConversations] = useState([]);
+  const [userVisuals, setUserVisuals] = useState([]);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -42,13 +56,26 @@ export default function StoryStudio() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
 
-        const [visuals, anims] = await Promise.all([
+        const [visuals, anims, userCreds, convs] = await Promise.all([
           base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 100),
-          base44.entities.StoryAnimation.filter({ is_active: true }, 'order')
+          base44.entities.StoryAnimation.filter({ is_active: true }, 'order'),
+          base44.entities.UserCredits.filter({ user_email: currentUser.email }),
+          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20)
         ]);
 
-        setMyVisuals(visuals);
+        // Filter for story format (9:16 or vertical)
+        const storyVisuals = visuals.filter(v => {
+          if (!v.dimensions) return false;
+          const [w, h] = v.dimensions.split('x').map(n => parseInt(n));
+          const ratio = w / h;
+          return ratio < 1; // Vertical formats only
+        });
+
+        setMyVisuals(storyVisuals);
+        setUserVisuals(visuals);
         setAnimations(anims);
+        setConversations(convs);
+        if (userCreds.length > 0) setCredits(userCreds[0]);
       } catch (e) {
         console.error(e);
       }
@@ -92,8 +119,13 @@ export default function StoryStudio() {
   };
 
   const handleAutoCut = () => {
+    if (selectedImages.length === 0) {
+      toast.error('Ajoutez au moins une image');
+      return;
+    }
+    
     if (animations.length === 0) {
-      toast.error('Aucune animation disponible');
+      toast.error('Aucune animation disponible - configurez-les en admin');
       return;
     }
 
@@ -107,7 +139,7 @@ export default function StoryStudio() {
     }));
 
     setSelectedImages(newImages);
-    toast.success('Animations appliquées automatiquement !');
+    toast.success('✨ Animations appliquées automatiquement !');
   };
 
   const handleAddText = (textData) => {
@@ -140,19 +172,54 @@ export default function StoryStudio() {
     );
   }
 
+  const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('StoryStudio'));
+  const handleLogout = () => base44.auth.logout(createPageUrl('StoryStudio'));
+
   return (
     <div className="min-h-screen relative">
+      <Toaster position="top-center" />
       <AnimatedBackground />
+      <GlobalHeader page="StoryStudio" />
+      
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        user={user}
+        credits={credits}
+        conversations={conversations}
+        visuals={userVisuals}
+        onNewChat={() => window.location.href = createPageUrl('Home')}
+        onSelectConversation={() => {}}
+        onDeleteConversation={() => {}}
+        onSelectVisual={() => {}}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
       
       {/* Header */}
-      <div className="relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-xl">
+      <div className={cn(
+        "relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300",
+        sidebarOpen && "md:ml-64"
+      )}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                iGPT Story Studio
-              </h1>
-              <p className="text-white/60 text-sm">Créez des stories vidéo 9:16 professionnelles</p>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => window.location.href = createPageUrl('Home')}
+                className="text-white/60 hover:text-white"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                  iGPT Story Studio
+                </h1>
+                <p className="text-white/60 text-sm">
+                  {language === 'fr' ? 'Créez des stories vidéo 9:16 professionnelles' : 'Create professional 9:16 video stories'}
+                </p>
+              </div>
             </div>
             <div className="flex gap-3">
               <Button
@@ -177,7 +244,10 @@ export default function StoryStudio() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+      <div className={cn(
+        "relative z-10 max-w-7xl mx-auto px-6 py-8 pb-32 transition-all duration-300",
+        sidebarOpen && "md:ml-64"
+      )}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Panel - Image Selection */}
           <div className="lg:col-span-1">
@@ -295,9 +365,13 @@ export default function StoryStudio() {
                     
                     {/* Text Overlays */}
                     {textLayers.map(text => (
-                      <div
+                      <button
                         key={text.id}
-                        className="absolute"
+                        onClick={() => setEditingTextId(text.id)}
+                        className={cn(
+                          "absolute cursor-move hover:ring-2 hover:ring-violet-500 transition-all",
+                          editingTextId === text.id && "ring-2 ring-violet-500"
+                        )}
                         style={{
                           top: `${text.position?.y || 50}%`,
                           left: `${text.position?.x || 50}%`,
@@ -306,11 +380,16 @@ export default function StoryStudio() {
                           color: text.color || '#ffffff',
                           fontWeight: text.bold ? 'bold' : 'normal',
                           fontStyle: text.italic ? 'italic' : 'normal',
-                          textAlign: text.align || 'center'
+                          textAlign: text.align || 'center',
+                          fontFamily: text.fontFamily || 'inherit',
+                          backgroundColor: text.bgColor || 'transparent',
+                          padding: text.bgColor ? '8px 16px' : '0',
+                          borderRadius: `${text.borderRadius || 0}px`,
+                          border: text.borderWidth ? `${text.borderWidth}px solid ${text.borderColor || '#ffffff'}` : 'none'
                         }}
                       >
                         {text.content}
-                      </div>
+                      </button>
                     ))}
 
                     {/* Play Button Overlay */}
@@ -342,16 +421,32 @@ export default function StoryStudio() {
                   className="bg-gradient-to-r from-blue-600 to-cyan-600"
                 >
                   <Type className="h-4 w-4 mr-2" />
-                  Ajouter du texte
+                  {language === 'fr' ? 'Ajouter du texte' : 'Add text'}
                 </Button>
                 <Button
+                  onClick={() => setShowTransitionsModal(true)}
+                  disabled={selectedImages.length < 2}
                   variant="outline"
                   className="bg-white/5 border-white/20 text-white"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Effets & Transitions
+                  {language === 'fr' ? 'Effets & Transitions' : 'Effects & Transitions'}
                 </Button>
               </div>
+              
+              {/* Text Editor Panel */}
+              {editingTextId && (
+                <TextStyleEditor
+                  text={textLayers.find(t => t.id === editingTextId)}
+                  onUpdate={(updates) => {
+                    setTextLayers(prev => prev.map(t => 
+                      t.id === editingTextId ? { ...t, ...updates } : t
+                    ));
+                  }}
+                  onClose={() => setEditingTextId(null)}
+                  language={language}
+                />
+              )}
 
               {/* Text Layers List */}
               {textLayers.length > 0 && (
@@ -376,6 +471,14 @@ export default function StoryStudio() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className={cn(
+        "fixed bottom-0 left-0 right-0 z-40 transition-all duration-300",
+        sidebarOpen && "md:ml-64"
+      )}>
+        <Footer />
       </div>
 
       {/* Visuals Modal */}
@@ -426,23 +529,224 @@ export default function StoryStudio() {
         <TextEditorModal
           onClose={() => setShowTextModal(false)}
           onAdd={handleAddText}
+          language={language}
+        />
+      )}
+
+      {/* Transitions Modal */}
+      {showTransitionsModal && (
+        <TransitionsModal
+          animations={animations}
+          selectedImages={selectedImages}
+          onApply={(imgIndex, transition) => {
+            const newImages = [...selectedImages];
+            newImages[imgIndex] = { ...newImages[imgIndex], transition };
+            setSelectedImages(newImages);
+            toast.success('Transition appliquée !');
+          }}
+          onClose={() => setShowTransitionsModal(false)}
+          language={language}
         />
       )}
     </div>
   );
 }
 
+// Text Style Editor Component
+function TextStyleEditor({ text, onUpdate, onClose, language }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mt-4 p-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-white font-semibold">{language === 'fr' ? 'Éditer le texte' : 'Edit text'}</h3>
+        <button onClick={onClose} className="p-1 hover:bg-white/10 rounded">
+          <X className="h-4 w-4 text-white" />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Taille' : 'Size'}: {text.fontSize}px</label>
+          <input
+            type="range"
+            min="16"
+            max="72"
+            value={text.fontSize}
+            onChange={(e) => onUpdate({ fontSize: parseInt(e.target.value) })}
+            className="w-full"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Couleur texte' : 'Text color'}</label>
+            <input
+              type="color"
+              value={text.color}
+              onChange={(e) => onUpdate({ color: e.target.value })}
+              className="w-full h-8 rounded cursor-pointer"
+            />
+          </div>
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Fond' : 'Background'}</label>
+            <input
+              type="color"
+              value={text.bgColor || '#000000'}
+              onChange={(e) => onUpdate({ bgColor: e.target.value })}
+              className="w-full h-8 rounded cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Police' : 'Font'}</label>
+          <select
+            value={text.fontFamily || 'inherit'}
+            onChange={(e) => onUpdate({ fontFamily: e.target.value })}
+            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white text-sm"
+          >
+            <option value="inherit">Défaut</option>
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Impact">Impact</option>
+            <option value="Courier New">Courier</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Bordure' : 'Border'}</label>
+            <input
+              type="number"
+              min="0"
+              max="10"
+              value={text.borderWidth || 0}
+              onChange={(e) => onUpdate({ borderWidth: parseInt(e.target.value) })}
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Couleur bordure' : 'Border color'}</label>
+            <input
+              type="color"
+              value={text.borderColor || '#ffffff'}
+              onChange={(e) => onUpdate({ borderColor: e.target.value })}
+              className="w-full h-8 rounded cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Arrondi' : 'Radius'}: {text.borderRadius || 0}px</label>
+          <input
+            type="range"
+            min="0"
+            max="50"
+            value={text.borderRadius || 0}
+            onChange={(e) => onUpdate({ borderRadius: parseInt(e.target.value) })}
+            className="w-full"
+          />
+        </div>
+
+        <div className="flex gap-2 pt-2">
+          <button
+            onClick={() => onUpdate({ bold: !text.bold })}
+            className={cn(
+              "flex-1 px-3 py-2 rounded border transition-all text-sm",
+              text.bold ? "bg-violet-600 border-violet-500 text-white" : "bg-white/5 border-white/10 text-white/60"
+            )}
+          >
+            <strong>B</strong>
+          </button>
+          <button
+            onClick={() => onUpdate({ italic: !text.italic })}
+            className={cn(
+              "flex-1 px-3 py-2 rounded border transition-all text-sm",
+              text.italic ? "bg-violet-600 border-violet-500 text-white" : "bg-white/5 border-white/10 text-white/60"
+            )}
+          >
+            <em>I</em>
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Transitions Modal Component
+function TransitionsModal({ animations, selectedImages, onApply, onClose, language }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-3xl p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-bold text-white mb-4">
+          {language === 'fr' ? 'Choisir une transition' : 'Choose transition'}
+        </h2>
+
+        <div className="grid grid-cols-3 gap-4 max-h-96 overflow-y-auto mb-4">
+          {animations.map(anim => (
+            <button
+              key={anim.id}
+              onClick={() => {
+                // Apply to all transitions
+                selectedImages.forEach((_, idx) => {
+                  if (idx < selectedImages.length - 1) {
+                    onApply(idx, anim);
+                  }
+                });
+                onClose();
+              }}
+              className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/50 rounded-xl transition-all"
+            >
+              {anim.thumbnail_url && (
+                <img src={anim.thumbnail_url} alt={anim.name} className="w-full h-24 object-cover rounded-lg mb-2" />
+              )}
+              <p className="text-white text-sm font-medium">{anim.name}</p>
+              <p className="text-white/40 text-xs">{anim.duration}s</p>
+            </button>
+          ))}
+        </div>
+
+        {animations.length === 0 && (
+          <p className="text-white/40 text-center py-8">
+            {language === 'fr' ? 'Aucune animation disponible' : 'No animations available'}
+          </p>
+        )}
+
+        <Button onClick={onClose} variant="outline" className="w-full bg-white/5 border-white/20 text-white">
+          {language === 'fr' ? 'Fermer' : 'Close'}
+        </Button>
+      </motion.div>
+    </div>
+  );
+}
+
 // Text Editor Modal Component
-function TextEditorModal({ onClose, onAdd }) {
+function TextEditorModal({ onClose, onAdd, language }) {
   const [text, setText] = useState('');
   const [fontSize, setFontSize] = useState(32);
   const [color, setColor] = useState('#ffffff');
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
+  const [bgColor, setBgColor] = useState('transparent');
+  const [fontFamily, setFontFamily] = useState('inherit');
+  const [borderWidth, setBorderWidth] = useState(0);
+  const [borderColor, setBorderColor] = useState('#ffffff');
+  const [borderRadius, setBorderRadius] = useState(0);
 
   const handleAdd = () => {
     if (!text.trim()) {
-      toast.error('Entrez du texte');
+      toast.error(language === 'fr' ? 'Entrez du texte' : 'Enter text');
       return;
     }
 
@@ -452,6 +756,11 @@ function TextEditorModal({ onClose, onAdd }) {
       color,
       bold,
       italic,
+      bgColor: bgColor === 'transparent' ? null : bgColor,
+      fontFamily,
+      borderWidth,
+      borderColor,
+      borderRadius,
       position: { x: 50, y: 50 }
     });
   };
@@ -464,25 +773,31 @@ function TextEditorModal({ onClose, onAdd }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md p-6"
+        className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-white mb-4">Ajouter du texte</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          {language === 'fr' ? 'Ajouter du texte' : 'Add text'}
+        </h2>
 
         <div className="space-y-4">
           <div>
-            <label className="text-white/60 text-sm mb-2 block">Texte</label>
+            <label className="text-white/60 text-sm mb-2 block">
+              {language === 'fr' ? 'Texte' : 'Text'}
+            </label>
             <input
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Entrez votre texte..."
+              placeholder={language === 'fr' ? 'Entrez votre texte...' : 'Enter your text...'}
               className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/30 outline-none focus:border-violet-500/50"
             />
           </div>
 
           <div>
-            <label className="text-white/60 text-sm mb-2 block">Taille: {fontSize}px</label>
+            <label className="text-white/60 text-sm mb-2 block">
+              {language === 'fr' ? 'Taille' : 'Size'}: {fontSize}px
+            </label>
             <input
               type="range"
               min="16"
@@ -493,13 +808,86 @@ function TextEditorModal({ onClose, onAdd }) {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Couleur texte' : 'Text color'}
+              </label>
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="w-full h-10 rounded-lg cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Fond' : 'Background'}
+              </label>
+              <input
+                type="color"
+                value={bgColor === 'transparent' ? '#000000' : bgColor}
+                onChange={(e) => setBgColor(e.target.value)}
+                className="w-full h-10 rounded-lg cursor-pointer"
+              />
+            </div>
+          </div>
+
           <div>
-            <label className="text-white/60 text-sm mb-2 block">Couleur</label>
+            <label className="text-white/60 text-sm mb-2 block">
+              {language === 'fr' ? 'Police' : 'Font'}
+            </label>
+            <select
+              value={fontFamily}
+              onChange={(e) => setFontFamily(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+            >
+              <option value="inherit">Défaut</option>
+              <option value="Arial">Arial</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Impact">Impact</option>
+              <option value="Courier New">Courier</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Bordure' : 'Border'} (px)
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="10"
+                value={borderWidth}
+                onChange={(e) => setBorderWidth(parseInt(e.target.value))}
+                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+              />
+            </div>
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Couleur bordure' : 'Border color'}
+              </label>
+              <input
+                type="color"
+                value={borderColor}
+                onChange={(e) => setBorderColor(e.target.value)}
+                className="w-full h-10 rounded-lg cursor-pointer"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-white/60 text-sm mb-2 block">
+              {language === 'fr' ? 'Arrondi' : 'Radius'}: {borderRadius}px
+            </label>
             <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="w-full h-10 rounded-lg cursor-pointer"
+              type="range"
+              min="0"
+              max="50"
+              value={borderRadius}
+              onChange={(e) => setBorderRadius(parseInt(e.target.value))}
+              className="w-full"
             />
           </div>
 
@@ -513,7 +901,7 @@ function TextEditorModal({ onClose, onAdd }) {
                   : "bg-white/5 border-white/10 text-white/60"
               )}
             >
-              <strong>Gras</strong>
+              <strong>{language === 'fr' ? 'Gras' : 'Bold'}</strong>
             </button>
             <button
               onClick={() => setItalic(!italic)}
@@ -524,7 +912,7 @@ function TextEditorModal({ onClose, onAdd }) {
                   : "bg-white/5 border-white/10 text-white/60"
               )}
             >
-              <em>Italique</em>
+              <em>{language === 'fr' ? 'Italique' : 'Italic'}</em>
             </button>
           </div>
 
