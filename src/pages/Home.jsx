@@ -1405,7 +1405,7 @@ export default function Home() {
                     <button className={cn(
                       "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
                       selectedFormat
-                        ? "bg-gradient-to-r from-amber-600/30 to-orange-600/30 border-amber-500/50 text-amber-200"
+                        ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                         : "bg-amber-600/10 border-amber-500/20 text-amber-300 hover:bg-amber-600/20"
                     )}>
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1450,7 +1450,7 @@ export default function Home() {
                     className={cn(
                       "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
                       selectedCategory?.id === cat.id
-                        ? "bg-gradient-to-r from-violet-600/40 to-purple-600/40 border-violet-500/60 text-white shadow-lg shadow-violet-500/20"
+                        ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
                     )}
                   >
