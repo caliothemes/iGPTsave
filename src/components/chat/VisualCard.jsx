@@ -220,15 +220,7 @@ export default function VisualCard({
           )}
         </div>
 
-        {/* Bottom Right - Expand Button */}
-        <div className="absolute bottom-3 right-3">
-          <button
-            onClick={() => setShowImageModal(true)}
-            className="p-2.5 rounded-xl bg-gradient-to-br from-gray-600/90 to-gray-700/90 backdrop-blur-sm hover:from-gray-500 hover:to-gray-600 transition-all shadow-lg shadow-gray-500/30 border border-gray-400/30"
-          >
-            <Expand className="h-5 w-5 text-white" />
-          </button>
-        </div>
+
 
         {/* Version Badge */}
         {visual.version > 1 && (
