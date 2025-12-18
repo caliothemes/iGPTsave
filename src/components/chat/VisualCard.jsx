@@ -696,59 +696,42 @@ export default function VisualCard({
         </div>
       )}
 
-      {/* Image Modal - Same system as Store */}
-      <AnimatePresence>
-        {showImageModal && (() => {
-          const dims = visual.dimensions || '1080x1080';
-          const [w, h] = dims.split('x').map(n => parseInt(n));
-          const aspectRatio = getAspectRatio(dims);
-          
-          return (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
-              style={{ zIndex: 99999 }}
-              onClick={() => setShowImageModal(false)}
-            >
-              <button
-                onClick={() => setShowImageModal(false)}
-                className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl"
-                style={{ zIndex: 100000 }}
-              >
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.95 }}
-                className="max-w-[90vw] max-h-[90vh]"
-                style={{ aspectRatio }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {isVideo ? (
-                  <video 
-                    src={visual.video_url || visual.image_url}
-                    controls
-                    autoPlay
-                    loop
-                    className="w-full h-full object-contain rounded-lg shadow-2xl"
-                  />
-                ) : (
-                  <img
-                    src={visual.image_url}
-                    alt="Preview"
-                    className="w-full h-full object-contain rounded-lg shadow-2xl"
-                  />
-                )}
-              </motion.div>
-            </motion.div>
-          );
-        })()}
-      </AnimatePresence>
+      {/* Image Modal - Exact Store system */}
+      {showImageModal && (
+        <div
+          className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
+          style={{ zIndex: 99999 }}
+          onClick={() => setShowImageModal(false)}
+        >
+          <button
+            onClick={() => setShowImageModal(false)}
+            className="absolute top-4 right-4 p-3 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl z-[100]"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div 
+            className="relative max-w-[90vw] max-h-[90vh]"
+            style={{ aspectRatio: getAspectRatio(visual.dimensions || '1080x1080') }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {isVideo ? (
+              <video 
+                src={visual.video_url || visual.image_url}
+                controls
+                autoPlay
+                loop
+                className="w-full h-full object-contain rounded-lg shadow-2xl"
+              />
+            ) : (
+              <img
+                src={visual.image_url}
+                alt={visual.title || 'Preview'}
+                className="w-full h-full object-contain rounded-lg shadow-2xl"
+              />
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
