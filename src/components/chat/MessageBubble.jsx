@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
+import { X } from 'lucide-react';
 
 
 function TypingIndicator() {
@@ -16,6 +17,7 @@ function TypingIndicator() {
 export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion...", user }) {
   const isUser = message.role === 'user';
   const isWarning = message.content?.includes('Nouveau sujet détecté') || message.content?.includes('New subject detected') || message.content?.includes('Ajout de texte détecté') || message.content?.includes('Text addition detected');
+  const [showImageModal, setShowImageModal] = useState(false);
 
   return (
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
@@ -79,6 +81,15 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "R�
             <ReactMarkdown 
               className="prose prose-invert prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
               components={{
+                img: ({ src, alt, ...props }) => (
+                  <img 
+                    src={src} 
+                    alt={alt}
+                    className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity max-w-full my-2"
+                    onClick={() => setShowImageModal(src)}
+                    {...props}
+                  />
+                ),
                 p: ({ children }) => <p className="my-1 leading-relaxed text-sm">{children}</p>,
                 ul: ({ children }) => <ul className="my-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>,
                 ol: ({ children }) => <ol className="my-2 ml-4 list-decimal space-y-1 text-sm">{children}</ol>,
@@ -91,6 +102,31 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "R�
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <button
+            onClick={() => setShowImageModal(false)}
+            className="absolute top-4 right-4 z-[110] p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 transition-all"
+          >
+            <X className="h-5 w-5 text-red-400" />
+          </button>
+          <div 
+            className="relative max-w-[90vw] max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={showImageModal}
+              alt="Preview"
+              className="w-full h-full object-contain rounded-lg shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
