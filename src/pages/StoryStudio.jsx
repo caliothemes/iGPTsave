@@ -393,14 +393,16 @@ export default function StoryStudio() {
                     ))}
 
                     {/* Play Button Overlay */}
-                    <button
-                      onClick={() => setPreviewPlaying(!previewPlaying)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
-                        <Play className="h-8 w-8 text-white" />
-                      </div>
-                    </button>
+                    {!previewPlaying && (
+                      <button
+                        onClick={() => setPreviewPlaying(true)}
+                        className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors group"
+                      >
+                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Play className="h-8 w-8 text-white ml-1" />
+                        </div>
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full">
@@ -714,10 +716,16 @@ function TransitionsModal({ animations, selectedImages, onApply, onClose, langua
                 });
                 onClose();
               }}
-              className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/50 rounded-xl transition-all"
+              className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/50 rounded-xl transition-all group"
             >
-              {anim.thumbnail_url && (
-                <img src={anim.thumbnail_url} alt={anim.name} className="w-full h-24 object-cover rounded-lg mb-2" />
+              {anim.preview_url && (
+                <div className="w-full h-24 bg-black/20 rounded-lg mb-2 overflow-hidden">
+                  <img 
+                    src={anim.preview_url} 
+                    alt={anim.name} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+                  />
+                </div>
               )}
               <p className="text-white text-sm font-medium">{anim.name}</p>
               <p className="text-white/40 text-xs">{anim.duration}s</p>
