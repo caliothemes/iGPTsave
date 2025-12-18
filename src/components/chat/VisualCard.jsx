@@ -695,81 +695,95 @@ export default function VisualCard({
         </div>
       )}
 
-      {/* Image Modal */}
-      {showImageModal && (() => {
-        const dims = visual.dimensions || '1080x1080';
-        const [w, h] = dims.split('x').map(n => parseInt(n));
-        
-        if (!w || !h) return null;
-        
-        const aspectRatio = w / h;
-        const maxWidth = window.innerWidth * 0.9;
-        const maxHeight = window.innerHeight * 0.9;
-        
-        let displayWidth, displayHeight;
-        if (aspectRatio > maxWidth / maxHeight) {
-          displayWidth = maxWidth;
-          displayHeight = maxWidth / aspectRatio;
-        } else {
-          displayHeight = maxHeight;
-          displayWidth = maxHeight * aspectRatio;
-        }
-        
-        return (
-          <div 
-            className="fixed inset-0 bg-black/95 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
-            onClick={() => setShowImageModal(false)}
-          >
-            <button
+      {/* Image Modal - Portal-style rendering */}
+      <AnimatePresence>
+        {showImageModal && (() => {
+          const dims = visual.dimensions || '1080x1080';
+          const [w, h] = dims.split('x').map(n => parseInt(n));
+          
+          if (!w || !h) return null;
+          
+          const aspectRatio = w / h;
+          const maxWidth = window.innerWidth * 0.9;
+          const maxHeight = window.innerHeight * 0.9;
+          
+          let displayWidth, displayHeight;
+          if (aspectRatio > maxWidth / maxHeight) {
+            displayWidth = maxWidth;
+            displayHeight = maxWidth / aspectRatio;
+          } else {
+            displayHeight = maxHeight;
+            displayWidth = maxHeight * aspectRatio;
+          }
+          
+          return (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center"
+              style={{ zIndex: 99999 }}
               onClick={() => setShowImageModal(false)}
-              className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl z-[10000]"
             >
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div 
-              className="relative"
-              style={{ 
-                width: `${displayWidth}px`,
-                height: `${displayHeight}px`,
-                aspectRatio: `${w} / ${h}`
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {isVideo ? (
-                <video 
-                  src={visual.video_url || visual.image_url}
-                  controls
-                  autoPlay
-                  loop
-                  className="w-full h-full object-contain rounded-lg shadow-2xl"
+              <button
+                onClick={() => setShowImageModal(false)}
+                className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl"
+                style={{ zIndex: 100000 }}
+              >
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.95 }}
+                className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className="relative"
                   style={{ 
-                    display: 'block',
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
+                    width: `${displayWidth}px`,
+                    height: `${displayHeight}px`,
                     aspectRatio: `${w} / ${h}`
                   }}
-                />
-              ) : (
-                <img
-                  src={visual.image_url}
-                  alt="Preview"
-                  className="w-full h-full object-contain rounded-lg shadow-2xl"
-                  style={{ 
-                    display: 'block',
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    aspectRatio: `${w} / ${h}`
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        );
-      })()}
+                >
+                  {isVideo ? (
+                    <video 
+                      src={visual.video_url || visual.image_url}
+                      controls
+                      autoPlay
+                      loop
+                      className="rounded-lg shadow-2xl"
+                      style={{ 
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        aspectRatio: `${w} / ${h}`
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={visual.image_url}
+                      alt="Preview"
+                      className="rounded-lg shadow-2xl"
+                      style={{ 
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        aspectRatio: `${w} / ${h}`
+                      }}
+                    />
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
     </>
   );
 }
