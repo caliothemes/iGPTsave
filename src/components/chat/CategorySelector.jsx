@@ -29,6 +29,7 @@ const CATEGORIES = [
     icon: Image,
     name: { fr: 'Image réaliste', en: 'Realistic Image' },
     description: { fr: 'Images époustouflantes réalistes ou pas', en: 'Stunning realistic images or not' },
+    prompt: { fr: 'Crée une image réaliste de ', en: 'Create a realistic image of ' },
     hasSubmenu: true,
     submenu: [
       { id: 'image_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une image réaliste format carré', en: 'Create a realistic image in square format' }, dimensions: '1080x1080' },
@@ -42,6 +43,7 @@ const CATEGORIES = [
     icon: Printer,
     name: { fr: 'Design Print', en: 'Print Design' },
     description: { fr: 'Carte de visite, Flyer, Affiche', en: 'Business card, Flyer, Poster' },
+    prompt: { fr: 'Crée un design print pour ', en: 'Create a print design for ' },
     hasSubmenu: true,
     isPrint: true,
     submenu: [
@@ -56,6 +58,7 @@ const CATEGORIES = [
     icon: Share2,
     name: { fr: 'Réseaux Sociaux', en: 'Social Media' },
     description: { fr: 'Posts, Stories, Bannières', en: 'Posts, Stories, Banners' },
+    prompt: { fr: 'Crée un design social media pour ', en: 'Create a social media design for ' },
     hasSubmenu: true,
     submenu: [
       { id: 'social_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un design social format carré pour', en: 'Create a square format social design for' }, dimensions: '1080x1080' },
@@ -69,6 +72,7 @@ const CATEGORIES = [
     icon: Image,
     name: { fr: 'Mockups', en: 'Mockups' },
     description: { fr: 'Mise en scène réaliste avec mockup', en: 'Realistic staging with mockup' },
+    prompt: { fr: 'Crée un mockup de ', en: 'Create a mockup of ' },
     hasSubmenu: true,
     submenu: [
       { id: 'mockup_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée un mockup carré', en: 'Create a square mockup' }, dimensions: '1080x1080' },
@@ -82,6 +86,7 @@ const CATEGORIES = [
     icon: Image,
     name: { fr: 'Produit', en: 'Product' },
     description: { fr: 'Photos de produits', en: 'Product photos' },
+    prompt: { fr: 'Crée une photo de produit de ', en: 'Create a product photo of ' },
     hasSubmenu: true,
     submenu: [
       { id: 'product_carre', name: { fr: 'Carré (1:1)', en: 'Square (1:1)' }, prompt: { fr: 'Crée une photo de produit carrée', en: 'Create a square product photo' }, dimensions: '1080x1080' },
@@ -95,6 +100,7 @@ const CATEGORIES = [
     icon: Box,
     name: { fr: 'Design Texte 3D', en: '3D Text Design' },
     description: { fr: 'Designs avec textes en 3D volumétriques', en: 'Designs with volumetric 3D texts' },
+    prompt: { fr: 'Crée un design 3D pour ', en: 'Create a 3D design for ' },
     hasSubmenu: true,
     defaultExpertMode: false,
     submenu: [
