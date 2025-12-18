@@ -218,6 +218,64 @@ export default function StoryStudio() {
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('StoryStudio'));
   const handleLogout = () => base44.auth.logout(createPageUrl('StoryStudio'));
 
+  // Get transition animation config
+  const getTransitionAnimation = (animationType) => {
+    const animations = {
+      'fadeIn': {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 }
+      },
+      'slideInRight': {
+        initial: { x: '100%', opacity: 0 },
+        animate: { x: 0, opacity: 1 },
+        exit: { x: '-100%', opacity: 0 }
+      },
+      'slideInLeft': {
+        initial: { x: '-100%', opacity: 0 },
+        animate: { x: 0, opacity: 1 },
+        exit: { x: '100%', opacity: 0 }
+      },
+      'slideInUp': {
+        initial: { y: '100%', opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: '-100%', opacity: 0 }
+      },
+      'slideInDown': {
+        initial: { y: '-100%', opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: '100%', opacity: 0 }
+      },
+      'zoomIn': {
+        initial: { scale: 0.8, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 1.2, opacity: 0 }
+      },
+      'rotateIn': {
+        initial: { rotate: -180, scale: 0, opacity: 0 },
+        animate: { rotate: 0, scale: 1, opacity: 1 },
+        exit: { rotate: 180, scale: 0, opacity: 0 }
+      },
+      'scaleUp': {
+        initial: { scale: 0.5, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 0.5, opacity: 0 }
+      },
+      'flipX': {
+        initial: { rotateY: 90, opacity: 0 },
+        animate: { rotateY: 0, opacity: 1 },
+        exit: { rotateY: -90, opacity: 0 }
+      },
+      'flipY': {
+        initial: { rotateX: 90, opacity: 0 },
+        animate: { rotateX: 0, opacity: 1 },
+        exit: { rotateX: -90, opacity: 0 }
+      }
+    };
+    
+    return animations[animationType] || animations['fadeIn'];
+  };
+
   return (
     <div className="min-h-screen relative">
       <Toaster position="top-center" />
@@ -415,12 +473,19 @@ export default function StoryStudio() {
               {/* Story Preview */}
               <div className="relative bg-black rounded-2xl overflow-hidden mx-auto" style={{ aspectRatio: '9/16', maxHeight: '600px' }}>
                 {selectedImages.length > 0 ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={selectedImages[previewIndex]?.image_url || selectedImages[0].image_url}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="relative w-full h-full overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={previewIndex}
+                        src={selectedImages[previewIndex]?.image_url || selectedImages[0].image_url}
+                        alt="Preview"
+                        className="w-full h-full object-cover absolute inset-0"
+                        initial={getTransitionAnimation(selectedImages[previewIndex - 1]?.transition?.css_animation).initial}
+                        animate={getTransitionAnimation(selectedImages[previewIndex - 1]?.transition?.css_animation).animate}
+                        exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation).exit}
+                        transition={{ duration: selectedImages[previewIndex - 1]?.transition?.duration || 0.8, ease: "easeInOut" }}
+                      />
+                    </AnimatePresence>
                     
                     {/* Text Overlays */}
                     {textLayers.map(text => (
@@ -490,16 +555,6 @@ export default function StoryStudio() {
                           <Play className="h-8 w-8 text-white ml-1" />
                         </div>
                       </button>
-                    )}
-                    
-                    {/* Transition Effect Overlay */}
-                    {previewPlaying && selectedImages[previewIndex]?.transition && (
-                      <div 
-                        className="absolute inset-0 pointer-events-none"
-                        style={{ 
-                          animation: `${selectedImages[previewIndex].transition.css_animation || 'fadeIn'} ${selectedImages[previewIndex].transition.duration || 1}s ease-in-out`
-                        }}
-                      />
                     )}
                     
                     {/* Progress indicator */}
@@ -615,7 +670,7 @@ export default function StoryStudio() {
                 <X className="h-5 w-5 text-white" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 p-6 space-y-6 flex flex-col">
               {myVisuals.length === 0 ? (
                 <div className="text-center py-12">
                   <ImageIcon className="h-16 w-16 text-white/20 mx-auto mb-4" />
@@ -625,44 +680,47 @@ export default function StoryStudio() {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-3 gap-4">
-                    {myVisuals.slice(0, visualsDisplayCount).map(visual => {
-                      const dims = visual.dimensions || '1080x1080';
-                      const [w, h] = dims.split('x').map(n => parseInt(n));
-                      const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
-                      
-                      return (
-                        <button
-                          key={visual.id}
-                          onClick={() => handleSelectFromVisuals(visual)}
-                          className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
-                        >
-                          <div style={{ aspectRatio }}>
-                            <img
-                              src={visual.image_url}
-                              alt={visual.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                            <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
-                          </div>
-                        </button>
-                      );
-                    })}
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-3 gap-4 pb-4">
+                      {myVisuals.slice(0, visualsDisplayCount).map(visual => {
+                        const dims = visual.dimensions || '1080x1080';
+                        const [w, h] = dims.split('x').map(n => parseInt(n));
+                        const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
+                        
+                        return (
+                          <button
+                            key={visual.id}
+                            onClick={() => handleSelectFromVisuals(visual)}
+                            className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                          >
+                            <div style={{ aspectRatio }}>
+                              <img
+                                src={visual.image_url}
+                                alt={visual.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                              <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                   
-                  {/* Voir plus button */}
+                  {/* Voir plus button - sticky at bottom */}
                   {visualsDisplayCount < myVisuals.length && (
-                    <div className="flex justify-center pb-4">
+                    <div className="flex-shrink-0 flex justify-center pt-4 border-t border-white/10">
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           setVisualsDisplayCount(prev => prev + 21);
                         }}
-                        className="bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-violet-500/50"
+                        size="lg"
+                        className="bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-violet-500/50 hover:scale-105 transition-all"
                       >
-                        <ChevronRight className="h-4 w-4 mr-2" />
+                        <ChevronRight className="h-5 w-5 mr-2" />
                         {language === 'fr' ? `Voir plus (${myVisuals.length - visualsDisplayCount} restants)` : `Load more (${myVisuals.length - visualsDisplayCount} remaining)`}
                       </Button>
                     </div>
@@ -761,36 +819,7 @@ export default function StoryStudio() {
         </div>
       )}
 
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideInRight {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        @keyframes slideInLeft {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(0); }
-        }
-        @keyframes slideInUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-        @keyframes slideInDown {
-          from { transform: translateY(-100%); }
-          to { transform: translateY(0); }
-        }
-        @keyframes zoomIn {
-          from { transform: scale(0.8); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        @keyframes rotateIn {
-          from { transform: rotate(-180deg) scale(0); opacity: 0; }
-          to { transform: rotate(0) scale(1); opacity: 1; }
-        }
-      `}</style>
+
     </div>
   );
 }
