@@ -218,15 +218,28 @@ export default function StoryStudio() {
   const handleLogin = () => base44.auth.redirectToLogin(createPageUrl('StoryStudio'));
   const handleLogout = () => base44.auth.logout(createPageUrl('StoryStudio'));
 
-  // Get transition animation config
+  // Get transition animation config - TRANSITIONS PRO
   const getTransitionAnimation = (animationType) => {
-    const animations = {
+    const transitions = {
+      // Fades
       'fadeIn': {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
         exit: { opacity: 0 }
       },
+      'fade-in': {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 }
+      },
+      
+      // Slides horizontaux
       'slideInRight': {
+        initial: { x: '100%', opacity: 0 },
+        animate: { x: 0, opacity: 1 },
+        exit: { x: '-100%', opacity: 0 }
+      },
+      'slide-right': {
         initial: { x: '100%', opacity: 0 },
         animate: { x: 0, opacity: 1 },
         exit: { x: '-100%', opacity: 0 }
@@ -236,7 +249,19 @@ export default function StoryStudio() {
         animate: { x: 0, opacity: 1 },
         exit: { x: '100%', opacity: 0 }
       },
+      'slide-left': {
+        initial: { x: '-100%', opacity: 0 },
+        animate: { x: 0, opacity: 1 },
+        exit: { x: '100%', opacity: 0 }
+      },
+      
+      // Slides verticaux
       'slideInUp': {
+        initial: { y: '100%', opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: '-100%', opacity: 0 }
+      },
+      'slide-up': {
         initial: { y: '100%', opacity: 0 },
         animate: { y: 0, opacity: 1 },
         exit: { y: '-100%', opacity: 0 }
@@ -246,22 +271,48 @@ export default function StoryStudio() {
         animate: { y: 0, opacity: 1 },
         exit: { y: '100%', opacity: 0 }
       },
+      'slide-down': {
+        initial: { y: '-100%', opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: '100%', opacity: 0 }
+      },
+      
+      // Zooms
       'zoomIn': {
-        initial: { scale: 0.8, opacity: 0 },
-        animate: { scale: 1, opacity: 1 },
-        exit: { scale: 1.2, opacity: 0 }
-      },
-      'rotateIn': {
-        initial: { rotate: -180, scale: 0, opacity: 0 },
-        animate: { rotate: 0, scale: 1, opacity: 1 },
-        exit: { rotate: 180, scale: 0, opacity: 0 }
-      },
-      'scaleUp': {
         initial: { scale: 0.5, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 1.5, opacity: 0 }
+      },
+      'zoom-in': {
+        initial: { scale: 0.5, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 1.5, opacity: 0 }
+      },
+      'zoom-out': {
+        initial: { scale: 1.5, opacity: 0 },
         animate: { scale: 1, opacity: 1 },
         exit: { scale: 0.5, opacity: 0 }
       },
+      
+      // Rotations
+      'rotateIn': {
+        initial: { rotate: -180, scale: 0.5, opacity: 0 },
+        animate: { rotate: 0, scale: 1, opacity: 1 },
+        exit: { rotate: 180, scale: 0.5, opacity: 0 }
+      },
+      'rotate-in': {
+        initial: { rotate: -180, scale: 0.5, opacity: 0 },
+        animate: { rotate: 0, scale: 1, opacity: 1 },
+        exit: { rotate: 180, scale: 0.5, opacity: 0 }
+      },
+      
+      // Flips
       'flipX': {
+        initial: { rotateY: 90, opacity: 0 },
+        animate: { rotateY: 0, opacity: 1 },
+        exit: { rotateY: -90, opacity: 0 }
+      },
+      'flip-x': {
         initial: { rotateY: 90, opacity: 0 },
         animate: { rotateY: 0, opacity: 1 },
         exit: { rotateY: -90, opacity: 0 }
@@ -270,10 +321,41 @@ export default function StoryStudio() {
         initial: { rotateX: 90, opacity: 0 },
         animate: { rotateX: 0, opacity: 1 },
         exit: { rotateX: -90, opacity: 0 }
+      },
+      'flip-y': {
+        initial: { rotateX: 90, opacity: 0 },
+        animate: { rotateX: 0, opacity: 1 },
+        exit: { rotateX: -90, opacity: 0 }
+      },
+      
+      // Scale
+      'scaleUp': {
+        initial: { scale: 0, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 0, opacity: 0 }
+      },
+      'scale-up': {
+        initial: { scale: 0, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        exit: { scale: 0, opacity: 0 }
+      },
+      
+      // Blur
+      'blur': {
+        initial: { filter: 'blur(20px)', opacity: 0 },
+        animate: { filter: 'blur(0px)', opacity: 1 },
+        exit: { filter: 'blur(20px)', opacity: 0 }
+      },
+      
+      // Diagonal slides
+      'slide-diagonal': {
+        initial: { x: '100%', y: '100%', opacity: 0 },
+        animate: { x: 0, y: 0, opacity: 1 },
+        exit: { x: '-100%', y: '-100%', opacity: 0 }
       }
     };
     
-    return animations[animationType] || animations['fadeIn'];
+    return transitions[animationType] || transitions['fadeIn'];
   };
 
   return (
@@ -480,10 +562,10 @@ export default function StoryStudio() {
                         src={selectedImages[previewIndex]?.image_url || selectedImages[0].image_url}
                         alt="Preview"
                         className="w-full h-full object-cover absolute inset-0"
-                        initial={getTransitionAnimation(selectedImages[previewIndex - 1]?.transition?.css_animation).initial}
-                        animate={getTransitionAnimation(selectedImages[previewIndex - 1]?.transition?.css_animation).animate}
-                        exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation).exit}
-                        transition={{ duration: selectedImages[previewIndex - 1]?.transition?.duration || 0.8, ease: "easeInOut" }}
+                        initial={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').initial}
+                        animate={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').animate}
+                        exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').exit}
+                        transition={{ duration: selectedImages[previewIndex]?.transition?.duration || 0.8, ease: "easeInOut" }}
                       />
                     </AnimatePresence>
                     
@@ -707,21 +789,22 @@ export default function StoryStudio() {
                     })}
                   </div>
                   
-                  {/* Voir plus button */}
-                  {visualsDisplayCount < myVisuals.length && (
-                    <div className="flex justify-center pt-2 pb-4">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setVisualsDisplayCount(prev => prev + 21);
-                        }}
-                        size="lg"
-                        className="bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-violet-500/50 hover:scale-105 transition-all"
-                      >
-                        <ChevronRight className="h-5 w-5 mr-2" />
-                        {language === 'fr' ? `Voir plus (${myVisuals.length - visualsDisplayCount} restants)` : `Load more (${myVisuals.length - visualsDisplayCount} remaining)`}
-                      </Button>
-                    </div>
+                  {/* Voir plus button - ALWAYS visible if more visuals */}
+                  {myVisuals.length > visualsDisplayCount && (
+                   <div className="flex justify-center pt-4 pb-2 border-t border-white/10 mt-4">
+                     <Button
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         console.log('Before:', visualsDisplayCount, 'Total:', myVisuals.length);
+                         setVisualsDisplayCount(prev => prev + 21);
+                       }}
+                       size="lg"
+                       className="bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-violet-500/50 hover:scale-105 transition-all font-bold"
+                     >
+                       <Plus className="h-5 w-5 mr-2" />
+                       {language === 'fr' ? `Voir plus (${myVisuals.length - visualsDisplayCount} restants)` : `Load more (${myVisuals.length - visualsDisplayCount} remaining)`}
+                     </Button>
+                   </div>
                   )}
                 </div>
               )}
