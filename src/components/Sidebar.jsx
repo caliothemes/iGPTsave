@@ -66,7 +66,10 @@ export default function Sidebar({
           variant="ghost"
           size="icon"
           onClick={onToggle}
-          className="text-white/70 hover:text-white hover:bg-white/10"
+          className={cn(
+            "text-white/70 hover:text-white hover:bg-white/10",
+            isOpen && "md:bg-transparent bg-white/20 backdrop-blur-sm border border-white/30"
+          )}
         >
           {isOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
         </Button>
