@@ -45,9 +45,11 @@ export default function StoryStudio() {
   const [currentStep, setCurrentStep] = useState('select');
   const [exporting, setExporting] = useState(false);
   const [previewPlaying, setPreviewPlaying] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [userVisuals, setUserVisuals] = useState([]);
+  const [visualsDisplayCount, setVisualsDisplayCount] = useState(21);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -358,7 +360,7 @@ export default function StoryStudio() {
                 {selectedImages.length > 0 ? (
                   <div className="relative w-full h-full">
                     <img
-                      src={selectedImages[0].image_url}
+                      src={selectedImages[previewIndex]?.image_url || selectedImages[0].image_url}
                       alt="Preview"
                       className="w-full h-full object-cover"
                     />
@@ -395,13 +397,43 @@ export default function StoryStudio() {
                     {/* Play Button Overlay */}
                     {!previewPlaying && (
                       <button
-                        onClick={() => setPreviewPlaying(true)}
+                        onClick={() => {
+                          setPreviewPlaying(true);
+                          setPreviewIndex(0);
+                          // Auto-play sequence
+                          let currentIdx = 0;
+                          const interval = setInterval(() => {
+                            currentIdx++;
+                            if (currentIdx >= selectedImages.length) {
+                              clearInterval(interval);
+                              setPreviewPlaying(false);
+                              setPreviewIndex(0);
+                            } else {
+                              setPreviewIndex(currentIdx);
+                            }
+                          }, selectedImages[currentIdx]?.duration * 1000 || 3000);
+                        }}
                         className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors group"
                       >
                         <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Play className="h-8 w-8 text-white ml-1" />
                         </div>
                       </button>
+                    )}
+                    
+                    {/* Progress indicator */}
+                    {previewPlaying && (
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
+                        {selectedImages.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className={cn(
+                              "h-1 rounded-full transition-all",
+                              idx === previewIndex ? "bg-white w-8" : "bg-white/40 w-4"
+                            )}
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
                 ) : (
@@ -504,7 +536,7 @@ export default function StoryStudio() {
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-3 gap-4">
-                {myVisuals.map(visual => {
+                {myVisuals.slice(0, visualsDisplayCount).map(visual => {
                   const dims = visual.dimensions || '1080x1080';
                   const [w, h] = dims.split('x').map(n => parseInt(n));
                   const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
@@ -529,6 +561,19 @@ export default function StoryStudio() {
                   );
                 })}
               </div>
+              
+              {/* Voir plus button */}
+              {visualsDisplayCount < myVisuals.length && (
+                <div className="mt-6 flex justify-center">
+                  <Button
+                    onClick={() => setVisualsDisplayCount(prev => prev + 21)}
+                    variant="outline"
+                    className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+                  >
+                    {language === 'fr' ? `Voir plus (${myVisuals.length - visualsDisplayCount} restants)` : `Load more (${myVisuals.length - visualsDisplayCount} remaining)`}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
