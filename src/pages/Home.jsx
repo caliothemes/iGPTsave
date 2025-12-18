@@ -1448,7 +1448,7 @@ export default function Home() {
                     key={cat.id}
                     onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
                     className={cn(
-                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border",
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
                       selectedCategory?.id === cat.id
                         ? "bg-gradient-to-r from-violet-600/40 to-purple-600/40 border-violet-500/60 text-white shadow-lg shadow-violet-500/20"
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
