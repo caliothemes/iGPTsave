@@ -100,6 +100,7 @@ export default function Home() {
   const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(true);
   const [showExamplesModal, setShowExamplesModal] = useState(false);
+  const [tagsExpanded, setTagsExpanded] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -1232,157 +1233,17 @@ export default function Home() {
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
               {/* Ligne principale - Textarea + boutons */}
               <div className="flex items-center gap-2 px-4 py-3">
-                {/* Plus Category Menu */}
+                {/* Plus Menu */}
                 <DropdownMenu open={categoryDropdownOpen} onOpenChange={setCategoryDropdownOpen}>
                   <DropdownMenuTrigger asChild>
                     <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
                       <Plus className="h-5 w-5" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-72 bg-gray-900/95 backdrop-blur-xl border border-white/10 p-0">
-                    <DropdownMenuLabel className="text-white/50 text-xs px-3 py-2">
-                      {language === 'fr' ? 'Choisir un type de visuel' : 'Choose a visual type'}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <div className="max-h-96 overflow-y-auto">
-                      {CATEGORIES.map((category) => {
-                        const Icon = category.icon;
-                        const isOpen = openSubmenu === category.id;
-                        const isFreePrompt = category.isFreePrompt;
-
-                        return (
-                          <div key={category.id}>
-                            <div
-                              onClick={() => {
-                                if (category.hasSubmenu) {
-                                  setOpenSubmenu(isOpen ? null : category.id);
-                                  setOpenNestedSubmenu(null);
-                                } else {
-                                  handleCategorySelect({ ...category, expertMode: expertMode[category.id] || false });
-                                }
-                              }}
-                              className={cn(
-                                "px-3 py-2.5 flex items-center gap-3 cursor-pointer transition-colors",
-                                "hover:bg-white/10",
-                                isFreePrompt && "bg-blue-600/10 hover:bg-blue-600/20"
-                              )}
-                            >
-                              <div className="p-1.5 rounded-lg bg-white/5">
-                                <Icon className="h-4 w-4 text-white/70" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-white text-xs font-medium">{category?.name?.[language] || category?.name?.fr || 'N/A'}</span>
-                                  {category.hasSubmenu && (
-                                    <ChevronDown className={cn(
-                                      "h-3 w-3 text-white/40 transition-transform",
-                                      isOpen && "rotate-180"
-                                    )} />
-                                  )}
-                                </div>
-                              </div>
-                              {/* Switch + Badge */}
-                              <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                                {category.id === 'free_prompt' ? (
-                                  <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold rounded-full">
-                                    EXPERT
-                                  </span>
-                                ) : category.id === 'logo_picto' ? (
-                                  <>
-                                    <div className="relative inline-flex h-3 w-5 items-center rounded-full opacity-40 cursor-not-allowed bg-white/20">
-                                      <span className="inline-block h-2 w-2 transform rounded-full bg-white translate-x-0.5" />
-                                    </div>
-                                    <span className="px-1.5 py-0.5 bg-blue-500/60 text-white text-[9px] font-medium rounded-full">
-                                      ASSISTÉ
-                                    </span>
-                                  </>
-                                ) : category.id === 'logo_complet' ? (
-                                  <>
-                                    <div className="relative inline-flex h-3 w-5 items-center rounded-full opacity-40 cursor-not-allowed bg-violet-600">
-                                      <span className="inline-block h-2 w-2 transform rounded-full bg-white translate-x-2.5" />
-                                    </div>
-                                    <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold rounded-full">
-                                      EXPERT
-                                    </span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <button
-                                      onClick={(e) => toggleExpertMode(category.id, e)}
-                                      className={cn(
-                                        "relative inline-flex h-3 w-5 items-center rounded-full transition-colors",
-                                        expertMode[category.id] ? "bg-violet-600" : "bg-white/20"
-                                      )}
-                                    >
-                                      <span className={cn(
-                                        "inline-block h-2 w-2 transform rounded-full bg-white transition-transform",
-                                        expertMode[category.id] ? "translate-x-2.5" : "translate-x-0.5"
-                                      )} />
-                                    </button>
-                                    {expertMode[category.id] ? (
-                                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold rounded-full">
-                                        EXPERT
-                                      </span>
-                                    ) : (
-                                      <span className="px-1.5 py-0.5 bg-blue-500/60 text-white text-[9px] font-medium rounded-full">
-                                        ASSISTÉ
-                                      </span>
-                                    )}
-                                  </>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Submenu content */}
-                            {category.hasSubmenu && isOpen && (
-                              <div className="bg-gray-800/50 border-t border-white/5">
-                                {category.submenu.map((item) => (
-                                  <div key={item.id}>
-                                    <button
-                                      onClick={() => {
-                                        if (item.orientations) {
-                                          setOpenNestedSubmenu(openNestedSubmenu === item.id ? null : item.id);
-                                        } else {
-                                          handleCategorySelect({ ...category, selectedSubmenu: item, expertMode: expertMode[category.id] || false });
-                                        }
-                                      }}
-                                      className="w-full px-6 py-2 text-left text-white/70 text-xs hover:bg-white/10 transition-colors flex items-center justify-between"
-                                    >
-                                      {item?.name?.[language] || item?.name?.fr || 'N/A'}
-                                      {item.orientations && (
-                                        <ChevronRight className={cn(
-                                          "h-3 w-3 text-white/40 transition-transform",
-                                          openNestedSubmenu === item.id && "rotate-90"
-                                        )} />
-                                      )}
-                                    </button>
-
-                                    {/* Nested orientations */}
-                                    {item.orientations && openNestedSubmenu === item.id && (
-                                      <div className="bg-gray-700/50">
-                                        {item.orientations.map((orientation) => (
-                                          <button
-                                            key={orientation.id}
-                                            onClick={() => handleCategorySelect({ ...category, selectedSubmenu: { ...item, ...orientation }, expertMode: expertMode[category.id] || false })}
-                                            className="w-full px-8 py-1.5 text-left text-white/60 text-xs hover:bg-white/10 transition-colors"
-                                          >
-                                            {orientation?.name?.[language] || orientation?.name?.fr || 'N/A'}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <DropdownMenuSeparator className="bg-white/10 my-2" />
+                  <DropdownMenuContent align="start" className="w-72 bg-gray-900/95 backdrop-blur-xl border border-white/10 p-2">
                     <Link 
                       to={createPageUrl('Store')}
-                      className="mx-2 mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
                     >
                       <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
                         <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1395,13 +1256,13 @@ export default function Home() {
                           {language === 'fr' ? 'Visuels prêts à l\'emploi' : 'Ready-to-use visuals'}
                         </div>
                       </div>
-                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentRole">
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
                     <Link 
                       to={createPageUrl('MyVisuals')}
-                      className="mx-2 mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-blue-900/40 to-white/[0.03] hover:from-blue-900/50 hover:to-white/[0.08] border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-blue-900/40 to-white/[0.03] hover:from-blue-900/50 hover:to-white/[0.08] border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
                     >
                       <div className="p-2 rounded-lg bg-white/5">
                         <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1421,6 +1282,65 @@ export default function Home() {
                         </div>
                         <div className="text-white/80 text-xs">
                           {language === 'fr' ? 'Tous vos visuels créés' : 'All your created visuals'}
+                        </div>
+                      </div>
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link 
+                      to={createPageUrl('Pricing')}
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
+                    >
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white text-sm font-bold">
+                          {language === 'fr' ? 'Tarifs' : 'Pricing'}
+                        </div>
+                        <div className="text-white/80 text-xs">
+                          {language === 'fr' ? 'Nos offres et abonnements' : 'Our plans and subscriptions'}
+                        </div>
+                      </div>
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link 
+                      to={createPageUrl('Support')}
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
+                    >
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white text-sm font-bold">Support</div>
+                        <div className="text-white/80 text-xs">
+                          {language === 'fr' ? 'Aide et assistance' : 'Help and assistance'}
+                        </div>
+                      </div>
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link 
+                      to={createPageUrl('Legal')}
+                      className="px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
+                    >
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white text-sm font-bold">FAQ</div>
+                        <div className="text-white/80 text-xs">
+                          {language === 'fr' ? 'Questions fréquentes' : 'Frequently asked questions'}
                         </div>
                       </div>
                       <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1469,8 +1389,12 @@ export default function Home() {
                 </Button>
               </div>
 
-              {/* Tags sous le prompt */}
-              <div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap border-t border-white/5 pt-2">
+              {/* Tags sous le prompt - Collapsible en mobile */}
+              <div className="px-4 pb-2 border-t border-white/5 pt-2">
+                <div className={cn(
+                  "flex items-center gap-1.5 flex-wrap transition-all",
+                  !tagsExpanded && "md:flex max-h-8 overflow-hidden"
+                )}>
                 {/* Tag Format - Couleur spéciale */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -1550,7 +1474,26 @@ export default function Home() {
                     </span>
                   )}
                 </Link>
-              </div>
+                </div>
+
+                {/* Toggle button - visible en mobile uniquement */}
+                <button
+                  onClick={() => setTagsExpanded(!tagsExpanded)}
+                  className="md:hidden w-full mt-2 flex items-center justify-center gap-2 text-white/50 hover:text-white/70 text-xs transition-colors"
+                >
+                  {tagsExpanded ? (
+                    <>
+                      <ChevronDown className="h-3 w-3" />
+                      {language === 'fr' ? 'Réduire' : 'Collapse'}
+                    </>
+                  ) : (
+                    <>
+                      <ChevronRight className="h-3 w-3" />
+                      {language === 'fr' ? 'Voir plus' : 'See more'}
+                    </>
+                  )}
+                </button>
+                </div>
             </div>
 
             {/* Footer Links */}
