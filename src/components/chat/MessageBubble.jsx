@@ -82,13 +82,24 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
               className="prose prose-invert prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
               components={{
                 img: ({ src, alt, ...props }) => (
-                  <img 
-                    src={src} 
-                    alt={alt}
-                    className="rounded-lg cursor-pointer hover:opacity-80 transition-opacity max-w-full my-2"
+                  <div 
+                    className="relative group cursor-pointer my-2 rounded-lg overflow-hidden inline-block max-w-full"
                     onClick={() => setShowImageModal(src)}
-                    {...props}
-                  />
+                  >
+                    <img 
+                      src={src} 
+                      alt={alt}
+                      className="rounded-lg max-w-full transition-all group-hover:brightness-75"
+                      {...props}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                      <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/40 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
                 ),
                 p: ({ children }) => <p className="my-1 leading-relaxed text-sm">{children}</p>,
                 ul: ({ children }) => <ul className="my-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>,
