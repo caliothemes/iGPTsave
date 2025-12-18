@@ -1242,18 +1242,20 @@ export default function Home() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-72 bg-gray-900/95 backdrop-blur-xl border border-white/10 p-2">
                     <Link 
-                      to={createPageUrl('Store')}
-                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
+                      to={createPageUrl('Account')}
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
                     >
-                      <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-                        <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <div className="text-white text-sm font-bold">iGPT Store</div>
+                        <div className="text-white text-sm font-bold">
+                          {language === 'fr' ? 'Mon compte' : 'My account'}
+                        </div>
                         <div className="text-white/80 text-xs">
-                          {language === 'fr' ? 'Visuels prêts à l\'emploi' : 'Ready-to-use visuals'}
+                          {language === 'fr' ? 'Paramètres et profil' : 'Settings and profile'}
                         </div>
                       </div>
                       <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1261,7 +1263,7 @@ export default function Home() {
                       </svg>
                     </Link>
                     <Link 
-                      to={createPageUrl('MyVisuals')}
+                      to={createPageUrl('Pricing')}
                       className="mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-blue-900/40 to-white/[0.03] hover:from-blue-900/50 hover:to-white/[0.08] border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
                     >
                       <div className="p-2 rounded-lg bg-white/5">
@@ -1310,7 +1312,7 @@ export default function Home() {
                       </svg>
                     </Link>
                     <Link 
-                      to={createPageUrl('Support')}
+                      to={createPageUrl('Legal')}
                       className="mb-2 px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
                     >
                       <div className="p-2 rounded-lg bg-white/5">
@@ -1319,9 +1321,11 @@ export default function Home() {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <div className="text-white text-sm font-bold">Support</div>
+                        <div className="text-white text-sm font-bold">
+                          {language === 'fr' ? 'Support & FAQ' : 'Support & FAQ'}
+                        </div>
                         <div className="text-white/80 text-xs">
-                          {language === 'fr' ? 'Aide et assistance' : 'Help and assistance'}
+                          {language === 'fr' ? 'Aide et questions fréquentes' : 'Help and frequently asked questions'}
                         </div>
                       </div>
                       <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1329,18 +1333,46 @@ export default function Home() {
                       </svg>
                     </Link>
                     <Link 
-                      to={createPageUrl('Legal')}
-                      className="px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
+                      to={createPageUrl('MyVisuals')}
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
                     >
                       <div className="p-2 rounded-lg bg-white/5">
                         <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <div className="text-white text-sm font-bold">FAQ</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm font-bold">
+                            {language === 'fr' ? 'Mes visuels' : 'My visuals'}
+                          </span>
+                          {totalVisualsCount > 0 && (
+                            <span className="px-2 py-0.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold">
+                              {totalVisualsCount}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-white/80 text-xs">
-                          {language === 'fr' ? 'Questions fréquentes' : 'Frequently asked questions'}
+                          {language === 'fr' ? 'Tous vos visuels créés' : 'All your created visuals'}
+                        </div>
+                      </div>
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link 
+                      to={createPageUrl('Store')}
+                      className="px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 rounded-lg transition-all shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
+                    >
+                      <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
+                        <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white text-sm font-bold">iGPT Store</div>
+                        <div className="text-white/80 text-xs">
+                          {language === 'fr' ? 'Visuels prêts à l\'emploi' : 'Ready-to-use visuals'}
                         </div>
                       </div>
                       <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1389,11 +1421,11 @@ export default function Home() {
                 </Button>
               </div>
 
-              {/* Tags sous le prompt - Collapsible en mobile */}
+              {/* Tags sous le prompt - Collapsible en mobile uniquement */}
               <div className="px-4 pb-2 border-t border-white/5 pt-2">
                 <div className={cn(
                   "flex items-center gap-1.5 flex-wrap transition-all",
-                  !tagsExpanded && "md:flex max-h-8 overflow-hidden"
+                  !tagsExpanded && "max-md:max-h-8 max-md:overflow-hidden"
                 )}>
                 {/* Tag Format - Couleur spéciale */}
                 <DropdownMenu>
