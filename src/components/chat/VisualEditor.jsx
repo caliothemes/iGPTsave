@@ -3768,7 +3768,7 @@ Réponds en JSON avec:
                     <div className="flex gap-2 items-center">
                       <span className="text-white/40 text-xs w-10">{language === 'fr' ? 'Taille' : 'Size'}</span>
                       <div className="flex-1">
-                        <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={120} step={1} />
+                        <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={5} max={120} step={1} />
                       </div>
                       <span className="text-white/50 text-xs w-12">{currentLayer.fontSize}px</span>
                     </div>
