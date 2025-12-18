@@ -854,7 +854,7 @@ export default function Home() {
         sidebarOpen ? "ml-64" : "ml-0"
       )}>
         {showInitialView ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-4 pb-32 pt-16">
+          <div className="flex-1 flex flex-col items-center justify-start px-4 pb-[500px] pt-16 overflow-y-auto">
             {/* Logo - Clickable to open modal - NO TEXT */}
             <div 
               className="cursor-pointer mb-10 mt-12"
@@ -917,7 +917,7 @@ export default function Home() {
 
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4 py-6 pb-[500px]">
+          <div className="flex-1 overflow-y-auto px-4 py-6 pb-96">
             <div className="max-w-3xl mx-auto space-y-4">
               <AnimatePresence>
                 {messages.map((msg, idx) => (
