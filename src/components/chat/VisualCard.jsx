@@ -696,33 +696,19 @@ export default function VisualCard({
         </div>
       )}
 
-      {/* Image Modal - Portal-style rendering */}
+      {/* Image Modal - Same system as Store */}
       <AnimatePresence>
         {showImageModal && (() => {
           const dims = visual.dimensions || '1080x1080';
           const [w, h] = dims.split('x').map(n => parseInt(n));
-          
-          if (!w || !h) return null;
-          
-          const aspectRatio = w / h;
-          const maxWidth = window.innerWidth * 0.9;
-          const maxHeight = window.innerHeight * 0.9;
-          
-          let displayWidth, displayHeight;
-          if (aspectRatio > maxWidth / maxHeight) {
-            displayWidth = maxWidth;
-            displayHeight = maxWidth / aspectRatio;
-          } else {
-            displayHeight = maxHeight;
-            displayWidth = maxHeight * aspectRatio;
-          }
+          const aspectRatio = getAspectRatio(dims);
           
           return (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center"
+              className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
               style={{ zIndex: 99999 }}
               onClick={() => setShowImageModal(false)}
             >
@@ -739,47 +725,25 @@ export default function VisualCard({
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.95 }}
-                className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+                className="max-w-[90vw] max-h-[90vh]"
+                style={{ aspectRatio }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div 
-                  className="relative"
-                  style={{ 
-                    width: `${displayWidth}px`,
-                    height: `${displayHeight}px`,
-                    aspectRatio: `${w} / ${h}`
-                  }}
-                >
-                  {isVideo ? (
-                    <video 
-                      src={visual.video_url || visual.image_url}
-                      controls
-                      autoPlay
-                      loop
-                      className="rounded-lg shadow-2xl"
-                      style={{ 
-                        display: 'block',
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        aspectRatio: `${w} / ${h}`
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src={visual.image_url}
-                      alt="Preview"
-                      className="rounded-lg shadow-2xl"
-                      style={{ 
-                        display: 'block',
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
-                        aspectRatio: `${w} / ${h}`
-                      }}
-                    />
-                  )}
-                </div>
+                {isVideo ? (
+                  <video 
+                    src={visual.video_url || visual.image_url}
+                    controls
+                    autoPlay
+                    loop
+                    className="w-full h-full object-contain rounded-lg shadow-2xl"
+                  />
+                ) : (
+                  <img
+                    src={visual.image_url}
+                    alt="Preview"
+                    className="w-full h-full object-contain rounded-lg shadow-2xl"
+                  />
+                )}
               </motion.div>
             </motion.div>
           );
