@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X, Info } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X, Info, Expand } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
@@ -54,6 +54,7 @@ export default function VisualCard({
   const [showColorModal, setShowColorModal] = useState(false);
   const [showPromptModal, setShowPromptModal] = useState(false);
   const [copiedColor, setCopiedColor] = useState(null);
+  const [showImageModal, setShowImageModal] = useState(false);
   
   // Detect if this is a video
   const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
@@ -216,6 +217,16 @@ export default function VisualCard({
               </div>
             </button>
           )}
+        </div>
+
+        {/* Bottom Right - Expand Button */}
+        <div className="absolute bottom-3 right-3">
+          <button
+            onClick={() => setShowImageModal(true)}
+            className="p-2.5 rounded-xl bg-gradient-to-br from-gray-600/90 to-gray-700/90 backdrop-blur-sm hover:from-gray-500 hover:to-gray-600 transition-all shadow-lg shadow-gray-500/30 border border-gray-400/30"
+          >
+            <Expand className="h-5 w-5 text-white" />
+          </button>
         </div>
 
         {/* Version Badge */}
@@ -680,6 +691,46 @@ export default function VisualCard({
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <button
+            onClick={() => setShowImageModal(false)}
+            className="absolute top-4 right-4 z-[110] p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 transition-all"
+          >
+            <X className="h-5 w-5 text-red-400" />
+          </button>
+          <div 
+            className="relative"
+            style={{ 
+              maxWidth: '90vw', 
+              maxHeight: '90vh',
+              aspectRatio: getAspectRatio(visual.dimensions)
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {isVideo ? (
+              <video 
+                src={visual.video_url || visual.image_url}
+                controls
+                autoPlay
+                loop
+                className="w-full h-full object-contain rounded-lg shadow-2xl"
+              />
+            ) : (
+              <img
+                src={visual.image_url}
+                alt="Preview"
+                className="w-full h-full object-contain rounded-lg shadow-2xl"
+              />
+            )}
           </div>
         </div>
       )}
