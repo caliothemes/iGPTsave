@@ -615,45 +615,59 @@ export default function StoryStudio() {
                 <X className="h-5 w-5 text-white" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="grid grid-cols-3 gap-4">
-                {myVisuals.slice(0, visualsDisplayCount).map(visual => {
-                  const dims = visual.dimensions || '1080x1080';
-                  const [w, h] = dims.split('x').map(n => parseInt(n));
-                  const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
-                  
-                  return (
-                    <button
-                      key={visual.id}
-                      onClick={() => handleSelectFromVisuals(visual)}
-                      className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
-                    >
-                      <div style={{ aspectRatio }}>
-                        <img
-                          src={visual.image_url}
-                          alt={visual.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                        <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-              
-              {/* Voir plus button */}
-              {visualsDisplayCount < myVisuals.length && (
-                <div className="mt-6 flex justify-center">
-                  <Button
-                    onClick={() => setVisualsDisplayCount(prev => prev + 21)}
-                    variant="outline"
-                    className="bg-white/5 border-white/20 text-white hover:bg-white/10"
-                  >
-                    {language === 'fr' ? `Voir plus (${myVisuals.length - visualsDisplayCount} restants)` : `Load more (${myVisuals.length - visualsDisplayCount} remaining)`}
-                  </Button>
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {myVisuals.length === 0 ? (
+                <div className="text-center py-12">
+                  <ImageIcon className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                  <p className="text-white/40">
+                    {language === 'fr' ? 'Aucun visuel vertical (9:16)' : 'No vertical visuals (9:16)'}
+                  </p>
                 </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-3 gap-4">
+                    {myVisuals.slice(0, visualsDisplayCount).map(visual => {
+                      const dims = visual.dimensions || '1080x1080';
+                      const [w, h] = dims.split('x').map(n => parseInt(n));
+                      const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
+                      
+                      return (
+                        <button
+                          key={visual.id}
+                          onClick={() => handleSelectFromVisuals(visual)}
+                          className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                        >
+                          <div style={{ aspectRatio }}>
+                            <img
+                              src={visual.image_url}
+                              alt={visual.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                            <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Voir plus button */}
+                  {visualsDisplayCount < myVisuals.length && (
+                    <div className="flex justify-center pb-4">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setVisualsDisplayCount(prev => prev + 21);
+                        }}
+                        className="bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-violet-500/50"
+                      >
+                        <ChevronRight className="h-4 w-4 mr-2" />
+                        {language === 'fr' ? `Voir plus (${myVisuals.length - visualsDisplayCount} restants)` : `Load more (${myVisuals.length - visualsDisplayCount} remaining)`}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
