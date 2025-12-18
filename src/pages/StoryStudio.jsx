@@ -50,7 +50,11 @@ export default function StoryStudio() {
   const [conversations, setConversations] = useState([]);
   const [userVisuals, setUserVisuals] = useState([]);
   const [visualsDisplayCount, setVisualsDisplayCount] = useState(21);
+  const [myStories, setMyStories] = useState([]);
+  const [showStoriesModal, setShowStoriesModal] = useState(false);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef(null);
+  const previewIntervalRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -58,11 +62,12 @@ export default function StoryStudio() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
 
-        const [visuals, anims, userCreds, convs] = await Promise.all([
+        const [visuals, anims, userCreds, convs, stories] = await Promise.all([
           base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 100),
           base44.entities.StoryAnimation.filter({ is_active: true }, 'order'),
           base44.entities.UserCredits.filter({ user_email: currentUser.email }),
-          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20)
+          base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20),
+          base44.entities.Story.filter({ user_email: currentUser.email }, '-created_date', 50)
         ]);
 
         // Filter for story format (9:16 or vertical)
@@ -77,6 +82,7 @@ export default function StoryStudio() {
         setUserVisuals(visuals);
         setAnimations(anims);
         setConversations(convs);
+        setMyStories(stories);
         if (userCreds.length > 0) setCredits(userCreds[0]);
       } catch (e) {
         console.error(e);
@@ -147,6 +153,41 @@ export default function StoryStudio() {
   const handleAddText = (textData) => {
     setTextLayers(prev => [...prev, { ...textData, id: Date.now() }]);
     setShowTextModal(false);
+  };
+
+  const handleSaveStory = async () => {
+    if (selectedImages.length === 0) {
+      toast.error(language === 'fr' ? 'Ajoutez au moins une image' : 'Add at least one image');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const totalDuration = selectedImages.reduce((acc, img) => acc + (img.duration || 3), 0);
+      
+      const story = await base44.entities.Story.create({
+        user_email: user.email,
+        title: `Story ${new Date().toLocaleDateString('fr-FR')}`,
+        images: selectedImages,
+        text_layers: textLayers,
+        thumbnail_url: selectedImages[0].image_url,
+        duration: totalDuration
+      });
+
+      setMyStories(prev => [story, ...prev]);
+      toast.success(language === 'fr' ? '✅ Story sauvegardée !' : '✅ Story saved!');
+    } catch (e) {
+      console.error(e);
+      toast.error(language === 'fr' ? 'Erreur lors de la sauvegarde' : 'Save error');
+    }
+    setSaving(false);
+  };
+
+  const handleLoadStory = (story) => {
+    setSelectedImages(story.images || []);
+    setTextLayers(story.text_layers || []);
+    setShowStoriesModal(false);
+    toast.success(language === 'fr' ? 'Story chargée !' : 'Story loaded!');
   };
 
   const handleExport = async () => {
@@ -233,6 +274,14 @@ export default function StoryStudio() {
                 Auto Cut
               </Button>
               <Button
+                onClick={handleSaveStory}
+                disabled={selectedImages.length === 0 || saving}
+                className="bg-gradient-to-r from-amber-600 to-orange-600"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? (language === 'fr' ? 'Sauvegarde...' : 'Saving...') : (language === 'fr' ? 'Sauvegarder' : 'Save')}
+              </Button>
+              <Button
                 onClick={handleExport}
                 disabled={selectedImages.length === 0 || exporting}
                 className="bg-gradient-to-r from-green-600 to-emerald-600"
@@ -276,6 +325,14 @@ export default function StoryStudio() {
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
                   Mes visuels
+                </Button>
+                <Button
+                  onClick={() => setShowStoriesModal(true)}
+                  variant="outline"
+                  className="w-full bg-gradient-to-r from-violet-600/20 to-pink-600/20 border-violet-500/30 text-white"
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Mes Stories ({myStories.length})
                 </Button>
               </div>
 
@@ -398,20 +455,34 @@ export default function StoryStudio() {
                     {!previewPlaying && (
                       <button
                         onClick={() => {
+                          if (previewIntervalRef.current) {
+                            clearInterval(previewIntervalRef.current);
+                          }
+                          
                           setPreviewPlaying(true);
                           setPreviewIndex(0);
-                          // Auto-play sequence
+                          
                           let currentIdx = 0;
-                          const interval = setInterval(() => {
+                          
+                          const playNext = () => {
                             currentIdx++;
                             if (currentIdx >= selectedImages.length) {
-                              clearInterval(interval);
                               setPreviewPlaying(false);
                               setPreviewIndex(0);
+                              if (previewIntervalRef.current) {
+                                clearInterval(previewIntervalRef.current);
+                                previewIntervalRef.current = null;
+                              }
                             } else {
                               setPreviewIndex(currentIdx);
+                              if (previewIntervalRef.current) {
+                                clearInterval(previewIntervalRef.current);
+                              }
+                              previewIntervalRef.current = setTimeout(playNext, (selectedImages[currentIdx]?.duration || 3) * 1000);
                             }
-                          }, selectedImages[currentIdx]?.duration * 1000 || 3000);
+                          };
+                          
+                          previewIntervalRef.current = setTimeout(playNext, (selectedImages[0]?.duration || 3) * 1000);
                         }}
                         className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors group"
                       >
@@ -419,6 +490,16 @@ export default function StoryStudio() {
                           <Play className="h-8 w-8 text-white ml-1" />
                         </div>
                       </button>
+                    )}
+                    
+                    {/* Transition Effect Overlay */}
+                    {previewPlaying && selectedImages[previewIndex]?.transition && (
+                      <div 
+                        className="absolute inset-0 pointer-events-none"
+                        style={{ 
+                          animation: `${selectedImages[previewIndex].transition.css_animation || 'fadeIn'} ${selectedImages[previewIndex].transition.duration || 1}s ease-in-out`
+                        }}
+                      />
                     )}
                     
                     {/* Progress indicator */}
@@ -603,6 +684,99 @@ export default function StoryStudio() {
           language={language}
         />
       )}
+
+      {/* Stories Modal */}
+      {showStoriesModal && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowStoriesModal(false)}
+        >
+          <div
+            className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <h2 className="text-xl font-bold text-white">
+                {language === 'fr' ? 'Mes Stories' : 'My Stories'}
+              </h2>
+              <button
+                onClick={() => setShowStoriesModal(false)}
+                className="p-2 hover:bg-white/10 rounded-lg"
+              >
+                <X className="h-5 w-5 text-white" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              {myStories.length === 0 ? (
+                <div className="text-center py-12">
+                  <Video className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                  <p className="text-white/40">
+                    {language === 'fr' ? 'Aucune story sauvegardée' : 'No saved stories'}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-4">
+                  {myStories.map(story => (
+                    <button
+                      key={story.id}
+                      onClick={() => handleLoadStory(story)}
+                      className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                    >
+                      <div style={{ aspectRatio: '9/16' }}>
+                        <img
+                          src={story.thumbnail_url}
+                          alt={story.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
+                        <p className="text-white text-sm font-medium">{story.title}</p>
+                        <p className="text-white/60 text-xs">
+                          {story.images?.length || 0} {language === 'fr' ? 'images' : 'images'} • {story.duration}s
+                        </p>
+                      </div>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                        <Play className="h-12 w-12 text-white opacity-0 group-hover:opacity-100 transition-all" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
+        }
+        @keyframes slideInUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        @keyframes slideInDown {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(0); }
+        }
+        @keyframes zoomIn {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes rotateIn {
+          from { transform: rotate(-180deg) scale(0); opacity: 0; }
+          to { transform: rotate(0) scale(1); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
