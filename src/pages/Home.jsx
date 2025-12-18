@@ -1264,34 +1264,6 @@ export default function Home() {
                     </Link>
                     <Link 
                       to={createPageUrl('Pricing')}
-                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-blue-900/40 to-white/[0.03] hover:from-blue-900/50 hover:to-white/[0.08] border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
-                    >
-                      <div className="p-2 rounded-lg bg-white/5">
-                        <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white text-sm font-bold">
-                            {language === 'fr' ? 'Mes visuels' : 'My visuals'}
-                          </span>
-                          {totalVisualsCount > 0 && (
-                            <span className="px-2 py-0.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold">
-                              {totalVisualsCount}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-white/80 text-xs">
-                          {language === 'fr' ? 'Tous vos visuels créés' : 'All your created visuals'}
-                        </div>
-                      </div>
-                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                    <Link 
-                      to={createPageUrl('Pricing')}
                       className="mb-2 px-4 py-3 flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-lg transition-all"
                     >
                       <div className="p-2 rounded-lg bg-white/5">
@@ -1326,6 +1298,34 @@ export default function Home() {
                         </div>
                         <div className="text-white/80 text-xs">
                           {language === 'fr' ? 'Aide et questions fréquentes' : 'Help and frequently asked questions'}
+                        </div>
+                      </div>
+                      <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                    <Link 
+                      to={createPageUrl('MyVisuals')}
+                      className="mb-2 px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-blue-900/40 to-white/[0.03] hover:from-blue-900/50 hover:to-white/[0.08] border border-white/10 hover:border-blue-500/20 rounded-lg transition-all"
+                    >
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm font-bold">
+                            {language === 'fr' ? 'Mes visuels' : 'My visuals'}
+                          </span>
+                          {totalVisualsCount > 0 && (
+                            <span className="px-2 py-0.5 bg-white/20 border border-white/30 rounded-full text-white text-xs font-semibold">
+                              {totalVisualsCount}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-white/80 text-xs">
+                          {language === 'fr' ? 'Tous vos visuels créés' : 'All your created visuals'}
                         </div>
                       </div>
                       <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
