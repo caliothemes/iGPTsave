@@ -942,7 +942,7 @@ export default function Store() {
                       {/* Product Info */}
                       <div className="p-4 space-y-3">
                         {/* Title */}
-                        <h3 className="text-white font-bold text-sm line-clamp-2 min-h-[2.5rem]">
+                        <h3 className="text-white font-bold text-sm min-h-[2.5rem]">
                           {item.title}
                         </h3>
                         
