@@ -248,6 +248,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const mockupInputRef = useRef(null);
   const [tool, setTool] = useState('select');
   const [showMockupTooltip, setShowMockupTooltip] = useState(false);
+  const [editingTextInline, setEditingTextInline] = useState(null);
+  const [inlineTextValue, setInlineTextValue] = useState('');
+  const inlineInputRef = useRef(null);
   
   // Detect if this is a mockup visual
   const isMockupVisual = visual.visual_type === 'mockup' || 
@@ -1786,6 +1789,61 @@ Réponds en JSON avec:
     return null;
   };
 
+  const handleCanvasDoubleClick = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvasSize.width / rect.width);
+    const y = (e.clientY - rect.top) * (canvasSize.height / rect.height);
+    
+    // Check if we double-clicked on a text layer
+    for (let i = layers.length - 1; i >= 0; i--) {
+      const layer = layers[i];
+      if (layer.type === 'text') {
+        const ctx = canvasRef.current.getContext('2d');
+        ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
+        
+        const wrapText = (text, maxWidth) => {
+          if (!maxWidth || maxWidth <= 0) return [text];
+          const words = text.split(' ');
+          const lines = [];
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine ? `${currentLine} ${word}` : word;
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) lines.push(currentLine);
+          return lines;
+        };
+        
+        const lines = wrapText(layer.text, layer.maxWidth || 0);
+        let maxWidth = 0;
+        lines.forEach(line => {
+          const metrics = ctx.measureText(line);
+          maxWidth = Math.max(maxWidth, metrics.width);
+        });
+        const effectiveWidth = layer.maxWidth || maxWidth;
+        const lineHeight = layer.fontSize * 1.2;
+        const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
+        const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
+        
+        const hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y - layer.fontSize + textHeight;
+        
+        if (hit) {
+          setEditingTextInline(i);
+          setInlineTextValue(layer.text);
+          setTimeout(() => inlineInputRef.current?.focus(), 100);
+          return;
+        }
+      }
+    }
+  };
+
   const handleCanvasMouseDown = async (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (canvasSize.width / rect.width);
@@ -3182,8 +3240,8 @@ Réponds en JSON avec:
 
               {/* Canvas - Responsive with Vertical Toolbars */}
               <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
-        {/* Left Toolbar - Main Tools */}
-        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10 items-start">
+        {/* Left Toolbar - Main Tools - Sticky */}
+        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10 items-start sticky top-4 self-start max-h-[calc(100vh-200px)] overflow-y-auto">
           <button
             onClick={() => setActiveTab('background')}
             className={cn(
@@ -3366,7 +3424,8 @@ Réponds en JSON avec:
                 onMouseDown={handleCanvasMouseDown} 
                 onMouseMove={handleCanvasMouseMove} 
                 onMouseUp={handleCanvasMouseUp} 
-                onMouseLeave={handleCanvasMouseUp} 
+                onMouseLeave={handleCanvasMouseUp}
+                onDoubleClick={handleCanvasDoubleClick}
                 onTouchStart={(e) => {
                   const touch = e.touches[0];
                   handleCanvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
@@ -3378,8 +3437,52 @@ Réponds en JSON avec:
                 onTouchEnd={handleCanvasMouseUp}
               />
               
+              {/* Inline text editor */}
+              {editingTextInline !== null && (
+                <div
+                  className="absolute z-50 animate-in fade-in zoom-in-95"
+                  style={{
+                    top: `${layers[editingTextInline].y - layers[editingTextInline].fontSize * 0.85 - 5}px`,
+                    left: `${layers[editingTextInline].x - (layers[editingTextInline].align === 'center' ? (layers[editingTextInline].maxWidth || 100)/2 : layers[editingTextInline].align === 'right' ? (layers[editingTextInline].maxWidth || 100) : 0) - 5}px`,
+                    width: `${(layers[editingTextInline].maxWidth || 200) + 10}px`
+                  }}
+                >
+                  <div className="bg-gray-900/95 backdrop-blur-sm border-2 border-violet-500 rounded-lg shadow-2xl p-2">
+                    <Textarea
+                      ref={inlineInputRef}
+                      value={inlineTextValue}
+                      onChange={(e) => setInlineTextValue(e.target.value)}
+                      onBlur={() => {
+                        updateLayer(editingTextInline, { text: inlineTextValue });
+                        setEditingTextInline(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          updateLayer(editingTextInline, { text: inlineTextValue });
+                          setEditingTextInline(null);
+                        }
+                        if (e.key === 'Escape') {
+                          setEditingTextInline(null);
+                        }
+                      }}
+                      className="bg-white/10 border-none text-white resize-none"
+                      style={{
+                        fontFamily: layers[editingTextInline].fontFamily,
+                        fontSize: `${layers[editingTextInline].fontSize}px`,
+                        color: layers[editingTextInline].color,
+                        textAlign: layers[editingTextInline].align
+                      }}
+                    />
+                    <p className="text-white/40 text-[10px] mt-1">
+                      {language === 'fr' ? 'Entrée pour valider, Échap pour annuler' : 'Enter to confirm, Esc to cancel'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Mini toolbar for text layers */}
-              {selectedLayer !== null && currentLayer?.type === 'text' && (
+              {selectedLayer !== null && currentLayer?.type === 'text' && editingTextInline === null && (
                 <div 
                   className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
                   style={{
@@ -3556,8 +3659,8 @@ Réponds en JSON avec:
           )}
         </div>
         
-        {/* Right Toolbar - Drawing Tools */}
-        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10">
+        {/* Right Toolbar - Drawing Tools - Sticky */}
+        <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10 sticky top-4 self-start max-h-[calc(100vh-200px)] overflow-y-auto">
           <button
             onClick={async () => {
               setRemovingBg(true);
