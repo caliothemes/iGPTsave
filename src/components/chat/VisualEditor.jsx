@@ -3444,7 +3444,7 @@ Réponds en JSON avec:
                   style={{
                     top: `${layers[editingTextInline].y - layers[editingTextInline].fontSize * 0.85 - 5}px`,
                     left: `${layers[editingTextInline].x - (layers[editingTextInline].align === 'center' ? (layers[editingTextInline].maxWidth || 100)/2 : layers[editingTextInline].align === 'right' ? (layers[editingTextInline].maxWidth || 100) : 0) - 5}px`,
-                    width: `${(layers[editingTextInline].maxWidth || 200) + 10}px`
+                    width: `${Math.max(300, (layers[editingTextInline].maxWidth || 200) + 10)}px`
                   }}
                 >
                   <div className="bg-gray-900/95 backdrop-blur-sm border-2 border-violet-500 rounded-lg shadow-2xl p-2">
