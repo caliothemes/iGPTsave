@@ -101,6 +101,8 @@ export default function Home() {
   const [assistantOpen, setAssistantOpen] = useState(true);
   const [showExamplesModal, setShowExamplesModal] = useState(false);
   const [tagsExpanded, setTagsExpanded] = useState(false);
+  const [promptMode, setPromptMode] = useState(null); // 'modify' or 'new'
+  const [showModeSelector, setShowModeSelector] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -259,25 +261,6 @@ export default function Home() {
     }
   };
 
-  // Détection intelligente : modification ou nouveau prompt
-  const isModificationRequest = (message) => {
-    const modificationKeywords = [
-      // Français
-      'change', 'modifie', 'enlève', 'enleve', 'retire', 'supprime', 'ajoute', 
-      'remplace', 'je veux', 'plutôt', 'plutot', 'au lieu', 'sans', 'avec plus',
-      'plus grand', 'plus petit', 'en blond', 'en rouge', 'en bleu', 'en vert',
-      'moins de', 'davantage', 'réduis', 'reduis', 'agrandis', 'modif',
-      'transforme', 'convertis', 'celui', 'celle', 'juste', 'seulement',
-      // Anglais
-      'modify', 'change', 'remove', 'delete', 'add', 'replace', 'i want',
-      'instead', 'without', 'with more', 'bigger', 'smaller', 'make it',
-      'turn it', 'convert', 'transform', 'just', 'only', 'that one'
-    ];
-    
-    const messageLower = message.toLowerCase();
-    return modificationKeywords.some(kw => messageLower.includes(kw));
-  };
-
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
@@ -310,8 +293,8 @@ export default function Home() {
     
     const userMessage = inputValue.trim();
     
-    // Détection : est-ce une demande de modification de l'image actuelle ?
-    const isModification = currentVisual && isModificationRequest(userMessage);
+    // Utiliser le mode choisi par l'utilisateur
+    const isModification = promptMode === 'modify' && currentVisual;
     let finalPrompt = userMessage;
     let displayMessage = userMessage;
     
@@ -321,6 +304,9 @@ export default function Home() {
       displayMessage = `✏️ ${userMessage}`;
     }
     
+    // Reset mode après envoi
+    setPromptMode(null);
+    
     setInputValue('');
     // Reset textarea height
     if (inputRef.current) {
@@ -329,7 +315,11 @@ export default function Home() {
     }
     setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
     setIsGenerating(true);
-    // NE PAS reset currentVisual à null - on garde le contexte pour les modifications en chaîne
+    
+    // Reset currentVisual seulement si c'est un nouveau prompt
+    if (promptMode === 'new') {
+      setCurrentVisual(null);
+    }
 
     const generatingMessage = isModification 
       ? (language === 'fr' ? '✨ Modification en cours...' : '✨ Modifying...')
@@ -1404,6 +1394,12 @@ export default function Home() {
                     e.target.style.height = 'auto';
                     e.target.style.height = e.target.scrollHeight + 'px';
                   }}
+                  onFocus={() => {
+                    // Si une image est présente et qu'aucun mode n'est sélectionné, demander
+                    if (currentVisual && !promptMode && !isGenerating) {
+                      setShowModeSelector(true);
+                    }
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -1611,6 +1607,68 @@ export default function Home() {
         favorites={favoriteVisuals}
         onSelectVisual={(visual) => setCurrentVisual(visual)}
       />
+
+      {/* Mode Selector Modal */}
+      <AnimatePresence>
+        {showModeSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowModeSelector(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-gray-900/95 backdrop-blur-xl border border-violet-500/30 rounded-2xl p-6 max-w-md mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold text-white mb-3">
+                {language === 'fr' ? '🎨 Que souhaitez-vous faire ?' : '🎨 What would you like to do?'}
+              </h3>
+              <p className="text-white/60 text-sm mb-6">
+                {language === 'fr' 
+                  ? 'Voulez-vous modifier l\'image actuelle ou créer un nouveau visuel ?'
+                  : 'Do you want to modify the current image or create a new visual?'}
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setPromptMode('modify');
+                    setShowModeSelector(false);
+                    inputRef.current?.focus();
+                  }}
+                  className="w-full px-4 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition-colors flex items-center gap-3"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>
+                    {language === 'fr' ? 'Modifier l\'image actuelle' : 'Modify current image'}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    setPromptMode('new');
+                    setShowModeSelector(false);
+                    inputRef.current?.focus();
+                  }}
+                  className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors flex items-center gap-3"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>
+                    {language === 'fr' ? 'Créer un nouveau visuel' : 'Create new visual'}
+                  </span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Examples Modal */}
       <Dialog open={showExamplesModal} onOpenChange={setShowExamplesModal}>
