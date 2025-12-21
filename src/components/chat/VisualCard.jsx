@@ -329,14 +329,14 @@ export default function VisualCard({
           )}
           
           {/* Original Prompt - Clickable */}
-          {(visual.image_prompt || visual.original_prompt) && (
+          {visual.original_prompt && (
             <button
               onClick={() => setShowPromptModal(true)}
               className="w-full text-left p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all group"
               title={language === 'fr' ? 'Cliquer pour voir le prompt complet' : 'Click to see full prompt'}
             >
               <p className="text-white/60 text-xs line-clamp-4 group-hover:text-white/80 transition-colors">
-                {visual.image_prompt || visual.original_prompt}
+                {visual.original_prompt}
               </p>
             </button>
           )}
@@ -549,13 +549,13 @@ export default function VisualCard({
           <div className="space-y-3">
             <div className="bg-white/5 border border-white/10 rounded-lg p-4 max-h-96 overflow-y-auto">
               <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
-                {visual.image_prompt || visual.original_prompt}
+                {visual.original_prompt}
               </p>
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={() => {
-                  navigator.clipboard.writeText(visual.image_prompt || visual.original_prompt);
+                  navigator.clipboard.writeText(visual.original_prompt);
                   toast.success(language === 'fr' ? 'Prompt copié' : 'Prompt copied');
                 }}
                 className="flex-1 bg-violet-600 hover:bg-violet-700"
@@ -568,7 +568,7 @@ export default function VisualCard({
               {onPromptClick && (
                 <Button
                   onClick={() => {
-                    onPromptClick(visual.image_prompt || visual.original_prompt);
+                    onPromptClick(visual.original_prompt);
                     setShowPromptModal(false);
                   }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
