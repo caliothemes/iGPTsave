@@ -449,7 +449,9 @@ export default function Home() {
           image_url: result.url,
           original_image_url: result.url,
           title: userMessage.slice(0, 50),
-          original_prompt: userMessage,
+          original_prompt: isModification 
+            ? `${currentVisual.original_prompt} • MODIFICATION: ${userMessage}`
+            : userMessage,
           image_prompt: isModification ? finalPrompt : enhancedPrompt,
           dimensions: dimensions,
           visual_type: activeCategory?.id,
