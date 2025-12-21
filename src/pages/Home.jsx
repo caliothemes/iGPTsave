@@ -1082,8 +1082,8 @@ export default function Home() {
                       </p>
                       <p className="text-orange-300/90 text-xs leading-relaxed">
                         {language === 'fr' 
-                          ? 'Vous n\'avez pas sélectionné de catégorie dans les tags sous ce prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez une catégorie adaptée à votre besoin (Logo, Print, Social, etc.).'
-                          : 'You haven\'t selected a category in the tags below this prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable category (Logo, Print, Social, etc.).'
+                          ? 'Vous n\'avez pas sélectionné de catégorie dans le menu "Que souhaitez-vous créer ?" du prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez une catégorie adaptée à votre besoin (Logo, Print, Social, etc.).'
+                          : 'You haven\'t selected a category in the "What do you want to create?" menu in the prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable category (Logo, Print, Social, etc.).'
                         }
                       </p>
                     </div>
