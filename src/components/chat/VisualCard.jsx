@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X, Info, Expand, Scissors } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Feather, Sparkles, Video, X, Info, Expand, Scissors } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
@@ -410,7 +410,7 @@ export default function VisualCard({
                     onClick={() => onEdit(visual)}
                     className="flex-1 bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600"
                   >
-                    <Pencil className="h-4 w-4 mr-1" />
+                    <Feather className="h-4 w-4 mr-1" />
                     <span className="text-xs">{language === 'fr' ? 'Éditer' : 'Edit'}</span>
                   </Button>
                   <Button
@@ -462,7 +462,7 @@ export default function VisualCard({
                       onClick={() => onEdit(visual)}
                       className="w-full bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600 mb-2"
                     >
-                      <Pencil className="h-4 w-4 mr-2" />
+                      <Feather className="h-4 w-4 mr-2" />
                       {language === 'fr' ? 'Personnaliser' : 'Customize'}
                     </Button>
                   )}
