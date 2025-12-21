@@ -468,8 +468,8 @@ export default function Home() {
 
         const successMessage = isModification
           ? (language === 'fr' 
-              ? '✨ Modification appliquée !\n\nCependant, je suis obligé de créer une nouvelle image car je ne peux pas modifier directement l\'image précédente. J\'ai enrichi votre prompt original avec votre demande de modification pour générer cette nouvelle version.' 
-              : '✨ Modification applied!\n\nHowever, I had to create a new image as I cannot directly modify the previous one. I enriched your original prompt with your modification request to generate this new version.')
+              ? '✨ Modification appliquée ! Cependant, je suis obligé de créer une nouvelle image car je ne peux pas modifier directement l\'image précédente. J\'ai enrichi votre prompt original avec votre demande de modification pour générer cette nouvelle version.' 
+              : '✨ Modification applied! However, I had to create a new image as I cannot directly modify the previous one. I enriched your original prompt with your modification request to generate this new version.')
           : `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`;
 
         // Add both text message AND visual card

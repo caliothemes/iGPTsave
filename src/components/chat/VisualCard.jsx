@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X, Info, Expand } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Pencil, Sparkles, Video, X, Info, Expand, Scissors } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
@@ -200,20 +200,18 @@ export default function VisualCard({
             </button>
           )}
 
-          {/* ADS Button - temporarily hidden */}
-          {false && !isVideo && onValidate && (
+          {/* Crop Button - only for images */}
+          {!isVideo && (
             <button
-              onClick={() => onValidate?.('ads')}
-              className="group/adsbtn relative p-2.5 rounded-xl bg-gradient-to-br from-orange-600/90 to-pink-600/90 backdrop-blur-sm hover:from-orange-500 hover:to-pink-500 transition-all shadow-lg shadow-orange-500/30 border border-orange-400/30"
+              onClick={() => setShowCropModal(true)}
+              className="group/cropbtn relative p-2.5 rounded-xl bg-gradient-to-br from-blue-600/90 to-cyan-600/90 backdrop-blur-sm hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-500/30 border border-blue-400/30"
             >
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-              </svg>
+              <Scissors className="h-5 w-5 text-white" />
               {/* Tooltip on hover */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/adsbtn:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900/95 backdrop-blur-sm border border-orange-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
-                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Créer une publicité' : 'Create ad'}</p>
-                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Textes automatiques par IA' : 'Automatic AI texts'}</p>
+              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/cropbtn:opacity-100 transition-opacity pointer-events-none">
+                <div className="bg-gray-900/95 backdrop-blur-sm border border-blue-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
+                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Découpe' : 'Crop'}</p>
+                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Recadrer l\'image' : 'Crop the image'}</p>
                 </div>
               </div>
             </button>
@@ -298,53 +296,6 @@ export default function VisualCard({
         )}
 
       </div>
-
-      {/* Crop Button - For all categories */}
-      {!compact && (
-        <div className="px-3 pt-3">
-          <button
-            onClick={() => setShowCropModal(true)}
-            className="w-full px-4 py-2.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 relative overflow-hidden group"
-          >
-            {/* Animated shine effect */}
-            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" 
-                 style={{ animation: 'shine 3s ease-in-out infinite' }} />
-            <svg className="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
-            </svg>
-            {language === 'fr' ? 'Effectuer une découpe' : 'Crop image'}
-          </button>
-          <style>{`
-            @keyframes shine {
-              0% { transform: translateX(-100%); }
-              50% { transform: translateX(-100%); }
-              100% { transform: translateX(200%); }
-            }
-          `}</style>
-        </div>
-      )}
-      {compact && onCropOpen && (
-        <div className="px-3 pt-3">
-          <button
-            onClick={() => onCropOpen(visual)}
-            className="w-full px-4 py-2.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" 
-                 style={{ animation: 'shine 3s ease-in-out infinite' }} />
-            <svg className="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
-            </svg>
-            {language === 'fr' ? 'Effectuer une découpe' : 'Crop image'}
-          </button>
-          <style>{`
-            @keyframes shine {
-              0% { transform: translateX(-100%); }
-              50% { transform: translateX(-100%); }
-              100% { transform: translateX(200%); }
-            }
-          `}</style>
-        </div>
-      )}
 
       {/* Color Palette Bar - Just under image */}
       {visual.color_palette && visual.color_palette.length > 0 && (
