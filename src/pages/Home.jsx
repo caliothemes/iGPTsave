@@ -259,6 +259,25 @@ export default function Home() {
     }
   };
 
+  // Détection intelligente : modification ou nouveau prompt
+  const isModificationRequest = (message) => {
+    const modificationKeywords = [
+      // Français
+      'change', 'modifie', 'enlève', 'enleve', 'retire', 'supprime', 'ajoute', 
+      'remplace', 'je veux', 'plutôt', 'plutot', 'au lieu', 'sans', 'avec plus',
+      'plus grand', 'plus petit', 'en blond', 'en rouge', 'en bleu', 'en vert',
+      'moins de', 'davantage', 'réduis', 'reduis', 'agrandis', 'modif',
+      'transforme', 'convertis', 'celui', 'celle', 'juste', 'seulement',
+      // Anglais
+      'modify', 'change', 'remove', 'delete', 'add', 'replace', 'i want',
+      'instead', 'without', 'with more', 'bigger', 'smaller', 'make it',
+      'turn it', 'convert', 'transform', 'just', 'only', 'that one'
+    ];
+    
+    const messageLower = message.toLowerCase();
+    return modificationKeywords.some(kw => messageLower.includes(kw));
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
@@ -290,17 +309,32 @@ export default function Home() {
     }
     
     const userMessage = inputValue.trim();
+    
+    // Détection : est-ce une demande de modification de l'image actuelle ?
+    const isModification = currentVisual && isModificationRequest(userMessage);
+    let finalPrompt = userMessage;
+    let displayMessage = userMessage;
+    
+    if (isModification) {
+      // Enrichir le prompt avec l'instruction de modification
+      finalPrompt = `${currentVisual.image_prompt || currentVisual.original_prompt} MODIFICATION DEMANDÉE: ${userMessage}`;
+      displayMessage = `✏️ ${userMessage}`;
+    }
+    
     setInputValue('');
     // Reset textarea height
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
       inputRef.current.style.height = '24px';
     }
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
     setIsGenerating(true);
     setCurrentVisual(null);
 
-    setMessages(prev => [...prev, { role: 'assistant', content: t('generating'), isStreaming: true }]);
+    const generatingMessage = isModification 
+      ? (language === 'fr' ? '✨ Modification en cours...' : '✨ Modifying...')
+      : t('generating');
+    setMessages(prev => [...prev, { role: 'assistant', content: generatingMessage, isStreaming: true }]);
 
     // Create conversation if it doesn't exist
     let activeConversation = currentConversation;
@@ -388,11 +422,15 @@ export default function Home() {
 
         enhancedPrompt += ', professional quality, 4K resolution';
         console.log('📝 Prompt final enrichi:', enhancedPrompt);
-      }
+        }
 
-      const result = await base44.integrations.Core.GenerateImage({
-        prompt: enhancedPrompt
-      });
+        // Si c'est une modification, utiliser le prompt enrichi directement
+        const promptToUse = isModification ? finalPrompt : enhancedPrompt;
+        console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
+
+        const result = await base44.integrations.Core.GenerateImage({
+        prompt: promptToUse
+        });
 
       if (result.url) {
         // Extract color palette from generated image
@@ -422,7 +460,7 @@ export default function Home() {
           original_image_url: result.url,
           title: userMessage.slice(0, 50),
           original_prompt: userMessage,
-          image_prompt: enhancedPrompt,
+          image_prompt: isModification ? finalPrompt : enhancedPrompt,
           dimensions: dimensions,
           visual_type: activeCategory?.id,
           style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
@@ -438,8 +476,10 @@ export default function Home() {
         setCurrentVisual(savedVisual);
         setVisualsHistory(prev => [...prev, savedVisual]); // Add to history
 
-        const successMessage = `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`;
-        
+        const successMessage = isModification
+          ? `✨ ${language === 'fr' ? 'Modification appliquée !' : 'Modification applied!'}`
+          : `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`;
+
         // Add both text message AND visual card
         setMessages(prev => [
           ...prev.slice(0, -1), // Remove "generating" message
