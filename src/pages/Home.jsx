@@ -329,7 +329,7 @@ export default function Home() {
     }
     setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
     setIsGenerating(true);
-    setCurrentVisual(null);
+    // NE PAS reset currentVisual à null - on garde le contexte pour les modifications en chaîne
 
     const generatingMessage = isModification 
       ? (language === 'fr' ? '✨ Modification en cours...' : '✨ Modifying...')
