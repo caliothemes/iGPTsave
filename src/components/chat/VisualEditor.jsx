@@ -15,7 +15,7 @@ import {
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
   PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors, Frame,
-  SlidersHorizontal
+  SlidersHorizontal, ChevronRight
 } from 'lucide-react';
 import {
   DropdownMenu,
