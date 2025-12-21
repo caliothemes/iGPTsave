@@ -193,6 +193,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [guides, setGuides] = useState({ showVertical: false, showHorizontal: false }); // Center guides
   const [textAccordion, setTextAccordion] = useState('properties'); // 'properties' or 'effects'
   const [textToolExpanded, setTextToolExpanded] = useState(false); // Expansion de l'outil texte
+  const [shapesToolExpanded, setShapesToolExpanded] = useState(false); // Expansion de l'outil formes
   
   // Store original image URL separately (never changes)
   const [originalImageUrl, setOriginalImageUrl] = useState(visual.original_image_url || visual.image_url);
@@ -3299,16 +3300,50 @@ Réponds en JSON avec:
               </>
             )}
           </div>
-          <button
-            onClick={() => setActiveTab('shapes')}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              activeTab === 'shapes' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShapesToolExpanded(!shapesToolExpanded)}
+              className={cn(
+                "p-2.5 rounded-lg transition-all",
+                shapesToolExpanded ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
+              )}
+              title={language === 'fr' ? 'Formes' : 'Shapes'}
+            >
+              <Square className="h-5 w-5" />
+            </button>
+            
+            {/* Sous-options formes - horizontales */}
+            {shapesToolExpanded && (
+              <div className="flex gap-2">
+                {SHAPES.slice(0, 3).map(shape => {
+                  const ShapeIcon = shape.icon;
+                  return (
+                    <button
+                      key={shape.id}
+                      onClick={() => {
+                        addShapeLayer(shape.id);
+                        setShapesToolExpanded(false);
+                      }}
+                      className="p-2.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 transition-all"
+                      title={shape.name}
+                    >
+                      <ShapeIcon className="h-5 w-5" />
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => {
+                    setActiveTab('shapes');
+                    setShapesToolExpanded(false);
+                  }}
+                  className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-all"
+                  title={language === 'fr' ? 'Toutes les formes' : 'All shapes'}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             )}
-            title={language === 'fr' ? 'Formes' : 'Shapes'}
-          >
-            <Square className="h-5 w-5" />
-          </button>
+          </div>
           <button
             onClick={() => setActiveTab('textures')}
             className={cn(
@@ -3482,14 +3517,50 @@ Réponds en JSON avec:
               )}
 
               {/* Mini toolbar for text layers */}
-              {selectedLayer !== null && currentLayer?.type === 'text' && editingTextInline === null && (
-                <div 
-                  className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
-                  style={{
-                    top: `${currentLayer.y - currentLayer.fontSize - 100}px`,
-                    left: `${currentLayer.x - (currentLayer.align === 'center' ? (currentLayer.maxWidth || 100)/2 : currentLayer.align === 'right' ? (currentLayer.maxWidth || 100) : 0) - 5}px`
-                  }}
-                >
+              {selectedLayer !== null && currentLayer?.type === 'text' && editingTextInline === null && (() => {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.font = `${currentLayer.fontSize}px ${currentLayer.fontFamily}`;
+                
+                const wrapText = (text, maxWidth) => {
+                  if (!maxWidth || maxWidth <= 0) return [text];
+                  const words = text.split(' ');
+                  const lines = [];
+                  let currentLine = '';
+                  
+                  for (const word of words) {
+                    const testLine = currentLine ? `${currentLine} ${word}` : word;
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine) {
+                      lines.push(currentLine);
+                      currentLine = word;
+                    } else {
+                      currentLine = testLine;
+                    }
+                  }
+                  if (currentLine) lines.push(currentLine);
+                  return lines;
+                };
+                
+                const lines = wrapText(currentLayer.text, currentLayer.maxWidth || 0);
+                let maxWidth = 0;
+                lines.forEach(line => {
+                  const metrics = ctx.measureText(line);
+                  maxWidth = Math.max(maxWidth, metrics.width);
+                });
+                const effectiveWidth = currentLayer.maxWidth || maxWidth;
+                const lineHeight = currentLayer.fontSize * 1.2;
+                const totalHeight = currentLayer.fontSize + (lines.length - 1) * lineHeight;
+                const textX = currentLayer.x - (currentLayer.align === 'center' ? effectiveWidth/2 : currentLayer.align === 'right' ? effectiveWidth : 0);
+                const boxY = currentLayer.y - currentLayer.fontSize * 0.85 - 5;
+                
+                return (
+                  <div 
+                    className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
+                    style={{
+                      top: `${boxY - 50}px`,
+                      left: `${textX - 5}px`
+                    }}
+                  >
                   <button
                     onClick={() => duplicateLayer(selectedLayer)}
                     className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors"
@@ -3518,7 +3589,8 @@ Réponds en JSON avec:
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-              )}
+                );
+              })()}
             </div>
             
             {mockupSelectionMode && (
