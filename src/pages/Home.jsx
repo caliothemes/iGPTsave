@@ -1482,21 +1482,33 @@ export default function Home() {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Tags Catégories - Couleur prompt */}
-                {CATEGORIES.filter(c => ['logo_picto', 'logo_complet', 'image', 'print', 'social', 'mockup', 'product', 'design_3d', 'free_prompt'].includes(c.id)).map(cat => (
-                  <button
-                    key={cat.id}
-                    onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border",
-                      selectedCategory?.id === cat.id
+                {/* Tag Catégories - Menu déroulant */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={cn(
+                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
+                      selectedCategory
                         ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
-                    )}
-                  >
-                    {cat?.name?.[language] || cat?.name?.fr || 'N/A'}
-                  </button>
-                ))}
+                    )}>
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      </svg>
+                      {selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : (language === 'fr' ? 'Que souhaitez-vous créer ?' : 'What do you want to create?')}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 max-h-96 overflow-y-auto">
+                    {CATEGORIES.filter(c => ['logo_picto', 'logo_complet', 'image', 'print', 'social', 'mockup', 'product', 'design_3d', 'free_prompt'].includes(c.id)).map(cat => (
+                      <DropdownMenuItem 
+                        key={cat.id}
+                        onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
+                        className="text-white"
+                      >
+                        {cat?.name?.[language] || cat?.name?.fr || 'N/A'}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
                 {/* Tag iGPT Store */}
                 <Link
