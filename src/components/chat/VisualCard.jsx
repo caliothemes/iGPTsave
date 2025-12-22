@@ -316,18 +316,6 @@ export default function VisualCard({
       {/* Info & Actions */}
       {showActions && (
         <div className="p-4 pt-2 space-y-3">
-          {/* Info Message for certain visual types */}
-          {!hideInfoMessage && ['print', 'social', 'image'].includes(visual.visual_type) && (
-            <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <Info className="h-4 w-4 text-blue-400 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-blue-200 leading-relaxed">
-                {language === 'fr' 
-                  ? 'Visuel créé sans texte (l\'IA n\'est pas performante sur les textes). Utilisez l\'Éditeur Magique pour ajouter vos textes et finaliser votre création.'
-                  : 'Visual created without text (AI is not efficient with text). Use the Magic Editor to add your texts and finalize your creation.'}
-              </p>
-            </div>
-          )}
-          
           {/* Original Prompt - Clickable */}
           {visual.original_prompt && (
             <button
