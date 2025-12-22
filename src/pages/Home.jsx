@@ -510,14 +510,18 @@ export default function Home() {
                 y: Math.min(layer.y || 50, height - 100),
                 fontSize: layer.fontSize || 48,
                 fontFamily: layer.fontFamily || 'Arial',
-                fontWeight: layer.fontWeight || 'bold',
+                fontWeight: layer.fontWeight || 700,
                 color: layer.color || '#ffffff',
                 backgroundColor: layer.backgroundColor || 'transparent',
                 padding: layer.padding || 20,
                 borderRadius: layer.borderRadius || 8,
-                opacity: 1,
+                opacity: 100,
                 visible: true,
-                textAlign: layer.textAlign || 'left'
+                align: layer.textAlign || 'left',
+                bold: true,
+                italic: false,
+                shadow: true,
+                stroke: false
               }));
               console.log('✅ Calques générés:', editorLayers);
 
