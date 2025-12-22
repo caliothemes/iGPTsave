@@ -328,76 +328,117 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
         
         // If we have saved layers, preload their images first
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
-          // First, always load the base image
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            setLoadedImages(prev => ({ ...prev, [baseUrl]: img }));
-            
-            // Calculate canvas size from dimensions
-            let targetWidth = img.width;
-            let targetHeight = img.height;
-            
-            if (visual.dimensions) {
-              const [metaW, metaH] = visual.dimensions.split('x').map(Number);
-              if (metaW && metaH) {
-                targetWidth = metaW;
-                targetHeight = metaH;
-              }
+          console.log('📦 Chargement avec layers sauvegardés:', visual.editor_layers);
+          
+          // Check if a base image layer already exists in saved layers
+          const hasBaseImageLayer = visual.editor_layers.some(l => l.isBaseImage);
+          
+          // Collect all images to preload (base + layers)
+          const imageUrls = [baseUrl, originalUrl];
+          visual.editor_layers.forEach(layer => {
+            if (layer.type === 'image' && layer.imageUrl && !imageUrls.includes(layer.imageUrl)) {
+              imageUrls.push(layer.imageUrl);
             }
-            
-            const isPortrait = targetHeight > targetWidth;
-            const maxWidth = isPortrait ? 280 : 450;
-            const maxHeight = isPortrait ? 450 : 350;
-            const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
-            const displayWidth = Math.round(targetWidth * ratio);
-            const displayHeight = Math.round(targetHeight * ratio);
-            
-            setCanvasSize({ width: displayWidth, height: displayHeight });
-            
-            // Check if a base image layer already exists
-            const hasBaseImageLayer = visual.editor_layers.some(l => l.isBaseImage);
-            
-            if (!hasBaseImageLayer) {
-              // Add base image layer at the beginning
-              const imgRatio = img.width / img.height;
-              const canvasRatio = displayWidth / displayHeight;
-              let drawWidth, drawHeight, drawX, drawY;
-              
-              if (imgRatio > canvasRatio) {
-                drawHeight = displayHeight;
-                drawWidth = displayHeight * imgRatio;
-                drawX = (displayWidth - drawWidth) / 2;
-                drawY = 0;
-              } else {
-                drawWidth = displayWidth;
-                drawHeight = displayWidth / imgRatio;
-                drawX = 0;
-                drawY = (displayHeight - drawHeight) / 2;
-              }
-              
-              const baseImageLayer = {
-                type: 'image',
-                imageUrl: baseUrl,
-                x: Math.round(drawX),
-                y: Math.round(drawY),
-                width: Math.round(drawWidth),
-                height: Math.round(drawHeight),
-                opacity: 100,
-                isBaseImage: true
-              };
-              
-              // Add base layer at the start, then saved layers
-              setLayers([baseImageLayer, ...visual.editor_layers]);
+            if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue && !imageUrls.includes(layer.bgValue)) {
+              imageUrls.push(layer.bgValue);
             }
-            
-            setImageLoaded(true);
-          };
-          img.onerror = () => {
-            console.error('Failed to load base image:', baseUrl);
-            setImageLoaded(true);
-          };
-          img.src = baseUrl;
+          });
+          
+          console.log('🖼️ Images à charger:', imageUrls);
+          
+          // Preload all images
+          let loadedCount = 0;
+          const imagesToLoad = new Map();
+          
+          imageUrls.forEach(url => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              imagesToLoad.set(url, img);
+              loadedCount++;
+              console.log(`✅ Image chargée ${loadedCount}/${imageUrls.length}:`, url);
+              
+              if (loadedCount === imageUrls.length) {
+                console.log('✅ Toutes les images chargées');
+                // Update loaded images state
+                const newLoadedImages = {};
+                imagesToLoad.forEach((img, url) => {
+                  newLoadedImages[url] = img;
+                });
+                setLoadedImages(newLoadedImages);
+                
+                // Calculate canvas size
+                let targetWidth = imagesToLoad.get(baseUrl).width;
+                let targetHeight = imagesToLoad.get(baseUrl).height;
+                
+                if (visual.dimensions) {
+                  const [metaW, metaH] = visual.dimensions.split('x').map(Number);
+                  if (metaW && metaH) {
+                    targetWidth = metaW;
+                    targetHeight = metaH;
+                  }
+                }
+                
+                const isPortrait = targetHeight > targetWidth;
+                const maxWidth = isPortrait ? 280 : 450;
+                const maxHeight = isPortrait ? 450 : 350;
+                const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
+                const displayWidth = Math.round(targetWidth * ratio);
+                const displayHeight = Math.round(targetHeight * ratio);
+                
+                setCanvasSize({ width: displayWidth, height: displayHeight });
+                
+                if (!hasBaseImageLayer) {
+                  // Add base image layer at the beginning
+                  const img = imagesToLoad.get(baseUrl);
+                  const imgRatio = img.width / img.height;
+                  const canvasRatio = displayWidth / displayHeight;
+                  let drawWidth, drawHeight, drawX, drawY;
+                  
+                  if (imgRatio > canvasRatio) {
+                    drawHeight = displayHeight;
+                    drawWidth = displayHeight * imgRatio;
+                    drawX = (displayWidth - drawWidth) / 2;
+                    drawY = 0;
+                  } else {
+                    drawWidth = displayWidth;
+                    drawHeight = displayWidth / imgRatio;
+                    drawX = 0;
+                    drawY = (displayHeight - drawHeight) / 2;
+                  }
+                  
+                  const baseImageLayer = {
+                    type: 'image',
+                    imageUrl: baseUrl,
+                    x: Math.round(drawX),
+                    y: Math.round(drawY),
+                    width: Math.round(drawWidth),
+                    height: Math.round(drawHeight),
+                    opacity: 100,
+                    isBaseImage: true
+                  };
+                  
+                  // Add base layer at the start, then saved layers
+                  console.log('📦 Layers finaux:', [baseImageLayer, ...visual.editor_layers]);
+                  setLayers([baseImageLayer, ...visual.editor_layers]);
+                } else {
+                  // Just use saved layers as-is
+                  console.log('📦 Utilisation des layers sauvegardés');
+                  setLayers(visual.editor_layers);
+                }
+                
+                setImageLoaded(true);
+              }
+            };
+            img.onerror = () => {
+              console.error('❌ Échec chargement image:', url);
+              loadedCount++;
+              if (loadedCount === imageUrls.length) {
+                setImageLoaded(true);
+              }
+            };
+            img.src = url;
+          });
           return;
         }
         
