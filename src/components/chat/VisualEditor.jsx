@@ -296,11 +296,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
         });
         setSharedLibrary(allSharedItems);
         
-        // Load saved layers from visual
+        // Restore background state if there's a background layer (but don't set layers yet - done in image loading effect)
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
-          setLayers(visual.editor_layers);
-          
-          // Restore background state if there's a background layer
           const bgLayer = visual.editor_layers.find(l => l.type === 'background');
           if (bgLayer) {
             setBgType(bgLayer.bgType);
