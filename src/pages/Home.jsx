@@ -517,7 +517,7 @@ export default function Home() {
             });
 
             if (layersResult.layers && layersResult.layers.length > 0) {
-              // Create editor layers - NO CANVAS COMPOSITION, just layers for editor
+              // Create editor layers with proper structure
               editorLayers = layersResult.layers.map((layer, idx) => ({
                 id: `layer-${Date.now()}-${idx}`,
                 type: 'text',
@@ -539,10 +539,113 @@ export default function Home() {
                 shadow: true,
                 stroke: false
               }));
-              console.log('✅ Calques publicitaires générés:', editorLayers);
+              console.log('✅ Calques générés:', editorLayers);
+
+              // Compose image with text layers using canvas
+              console.log('🖼️ Composition de l\'image avec les textes...');
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+
+              // Load and draw background image
+              const bgImage = new Image();
+              bgImage.crossOrigin = 'anonymous';
+
+              await new Promise((resolve, reject) => {
+                bgImage.onload = () => {
+                  console.log('✅ Image de fond chargée');
+                  resolve();
+                };
+                bgImage.onerror = (err) => {
+                  console.error('❌ Erreur chargement image:', err);
+                  reject(err);
+                };
+                bgImage.src = result.url;
+              });
+
+              // Draw background
+              ctx.drawImage(bgImage, 0, 0, width, height);
+              console.log('✅ Fond dessiné');
+
+              // Draw text layers with styled backgrounds
+              editorLayers.forEach((layer, idx) => {
+                if (layer.type === 'text' && layer.text) {
+                  console.log(`🎨 Dessin calque ${idx}:`, layer.text);
+                  ctx.save();
+
+                  // Set font
+                  const fontWeight = layer.fontWeight || 700;
+                  const fontSize = layer.fontSize || 48;
+                  const fontFamily = layer.fontFamily || 'Arial';
+                  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+                  ctx.textAlign = layer.align || 'left';
+                  ctx.textBaseline = 'top';
+
+                  // Measure text
+                  const metrics = ctx.measureText(layer.text);
+                  const textWidth = metrics.width;
+                  const textHeight = fontSize * 1.2;
+
+                  // Draw background box with padding and border-radius
+                  if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+                    const padding = layer.padding || 25;
+                    const borderRadius = layer.borderRadius || 15;
+
+                    ctx.fillStyle = layer.backgroundColor;
+                    const boxX = layer.x - padding;
+                    const boxY = layer.y - padding;
+                    const boxWidth = textWidth + padding * 2;
+                    const boxHeight = textHeight + padding * 2;
+
+                    // Rounded rectangle
+                    const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+                    ctx.beginPath();
+                    ctx.moveTo(boxX + radius, boxY);
+                    ctx.lineTo(boxX + boxWidth - radius, boxY);
+                    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+                    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+                    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+                    ctx.lineTo(boxX + radius, boxY + boxHeight);
+                    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+                    ctx.lineTo(boxX, boxY + radius);
+                    ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+                    ctx.closePath();
+                    ctx.fill();
+                  }
+
+                  // Draw text
+                  ctx.fillStyle = layer.color || '#ffffff';
+                  ctx.fillText(layer.text, layer.x, layer.y);
+
+                  ctx.restore();
+                }
+              });
+
+              console.log('✅ Tous les calques dessinés');
+
+              // Convert canvas to blob and upload
+              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+              if (!blob) {
+                throw new Error('Failed to create blob from canvas');
+              }
+
+              const file = new File([blob], 'pub_ad_composite.png', { type: 'image/png' });
+              console.log('📤 Upload de l\'image composite...');
+              const uploadResult = await base44.integrations.Core.UploadFile({ file });
+
+              if (uploadResult?.file_url) {
+                compositeImageUrl = uploadResult.file_url;
+                console.log('✅ Image composite créée:', compositeImageUrl);
+              } else {
+                console.error('❌ Pas d\'URL retournée par l\'upload');
+                throw new Error('Upload failed - no URL returned');
+              }
             }
           } catch (e) {
-            console.error('❌ Échec génération calques pub:', e);
+            console.error('❌ Échec composition pub:', e);
+            // En cas d'erreur, on garde l'image originale et les calques
+            compositeImageUrl = result.url;
           }
         }
 
