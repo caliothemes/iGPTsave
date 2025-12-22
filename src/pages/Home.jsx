@@ -524,21 +524,21 @@ export default function Home() {
                 id: `layer-${Date.now()}-${idx}`,
                 type: 'text',
                 text: layer.text || '',
-                x: Math.max(20, Math.min(layer.x || 50, width - 200)),
-                y: Math.max(20, Math.min(layer.y || 50, height - 100)),
+                x: Math.max(80, Math.min(layer.x || 100, width - 250)),
+                y: Math.max(80, Math.min(layer.y || 100, height - 150)),
                 fontSize: layer.fontSize || 48,
                 fontFamily: layer.fontFamily || 'Arial',
                 fontWeight: layer.fontWeight || 700,
                 color: layer.color || '#ffffff',
                 backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
-                padding: Math.max(layer.padding || 25, 20),
-                borderRadius: Math.max(layer.borderRadius || 15, 10),
+                padding: Math.max(layer.padding || 28, 25),
+                borderRadius: Math.max(layer.borderRadius || 18, 12),
                 opacity: 100,
                 visible: true,
-                align: layer.textAlign || 'left',
+                align: 'left',
                 bold: true,
                 italic: false,
-                shadow: true,
+                shadow: false,
                 stroke: false
               }));
               console.log('✅ Calques générés:', editorLayers);
@@ -570,37 +570,49 @@ export default function Home() {
               ctx.drawImage(bgImage, 0, 0, width, height);
               console.log('✅ Fond dessiné');
 
-              // Draw text layers with styled backgrounds
+              // Draw text layers EXACTLY like VisualEditor does
               editorLayers.forEach((layer, idx) => {
                 if (layer.type === 'text' && layer.text) {
                   console.log(`🎨 Dessin calque ${idx}:`, layer.text);
                   ctx.save();
 
-                  // Set font - ALWAYS use left align like editor
-                  const fontWeight = layer.fontWeight || 700;
-                  const fontSize = layer.fontSize || 48;
-                  const fontFamily = layer.fontFamily || 'Arial';
-                  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-                  ctx.textAlign = 'left';
-                  ctx.textBaseline = 'top';
+                  // Set font - EXACTLY like VisualEditor
+                  const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
+                  const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+                  ctx.font = fontStyle;
+                  ctx.fillStyle = layer.color;
+                  ctx.textAlign = layer.align || 'left';
+                  ctx.letterSpacing = `${layer.letterSpacing || 0}px`;
 
-                  // Measure text
+                  // Reset shadows
+                  ctx.shadowColor = 'transparent';
+                  ctx.shadowBlur = 0;
+                  ctx.shadowOffsetX = 0;
+                  ctx.shadowOffsetY = 0;
+
+                  // Text positioning - EXACTLY like VisualEditor
+                  const lines = [layer.text]; // Single line for pub ads
+                  const lineHeight = layer.fontSize * 1.2;
+                  const startY = layer.y - (lines.length - 1) * lineHeight / 2;
+
+                  // Measure text for background box
                   const metrics = ctx.measureText(layer.text);
                   const textWidth = metrics.width;
-                  const textHeight = fontSize * 1.2;
 
-                  // Draw background box with padding and border-radius FIRST
+                  // Draw background box EXACTLY like VisualEditor - with padding around text
                   if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
                     const padding = layer.padding || 28;
                     const borderRadius = layer.borderRadius || 18;
 
-                    ctx.fillStyle = layer.backgroundColor;
+                    // Calculate box position to center the text vertically in the box
                     const boxX = layer.x - padding;
-                    const boxY = layer.y - fontSize * 0.8 - padding;
+                    const boxY = layer.y - layer.fontSize * 0.85 - padding;
                     const boxWidth = textWidth + padding * 2;
-                    const boxHeight = fontSize * 1.15 + padding * 2;
+                    const boxHeight = layer.fontSize * 1.15 + padding * 2;
 
-                    // Rounded rectangle
+                    ctx.fillStyle = layer.backgroundColor;
+
+                    // Draw rounded rectangle
                     const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
                     ctx.beginPath();
                     ctx.moveTo(boxX + radius, boxY);
@@ -616,15 +628,27 @@ export default function Home() {
                     ctx.fill();
                   }
 
-                  // Draw text shadow for better readability
-                  ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                  ctx.shadowBlur = 4;
-                  ctx.shadowOffsetX = 2;
-                  ctx.shadowOffsetY = 2;
+                  // Draw text with shadow if enabled
+                  if (layer.shadow) {
+                    ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                    ctx.shadowBlur = layer.shadowBlur || 6;
+                    ctx.shadowOffsetX = layer.shadowOffsetX || 3;
+                    ctx.shadowOffsetY = layer.shadowOffsetY || 3;
+                  }
+
+                  // Draw stroke if enabled
+                  if (layer.stroke) {
+                    ctx.strokeStyle = layer.strokeColor || '#000000';
+                    ctx.lineWidth = layer.strokeWidth || 2;
+                    lines.forEach((line, lineIdx) => {
+                      ctx.strokeText(line, layer.x, startY + lineIdx * lineHeight);
+                    });
+                  }
 
                   // Draw text
-                  ctx.fillStyle = layer.color || '#ffffff';
-                  ctx.fillText(layer.text, layer.x, layer.y);
+                  lines.forEach((line, lineIdx) => {
+                    ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
+                  });
 
                   ctx.restore();
                 }
