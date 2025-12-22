@@ -1082,8 +1082,8 @@ export default function Home() {
                       </p>
                       <p className="text-orange-300/90 text-xs leading-relaxed">
                         {language === 'fr' 
-                          ? 'Vous n\'avez pas sélectionné de catégorie dans le menu "Que souhaitez-vous créer ?" du prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez une catégorie adaptée à votre besoin (Logo, Print, Social, etc.).'
-                          : 'You haven\'t selected a category in the "What do you want to create?" menu in the prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable category (Logo, Print, Social, etc.).'
+                          ? 'Vous n\'avez pas sélectionné de catégorie dans le menu "Catégories" du prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez une catégorie adaptée à votre besoin (Logo, Print, Posts/Story, etc.).'
+                          : 'You haven\'t selected a category in the "Categories" menu in the prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable category (Logo, Print, Social, etc.).'
                         }
                       </p>
                     </div>
@@ -1494,7 +1494,7 @@ export default function Home() {
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                       </svg>
-                      {selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : (language === 'fr' ? 'Que souhaitez-vous créer ?' : 'What do you want to create?')}
+                      {selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : (language === 'fr' ? 'Catégories' : 'Categories')}
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 max-h-96 overflow-y-auto">
