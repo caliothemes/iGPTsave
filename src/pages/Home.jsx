@@ -398,8 +398,18 @@ export default function Home() {
             // Design à plat pour social (NE PAS MODIFIER - fonctionne bien)
             enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
           } else if (activeCategory?.id === 'pub_ads') {
-            // Publicité - Image de fond sans texte (textes ajoutés après via calques)
-            enhancedPrompt = `advertising background image for ${userMessage}, professional ad backdrop, commercial photography style, clean and uncluttered background perfect for adding text overlays, marketing visual design, attention-grabbing composition, space for headlines and call-to-action, brand-oriented imagery --no text --no letters --no typography --no words --no writing`;
+            // Publicité - Utiliser le prompt admin si disponible, sinon prompt par défaut
+            const pubAdsTemplate = promptTemplates.find(t => t.category === 'pub_ads');
+            const adminPrompt = settings.ads_base_prompt;
+
+            if (adminPrompt) {
+              enhancedPrompt = adminPrompt.replace('{userMessage}', userMessage).replace('{message}', userMessage);
+            } else if (pubAdsTemplate) {
+              const templateText = language === 'fr' ? pubAdsTemplate.prompt_fr : (pubAdsTemplate.prompt_en || pubAdsTemplate.prompt_fr);
+              enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
+            } else {
+              enhancedPrompt = `advertising background image for ${userMessage}, professional ad backdrop, commercial photography style, clean and uncluttered background perfect for adding text overlays, marketing visual design, attention-grabbing composition, space for headlines and call-to-action, brand-oriented imagery --no text --no letters --no typography --no words --no writing`;
+            }
           } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
