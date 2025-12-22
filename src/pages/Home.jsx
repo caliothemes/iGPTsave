@@ -458,15 +458,20 @@ export default function Home() {
 
         // Generate editor layers automatically for pub_ads category
         let editorLayers = [];
+        let compositeImageUrl = result.url;
+
         if (activeCategory?.id === 'pub_ads') {
           try {
             console.log('🎨 Génération automatique de calques publicitaires...');
+            const [width, height] = dimensions.split('x').map(Number);
+
             const layersResult = await base44.integrations.Core.InvokeLLM({
               prompt: `Analyze this advertising request and generate text layers for the ad: "${userMessage}". 
               Extract key information and create 2-4 text elements (headline, subheadline, call-to-action, etc.).
               Consider the ad context, business type, and promotional message.
               Each text should be concise and impactful for advertising.
-              Return layers with realistic positioning for ${dimensions} format.`,
+              Canvas size is ${width}x${height}px.
+              Return layers with realistic positioning.`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -502,16 +507,95 @@ export default function Home() {
                 visible: true
               }));
               console.log('✅ Calques générés:', editorLayers.length);
+
+              // Compose image with text layers
+              console.log('🖼️ Composition de l\'image avec les textes...');
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+
+              // Load and draw background image
+              const bgImage = new Image();
+              bgImage.crossOrigin = 'anonymous';
+              await new Promise((resolve, reject) => {
+                bgImage.onload = resolve;
+                bgImage.onerror = reject;
+                bgImage.src = result.url;
+              });
+
+              ctx.drawImage(bgImage, 0, 0, width, height);
+
+              // Draw text layers
+              editorLayers.forEach(layer => {
+                if (layer.type === 'text' && layer.text) {
+                  ctx.save();
+
+                  // Set font
+                  const fontWeight = layer.fontWeight || 'bold';
+                  const fontSize = layer.fontSize || 48;
+                  const fontFamily = layer.fontFamily || 'Arial';
+                  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+                  ctx.textAlign = layer.textAlign || 'left';
+                  ctx.textBaseline = 'top';
+
+                  // Draw background box if specified
+                  if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+                    const padding = layer.padding || 20;
+                    const metrics = ctx.measureText(layer.text);
+                    const textWidth = metrics.width;
+                    const textHeight = fontSize * 1.2;
+
+                    ctx.fillStyle = layer.backgroundColor;
+                    const boxX = layer.x - padding;
+                    const boxY = layer.y - padding;
+                    const boxWidth = textWidth + padding * 2;
+                    const boxHeight = textHeight + padding * 2;
+
+                    if (layer.borderRadius) {
+                      // Rounded rectangle
+                      const radius = layer.borderRadius;
+                      ctx.beginPath();
+                      ctx.moveTo(boxX + radius, boxY);
+                      ctx.lineTo(boxX + boxWidth - radius, boxY);
+                      ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+                      ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+                      ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+                      ctx.lineTo(boxX + radius, boxY + boxHeight);
+                      ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+                      ctx.lineTo(boxX, boxY + radius);
+                      ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+                      ctx.closePath();
+                      ctx.fill();
+                    } else {
+                      ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+                    }
+                  }
+
+                  // Draw text
+                  ctx.fillStyle = layer.color || '#ffffff';
+                  ctx.fillText(layer.text, layer.x, layer.y);
+
+                  ctx.restore();
+                }
+              });
+
+              // Convert canvas to blob and upload
+              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+              const file = new File([blob], 'pub_ad_composite.png', { type: 'image/png' });
+              const uploadResult = await base44.integrations.Core.UploadFile({ file });
+              compositeImageUrl = uploadResult.file_url;
+              console.log('✅ Image composite créée:', compositeImageUrl);
             }
           } catch (e) {
-            console.error('Échec génération calques:', e);
+            console.error('Échec composition pub:', e);
           }
         }
 
         const visualData = {
           user_email: user?.email || 'anonymous',
           conversation_id: activeConversation?.id,
-          image_url: result.url,
+          image_url: compositeImageUrl,
           original_image_url: result.url,
           title: userMessage.slice(0, 50),
           original_prompt: isModification 
