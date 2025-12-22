@@ -471,7 +471,8 @@ export default function Home() {
               Consider the ad context, business type, and promotional message.
               Each text should be concise and impactful for advertising.
               Canvas size is ${width}x${height}px.
-              Return layers with realistic positioning.`,
+              Return layers with realistic positioning (x, y should be within canvas bounds).
+              Use backgroundColor with semi-transparent colors like rgba(255,20,147,0.9) for better visibility.`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -500,15 +501,27 @@ export default function Home() {
             });
 
             if (layersResult.layers && layersResult.layers.length > 0) {
+              // Create editor layers with proper structure
               editorLayers = layersResult.layers.map((layer, idx) => ({
                 id: `layer-${Date.now()}-${idx}`,
-                ...layer,
+                type: 'text',
+                text: layer.text || '',
+                x: Math.min(layer.x || 50, width - 100),
+                y: Math.min(layer.y || 50, height - 100),
+                fontSize: layer.fontSize || 48,
+                fontFamily: layer.fontFamily || 'Arial',
+                fontWeight: layer.fontWeight || 'bold',
+                color: layer.color || '#ffffff',
+                backgroundColor: layer.backgroundColor || 'transparent',
+                padding: layer.padding || 20,
+                borderRadius: layer.borderRadius || 8,
                 opacity: 1,
-                visible: true
+                visible: true,
+                textAlign: layer.textAlign || 'left'
               }));
-              console.log('✅ Calques générés:', editorLayers.length);
+              console.log('✅ Calques générés:', editorLayers);
 
-              // Compose image with text layers
+              // Compose image with text layers using canvas
               console.log('🖼️ Composition de l\'image avec les textes...');
               const canvas = document.createElement('canvas');
               canvas.width = width;
@@ -518,17 +531,27 @@ export default function Home() {
               // Load and draw background image
               const bgImage = new Image();
               bgImage.crossOrigin = 'anonymous';
+
               await new Promise((resolve, reject) => {
-                bgImage.onload = resolve;
-                bgImage.onerror = reject;
+                bgImage.onload = () => {
+                  console.log('✅ Image de fond chargée');
+                  resolve();
+                };
+                bgImage.onerror = (err) => {
+                  console.error('❌ Erreur chargement image:', err);
+                  reject(err);
+                };
                 bgImage.src = result.url;
               });
 
+              // Draw background
               ctx.drawImage(bgImage, 0, 0, width, height);
+              console.log('✅ Fond dessiné');
 
               // Draw text layers
-              editorLayers.forEach(layer => {
+              editorLayers.forEach((layer, idx) => {
                 if (layer.type === 'text' && layer.text) {
+                  console.log(`🎨 Dessin calque ${idx}:`, layer.text);
                   ctx.save();
 
                   // Set font
@@ -554,7 +577,7 @@ export default function Home() {
 
                     if (layer.borderRadius) {
                       // Rounded rectangle
-                      const radius = layer.borderRadius;
+                      const radius = Math.min(layer.borderRadius, boxWidth / 2, boxHeight / 2);
                       ctx.beginPath();
                       ctx.moveTo(boxX + radius, boxY);
                       ctx.lineTo(boxX + boxWidth - radius, boxY);
@@ -580,15 +603,30 @@ export default function Home() {
                 }
               });
 
+              console.log('✅ Tous les calques dessinés');
+
               // Convert canvas to blob and upload
-              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+              if (!blob) {
+                throw new Error('Failed to create blob from canvas');
+              }
+
               const file = new File([blob], 'pub_ad_composite.png', { type: 'image/png' });
+              console.log('📤 Upload de l\'image composite...');
               const uploadResult = await base44.integrations.Core.UploadFile({ file });
-              compositeImageUrl = uploadResult.file_url;
-              console.log('✅ Image composite créée:', compositeImageUrl);
+
+              if (uploadResult?.file_url) {
+                compositeImageUrl = uploadResult.file_url;
+                console.log('✅ Image composite créée:', compositeImageUrl);
+              } else {
+                console.error('❌ Pas d\'URL retournée par l\'upload');
+                throw new Error('Upload failed - no URL returned');
+              }
             }
           } catch (e) {
-            console.error('Échec composition pub:', e);
+            console.error('❌ Échec composition pub:', e);
+            // En cas d'erreur, on garde l'image originale et les calques
+            compositeImageUrl = result.url;
           }
         }
 
