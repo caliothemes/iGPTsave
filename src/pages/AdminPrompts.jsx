@@ -36,19 +36,24 @@ export default function AdminPrompts() {
     { value: 'logo_picto', label: 'Logo Pictogramme', mode: 'assisté' },
     { value: 'logo_complet', label: 'Logo Complet', mode: 'expert' },
     { value: 'print', label: 'Print', mode: 'modifiable' },
-    { value: 'social', label: 'Réseaux sociaux', mode: 'modifiable' },
-    { value: 'image', label: 'Image réaliste', mode: 'modifiable' }
+    { value: 'social', label: 'Posts, Story', mode: 'modifiable' },
+    { value: 'pub_ads', label: 'Pub ADS', mode: 'modifiable' },
+    { value: 'image', label: 'Image réaliste', mode: 'modifiable' },
+    { value: 'mockup', label: 'Mockups', mode: 'modifiable' },
+    { value: 'product', label: 'Produit', mode: 'modifiable' },
+    { value: 'design_3d', label: 'Design Texte 3D', mode: 'modifiable' }
   ];
 
   const exampleCategories = [
     { value: 'logo_picto', label: 'Logo Pictogramme' },
     { value: 'logo_complet', label: 'Logo Complet' },
     { value: 'print', label: 'Design Print' },
-    { value: 'social', label: 'Réseaux sociaux' },
+    { value: 'social', label: 'Posts, Story' },
+    { value: 'pub_ads', label: 'Pub ADS' },
     { value: 'image', label: 'Image réaliste' },
     { value: 'mockup', label: 'Mockups' },
     { value: 'product', label: 'Produit' },
-    { value: 'design_3d', label: 'Design 3D' },
+    { value: 'design_3d', label: 'Design Texte 3D' },
     { value: 'textures', label: 'Textures' },
     { value: 'illustrations', label: 'Illustrations' },
     { value: 'icones_picto', label: 'Icônes Picto' }
@@ -197,8 +202,8 @@ export default function AdminPrompts() {
                 <Wand2 className="h-5 w-5 text-orange-400" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Prompt de base - Créateur de Pub IA</h2>
-                <p className="text-sm text-white/50">Instructions ajoutées automatiquement avant la demande utilisateur</p>
+                <h2 className="text-lg font-semibold text-white">Prompt arrière-plan - Catégorie Pub ADS</h2>
+                <p className="text-sm text-white/50">Prompt utilisé pour générer le fond d'image des publicités (textes ajoutés après par l'IA)</p>
               </div>
             </div>
             <Button
@@ -218,26 +223,11 @@ export default function AdminPrompts() {
           <Textarea
             value={adsPrompt}
             onChange={(e) => setAdsPrompt(e.target.value)}
-            placeholder={`Create ULTRA MODERN professional advertising design with BOLD, CONTEMPORARY styling.
-
-MODERN DESIGN PRINCIPLES:
-1. TYPOGRAPHY: Use bold sans-serif fonts (Impact, Arial Black, Helvetica) with large sizes (80-140px titles)
-2. COLORS: Vibrant gradients (neon, pastel, or bold contrasts), avoid plain colors
-3. BACKGROUNDS: Full-width colored boxes with gradients, semi-transparent overlays (rgba 0.85-0.95)
-4. EFFECTS: Strong shadows + thick strokes (5-8px) for maximum pop and readability
-5. LAYOUT: Asymmetric, dynamic placement - use corners and edges, avoid center
-6. SPACING: Generous padding (40-60px) in background boxes, leave breathing room
-7. STYLE: Instagram/TikTok aesthetic - punchy, eye-catching, trendy
-
-BACKGROUND BOX RULES:
-- Must extend FULL WIDTH or near-full width of text
-- Use backgroundPadding: 50-70 for generous spacing
-- Prefer gradient backgrounds over solid colors
-- Examples: "linear-gradient(135deg, rgba(255,20,147,0.95), rgba(138,43,226,0.95))"`}
-            className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-64 font-mono text-xs"
+            placeholder="advertising background image for {userMessage}, professional ad backdrop, commercial photography style, clean and uncluttered background perfect for adding text overlays, marketing visual design, attention-grabbing composition, space for headlines and call-to-action, brand-oriented imagery --no text --no letters --no typography --no words --no writing"
+            className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-32 font-mono text-xs"
           />
           <p className="text-xs text-white/40 mt-2">
-            Ce prompt définit le style et les règles de génération des publicités dans l'outil de création de pub.
+            Ce prompt génère le fond d'image sans texte. L'IA ajoutera ensuite automatiquement les textes publicitaires sous forme de calques éditables. Utilisez {"{userMessage}"} pour insérer le prompt utilisateur.
           </p>
         </div>
 
