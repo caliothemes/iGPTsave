@@ -466,28 +466,31 @@ export default function Home() {
             const [width, height] = dimensions.split('x').map(Number);
 
             const layersResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this advertising image and request: "${userMessage}". 
-              Extract the dominant colors from the context and create 2-4 professional text layers for the ad.
-              Generate impactful text elements (headline, subheadline, call-to-action, tagline).
+              prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
 
-              IMPORTANT STYLE GUIDELINES:
-              - Use vibrant, eye-catching colors that complement the image (reds, oranges, blues, purples, pinks)
-              - NEVER use plain white or transparent backgrounds
-              - Each layer must have a BOLD colored background with high opacity (0.85-0.95)
-              - Add generous padding (25-35px) for readability
-              - Use large border-radius (12-20px) for modern look
-              - Position layers strategically across the canvas (not all in the same area)
-              - Vary font sizes: headline (60-80px), subheadline (40-50px), CTA (35-45px)
+              CRITICAL TEXT GUIDELINES:
+              - Keep texts SHORT (2-6 words max per text)
+              - Headline: 2-4 words, bold and catchy
+              - Subtext: 3-6 words, descriptive
+              - CTA: 1-3 words (ex: "BUY NOW", "DISCOVER", "ORDER TODAY")
 
-              Canvas size is ${width}x${height}px.
-              Ensure x, y coordinates keep layers fully visible on canvas.
+              DESIGN & COLOR:
+              - Extract 1-2 dominant vibrant colors from the image
+              - Use BOLD, eye-catching semi-transparent backgrounds (rgba with 0.88-0.95 opacity)
+              - Colors: hot pink, electric blue, deep purple, neon orange, vivid red
+              - Large padding: 28-35px for impact
+              - Border radius: 16-22px for modern look
 
-              Example of good background colors:
-              - rgba(255, 59, 92, 0.92) - vibrant red
-              - rgba(255, 107, 0, 0.90) - energetic orange  
-              - rgba(138, 43, 226, 0.88) - bold purple
-              - rgba(0, 168, 255, 0.90) - electric blue
-              - rgba(255, 20, 147, 0.92) - hot pink`,
+              POSITIONING (Canvas ${width}x${height}px):
+              - Spread texts across different areas (top, middle, bottom)
+              - Leave 80px+ margin from edges
+              - Don't cluster texts together
+
+              FONTS & SIZES:
+              - Headline: 56-72px, bold (700-900 weight), Arial or Montserrat
+              - Subtext: 38-48px, medium-bold (600-700), Arial
+              - CTA: 42-52px, extra-bold (800-900), Arial
+              - ALWAYS use textAlign: 'left' (never center or right)`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -506,8 +509,7 @@ export default function Home() {
                         color: { type: "string" },
                         backgroundColor: { type: "string" },
                         padding: { type: "number" },
-                        borderRadius: { type: "number" },
-                        textAlign: { type: "string" }
+                        borderRadius: { type: "number" }
                       }
                     }
                   }
@@ -574,12 +576,12 @@ export default function Home() {
                   console.log(`🎨 Dessin calque ${idx}:`, layer.text);
                   ctx.save();
 
-                  // Set font
+                  // Set font - ALWAYS use left align like editor
                   const fontWeight = layer.fontWeight || 700;
                   const fontSize = layer.fontSize || 48;
                   const fontFamily = layer.fontFamily || 'Arial';
                   ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-                  ctx.textAlign = layer.align || 'left';
+                  ctx.textAlign = 'left';
                   ctx.textBaseline = 'top';
 
                   // Measure text
@@ -587,16 +589,16 @@ export default function Home() {
                   const textWidth = metrics.width;
                   const textHeight = fontSize * 1.2;
 
-                  // Draw background box with padding and border-radius
+                  // Draw background box with padding and border-radius FIRST
                   if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-                    const padding = layer.padding || 25;
-                    const borderRadius = layer.borderRadius || 15;
+                    const padding = layer.padding || 28;
+                    const borderRadius = layer.borderRadius || 18;
 
                     ctx.fillStyle = layer.backgroundColor;
                     const boxX = layer.x - padding;
-                    const boxY = layer.y - padding;
+                    const boxY = layer.y - fontSize * 0.8 - padding;
                     const boxWidth = textWidth + padding * 2;
-                    const boxHeight = textHeight + padding * 2;
+                    const boxHeight = fontSize * 1.15 + padding * 2;
 
                     // Rounded rectangle
                     const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
@@ -613,6 +615,12 @@ export default function Home() {
                     ctx.closePath();
                     ctx.fill();
                   }
+
+                  // Draw text shadow for better readability
+                  ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                  ctx.shadowBlur = 4;
+                  ctx.shadowOffsetX = 2;
+                  ctx.shadowOffsetY = 2;
 
                   // Draw text
                   ctx.fillStyle = layer.color || '#ffffff';
