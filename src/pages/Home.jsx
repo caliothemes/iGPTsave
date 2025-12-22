@@ -391,13 +391,16 @@ export default function Home() {
               enhancedPrompt = `visual background design for ${userMessage}, thematic elements related to the business, relevant imagery, professional backdrop, contextual graphics`;
             }
             enhancedPrompt += ' --no text --no letters --no words --no typography --no writing';
-            } else if (activeCategory?.id === 'print') {
-              // Design PRINT plein écran - AUCUN cadre, étalement total du design
-              enhancedPrompt = `${userMessage}, complete full bleed design filling entire canvas edge to edge, total surface coverage with design elements spreading to all corners and borders, wallpaper style layout covering 100% of area, seamless infinity pattern extending beyond frame, continuous design with no empty margins or white space, professional print-ready full bleed artwork --no border --no white space --no frame --no margin --no padding --no mockup --no card --no centered element --no floating object --no canvas --no mat --no mount --no white background --no empty area --no negative space around design --no perspective --no 3d --no shadow --no text --no letters --no typography`;
-            } else if (activeCategory?.id === 'social') {
-              // Design à plat pour social (NE PAS MODIFIER - fonctionne bien)
-              enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
-            } else {
+          } else if (activeCategory?.id === 'print') {
+            // Design PRINT plein écran - AUCUN cadre, étalement total du design
+            enhancedPrompt = `${userMessage}, complete full bleed design filling entire canvas edge to edge, total surface coverage with design elements spreading to all corners and borders, wallpaper style layout covering 100% of area, seamless infinity pattern extending beyond frame, continuous design with no empty margins or white space, professional print-ready full bleed artwork --no border --no white space --no frame --no margin --no padding --no mockup --no card --no centered element --no floating object --no canvas --no mat --no mount --no white background --no empty area --no negative space around design --no perspective --no 3d --no shadow --no text --no letters --no typography`;
+          } else if (activeCategory?.id === 'social') {
+            // Design à plat pour social (NE PAS MODIFIER - fonctionne bien)
+            enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
+          } else if (activeCategory?.id === 'pub_ads') {
+            // Publicité - Image de fond sans texte (textes ajoutés après via calques)
+            enhancedPrompt = `advertising background image for ${userMessage}, professional ad backdrop, commercial photography style, clean and uncluttered background perfect for adding text overlays, marketing visual design, attention-grabbing composition, space for headlines and call-to-action, brand-oriented imagery --no text --no letters --no typography --no words --no writing`;
+          } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
           console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
@@ -443,6 +446,58 @@ export default function Home() {
           }
         }
 
+        // Generate editor layers automatically for pub_ads category
+        let editorLayers = [];
+        if (activeCategory?.id === 'pub_ads') {
+          try {
+            console.log('🎨 Génération automatique de calques publicitaires...');
+            const layersResult = await base44.integrations.Core.InvokeLLM({
+              prompt: `Analyze this advertising request and generate text layers for the ad: "${userMessage}". 
+              Extract key information and create 2-4 text elements (headline, subheadline, call-to-action, etc.).
+              Consider the ad context, business type, and promotional message.
+              Each text should be concise and impactful for advertising.
+              Return layers with realistic positioning for ${dimensions} format.`,
+              response_json_schema: {
+                type: "object",
+                properties: {
+                  layers: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        type: { type: "string" },
+                        text: { type: "string" },
+                        x: { type: "number" },
+                        y: { type: "number" },
+                        fontSize: { type: "number" },
+                        fontFamily: { type: "string" },
+                        fontWeight: { type: "string" },
+                        color: { type: "string" },
+                        backgroundColor: { type: "string" },
+                        padding: { type: "number" },
+                        borderRadius: { type: "number" },
+                        textAlign: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            });
+
+            if (layersResult.layers && layersResult.layers.length > 0) {
+              editorLayers = layersResult.layers.map((layer, idx) => ({
+                id: `layer-${Date.now()}-${idx}`,
+                ...layer,
+                opacity: 1,
+                visible: true
+              }));
+              console.log('✅ Calques générés:', editorLayers.length);
+            }
+          } catch (e) {
+            console.error('Échec génération calques:', e);
+          }
+        }
+
         const visualData = {
           user_email: user?.email || 'anonymous',
           conversation_id: activeConversation?.id,
@@ -456,7 +511,8 @@ export default function Home() {
           dimensions: dimensions,
           visual_type: activeCategory?.id,
           style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
-          color_palette: extractedColors
+          color_palette: extractedColors,
+          editor_layers: editorLayers.length > 0 ? editorLayers : undefined
         };
 
         let savedVisual = visualData;

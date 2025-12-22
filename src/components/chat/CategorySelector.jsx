@@ -111,6 +111,22 @@ const CATEGORIES = [
     ]
   },
   {
+    id: 'pub_ads',
+    icon: ShoppingBag,
+    name: { fr: 'Pub ADS', en: 'Ad ADS' },
+    description: { fr: 'Publicités avec textes et cadres éditables', en: 'Ads with editable texts and frames' },
+    prompt: { fr: 'Crée une publicité pour ', en: 'Create an ad for ' },
+    hasSubmenu: true,
+    defaultExpertMode: false,
+    isPubAds: true,
+    submenu: [
+      { id: 'pub_ads_square', name: { fr: 'Carré 1:1', en: 'Square 1:1' }, prompt: { fr: 'Crée une publicité format carré pour', en: 'Create a square format ad for' }, dimensions: '1080x1080' },
+      { id: 'pub_ads_story', name: { fr: 'Story 9:16', en: 'Story 9:16' }, prompt: { fr: 'Crée une publicité format story pour', en: 'Create a story format ad for' }, dimensions: '1080x1920' },
+      { id: 'pub_ads_portrait', name: { fr: 'Portrait 4:5', en: 'Portrait 4:5' }, prompt: { fr: 'Crée une publicité format portrait pour', en: 'Create a portrait format ad for' }, dimensions: '1080x1350' },
+      { id: 'pub_ads_landscape', name: { fr: 'Paysage 16:9', en: 'Landscape 16:9' }, prompt: { fr: 'Crée une publicité format paysage pour', en: 'Create a landscape format ad for' }, dimensions: '1920x1080' },
+    ]
+  },
+  {
     id: 'free_prompt',
     icon: Sparkles,
     name: { fr: 'Prompt 100% libre', en: '100% Free Prompt' },

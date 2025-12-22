@@ -1,59 +1,59 @@
-import Pricing from './pages/Pricing';
+import Account from './pages/Account';
 import Admin from './pages/Admin';
-import Legal from './pages/Legal';
-import MyVisuals from './pages/MyVisuals';
+import AdminAssets from './pages/AdminAssets';
+import AdminLegal from './pages/AdminLegal';
+import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
+import AdminNewsletters from './pages/AdminNewsletters';
+import AdminPresentation from './pages/AdminPresentation';
+import AdminPricing from './pages/AdminPricing';
+import AdminPrompts from './pages/AdminPrompts';
+import AdminSettings from './pages/AdminSettings';
+import AdminStoreCategories from './pages/AdminStoreCategories';
+import AdminStoryAnimations from './pages/AdminStoryAnimations';
+import AdminSupport from './pages/AdminSupport';
+import AdminUserDetail from './pages/AdminUserDetail';
 import AdminUsers from './pages/AdminUsers';
 import AdminVisuals from './pages/AdminVisuals';
-import AdminSettings from './pages/AdminSettings';
-import Account from './pages/Account';
-import AdminLegal from './pages/AdminLegal';
-import AdminAssets from './pages/AdminAssets';
-import AdminPricing from './pages/AdminPricing';
-import PaymentSuccess from './pages/PaymentSuccess';
-import AdminPresentation from './pages/AdminPresentation';
-import Portfolio from './pages/Portfolio';
 import Home from './pages/Home';
-import AdminPrompts from './pages/AdminPrompts';
-import Store from './pages/Store';
-import AdminStoreCategories from './pages/AdminStoreCategories';
-import AdminUserDetail from './pages/AdminUserDetail';
-import Support from './pages/Support';
-import AdminSupport from './pages/AdminSupport';
-import AdminNewsletters from './pages/AdminNewsletters';
-import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
-import StoryStudio from './pages/StoryStudio';
-import AdminStoryAnimations from './pages/AdminStoryAnimations';
 import homeBackup from './pages/Home_backup';
+import Legal from './pages/Legal';
+import MyVisuals from './pages/MyVisuals';
+import PaymentSuccess from './pages/PaymentSuccess';
+import Portfolio from './pages/Portfolio';
+import Pricing from './pages/Pricing';
+import Store from './pages/Store';
+import StoryStudio from './pages/StoryStudio';
+import Support from './pages/Support';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Pricing": Pricing,
+    "Account": Account,
     "Admin": Admin,
-    "Legal": Legal,
-    "MyVisuals": MyVisuals,
+    "AdminAssets": AdminAssets,
+    "AdminLegal": AdminLegal,
+    "AdminNewsletterTemplates": AdminNewsletterTemplates,
+    "AdminNewsletters": AdminNewsletters,
+    "AdminPresentation": AdminPresentation,
+    "AdminPricing": AdminPricing,
+    "AdminPrompts": AdminPrompts,
+    "AdminSettings": AdminSettings,
+    "AdminStoreCategories": AdminStoreCategories,
+    "AdminStoryAnimations": AdminStoryAnimations,
+    "AdminSupport": AdminSupport,
+    "AdminUserDetail": AdminUserDetail,
     "AdminUsers": AdminUsers,
     "AdminVisuals": AdminVisuals,
-    "AdminSettings": AdminSettings,
-    "Account": Account,
-    "AdminLegal": AdminLegal,
-    "AdminAssets": AdminAssets,
-    "AdminPricing": AdminPricing,
-    "PaymentSuccess": PaymentSuccess,
-    "AdminPresentation": AdminPresentation,
-    "Portfolio": Portfolio,
     "Home": Home,
-    "AdminPrompts": AdminPrompts,
-    "Store": Store,
-    "AdminStoreCategories": AdminStoreCategories,
-    "AdminUserDetail": AdminUserDetail,
-    "Support": Support,
-    "AdminSupport": AdminSupport,
-    "AdminNewsletters": AdminNewsletters,
-    "AdminNewsletterTemplates": AdminNewsletterTemplates,
-    "StoryStudio": StoryStudio,
-    "AdminStoryAnimations": AdminStoryAnimations,
     "Home_backup": homeBackup,
+    "Legal": Legal,
+    "MyVisuals": MyVisuals,
+    "PaymentSuccess": PaymentSuccess,
+    "Portfolio": Portfolio,
+    "Pricing": Pricing,
+    "Store": Store,
+    "StoryStudio": StoryStudio,
+    "Support": Support,
 }
 
 export const pagesConfig = {
