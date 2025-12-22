@@ -328,86 +328,76 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
         
         // If we have saved layers, preload their images first
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
-          // Preload all image URLs from layers
-          const imageUrls = [];
-          visual.editor_layers.forEach(layer => {
-            if (layer.type === 'image' && layer.imageUrl) {
-              imageUrls.push(layer.imageUrl);
-            }
-            if (layer.type === 'background' && layer.bgType === 'image' && layer.bgValue) {
-              imageUrls.push(layer.bgValue);
-            }
-          });
-          
-          // Load all images
-          let loadedCount = 0;
-          const totalToLoad = imageUrls.length;
-          
-          if (totalToLoad === 0) {
-            // No images to load, just set canvas size from dimensions
+          // First, always load the base image
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            setLoadedImages(prev => ({ ...prev, [baseUrl]: img }));
+            
+            // Calculate canvas size from dimensions
+            let targetWidth = img.width;
+            let targetHeight = img.height;
+            
             if (visual.dimensions) {
               const [metaW, metaH] = visual.dimensions.split('x').map(Number);
               if (metaW && metaH) {
-                const isPortrait = metaH > metaW;
-                const maxWidth = isPortrait ? 280 : 450;
-                const maxHeight = isPortrait ? 450 : 350;
-                const ratio = Math.min(maxWidth / metaW, maxHeight / metaH);
-                setCanvasSize({
-                  width: Math.round(metaW * ratio),
-                  height: Math.round(metaH * ratio)
-                });
+                targetWidth = metaW;
+                targetHeight = metaH;
               }
             }
-            setImageLoaded(true);
-            return;
-          }
-          
-          imageUrls.forEach(url => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-              setLoadedImages(prev => ({ ...prev, [url]: img }));
-              loadedCount++;
+            
+            const isPortrait = targetHeight > targetWidth;
+            const maxWidth = isPortrait ? 280 : 450;
+            const maxHeight = isPortrait ? 450 : 350;
+            const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
+            const displayWidth = Math.round(targetWidth * ratio);
+            const displayHeight = Math.round(targetHeight * ratio);
+            
+            setCanvasSize({ width: displayWidth, height: displayHeight });
+            
+            // Check if a base image layer already exists
+            const hasBaseImageLayer = visual.editor_layers.some(l => l.isBaseImage);
+            
+            if (!hasBaseImageLayer) {
+              // Add base image layer at the beginning
+              const imgRatio = img.width / img.height;
+              const canvasRatio = displayWidth / displayHeight;
+              let drawWidth, drawHeight, drawX, drawY;
               
-              // When all images are loaded, set canvas size and mark as loaded
-              if (loadedCount === totalToLoad) {
-                // Use dimensions from metadata
-                if (visual.dimensions) {
-                  const [metaW, metaH] = visual.dimensions.split('x').map(Number);
-                  if (metaW && metaH) {
-                    const isPortrait = metaH > metaW;
-                    const maxWidth = isPortrait ? 280 : 450;
-                    const maxHeight = isPortrait ? 450 : 350;
-                    const ratio = Math.min(maxWidth / metaW, maxHeight / metaH);
-                    setCanvasSize({
-                      width: Math.round(metaW * ratio),
-                      height: Math.round(metaH * ratio)
-                    });
-                  }
-                } else {
-                  // Fallback: use first image dimensions
-                  const firstImg = loadedImages[imageUrls[0]] || img;
-                  const isPortrait = firstImg.height > firstImg.width;
-                  const maxWidth = isPortrait ? 280 : 450;
-                  const maxHeight = isPortrait ? 450 : 350;
-                  const ratio = Math.min(maxWidth / firstImg.width, maxHeight / firstImg.height);
-                  setCanvasSize({
-                    width: Math.round(firstImg.width * ratio),
-                    height: Math.round(firstImg.height * ratio)
-                  });
-                }
-                setImageLoaded(true);
+              if (imgRatio > canvasRatio) {
+                drawHeight = displayHeight;
+                drawWidth = displayHeight * imgRatio;
+                drawX = (displayWidth - drawWidth) / 2;
+                drawY = 0;
+              } else {
+                drawWidth = displayWidth;
+                drawHeight = displayWidth / imgRatio;
+                drawX = 0;
+                drawY = (displayHeight - drawHeight) / 2;
               }
-            };
-            img.onerror = () => {
-              console.error('Failed to load image:', url);
-              loadedCount++;
-              if (loadedCount === totalToLoad) {
-                setImageLoaded(true);
-              }
-            };
-            img.src = url;
-          });
+              
+              const baseImageLayer = {
+                type: 'image',
+                imageUrl: baseUrl,
+                x: Math.round(drawX),
+                y: Math.round(drawY),
+                width: Math.round(drawWidth),
+                height: Math.round(drawHeight),
+                opacity: 100,
+                isBaseImage: true
+              };
+              
+              // Add base layer at the start, then saved layers
+              setLayers([baseImageLayer, ...visual.editor_layers]);
+            }
+            
+            setImageLoaded(true);
+          };
+          img.onerror = () => {
+            console.error('Failed to load base image:', baseUrl);
+            setImageLoaded(true);
+          };
+          img.src = baseUrl;
           return;
         }
         
