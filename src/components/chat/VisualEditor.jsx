@@ -316,10 +316,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
     init();
   }, [visual.id]);
 
-  // Load base image - use current image (can be cropped)
+  // Load base image - use original_image_url for pub_ads to avoid double text
       useEffect(() => {
-        // Use current image_url (cropped or not), save original separately
-        const baseUrl = visual.image_url;
+        // For pub_ads, use original_image_url (without burned text) as base
+        const baseUrl = visual.original_image_url || visual.image_url;
         const originalUrl = visual.original_image_url || visual.image_url;
         setOriginalImageUrl(originalUrl);
         
