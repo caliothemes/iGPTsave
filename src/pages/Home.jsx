@@ -466,13 +466,28 @@ export default function Home() {
             const [width, height] = dimensions.split('x').map(Number);
 
             const layersResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this advertising request and generate text layers for the ad: "${userMessage}". 
-              Extract key information and create 2-4 text elements (headline, subheadline, call-to-action, etc.).
-              Consider the ad context, business type, and promotional message.
-              Each text should be concise and impactful for advertising.
+              prompt: `Analyze this advertising image and request: "${userMessage}". 
+              Extract the dominant colors from the context and create 2-4 professional text layers for the ad.
+              Generate impactful text elements (headline, subheadline, call-to-action, tagline).
+
+              IMPORTANT STYLE GUIDELINES:
+              - Use vibrant, eye-catching colors that complement the image (reds, oranges, blues, purples, pinks)
+              - NEVER use plain white or transparent backgrounds
+              - Each layer must have a BOLD colored background with high opacity (0.85-0.95)
+              - Add generous padding (25-35px) for readability
+              - Use large border-radius (12-20px) for modern look
+              - Position layers strategically across the canvas (not all in the same area)
+              - Vary font sizes: headline (60-80px), subheadline (40-50px), CTA (35-45px)
+
               Canvas size is ${width}x${height}px.
-              Return layers with realistic positioning (x, y should be within canvas bounds).
-              Use backgroundColor with semi-transparent colors like rgba(255,20,147,0.9) for better visibility.`,
+              Ensure x, y coordinates keep layers fully visible on canvas.
+
+              Example of good background colors:
+              - rgba(255, 59, 92, 0.92) - vibrant red
+              - rgba(255, 107, 0, 0.90) - energetic orange  
+              - rgba(138, 43, 226, 0.88) - bold purple
+              - rgba(0, 168, 255, 0.90) - electric blue
+              - rgba(255, 20, 147, 0.92) - hot pink`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -487,7 +502,7 @@ export default function Home() {
                         y: { type: "number" },
                         fontSize: { type: "number" },
                         fontFamily: { type: "string" },
-                        fontWeight: { type: "string" },
+                        fontWeight: { type: "number" },
                         color: { type: "string" },
                         backgroundColor: { type: "string" },
                         padding: { type: "number" },
@@ -497,24 +512,25 @@ export default function Home() {
                     }
                   }
                 }
-              }
+              },
+              file_urls: [result.url]
             });
 
             if (layersResult.layers && layersResult.layers.length > 0) {
-              // Create editor layers with proper structure
+              // Create editor layers - NO CANVAS COMPOSITION, just layers for editor
               editorLayers = layersResult.layers.map((layer, idx) => ({
                 id: `layer-${Date.now()}-${idx}`,
                 type: 'text',
                 text: layer.text || '',
-                x: Math.min(layer.x || 50, width - 100),
-                y: Math.min(layer.y || 50, height - 100),
+                x: Math.max(20, Math.min(layer.x || 50, width - 200)),
+                y: Math.max(20, Math.min(layer.y || 50, height - 100)),
                 fontSize: layer.fontSize || 48,
                 fontFamily: layer.fontFamily || 'Arial',
                 fontWeight: layer.fontWeight || 700,
                 color: layer.color || '#ffffff',
-                backgroundColor: layer.backgroundColor || 'transparent',
-                padding: layer.padding || 20,
-                borderRadius: layer.borderRadius || 8,
+                backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
+                padding: Math.max(layer.padding || 25, 20),
+                borderRadius: Math.max(layer.borderRadius || 15, 10),
                 opacity: 100,
                 visible: true,
                 align: layer.textAlign || 'left',
@@ -523,114 +539,10 @@ export default function Home() {
                 shadow: true,
                 stroke: false
               }));
-              console.log('✅ Calques générés:', editorLayers);
-
-              // Compose image with text layers using canvas
-              console.log('🖼️ Composition de l\'image avec les textes...');
-              const canvas = document.createElement('canvas');
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-
-              // Load and draw background image
-              const bgImage = new Image();
-              bgImage.crossOrigin = 'anonymous';
-
-              await new Promise((resolve, reject) => {
-                bgImage.onload = () => {
-                  console.log('✅ Image de fond chargée');
-                  resolve();
-                };
-                bgImage.onerror = (err) => {
-                  console.error('❌ Erreur chargement image:', err);
-                  reject(err);
-                };
-                bgImage.src = result.url;
-              });
-
-              // Draw background
-              ctx.drawImage(bgImage, 0, 0, width, height);
-              console.log('✅ Fond dessiné');
-
-              // Draw text layers
-              editorLayers.forEach((layer, idx) => {
-                if (layer.type === 'text' && layer.text) {
-                  console.log(`🎨 Dessin calque ${idx}:`, layer.text);
-                  ctx.save();
-
-                  // Set font
-                  const fontWeight = layer.fontWeight || 'bold';
-                  const fontSize = layer.fontSize || 48;
-                  const fontFamily = layer.fontFamily || 'Arial';
-                  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-                  ctx.textAlign = layer.textAlign || 'left';
-                  ctx.textBaseline = 'top';
-
-                  // Draw background box if specified
-                  if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-                    const padding = layer.padding || 20;
-                    const metrics = ctx.measureText(layer.text);
-                    const textWidth = metrics.width;
-                    const textHeight = fontSize * 1.2;
-
-                    ctx.fillStyle = layer.backgroundColor;
-                    const boxX = layer.x - padding;
-                    const boxY = layer.y - padding;
-                    const boxWidth = textWidth + padding * 2;
-                    const boxHeight = textHeight + padding * 2;
-
-                    if (layer.borderRadius) {
-                      // Rounded rectangle
-                      const radius = Math.min(layer.borderRadius, boxWidth / 2, boxHeight / 2);
-                      ctx.beginPath();
-                      ctx.moveTo(boxX + radius, boxY);
-                      ctx.lineTo(boxX + boxWidth - radius, boxY);
-                      ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
-                      ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
-                      ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
-                      ctx.lineTo(boxX + radius, boxY + boxHeight);
-                      ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
-                      ctx.lineTo(boxX, boxY + radius);
-                      ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
-                      ctx.closePath();
-                      ctx.fill();
-                    } else {
-                      ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-                    }
-                  }
-
-                  // Draw text
-                  ctx.fillStyle = layer.color || '#ffffff';
-                  ctx.fillText(layer.text, layer.x, layer.y);
-
-                  ctx.restore();
-                }
-              });
-
-              console.log('✅ Tous les calques dessinés');
-
-              // Convert canvas to blob and upload
-              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
-              if (!blob) {
-                throw new Error('Failed to create blob from canvas');
-              }
-
-              const file = new File([blob], 'pub_ad_composite.png', { type: 'image/png' });
-              console.log('📤 Upload de l\'image composite...');
-              const uploadResult = await base44.integrations.Core.UploadFile({ file });
-
-              if (uploadResult?.file_url) {
-                compositeImageUrl = uploadResult.file_url;
-                console.log('✅ Image composite créée:', compositeImageUrl);
-              } else {
-                console.error('❌ Pas d\'URL retournée par l\'upload');
-                throw new Error('Upload failed - no URL returned');
-              }
+              console.log('✅ Calques publicitaires générés:', editorLayers);
             }
           } catch (e) {
-            console.error('❌ Échec composition pub:', e);
-            // En cas d'erreur, on garde l'image originale et les calques
-            compositeImageUrl = result.url;
+            console.error('❌ Échec génération calques pub:', e);
           }
         }
 
