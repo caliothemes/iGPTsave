@@ -914,6 +914,35 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             const totalHeight = lines.length * lineHeight;
             const startY = layer.y - (lines.length - 1) * lineHeight / 2;
             
+            // Draw background box with padding and border-radius FIRST (for pub_ads style)
+            if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+              const metrics = ctx.measureText(layer.text);
+              const textWidth = metrics.width;
+              const padding = layer.padding || 28;
+              const borderRadius = layer.borderRadius || 18;
+              
+              ctx.fillStyle = layer.backgroundColor;
+              const boxX = layer.x - padding;
+              const boxY = layer.y - layer.fontSize * 0.85 - padding;
+              const boxWidth = textWidth + padding * 2;
+              const boxHeight = layer.fontSize * 1.15 + padding * 2;
+              
+              // Draw rounded rectangle
+              const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+              ctx.beginPath();
+              ctx.moveTo(boxX + radius, boxY);
+              ctx.lineTo(boxX + boxWidth - radius, boxY);
+              ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+              ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+              ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+              ctx.lineTo(boxX + radius, boxY + boxHeight);
+              ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+              ctx.lineTo(boxX, boxY + radius);
+              ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+              ctx.closePath();
+              ctx.fill();
+            }
+            
             // 3D Effect (draw multiple offset layers)
             if (layer.effect3d) {
               const depth = 6;
@@ -2421,6 +2450,38 @@ Réponds en JSON avec:
               const lineHeightExport = layer.fontSize * 1.2;
               const totalHeightExport = linesExport.length * lineHeightExport;
               const startYExport = layer.y - (linesExport.length - 1) * lineHeightExport / 2;
+              
+              // Draw background box FIRST (for pub_ads style)
+              if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+                const metrics = exportCtx.measureText(layer.text);
+                const textWidth = metrics.width;
+                const padding = layer.padding || 28;
+                const borderRadius = layer.borderRadius || 18;
+                
+                exportCtx.fillStyle = layer.backgroundColor;
+                const boxX = layer.x - padding;
+                const boxY = layer.y - layer.fontSize * 0.85 - padding;
+                const boxWidth = textWidth + padding * 2;
+                const boxHeight = layer.fontSize * 1.15 + padding * 2;
+                
+                // Draw rounded rectangle
+                const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+                exportCtx.beginPath();
+                exportCtx.moveTo(boxX + radius, boxY);
+                exportCtx.lineTo(boxX + boxWidth - radius, boxY);
+                exportCtx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+                exportCtx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+                exportCtx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+                exportCtx.lineTo(boxX + radius, boxY + boxHeight);
+                exportCtx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+                exportCtx.lineTo(boxX, boxY + radius);
+                exportCtx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+                exportCtx.closePath();
+                exportCtx.fill();
+                
+                // Reset fill style for text
+                exportCtx.fillStyle = layer.color;
+              }
               
               if (layer.effect3d) {
                 const depth = 6;
