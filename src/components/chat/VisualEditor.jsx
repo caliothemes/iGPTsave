@@ -3647,7 +3647,7 @@ Réponds en JSON avec:
                     className="absolute bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg shadow-2xl flex items-center gap-1 p-1.5 animate-in fade-in zoom-in-95"
                     style={{
                       top: `${boxY - 50}px`,
-                      left: `${textX - 5}px`
+                      left: `${textX + effectiveWidth + 10}px`
                     }}
                   >
                   <button
