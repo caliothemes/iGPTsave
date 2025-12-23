@@ -301,12 +301,12 @@ export default function VisualCard({
       {visual.color_palette && visual.color_palette.length > 0 && (
         <button
           onClick={() => setShowColorModal(true)}
-          className="w-full flex gap-1 p-3 hover:bg-white/5 transition-all cursor-pointer"
+          className="w-full flex gap-1 p-1.5 hover:bg-white/5 transition-all cursor-pointer"
         >
           {visual.color_palette.map((color, idx) => (
             <div
               key={idx}
-              className="flex-1 h-8 rounded-md shadow-lg hover:scale-105 transition-transform"
+              className="flex-1 h-4 rounded-md shadow-lg hover:scale-105 transition-transform"
               style={{ backgroundColor: color }}
             />
           ))}
