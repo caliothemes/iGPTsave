@@ -301,7 +301,7 @@ export default function VisualCard({
       {visual.color_palette && visual.color_palette.length > 0 && (
         <button
           onClick={() => setShowColorModal(true)}
-          className="w-full flex gap-1 p-1.5 hover:bg-white/5 transition-all cursor-pointer"
+          className="w-full flex gap-1 px-4 py-2 hover:bg-white/5 transition-all cursor-pointer"
         >
           {visual.color_palette.map((color, idx) => (
             <div
