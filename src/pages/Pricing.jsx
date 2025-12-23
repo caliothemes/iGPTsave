@@ -243,9 +243,9 @@ export default function Pricing() {
 
   const subscriptions = subscriptionPlans.filter(plan => {
     if (billingCycle === 'yearly') {
-      return plan.price_yearly > 0;
+      return plan.price_yearly && plan.price_yearly > 0;
     } else {
-      return plan.price_monthly > 0 && !plan.price_yearly;
+      return plan.price_monthly && plan.price_monthly > 0;
     }
   });
 
