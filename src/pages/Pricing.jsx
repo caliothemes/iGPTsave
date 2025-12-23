@@ -195,6 +195,27 @@ export default function Pricing() {
   const { language } = useLanguage();
   const [purchasing, setPurchasing] = useState(null);
   const [billingCycle, setBillingCycle] = useState('monthly');
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  const [creditPacks, setCreditPacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPricing = async () => {
+      try {
+        const [plans, packs] = await Promise.all([
+          base44.entities.SubscriptionPlan.filter({ is_active: true }, 'order'),
+          base44.entities.CreditPack.filter({ is_active: true }, 'order')
+        ]);
+        setSubscriptionPlans(plans);
+        setCreditPacks(packs);
+      } catch (e) {
+        console.error('Failed to load pricing:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPricing();
+  }, []);
 
   const handlePurchase = async (priceId, user) => {
     if (!user) {
@@ -220,15 +241,33 @@ export default function Pricing() {
     }
   };
 
-  const subscriptions = billingCycle === 'yearly' 
-    ? STRIPE_PRODUCTS.subscriptions.yearly 
-    : STRIPE_PRODUCTS.subscriptions.monthly;
+  // Filter plans by billing cycle
+  const subscriptions = subscriptionPlans.filter(plan => {
+    if (billingCycle === 'yearly') {
+      return plan.messages_per_year !== undefined && plan.messages_per_year !== null;
+    } else {
+      return plan.messages_per_month !== undefined && plan.messages_per_month !== null && 
+             (plan.messages_per_year === undefined || plan.messages_per_year === null);
+    }
+  });
 
   const getSavings = (plan) => {
-    if (billingCycle !== 'yearly' || !plan.priceMonthly) return 0;
-    const yearlyEquivalent = plan.priceMonthly * 12;
-    return Math.round(((yearlyEquivalent - plan.price) / yearlyEquivalent) * 100);
+    if (billingCycle !== 'yearly' || !plan.price_monthly) return 0;
+    const yearlyEquivalent = plan.price_monthly * 12;
+    return Math.round(((yearlyEquivalent - plan.price_yearly) / yearlyEquivalent) * 100);
   };
+
+  if (loading) {
+    return (
+      <PageWrapper>
+        {() => (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+          </div>
+        )}
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper>
@@ -303,19 +342,25 @@ export default function Pricing() {
               {language === 'fr' ? 'Abonnements' : 'Subscriptions'}
             </h2>
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-              {subscriptions.map((sub) => {
-                const IconComp = ICONS[sub.icon] || MessageSquare;
-                const savings = getSavings(sub);
-                const features = language === 'fr' ? sub.features.fr : sub.features.en;
+              {subscriptions.map((plan) => {
+                const IconComp = ICONS[plan.icon] || MessageSquare;
+                const savings = getSavings(plan);
+                const features = language === 'fr' ? (plan.features_fr || []) : (plan.features_en || plan.features_fr || []);
+                const planName = language === 'fr' ? plan.name_fr : (plan.name_en || plan.name_fr);
+                const isFree = plan.plan_id === 'free';
+                const messagesPerMonth = billingCycle === 'yearly' 
+                  ? (plan.messages_per_year === -1 ? '∞' : Math.floor((plan.messages_per_year || 0) / 12))
+                  : (plan.messages_per_month === -1 ? '∞' : plan.messages_per_month);
+                const price = billingCycle === 'yearly' ? plan.price_yearly : plan.price_monthly;
                 
                 return (
-                  <div key={sub.id} className={cn(
+                  <div key={plan.id} className={cn(
                     "relative rounded-2xl p-5 transition-all duration-300 hover:scale-105 flex flex-col",
-                    sub.is_popular 
+                    plan.is_popular 
                       ? "bg-gradient-to-br from-violet-800/30 to-purple-800/30 border-2 border-violet-500/50" 
                       : "bg-white/5 border border-white/10 hover:border-white/30"
                   )}>
-                    {sub.is_popular && (
+                    {plan.is_popular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full text-white text-xs font-medium whitespace-nowrap">
                         {language === 'fr' ? 'Populaire' : 'Popular'}
                       </div>
@@ -323,17 +368,17 @@ export default function Pricing() {
                     
                     {/* Icon & Name */}
                     <div className="flex items-center gap-2 mb-3">
-                      <div className={cn("p-2 rounded-lg bg-gradient-to-br", sub.gradient)}>
+                      <div className={cn("p-2 rounded-lg bg-gradient-to-br", plan.gradient || 'from-violet-600 to-purple-600')}>
                         <IconComp className="h-4 w-4 text-white" />
                       </div>
                       <h3 className="text-lg font-bold text-white">
-                        {sub.name[language]}
+                        {planName}
                       </h3>
                     </div>
 
                     {/* Price */}
                     <div className="mb-2">
-                      <span className="text-2xl font-bold text-white">{sub.price}€</span>
+                      <span className="text-2xl font-bold text-white">{price}€</span>
                       <span className="text-white/50 text-sm">
                         /{billingCycle === 'yearly' ? (language === 'fr' ? 'an' : 'year') : (language === 'fr' ? 'mois' : 'month')}
                       </span>
@@ -349,31 +394,34 @@ export default function Pricing() {
                     )}
 
                     {/* Credits */}
-                                              <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
-                                                {sub.isFree ? (
-                                                  <>
-                                                    <span className="text-white font-medium">{sub.credits}</span>
-                                                    <span className="text-white/60 text-sm"> {language === 'fr' ? 'crédits offerts / mois' : 'free credits / month'}</span>
-                                                  </>
-                                                ) : (
+                    <div className="mb-3 px-2 py-1 bg-white/5 rounded-lg text-center">
+                      {isFree ? (
                         <>
-                          <span className="text-white font-medium">
-                            {billingCycle === 'yearly' ? sub.creditsPerMonth : sub.credits}
-                          </span>
+                          <span className="text-white font-medium">{messagesPerMonth}</span>
+                          <span className="text-white/60 text-sm"> {language === 'fr' ? 'crédits offerts / mois' : 'free credits / month'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-white font-medium">{messagesPerMonth}</span>
                           <span className="text-white/60 text-sm"> {language === 'fr' ? 'crédits/mois' : 'credits/mo'}</span>
                         </>
                       )}
                     </div>
 
                     {/* Cost per credit */}
-                    {!sub.isFree && (
+                    {!isFree && messagesPerMonth !== '∞' && (
                       <p className="text-xs text-emerald-400 mb-3 text-center">
-                        {(sub.price / (billingCycle === 'yearly' ? sub.credits : sub.credits)).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
+                        {(price / messagesPerMonth).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                       </p>
                     )}
-                    {sub.isFree && (
+                    {isFree && (
                       <p className="text-xs text-white/40 mb-3 text-center">
                         {language === 'fr' ? 'Aucun paiement requis' : 'No payment required'}
+                      </p>
+                    )}
+                    {messagesPerMonth === '∞' && !isFree && (
+                      <p className="text-xs text-violet-400 mb-3 text-center font-medium">
+                        {language === 'fr' ? 'Illimité' : 'Unlimited'}
                       </p>
                     )}
 
@@ -388,11 +436,11 @@ export default function Pricing() {
                     </ul>
 
                     {/* Button */}
-                    {sub.isFree ? (
+                    {isFree ? (
                       <Button 
                         onClick={() => !user && base44.auth.redirectToLogin(createPageUrl('Pricing'))}
                         size="sm"
-                        className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", sub.gradient)}
+                        className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", plan.gradient || 'from-gray-600 to-gray-700')}
                         disabled={!!user}
                       >
                         {user 
@@ -401,12 +449,12 @@ export default function Pricing() {
                       </Button>
                     ) : (
                       <Button 
-                        onClick={() => handlePurchase(sub.priceId, user)} 
-                        disabled={purchasing === sub.priceId}
+                        onClick={() => handlePurchase(plan.stripe_price_id, user)} 
+                        disabled={purchasing === plan.stripe_price_id}
                         size="sm"
-                        className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", sub.gradient)}
+                        className={cn("w-full bg-gradient-to-r hover:opacity-90 transition-opacity", plan.gradient || 'from-violet-600 to-purple-600')}
                       >
-                        {purchasing === sub.priceId
+                        {purchasing === plan.stripe_price_id
                           ? <Loader2 className="h-4 w-4 animate-spin" />
                           : (language === 'fr' ? 'Souscrire' : 'Subscribe')}
                       </Button>
@@ -424,7 +472,7 @@ export default function Pricing() {
               {language === 'fr' ? 'Recharges de crédits' : 'Credit packs'}
             </h2>
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4 max-w-4xl mx-auto">
-              {STRIPE_PRODUCTS.packs.map((pack) => (
+              {creditPacks.map((pack) => (
                 <div key={pack.id} className={cn(
                   "relative rounded-2xl p-6 transition-all duration-300 hover:scale-105",
                   pack.is_popular 
@@ -444,8 +492,8 @@ export default function Pricing() {
                       {(pack.price / pack.credits).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                     </p>
                     <Button 
-                      onClick={() => handlePurchase(pack.priceId, user)} 
-                      disabled={purchasing === pack.priceId} 
+                      onClick={() => handlePurchase(pack.stripe_price_id, user)} 
+                      disabled={purchasing === pack.stripe_price_id} 
                       className={cn(
                         "w-full", 
                         pack.is_popular 
@@ -453,7 +501,7 @@ export default function Pricing() {
                           : "bg-white/10 hover:bg-white/20 text-white"
                       )}
                     >
-                      {purchasing === pack.priceId
+                      {purchasing === pack.stripe_price_id
                         ? <Loader2 className="h-4 w-4 animate-spin" />
                         : (language === 'fr' ? 'Acheter' : 'Buy')}
                     </Button>
