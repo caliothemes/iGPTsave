@@ -20,6 +20,8 @@ const STRIPE_PRICE_MAP = {
   'ELITE_yearly': 'price_1SZJ33HfyAhC7kY5fdZqeGdC',
   'ELITE_PLUS_yearly': 'price_1SZJ4hHfyAhC7kY54We57RJk',
   // Packs de crédits
+  'pack_50': null, // À configurer dans Stripe
+  'pack_100': null, // À configurer dans Stripe
   'pack_250': 'price_1SZIvEHfyAhC7kY5PJgk7nME',
   'pack_500': 'price_1SZIvjHfyAhC7kY5irsRoqBB'
 };
