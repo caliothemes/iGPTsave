@@ -420,9 +420,9 @@ export default function Pricing() {
                     </div>
 
                     {/* Cost per credit */}
-                    {!isFree && creditsPerMonth > 0 && (
+                    {!isFree && credits > 0 && (
                       <p className="text-xs text-emerald-400 mb-3 text-center">
-                        {(price / creditsPerMonth).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
+                        {(price / credits).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                       </p>
                     )}
                     {isFree && (
