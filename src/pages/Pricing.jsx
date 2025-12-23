@@ -7,184 +7,21 @@ import PageWrapper from '@/components/PageWrapper';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from "@/lib/utils";
 
-// Produits Stripe - IDs réels
-const STRIPE_PRODUCTS = {
-  subscriptions: {
-    monthly: [
-      { 
-                    id: 'free',
-                    priceId: null, // Gratuit, pas de paiement
-                    name: { fr: 'GRATUIT', en: 'FREE' },
-                    price: 0,
-                    credits: 25,
-                    icon: 'MessageSquare',
-                    gradient: 'from-slate-600 to-gray-600',
-                    isFree: true,
-                    features: { 
-                      fr: ['25 crédits offerts / mois', 'Visuels HD', 'Support'],
-                      en: ['25 free credits / month', 'HD visuals', 'Support']
-                    }
-                  },
-      { 
-        id: 'starter_monthly',
-        priceId: 'price_1SZIx2HfyAhC7kY5qlFmFIP8', // prod_TWLeCLUbXfQ4KF
-        name: { fr: 'STARTER', en: 'STARTER' },
-        price: 8.90,
-        credits: 100,
-        icon: 'Zap',
-        gradient: 'from-blue-600 to-cyan-600',
-        features: { 
-          fr: ['100 crédits/mois', 'Visuels HD', 'Support'],
-          en: ['100 credits/month', 'HD visuals', 'Support']
-        }
-      },
-      { 
-        id: 'pro_monthly',
-        priceId: 'price_1SZIzfHfyAhC7kY506OILTq9', // prod_TWLhV1pSXRSz3Q
-        name: { fr: 'PRO', en: 'PRO' },
-        price: 14.90,
-        credits: 250,
-        icon: 'Rocket',
-        gradient: 'from-violet-600 to-purple-600',
-        is_popular: true,
-        features: { 
-          fr: ['250 crédits/mois', 'Visuels HD', 'Support'],
-          en: ['250 credits/month', 'HD visuals', 'Support']
-        }
-      },
-      { 
-        id: 'elite_monthly',
-        priceId: 'price_1SZJ2HHfyAhC7kY5I0sUBlJq', // prod_TWLjEEHP8GyXTV
-        name: { fr: 'ELITE', en: 'ELITE' },
-        price: 24.90,
-        credits: 500,
-        icon: 'Crown',
-        gradient: 'from-amber-600 to-orange-600',
-        features: { 
-          fr: ['500 crédits/mois', 'Visuels HD & Print', 'Support'],
-          en: ['500 credits/month', 'HD & Print visuals', 'Support']
-        }
-      },
-      { 
-        id: 'elite_plus_monthly',
-        priceId: 'price_1SZJ3tHfyAhC7kY520ohEG7x', // prod_TWLlhvQGwnrOHX
-        name: { fr: 'ELITE PLUS', en: 'ELITE PLUS' },
-        price: 39.90,
-        credits: 1000,
-        icon: 'Gem',
-        gradient: 'from-rose-600 to-pink-600',
-        features: { 
-          fr: ['1000 crédits/mois', 'Visuels HD & Print', 'Support'],
-          en: ['1000 credits/month', 'HD & Print visuals', 'Support']
-        }
-      }
-    ],
-    yearly: [
-      { 
-                    id: 'free',
-                    priceId: null,
-                    name: { fr: 'GRATUIT', en: 'FREE' },
-                    price: 0,
-                    credits: 25,
-                    creditsPerMonth: 25,
-                    icon: 'MessageSquare',
-                    gradient: 'from-slate-600 to-gray-600',
-                    isFree: true,
-                    features: { 
-                      fr: ['25 crédits offerts / mois', 'Visuels HD', 'Support'],
-                      en: ['25 free credits / month', 'HD visuals', 'Support']
-                    }
-                  },
-      { 
-        id: 'starter_yearly',
-        priceId: 'price_1SZIyTHfyAhC7kY5BAIvAIyy', // prod_TWLfJW2UaDTeo5
-        name: { fr: 'STARTER', en: 'STARTER' },
-        price: 89,
-        priceMonthly: 8.90,
-        credits: 1200,
-        creditsPerMonth: 100,
-        icon: 'Zap',
-        gradient: 'from-blue-600 to-cyan-600',
-        features: { 
-          fr: ['100 crédits/mois', '1200/an', 'Visuels HD'],
-          en: ['100 credits/month', '1200/year', 'HD visuals']
-        }
-      },
-      { 
-        id: 'pro_yearly',
-        priceId: 'price_1SZJ1IHfyAhC7kY5pcJVZdxv', // prod_TWLirA98VTt6kD
-        name: { fr: 'PRO', en: 'PRO' },
-        price: 149,
-        priceMonthly: 14.90,
-        credits: 3000,
-        creditsPerMonth: 250,
-        icon: 'Rocket',
-        gradient: 'from-violet-600 to-purple-600',
-        is_popular: true,
-        features: { 
-          fr: ['250 crédits/mois', '3000/an', 'Support'],
-          en: ['250 credits/month', '3000/year', 'Support']
-        }
-      },
-      { 
-        id: 'elite_yearly',
-        priceId: 'price_1SZJ33HfyAhC7kY5fdZqeGdC', // prod_TWLkczcFEQ2ebe
-        name: { fr: 'ELITE', en: 'ELITE' },
-        price: 249,
-        priceMonthly: 24.90,
-        credits: 6000,
-        creditsPerMonth: 500,
-        icon: 'Crown',
-        gradient: 'from-amber-600 to-orange-600',
-        features: { 
-          fr: ['500 crédits/mois', '6000/an', 'Support'],
-          en: ['500 credits/month', '6000/year', 'Support']
-        }
-      },
-      { 
-        id: 'elite_plus_yearly',
-        priceId: 'price_1SZJ4hHfyAhC7kY54We57RJk', // prod_TWLm7SIvUgDBGh
-        name: { fr: 'ELITE PLUS', en: 'ELITE PLUS' },
-        price: 399,
-        priceMonthly: 39.90,
-        credits: 12000,
-        creditsPerMonth: 1000,
-        icon: 'Gem',
-        gradient: 'from-rose-600 to-pink-600',
-        features: { 
-          fr: ['1000 crédits/mois', '12000/an', 'Support'],
-          en: ['1000 credits/month', '12000/year', 'Support']
-        }
-      }
-    ]
-  },
-  packs: [
-    { 
-      id: 'pack_50',
-      priceId: 'price_pack_50', // À configurer
-      credits: 50,
-      price: 5.90
-    },
-    { 
-      id: 'pack_100',
-      priceId: 'price_pack_100', // À configurer
-      credits: 100,
-      price: 9.90
-    },
-    { 
-      id: 'pack_250',
-      priceId: 'price_1SZIvEHfyAhC7kY5PJgk7nME', // prod_TWLcf4UtzqMQe4
-      credits: 250,
-      price: 19.90,
-      is_popular: true
-    },
-    { 
-      id: 'pack_500',
-      priceId: 'price_1SZIvjHfyAhC7kY5irsRoqBB', // prod_TWLc6dyHxZtKJS
-      credits: 500,
-      price: 29.90
-    }
-  ]
+// Mapping des IDs Stripe basé sur les plan_id et pack_id
+const STRIPE_PRICE_MAP = {
+  // Abonnements mensuels
+  'STARTER_monthly': 'price_1ShegoHfyAhC7kY5vM7hrQf4',
+  'PRO_monthly': 'price_1ShenYHfyAhC7kY55ZxTTzmP',
+  'ELITE_monthly': 'price_1SZJ2HHfyAhC7kY5I0sUBlJq',
+  'ELITE_PLUS_monthly': 'price_1SZJ3tHfyAhC7kY520ohEG7x',
+  // Abonnements annuels
+  'STARTER_yearly': 'price_1ShekhHfyAhC7kY5wGLtF0e4',
+  'PRO_yearly': 'price_1SheoZHfyAhC7kY5d2OSRE3h',
+  'ELITE_yearly': 'price_1SZJ33HfyAhC7kY5fdZqeGdC',
+  'ELITE_PLUS_yearly': 'price_1SZJ4hHfyAhC7kY54We57RJk',
+  // Packs de crédits
+  'pack_250': 'price_1SZIvEHfyAhC7kY5PJgk7nME',
+  'pack_500': 'price_1SZIvjHfyAhC7kY5irsRoqBB'
 };
 
 const ICONS = {
@@ -358,11 +195,12 @@ export default function Pricing() {
                 const savings = getSavings(plan);
                 const features = language === 'fr' ? (plan.features_fr || []) : (plan.features_en || plan.features_fr || []);
                 const planName = language === 'fr' ? plan.name_fr : (plan.name_en || plan.name_fr);
-                const isFree = plan.plan_id === 'free';
+                const isFree = plan.plan_id === 'free' || plan.plan_id === 'FREE';
                 const price = billingCycle === 'yearly' ? plan.price_yearly : plan.price_monthly;
                 const credits = billingCycle === 'yearly' ? plan.messages_per_year : plan.messages_per_month;
                 const creditsPerMonth = billingCycle === 'yearly' ? Math.floor(plan.messages_per_year / 12) : plan.messages_per_month;
-                const stripeId = billingCycle === 'yearly' ? plan.stripe_price_id_yearly : plan.stripe_price_id_monthly;
+                // Get Stripe Price ID from mapping
+                const stripeId = STRIPE_PRICE_MAP[`${plan.plan_id}_${billingCycle}`];
                 
                 return (
                   <div key={plan.id} className={cn(
@@ -498,8 +336,11 @@ export default function Pricing() {
                       {(pack.price / pack.credits).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                     </p>
                     <Button 
-                      onClick={() => handlePurchase(pack.stripe_price_id, user)} 
-                      disabled={purchasing === pack.stripe_price_id || !pack.stripe_price_id} 
+                      onClick={() => {
+                        const stripeId = STRIPE_PRICE_MAP[pack.pack_id];
+                        handlePurchase(stripeId, user);
+                      }} 
+                      disabled={purchasing === STRIPE_PRICE_MAP[pack.pack_id] || !STRIPE_PRICE_MAP[pack.pack_id]} 
                       className={cn(
                         "w-full", 
                         pack.is_popular 
@@ -507,7 +348,7 @@ export default function Pricing() {
                           : "bg-white/10 hover:bg-white/20 text-white"
                       )}
                     >
-                      {purchasing === pack.stripe_price_id
+                      {purchasing === STRIPE_PRICE_MAP[pack.pack_id]
                         ? <Loader2 className="h-4 w-4 animate-spin" />
                         : (language === 'fr' ? 'Acheter' : 'Buy')}
                     </Button>
