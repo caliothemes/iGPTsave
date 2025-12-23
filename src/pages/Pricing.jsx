@@ -203,11 +203,24 @@ export default function Pricing() {
     const loadPricing = async () => {
       try {
         const [plans, packs] = await Promise.all([
-          base44.entities.SubscriptionPlan.filter({ is_active: true }, 'order'),
-          base44.entities.CreditPack.filter({ is_active: true }, 'order')
+          base44.entities.SubscriptionPlan.filter({ is_active: true }),
+          base44.entities.CreditPack.filter({ is_active: true })
         ]);
-        setSubscriptionPlans(plans);
-        setCreditPacks(packs);
+        
+        // Sort subscriptions: FREE first, then by price ascending
+        const sortedPlans = plans.sort((a, b) => {
+          if (a.plan_id === 'free') return -1;
+          if (b.plan_id === 'free') return 1;
+          const priceA = a.price_monthly || 0;
+          const priceB = b.price_monthly || 0;
+          return priceA - priceB;
+        });
+        
+        // Sort credit packs by price ascending
+        const sortedPacks = packs.sort((a, b) => (a.price || 0) - (b.price || 0));
+        
+        setSubscriptionPlans(sortedPlans);
+        setCreditPacks(sortedPacks);
       } catch (e) {
         console.error('Failed to load pricing:', e);
       } finally {
