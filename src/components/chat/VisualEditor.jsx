@@ -330,7 +330,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
           const hasBaseImageLayer = visual.editor_layers.some(l => l.isBaseImage);
           
           // Collect all images to preload (base + layers)
-          const imageUrls = [baseUrl, originalUrl];
+          const imageUrls = [baseUrl];
           visual.editor_layers.forEach(layer => {
             if (layer.type === 'image' && layer.imageUrl && !imageUrls.includes(layer.imageUrl)) {
               imageUrls.push(layer.imageUrl);
