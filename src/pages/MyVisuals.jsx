@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Grid, List, Heart, Download, Pencil } from 'lucide-react';
+import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
 import { useLanguage } from '@/components/LanguageContext';
@@ -38,6 +38,9 @@ export default function MyVisuals() {
   const [adsVisual, setAdsVisual] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropVisual, setCropVisual] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const VISUALS_PER_PAGE = 15;
+  const visualRefs = useRef({});
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -145,6 +148,15 @@ export default function MyVisuals() {
     
     setVisuals(prev => prev.map(v => v.id === editingVisual.id ? updatedVisual : v));
     setShowEditor(false);
+    
+    // Scroll to the edited visual after closing editor
+    setTimeout(() => {
+      const visualElement = visualRefs.current[editingVisual.id];
+      if (visualElement) {
+        visualElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    
     setEditingVisual(null);
   };
 
@@ -268,6 +280,17 @@ export default function MyVisuals() {
     return matchesSearch && matchesFilter && matchesType && matchesFormat;
   });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredVisuals.length / VISUALS_PER_PAGE);
+  const startIndex = (currentPage - 1) * VISUALS_PER_PAGE;
+  const endIndex = startIndex + VISUALS_PER_PAGE;
+  const paginatedVisuals = filteredVisuals.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filter, typeFilter, formatFilter]);
+
   // Editor view
   if (showEditor && editingVisual) {
     return (
@@ -367,40 +390,92 @@ export default function MyVisuals() {
           {filteredVisuals.length === 0 ? (
             <div className="text-center py-12 text-white/40">{t.noVisuals}</div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-              {filteredVisuals.map((visual) => (
-                <div key={visual.id} className="relative">
-                  {visual.isPurchased && (
-                    <div className="absolute top-2 left-2 z-10">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-violet-600 text-white text-xs font-medium rounded-full shadow-lg">
-                        🛍️ {language === 'fr' ? 'Acheté sur l\'iGPT Store' : 'Purchased on iGPT Store'}
-                      </span>
-                    </div>
-                  )}
-                  <VisualCard
-                    visual={visual}
-                    onDownload={() => handleDownload(visual, credits)}
-                    onToggleFavorite={handleToggleFavorite}
-                    onValidate={(action) => {
-                      if (action === 'edit') handleEdit(visual);
-                      else if (action === 'video') handleOpenVideo(visual);
-                      else if (action === 'ads') handleOpenADS(visual);
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+                {paginatedVisuals.map((visual) => (
+                  <div 
+                    key={visual.id} 
+                    className="relative"
+                    ref={(el) => {
+                      if (el) visualRefs.current[visual.id] = el;
                     }}
-                    onCropOpen={(v) => {
-                      setCropVisual(v);
-                      setShowCropModal(true);
-                    }}
-                    isRegenerating={false}
-                    canDownload={true}
-                    compact
-                    hideInfoMessage={true}
-                    showActions={true}
-                    showValidation={true}
-                    hideEditButton={true}
-                  />
+                  >
+                    {visual.isPurchased && (
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-violet-600 text-white text-xs font-medium rounded-full shadow-lg">
+                          🛍️ {language === 'fr' ? 'Acheté sur l\'iGPT Store' : 'Purchased on iGPT Store'}
+                        </span>
+                      </div>
+                    )}
+                    <VisualCard
+                      visual={visual}
+                      onDownload={() => handleDownload(visual, credits)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onValidate={(action) => {
+                        if (action === 'edit') handleEdit(visual);
+                        else if (action === 'video') handleOpenVideo(visual);
+                        else if (action === 'ads') handleOpenADS(visual);
+                      }}
+                      onCropOpen={(v) => {
+                        setCropVisual(v);
+                        setShowCropModal(true);
+                      }}
+                      isRegenerating={false}
+                      canDownload={true}
+                      compact
+                      hideInfoMessage={true}
+                      showActions={true}
+                      showValidation={true}
+                      hideEditButton={true}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="bg-white/5 border-white/10 text-white hover:bg-white/10 disabled:opacity-30"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={cn(
+                          "min-w-[32px]",
+                          currentPage === page 
+                            ? "bg-violet-600 text-white hover:bg-violet-700" 
+                            : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                        )}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="bg-white/5 border-white/10 text-white hover:bg-white/10 disabled:opacity-30"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
 
           {/* Modals */}
