@@ -2291,6 +2291,17 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
+            // Apply clipping mask if layer has one (for mockup zones)
+            if (layer.clipMask && layer.clipMask.length > 0) {
+              exportCtx.beginPath();
+              layer.clipMask.forEach((point, i) => {
+                if (i === 0) exportCtx.moveTo(point[0], point[1]);
+                else exportCtx.lineTo(point[0], point[1]);
+              });
+              exportCtx.closePath();
+              exportCtx.clip();
+            }
+            
             if (layer.halo) {
               exportCtx.shadowColor = layer.haloColor || '#FFD700';
               exportCtx.shadowBlur = layer.haloSize || 15;
@@ -4718,15 +4729,30 @@ Réponds en JSON avec:
                     try {
                       const { file_url: userImageUrl } = await base44.integrations.Core.UploadFile({ file: mockupImageFile });
                       
+                      // Load the uploaded image to get its real dimensions
+                      const uploadedImg = await new Promise((resolve) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => resolve(img);
+                        img.src = userImageUrl;
+                      });
+                      
                       const zone = detectedZone;
+                      
+                      // Calculate size: width fits zone, height proportional (real size)
+                      const scale = zone.width / uploadedImg.width;
+                      const scaledHeight = uploadedImg.height * scale;
+                      
+                      // Center vertically in the zone
+                      const yOffset = (zone.height - scaledHeight) / 2;
                       
                       const newLayer = {
                         type: 'image',
                         imageUrl: userImageUrl,
                         x: zone.x,
-                        y: zone.y,
+                        y: zone.y + yOffset,
                         width: zone.width,
-                        height: zone.height,
+                        height: scaledHeight,
                         opacity: 100,
                         clipMask: zone.points,
                         lockedToMask: true
