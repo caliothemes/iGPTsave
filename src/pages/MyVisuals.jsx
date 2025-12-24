@@ -446,28 +446,82 @@ export default function MyVisuals() {
                   </Button>
                   
                   <div className="flex items-center gap-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setCurrentPage(page)}
-                        className={cn(
-                          "min-w-[32px]",
-                          currentPage === page 
-                            ? "bg-violet-600 text-white hover:bg-violet-700" 
-                            : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
-                        )}
-                      >
-                        {page}
-                      </Button>
-                    ))}
+                    {(() => {
+                      const pages = [];
+                      const showEllipsis = totalPages > 7;
+                      
+                      if (!showEllipsis) {
+                        // Show all pages if 7 or less
+                        for (let i = 1; i <= totalPages; i++) {
+                          pages.push(i);
+                        }
+                      } else {
+                        // Always show first page
+                        pages.push(1);
+                        
+                        if (currentPage > 3) {
+                          pages.push('ellipsis-start');
+                        }
+                        
+                        // Show pages around current page
+                        const start = Math.max(2, currentPage - 1);
+                        const end = Math.min(totalPages - 1, currentPage + 1);
+                        
+                        for (let i = start; i <= end; i++) {
+                          if (!pages.includes(i)) {
+                            pages.push(i);
+                          }
+                        }
+                        
+                        if (currentPage < totalPages - 2) {
+                          pages.push('ellipsis-end');
+                        }
+                        
+                        // Always show last page
+                        if (!pages.includes(totalPages)) {
+                          pages.push(totalPages);
+                        }
+                      }
+                      
+                      return pages.map((page, idx) => {
+                        if (typeof page === 'string') {
+                          return (
+                            <span key={page} className="px-2 text-white/40">
+                              ...
+                            </span>
+                          );
+                        }
+                        
+                        return (
+                          <Button
+                            key={page}
+                            variant={currentPage === page ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => {
+                              setCurrentPage(page);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className={cn(
+                              "min-w-[32px]",
+                              currentPage === page 
+                                ? "bg-violet-600 text-white hover:bg-violet-700" 
+                                : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                            )}
+                          >
+                            {page}
+                          </Button>
+                        );
+                      });
+                    })()}
                   </div>
                   
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    onClick={() => {
+                      setCurrentPage(p => Math.min(totalPages, p + 1));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
                     disabled={currentPage === totalPages}
                     className="bg-white/5 border-white/10 text-white hover:bg-white/10 disabled:opacity-30"
                   >
