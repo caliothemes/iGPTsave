@@ -195,8 +195,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [textToolExpanded, setTextToolExpanded] = useState(false); // Expansion de l'outil texte
   const [shapesToolExpanded, setShapesToolExpanded] = useState(false); // Expansion de l'outil formes
   
-  // Store original image URL separately (never changes)
-  const [originalImageUrl, setOriginalImageUrl] = useState(visual.original_image_url || visual.image_url);
+  // Store original image URL separately - updates when visual changes (e.g., after crop)
+  const [originalImageUrl, setOriginalImageUrl] = useState(visual.image_url);
   
   // Custom texture generator
   const [showTextureGenerator, setShowTextureGenerator] = useState(false);
@@ -316,12 +316,11 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
     init();
   }, [visual.id]);
 
-  // Load base image - use original_image_url for pub_ads to avoid double text
+  // Load base image - use image_url as base (it contains cropped version if cropped)
       useEffect(() => {
-        // For pub_ads, use original_image_url (without burned text) as base
-        const baseUrl = visual.original_image_url || visual.image_url;
-        const originalUrl = visual.original_image_url || visual.image_url;
-        setOriginalImageUrl(originalUrl);
+        // Use image_url which reflects current state (cropped if cropped, original if not)
+        const baseUrl = visual.image_url;
+        setOriginalImageUrl(baseUrl);
         
         // If we have saved layers, preload their images first
         if (visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0) {
