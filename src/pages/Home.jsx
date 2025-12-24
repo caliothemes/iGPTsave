@@ -971,14 +971,26 @@ export default function Home() {
     setEditingVisual(null);
   };
 
-  const handleCropComplete = (newImageUrl) => {
+  const handleCropComplete = async (newImageUrl) => {
     // Update current visual with cropped image
     if (currentVisual) {
       const updatedVisual = {
         ...currentVisual,
         image_url: newImageUrl,
-        original_image_url: currentVisual.original_image_url || currentVisual.image_url
+        original_image_url: newImageUrl // Use cropped image as new base
       };
+
+      // Save to database if user is logged in
+      if (user && updatedVisual.id) {
+        try {
+          await base44.entities.Visual.update(updatedVisual.id, {
+            image_url: newImageUrl,
+            original_image_url: newImageUrl
+          });
+        } catch (e) {
+          console.error('Failed to save cropped visual:', e);
+        }
+      }
 
       // Update in messages history
       setMessages(prev => prev.map(m => 
