@@ -318,7 +318,7 @@ export default function Pricing() {
               {language === 'fr' ? 'Recharges de crédits' : 'Credit packs'}
             </h2>
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4 max-w-4xl mx-auto">
-              {creditPacks.map((pack) => (
+              {creditPacks.filter(pack => STRIPE_PRICE_MAP[pack.pack_id]).map((pack) => (
                 <div key={pack.id} className={cn(
                   "relative rounded-2xl p-6 transition-all duration-300 hover:scale-105",
                   pack.is_popular 
