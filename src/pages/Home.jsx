@@ -1753,7 +1753,10 @@ export default function Home() {
                       <DropdownMenuItem 
                         key={cat.id}
                         onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
-                        className="text-white"
+                        className={cn(
+                          "text-white",
+                          cat.id === 'free_prompt' && "bg-orange-500/10 hover:bg-orange-500/20 text-orange-200"
+                        )}
                       >
                         {cat?.name?.[language] || cat?.name?.fr || 'N/A'}
                       </DropdownMenuItem>
