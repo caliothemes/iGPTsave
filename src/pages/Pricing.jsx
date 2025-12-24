@@ -20,8 +20,8 @@ const STRIPE_PRICE_MAP = {
   'ELITE_yearly': 'price_1SZJ33HfyAhC7kY5fdZqeGdC',
   'ELITE_PLUS_yearly': 'price_1SZJ4hHfyAhC7kY54We57RJk',
   // Packs de crédits
-  'pack_50': null, // À configurer dans Stripe
-  'pack_100': null, // À configurer dans Stripe
+  'pack_50': 'price_1SZItxHfyAhC7kY58eNCZH1N',
+  'pack_100': 'price_1SZIuiHfyAhC7kY5Uv5NTq2A',
   'pack_250': 'price_1SZIvEHfyAhC7kY5PJgk7nME',
   'pack_500': 'price_1SZIvjHfyAhC7kY5irsRoqBB'
 };
@@ -318,7 +318,7 @@ export default function Pricing() {
               {language === 'fr' ? 'Recharges de crédits' : 'Credit packs'}
             </h2>
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4 max-w-4xl mx-auto">
-              {creditPacks.filter(pack => STRIPE_PRICE_MAP[pack.pack_id]).map((pack) => (
+              {creditPacks.map((pack) => (
                 <div key={pack.id} className={cn(
                   "relative rounded-2xl p-6 transition-all duration-300 hover:scale-105",
                   pack.is_popular 
