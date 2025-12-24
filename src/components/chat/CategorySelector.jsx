@@ -9,7 +9,7 @@ const CATEGORIES = [
   {
     id: 'logo_picto',
     icon: Gem,
-    name: { fr: 'Logo Pictogramme', en: 'Logo Icon' },
+    name: { fr: 'Pictogramme', en: 'Pictogram' },
     description: { fr: 'Logo pictogramme sans texte, icône seule, palette d\'icônes, illustrations, symboles...', en: 'Logo icon without text, icon only, icon palette, illustrations, symbols...' },
     hasSubmenu: false,
     prompt: { fr: 'Crée un logo pictogramme', en: 'Create a logo icon' },
@@ -98,7 +98,7 @@ const CATEGORIES = [
   {
     id: 'design_3d',
     icon: Box,
-    name: { fr: 'Design Texte 3D', en: '3D Text Design' },
+    name: { fr: 'Texte 3D', en: '3D Text' },
     description: { fr: 'Designs avec textes en 3D volumétriques', en: 'Designs with volumetric 3D texts' },
     prompt: { fr: 'Crée un design 3D pour ', en: 'Create a 3D design for ' },
     hasSubmenu: true,
