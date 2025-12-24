@@ -34,7 +34,7 @@ export default function Sidebar({
   onUpdateConversation
 }) {
   const { t } = useLanguage();
-  const [visualsOpen, setVisualsOpen] = useState(false);
+  const [visualsOpen, setVisualsOpen] = useState(true);
   const [historyOpen, setHistoryOpen] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingConv, setEditingConv] = useState(null);
