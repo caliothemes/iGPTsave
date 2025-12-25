@@ -252,6 +252,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
   const [editingTextInline, setEditingTextInline] = useState(null);
   const [inlineTextValue, setInlineTextValue] = useState('');
   const inlineInputRef = useRef(null);
+  const [showPropertiesModal, setShowPropertiesModal] = useState(false);
+  const [propertiesModalLayer, setPropertiesModalLayer] = useState(null);
   
   // Detect if this is a mockup visual
   const isMockupVisual = visual.visual_type === 'mockup' || 
@@ -1851,9 +1853,11 @@ Réponds en JSON avec:
     const x = (e.clientX - rect.left) * (canvasSize.width / rect.width);
     const y = (e.clientY - rect.top) * (canvasSize.height / rect.height);
     
-    // Check if we double-clicked on a text layer
+    // Check if we double-clicked on any layer
     for (let i = layers.length - 1; i >= 0; i--) {
       const layer = layers[i];
+      let hit = false;
+      
       if (layer.type === 'text') {
         const ctx = canvasRef.current.getContext('2d');
         ctx.font = `${layer.fontSize}px ${layer.fontFamily}`;
@@ -1889,14 +1893,18 @@ Réponds en JSON avec:
         const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
         const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
         
-        const hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y - layer.fontSize + textHeight;
-        
-        if (hit) {
-          setEditingTextInline(i);
-          setInlineTextValue(layer.text);
-          setTimeout(() => inlineInputRef.current?.focus(), 100);
-          return;
-        }
+        hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y - layer.fontSize + textHeight;
+      } else if (layer.type !== 'background') {
+        // For shapes, images, textures
+        hit = x >= layer.x && x <= layer.x + layer.width && y >= layer.y && y <= layer.y + layer.height;
+      }
+      
+      if (hit) {
+        // Open properties modal instead of inline editing
+        setSelectedLayer(i);
+        setPropertiesModalLayer(i);
+        setShowPropertiesModal(true);
+        return;
       }
     }
   };
@@ -4649,6 +4657,633 @@ Réponds en JSON avec:
               </div>
             ))}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Properties Modal - Opens on double-click */}
+      <Dialog open={showPropertiesModal} onOpenChange={setShowPropertiesModal}>
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-5 w-5 text-violet-400" />
+              {language === 'fr' ? 'Propriétés de l\'élément' : 'Element Properties'}
+            </DialogTitle>
+          </DialogHeader>
+          {propertiesModalLayer !== null && layers[propertiesModalLayer] && (() => {
+            const layer = layers[propertiesModalLayer];
+            
+            return (
+              <div className="space-y-4 py-2">
+                {/* TEXT LAYER */}
+                {layer.type === 'text' && (
+                  <>
+                    {/* AI Stylize Button */}
+                    <Button
+                      onClick={async () => {
+                        setStylizingText(true);
+                        try {
+                          const result = await base44.integrations.Core.InvokeLLM({
+                            prompt: `Tu es un expert en design graphique. Choisis UN style professionnel et moderne pour ce texte: "${layer.text}"
+                            
+Le texte sera affiché sur un visuel de type: ${visual.visual_type || 'design'}
+
+Choisis UN style parmi ces options et donne les valeurs exactes:
+- Style "Néon Cyberpunk": neon activé, couleur néon vive (#ff00ff ou #00ffff), fond sombre
+- Style "Or Luxe": halo doré (#FFD700), contour fin doré, texte blanc ou noir
+- Style "3D Pop": effet 3D activé, couleurs vives, contour contrasté
+- Style "Ombre Élégante": ombre portée douce, couleurs neutres ou pastels
+- Style "Lueur Moderne": glow blanc ou coloré, texte épuré
+- Style "Reflet Premium": reflet activé, couleurs métalliques ou élégantes
+
+Réponds en JSON avec:
+- style_name: nom du style choisi
+- color: couleur du texte (hex)
+- fontSize: taille recommandée (32-80)
+- fontWeight: poids (400-900)
+- neon: boolean
+- neonColor: hex si neon
+- neonIntensity: 10-25 si neon
+- glow: boolean
+- glowColor: hex si glow
+- glowSize: 10-30 si glow
+- halo: boolean
+- haloColor: hex si halo
+- haloSize: 10-40 si halo
+- effect3d: boolean
+- shadow: boolean
+- shadowColor: hex si shadow
+- shadowBlur: 5-15 si shadow
+- stroke: boolean
+- strokeColor: hex si stroke
+- strokeWidth: 1-4 si stroke
+- reflection: boolean
+- reflectionOpacity: 30-60 si reflection`,
+                            response_json_schema: {
+                              type: 'object',
+                              properties: {
+                                style_name: { type: 'string' },
+                                color: { type: 'string' },
+                                fontSize: { type: 'number' },
+                                fontWeight: { type: 'number' },
+                                neon: { type: 'boolean' },
+                                neonColor: { type: 'string' },
+                                neonIntensity: { type: 'number' },
+                                glow: { type: 'boolean' },
+                                glowColor: { type: 'string' },
+                                glowSize: { type: 'number' },
+                                halo: { type: 'boolean' },
+                                haloColor: { type: 'string' },
+                                haloSize: { type: 'number' },
+                                effect3d: { type: 'boolean' },
+                                shadow: { type: 'boolean' },
+                                shadowColor: { type: 'string' },
+                                shadowBlur: { type: 'number' },
+                                stroke: { type: 'boolean' },
+                                strokeColor: { type: 'string' },
+                                strokeWidth: { type: 'number' },
+                                reflection: { type: 'boolean' },
+                                reflectionOpacity: { type: 'number' }
+                              }
+                            }
+                          });
+
+                          const updates = {
+                            color: result.color || layer.color,
+                            fontSize: result.fontSize || layer.fontSize,
+                            fontWeight: result.fontWeight || layer.fontWeight,
+                            neon: result.neon || false,
+                            neonColor: result.neonColor,
+                            neonIntensity: result.neonIntensity,
+                            glow: result.glow || false,
+                            glowColor: result.glowColor,
+                            glowSize: result.glowSize,
+                            halo: result.halo || false,
+                            haloColor: result.haloColor,
+                            haloSize: result.haloSize,
+                            effect3d: result.effect3d || false,
+                            shadow: result.shadow || false,
+                            shadowColor: result.shadowColor,
+                            shadowBlur: result.shadowBlur,
+                            stroke: result.stroke || false,
+                            strokeColor: result.strokeColor,
+                            strokeWidth: result.strokeWidth,
+                            reflection: result.reflection || false,
+                            reflectionOpacity: result.reflectionOpacity
+                          };
+
+                          updateLayer(propertiesModalLayer, updates);
+                          showHelp(language === 'fr' ? `✨ Style "${result.style_name}" appliqué !` : `✨ "${result.style_name}" style applied!`);
+                        } catch (e) {
+                          console.error(e);
+                          showHelp(language === 'fr' ? '❌ Erreur lors de la stylisation' : '❌ Error during styling');
+                        }
+                        setStylizingText(false);
+                      }}
+                      disabled={stylizingText}
+                      className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 hover:from-pink-700 hover:via-purple-700 hover:to-violet-700 text-white font-medium shadow-lg shadow-purple-500/20"
+                    >
+                      {stylizingText ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 mr-2" />
+                      )}
+                      {language === 'fr' ? '✨ Styliser avec l\'IA' : '✨ Stylize with AI'}
+                    </Button>
+
+                    {/* Text Input */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Texte' : 'Text'}</label>
+                      <Input 
+                        value={layer.text} 
+                        onChange={(e) => updateLayer(propertiesModalLayer, { text: e.target.value })} 
+                        className="bg-white/5 border-white/10 text-white" 
+                      />
+                    </div>
+
+                    {/* Font Family */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Police' : 'Font'}</label>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white/70 text-sm transition-colors">
+                            <span style={{ fontFamily: layer.fontFamily }}>{FONTS.find(f => f.family === layer.fontFamily)?.name || 'Police'}</span>
+                            <ChevronDownIcon className="h-4 w-4 opacity-50" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-gray-900 border-white/10 max-h-64 overflow-y-auto w-64">
+                          {FONTS.map(font => (
+                            <DropdownMenuItem 
+                              key={font.id} 
+                              onClick={() => updateLayer(propertiesModalLayer, { fontFamily: font.family })}
+                              className={cn(
+                                "text-white/70 hover:text-white hover:bg-white/10 cursor-pointer",
+                                layer.fontFamily === font.family && "bg-violet-500/20 text-violet-300"
+                              )}
+                              style={{ fontFamily: font.family }}
+                            >
+                              {font.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    {/* Font Size */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Taille' : 'Size'}: {layer.fontSize}px</label>
+                      <Slider value={[layer.fontSize]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontSize: v })} min={5} max={120} step={1} />
+                    </div>
+
+                    {/* Font Weight */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Poids' : 'Weight'}: {layer.fontWeight || 400}</label>
+                      <Slider value={[layer.fontWeight || 400]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontWeight: v, bold: v >= 600 })} min={100} max={900} step={100} />
+                    </div>
+
+                    {/* Letter Spacing */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Espacement' : 'Spacing'}: {layer.letterSpacing || 0}px</label>
+                      <Slider value={[layer.letterSpacing || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} />
+                    </div>
+
+                    {/* Rotation */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {layer.rotation || 0}°</label>
+                      <Slider value={[layer.rotation || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { rotation: v })} min={0} max={360} step={1} />
+                    </div>
+
+                    {/* Max Width */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur max' : 'Max Width'}: {layer.maxWidth || (language === 'fr' ? 'Auto' : 'Auto')}</label>
+                      <Slider value={[layer.maxWidth || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={5} />
+                    </div>
+
+                    {/* Opacity */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {layer.opacity}%</label>
+                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} />
+                    </div>
+
+                    {/* Alignment and Style Buttons */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Alignement & Style' : 'Alignment & Style'}</label>
+                      <div className="grid grid-cols-5 gap-2">
+                        <button onClick={() => updateLayer(propertiesModalLayer, { italic: !layer.italic })} className={cn("p-2 rounded-lg", layer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><Italic className="h-4 w-4 mx-auto" /></button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { align: 'left' })} className={cn("p-2 rounded-lg", layer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignLeft className="h-4 w-4 mx-auto" /></button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { align: 'center' })} className={cn("p-2 rounded-lg", layer.align === 'center' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignCenter className="h-4 w-4 mx-auto" /></button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { align: 'right' })} className={cn("p-2 rounded-lg", layer.align === 'right' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}><AlignRight className="h-4 w-4 mx-auto" /></button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { curvedText: !layer.curvedText })} className={cn("p-2 rounded-lg", layer.curvedText ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")} title={language === 'fr' ? 'Texte en cercle' : 'Curved text'}><Circle className="h-4 w-4 mx-auto" /></button>
+                      </div>
+                    </div>
+
+                    {/* Color Picker */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
+                      <div className="flex gap-2 flex-wrap">
+                        {PRESET_COLORS.map(color => (
+                          <button key={color} onClick={() => updateLayer(propertiesModalLayer, { color })} className={cn("w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110", layer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                        ))}
+                        <input type="color" value={layer.color} onChange={(e) => updateLayer(propertiesModalLayer, { color: e.target.value })} className="w-8 h-8 rounded-lg cursor-pointer" />
+                      </div>
+                    </div>
+
+                    {/* Curved Text Options */}
+                    {layer.curvedText && (
+                      <div className="space-y-3 p-3 bg-violet-500/10 rounded-lg border border-violet-500/20">
+                        <p className="text-white/80 text-sm font-medium">{language === 'fr' ? 'Texte en cercle' : 'Curved text'}</p>
+                        <div className="space-y-2">
+                          <label className="text-white/60 text-sm">{language === 'fr' ? 'Rayon' : 'Radius'}: {layer.curveRadius || 100}</label>
+                          <Slider value={[layer.curveRadius || 100]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { curveRadius: v })} min={40} max={400} step={5} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button 
+                            onClick={() => updateLayer(propertiesModalLayer, { curveDirection: 'top' })} 
+                            className={cn("p-2 rounded-lg text-sm", (layer.curveDirection || 'top') === 'top' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}
+                          >
+                            ⌒ {language === 'fr' ? 'Haut' : 'Top'}
+                          </button>
+                          <button 
+                            onClick={() => updateLayer(propertiesModalLayer, { curveDirection: 'bottom' })} 
+                            className={cn("p-2 rounded-lg text-sm", layer.curveDirection === 'bottom' ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}
+                          >
+                            ⌣ {language === 'fr' ? 'Bas' : 'Bottom'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Text Effects */}
+                    <div className="space-y-3">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Effets' : 'Effects'}</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button onClick={() => updateLayer(propertiesModalLayer, { stroke: !layer.stroke })} className={cn("p-2 rounded-lg text-sm", layer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Contour' : 'Stroke'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { shadow: !layer.shadow })} className={cn("p-2 rounded-lg text-sm", layer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Ombre' : 'Shadow'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { glow: !layer.glow })} className={cn("p-2 rounded-lg text-sm", layer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Lueur' : 'Glow'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { halo: !layer.halo })} className={cn("p-2 rounded-lg text-sm", layer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          Halo
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { effect3d: !layer.effect3d })} className={cn("p-2 rounded-lg text-sm", layer.effect3d ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          3D
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { neon: !layer.neon })} className={cn("p-2 rounded-lg text-sm", layer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          Néon
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { reflection: !layer.reflection })} className={cn("p-2 rounded-lg text-sm", layer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Reflet' : 'Reflect'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { sparkle: !layer.sparkle })} className={cn("p-2 rounded-lg text-sm", layer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/5 text-white/60")}>
+                          ✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { textGradient: !layer.textGradient })} className={cn("p-2 rounded-lg text-sm", layer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/5 text-white/60")}>
+                          🌈 {language === 'fr' ? 'Dégradé' : 'Gradient'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Effect-specific controls */}
+                    {layer.stroke && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Contour' : 'Stroke'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.strokeColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={10} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.strokeWidth || 2}px</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.shadow && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Ombre' : 'Shadow'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.shadowColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { shadowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <div className="flex-1 space-y-1">
+                            <div className="flex gap-2 items-center">
+                              <span className="text-white/40 text-xs w-8">Blur</span>
+                              <Slider value={[layer.shadowBlur || 6]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowBlur: v })} min={1} max={30} step={1} className="flex-1" />
+                              <span className="text-white/60 text-xs w-8">{layer.shadowBlur || 6}</span>
+                            </div>
+                            <div className="flex gap-2 items-center">
+                              <span className="text-white/40 text-xs w-8">X</span>
+                              <Slider value={[layer.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} className="flex-1" />
+                              <span className="text-white/60 text-xs w-8">{layer.shadowOffsetX || 3}</span>
+                            </div>
+                            <div className="flex gap-2 items-center">
+                              <span className="text-white/40 text-xs w-8">Y</span>
+                              <Slider value={[layer.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} className="flex-1" />
+                              <span className="text-white/60 text-xs w-8">{layer.shadowOffsetY || 3}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.glow && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Lueur' : 'Glow'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.glowColor || '#ffffff'} onChange={(e) => updateLayer(propertiesModalLayer, { glowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.glowSize || 10]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { glowSize: v })} min={5} max={40} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.glowSize || 10}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.halo && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">Halo</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.haloColor || '#FFD700'} onChange={(e) => updateLayer(propertiesModalLayer, { haloColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.haloSize || 15]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { haloSize: v })} min={5} max={50} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.haloSize || 15}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.neon && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">Néon</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.neonColor || '#ff00ff'} onChange={(e) => updateLayer(propertiesModalLayer, { neonColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.neonIntensity || 15]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { neonIntensity: v })} min={5} max={30} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.neonIntensity || 15}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.reflection && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Reflet' : 'Reflection'}</label>
+                        <div className="flex gap-2 items-center">
+                          <Slider value={[layer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.reflectionOpacity || 40}%</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.sparkle && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</label>
+                        <div className="flex gap-2 items-center">
+                          <Slider value={[layer.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.sparkleIntensity || 50}%</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.textGradient && (
+                      <div className="space-y-3 p-3 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                        <p className="text-white/80 text-sm font-medium">🌈 {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button 
+                            onClick={() => updateLayer(propertiesModalLayer, { gradientDirection: 'horizontal' })} 
+                            className={cn("p-2 rounded-lg text-sm", (layer.gradientDirection || 'horizontal') === 'horizontal' ? "bg-pink-500/30 text-pink-300" : "bg-white/5 text-white/60")}
+                          >
+                            ← → {language === 'fr' ? 'Horizontal' : 'Horizontal'}
+                          </button>
+                          <button 
+                            onClick={() => updateLayer(propertiesModalLayer, { gradientDirection: 'vertical' })} 
+                            className={cn("p-2 rounded-lg text-sm", layer.gradientDirection === 'vertical' ? "bg-pink-500/30 text-pink-300" : "bg-white/5 text-white/60")}
+                          >
+                            ↑ ↓ {language === 'fr' ? 'Vertical' : 'Vertical'}
+                          </button>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.gradientColor1 || '#ff00ff'} onChange={(e) => updateLayer(propertiesModalLayer, { gradientColor1: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <div className="flex-1 h-8 rounded-lg" style={{ background: `linear-gradient(${layer.gradientDirection === 'vertical' ? '180deg' : '90deg'}, ${layer.gradientColor1 || '#ff00ff'}, ${layer.gradientColor2 || '#00ffff'})` }} />
+                          <input type="color" value={layer.gradientColor2 || '#00ffff'} onChange={(e) => updateLayer(propertiesModalLayer, { gradientColor2: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                        </div>
+                        <div className="grid grid-cols-4 gap-1">
+                          {[
+                            { c1: '#ff00ff', c2: '#00ffff' },
+                            { c1: '#ff6b6b', c2: '#feca57' },
+                            { c1: '#667eea', c2: '#764ba2' },
+                            { c1: '#f093fb', c2: '#f5576c' },
+                            { c1: '#4facfe', c2: '#00f2fe' },
+                            { c1: '#43e97b', c2: '#38f9d7' },
+                            { c1: '#fa709a', c2: '#fee140' },
+                            { c1: '#a18cd1', c2: '#fbc2eb' },
+                          ].map((preset, idx) => (
+                            <button 
+                              key={idx} 
+                              onClick={() => updateLayer(propertiesModalLayer, { gradientColor1: preset.c1, gradientColor2: preset.c2 })}
+                              className="h-6 rounded border border-white/10 hover:border-pink-400 transition-colors"
+                              style={{ background: `linear-gradient(90deg, ${preset.c1}, ${preset.c2})` }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* SHAPE LAYER */}
+                {layer.type === 'shape' && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {layer.width}px</label>
+                        <Slider value={[layer.width]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Hauteur' : 'Height'}: {layer.height}px</label>
+                        <Slider value={[layer.height]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {layer.rotation || 0}°</label>
+                      <Slider value={[layer.rotation || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { rotation: v })} min={0} max={360} step={1} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {layer.opacity}%</label>
+                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} />
+                    </div>
+
+                    {/* Color */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
+                      <div className="flex gap-2 flex-wrap">
+                        {PRESET_COLORS.map(color => (
+                          <button key={color} onClick={() => updateLayer(propertiesModalLayer, { color })} className={cn("w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110", layer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
+                        ))}
+                        <input type="color" value={layer.color} onChange={(e) => updateLayer(propertiesModalLayer, { color: e.target.value })} className="w-8 h-8 rounded-lg cursor-pointer" />
+                      </div>
+                    </div>
+
+                    {/* Effects */}
+                    <div className="space-y-3">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Effets' : 'Effects'}</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button onClick={() => updateLayer(propertiesModalLayer, { stroke: !layer.stroke })} className={cn("p-2 rounded-lg text-sm", layer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Bordure' : 'Border'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { shadow: !layer.shadow })} className={cn("p-2 rounded-lg text-sm", layer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Ombre' : 'Shadow'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { glow: !layer.glow })} className={cn("p-2 rounded-lg text-sm", layer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Lueur' : 'Glow'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {layer.shape === 'rectangle' && (
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Arrondi des coins' : 'Border Radius'}: {layer.borderRadius || 0}px</label>
+                        <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} />
+                      </div>
+                    )}
+
+                    {layer.stroke && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Bordure' : 'Border'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.strokeColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.strokeWidth || 2}px</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.glow && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Lueur' : 'Glow'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.glowColor || '#ffffff'} onChange={(e) => updateLayer(propertiesModalLayer, { glowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.glowSize || 10]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { glowSize: v })} min={5} max={40} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.glowSize || 10}</span>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* IMAGE LAYER */}
+                {layer.type === 'image' && (
+                  <>
+                    {!layer.isBaseImage && (
+                      <Button
+                        onClick={async () => {
+                          setRemovingBgFromLayer(true);
+                          try {
+                            const response = await base44.functions.invoke('removeBg', { image_url: layer.imageUrl });
+                            if (response.data?.success && response.data?.image_url) {
+                              updateLayer(propertiesModalLayer, { imageUrl: response.data.image_url });
+                              showHelp(language === 'fr' ? '✅ Fond supprimé de l\'image ! (1 crédit utilisé)' : '✅ Background removed from image! (1 credit used)');
+                            } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                              setServiceErrorType(response.data?.error);
+                              setShowServiceUnavailable(true);
+                            } else {
+                              showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
+                            }
+                          } catch (err) {
+                            console.error(err);
+                            showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
+                          }
+                          setRemovingBgFromLayer(false);
+                        }}
+                        disabled={removingBgFromLayer}
+                        className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
+                      >
+                        {removingBgFromLayer ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
+                        {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
+                      </Button>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {layer.width}px</label>
+                        <Slider value={[layer.width]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Hauteur' : 'Height'}: {layer.height}px</label>
+                        <Slider value={[layer.height]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {layer.opacity}%</label>
+                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} />
+                    </div>
+
+                    {/* Effects */}
+                    <div className="space-y-3">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Effets' : 'Effects'}</label>
+                      <div className="grid grid-cols-4 gap-2">
+                        <button onClick={() => updateLayer(propertiesModalLayer, { stroke: !layer.stroke })} className={cn("p-2 rounded-lg text-sm", layer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Bordure' : 'Border'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { shadow: !layer.shadow })} className={cn("p-2 rounded-lg text-sm", layer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Ombre' : 'Shadow'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { glow: !layer.glow })} className={cn("p-2 rounded-lg text-sm", layer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Lueur' : 'Glow'}
+                        </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { halo: !layer.halo })} className={cn("p-2 rounded-lg text-sm", layer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          Halo
+                        </button>
+                      </div>
+                    </div>
+
+                    {layer.stroke && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Bordure' : 'Border'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.strokeColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.strokeWidth || 2}px</span>
+                        </div>
+                        <div className="pt-2">
+                          <label className="text-white/60 text-sm">{language === 'fr' ? 'Arrondi' : 'Radius'}: {layer.borderRadius || 0}px</label>
+                          <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} />
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.shadow && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Ombre' : 'Shadow'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.shadowColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { shadowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.shadowBlur || 10]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowBlur: v })} min={5} max={50} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.shadowBlur || 10}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.glow && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Lueur' : 'Glow'}</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.glowColor || '#ffffff'} onChange={(e) => updateLayer(propertiesModalLayer, { glowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.glowSize || 10]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { glowSize: v })} min={5} max={40} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.glowSize || 10}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.halo && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">Halo</label>
+                        <div className="flex gap-2 items-center">
+                          <input type="color" value={layer.haloColor || '#FFD700'} onChange={(e) => updateLayer(propertiesModalLayer, { haloColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
+                          <Slider value={[layer.haloSize || 15]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { haloSize: v })} min={5} max={50} step={1} className="flex-1" />
+                          <span className="text-white/60 text-sm w-12">{layer.haloSize || 15}</span>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
