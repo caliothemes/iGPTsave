@@ -3501,7 +3501,7 @@ Réponds en JSON avec:
             minHeight: `${canvasSize.height * zoom}px`
           }}>
           {/* Zoom Controls - Horizontal - Fixed at top */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-gray-900/95 backdrop-blur-sm border border-white/10 rounded-lg p-2 shadow-xl">
             <button
               onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}
               disabled={zoom <= 0.5}
@@ -4664,9 +4664,19 @@ Réponds en JSON avec:
       <Dialog open={showPropertiesModal} onOpenChange={setShowPropertiesModal}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <SlidersHorizontal className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Propriétés de l\'élément' : 'Element Properties'}
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5 text-violet-400" />
+                {language === 'fr' ? 'Propriétés de l\'élément' : 'Element Properties'}
+              </div>
+              <Button
+                onClick={() => setShowPropertiesModal(false)}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                size="sm"
+              >
+                <Check className="h-4 w-4 mr-1" />
+                {language === 'fr' ? 'Valider' : 'Apply'}
+              </Button>
             </DialogTitle>
           </DialogHeader>
           {propertiesModalLayer !== null && layers[propertiesModalLayer] && (() => {
