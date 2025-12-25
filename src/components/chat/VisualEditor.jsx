@@ -4662,7 +4662,7 @@ Réponds en JSON avec:
 
       {/* Properties Modal - Opens on double-click */}
       <Dialog open={showPropertiesModal} onOpenChange={setShowPropertiesModal}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto [&>button]:hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -4841,37 +4841,37 @@ Réponds en JSON avec:
                     {/* Font Size */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Taille' : 'Size'}: {layer.fontSize}px</label>
-                      <Slider value={[layer.fontSize]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontSize: v })} min={5} max={120} step={1} />
+                      <Slider value={[layer.fontSize]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontSize: v })} min={5} max={120} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Font Weight */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Poids' : 'Weight'}: {layer.fontWeight || 400}</label>
-                      <Slider value={[layer.fontWeight || 400]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontWeight: v, bold: v >= 600 })} min={100} max={900} step={100} />
+                      <Slider value={[layer.fontWeight || 400]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontWeight: v, bold: v >= 600 })} min={100} max={900} step={100} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Letter Spacing */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Espacement' : 'Spacing'}: {layer.letterSpacing || 0}px</label>
-                      <Slider value={[layer.letterSpacing || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} />
+                      <Slider value={[layer.letterSpacing || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Rotation */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {layer.rotation || 0}°</label>
-                      <Slider value={[layer.rotation || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { rotation: v })} min={0} max={360} step={1} />
+                      <Slider value={[layer.rotation || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { rotation: v })} min={0} max={360} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Max Width */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur max' : 'Max Width'}: {layer.maxWidth || (language === 'fr' ? 'Auto' : 'Auto')}</label>
-                      <Slider value={[layer.maxWidth || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={5} />
+                      <Slider value={[layer.maxWidth || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Opacity */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {layer.opacity}%</label>
-                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} />
+                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Alignment and Style Buttons */}
@@ -4903,7 +4903,7 @@ Réponds en JSON avec:
                         <p className="text-white/80 text-sm font-medium">{language === 'fr' ? 'Texte en cercle' : 'Curved text'}</p>
                         <div className="space-y-2">
                           <label className="text-white/60 text-sm">{language === 'fr' ? 'Rayon' : 'Radius'}: {layer.curveRadius || 100}</label>
-                          <Slider value={[layer.curveRadius || 100]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { curveRadius: v })} min={40} max={400} step={5} />
+                          <Slider value={[layer.curveRadius || 100]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { curveRadius: v })} min={40} max={400} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <button 
@@ -4962,7 +4962,7 @@ Réponds en JSON avec:
                         <label className="text-white/60 text-sm">{language === 'fr' ? 'Contour' : 'Stroke'}</label>
                         <div className="flex gap-2 items-center">
                           <input type="color" value={layer.strokeColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
-                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={10} step={1} className="flex-1" />
+                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={10} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.strokeWidth || 2}px</span>
                         </div>
                       </div>
@@ -4976,17 +4976,17 @@ Réponds en JSON avec:
                           <div className="flex-1 space-y-1">
                             <div className="flex gap-2 items-center">
                               <span className="text-white/40 text-xs w-8">Blur</span>
-                              <Slider value={[layer.shadowBlur || 6]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowBlur: v })} min={1} max={30} step={1} className="flex-1" />
+                              <Slider value={[layer.shadowBlur || 6]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowBlur: v })} min={1} max={30} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                               <span className="text-white/60 text-xs w-8">{layer.shadowBlur || 6}</span>
                             </div>
                             <div className="flex gap-2 items-center">
                               <span className="text-white/40 text-xs w-8">X</span>
-                              <Slider value={[layer.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} className="flex-1" />
+                              <Slider value={[layer.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                               <span className="text-white/60 text-xs w-8">{layer.shadowOffsetX || 3}</span>
                             </div>
                             <div className="flex gap-2 items-center">
                               <span className="text-white/40 text-xs w-8">Y</span>
-                              <Slider value={[layer.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} className="flex-1" />
+                              <Slider value={[layer.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                               <span className="text-white/60 text-xs w-8">{layer.shadowOffsetY || 3}</span>
                             </div>
                           </div>
@@ -5021,7 +5021,7 @@ Réponds en JSON avec:
                         <label className="text-white/60 text-sm">Néon</label>
                         <div className="flex gap-2 items-center">
                           <input type="color" value={layer.neonColor || '#ff00ff'} onChange={(e) => updateLayer(propertiesModalLayer, { neonColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
-                          <Slider value={[layer.neonIntensity || 15]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { neonIntensity: v })} min={5} max={30} step={1} className="flex-1" />
+                          <Slider value={[layer.neonIntensity || 15]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { neonIntensity: v })} min={5} max={30} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.neonIntensity || 15}</span>
                         </div>
                       </div>
@@ -5031,7 +5031,7 @@ Réponds en JSON avec:
                       <div className="space-y-2 p-3 bg-white/5 rounded-lg">
                         <label className="text-white/60 text-sm">{language === 'fr' ? 'Reflet' : 'Reflection'}</label>
                         <div className="flex gap-2 items-center">
-                          <Slider value={[layer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
+                          <Slider value={[layer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.reflectionOpacity || 40}%</span>
                         </div>
                       </div>
@@ -5041,7 +5041,7 @@ Réponds en JSON avec:
                       <div className="space-y-2 p-3 bg-white/5 rounded-lg">
                         <label className="text-white/60 text-sm">✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</label>
                         <div className="flex gap-2 items-center">
-                          <Slider value={[layer.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="flex-1" />
+                          <Slider value={[layer.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.sparkleIntensity || 50}%</span>
                         </div>
                       </div>
@@ -5109,12 +5109,12 @@ Réponds en JSON avec:
 
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {layer.rotation || 0}°</label>
-                      <Slider value={[layer.rotation || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { rotation: v })} min={0} max={360} step={1} />
+                      <Slider value={[layer.rotation || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { rotation: v })} min={0} max={360} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {layer.opacity}%</label>
-                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} />
+                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Color */}
@@ -5147,7 +5147,7 @@ Réponds en JSON avec:
                     {layer.shape === 'rectangle' && (
                       <div className="space-y-2">
                         <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Arrondi des coins' : 'Border Radius'}: {layer.borderRadius || 0}px</label>
-                        <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} />
+                        <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                       </div>
                     )}
 
@@ -5247,12 +5247,12 @@ Réponds en JSON avec:
                         <label className="text-white/60 text-sm">{language === 'fr' ? 'Bordure' : 'Border'}</label>
                         <div className="flex gap-2 items-center">
                           <input type="color" value={layer.strokeColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
-                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1" />
+                          <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.strokeWidth || 2}px</span>
                         </div>
                         <div className="pt-2">
                           <label className="text-white/60 text-sm">{language === 'fr' ? 'Arrondi' : 'Radius'}: {layer.borderRadius || 0}px</label>
-                          <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} />
+                          <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                         </div>
                       </div>
                     )}
@@ -5262,7 +5262,7 @@ Réponds en JSON avec:
                         <label className="text-white/60 text-sm">{language === 'fr' ? 'Ombre' : 'Shadow'}</label>
                         <div className="flex gap-2 items-center">
                           <input type="color" value={layer.shadowColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { shadowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
-                          <Slider value={[layer.shadowBlur || 10]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowBlur: v })} min={5} max={50} step={1} className="flex-1" />
+                          <Slider value={[layer.shadowBlur || 10]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { shadowBlur: v })} min={5} max={50} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.shadowBlur || 10}</span>
                         </div>
                       </div>
