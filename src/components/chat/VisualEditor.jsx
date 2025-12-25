@@ -5210,17 +5210,17 @@ Réponds en JSON avec:
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {layer.width}px</label>
-                        <Slider value={[layer.width]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
+                        <Slider value={[layer.width]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { width: v })} min={20} max={canvasSize.width} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Hauteur' : 'Height'}: {layer.height}px</label>
-                        <Slider value={[layer.height]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
+                        <Slider value={[layer.height]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { height: v })} min={20} max={canvasSize.height} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {layer.opacity}%</label>
-                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} />
+                      <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Effects */}
