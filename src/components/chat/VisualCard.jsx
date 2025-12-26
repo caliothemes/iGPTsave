@@ -126,9 +126,8 @@ export default function VisualCard({
             />
           )}
         
-        {/* Top Right Buttons */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 items-center">
-          {/* Favorite Button */}
+        {/* Top Right - Favorite Button Only (inside image) */}
+        <div className="absolute top-3 right-3">
           {onToggleFavorite && (
             <button
               onClick={() => onToggleFavorite(visual)}
@@ -145,75 +144,6 @@ export default function VisualCard({
                   visual.is_favorite ? "fill-white text-white" : "text-white"
                 )} 
               />
-            </button>
-          )}
-
-          {/* Back to Image Button (only for videos) */}
-          {isVideo && onBackToImage && visual.parent_visual_id && (
-            <button
-              onClick={onBackToImage}
-              className="group/backbtn relative p-2.5 rounded-xl bg-gradient-to-br from-blue-600/90 to-cyan-600/90 backdrop-blur-sm hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-500/30 border border-blue-400/30"
-            >
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {/* Tooltip on hover */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/backbtn:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900/95 backdrop-blur-sm border border-blue-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
-                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Retour au visuel' : 'Back to image'}</p>
-                </div>
-              </div>
-            </button>
-          )}
-
-          {/* Magic Editor Button (top) - only for images */}
-          {!isVideo && onValidate && (
-            <button
-              onClick={() => onValidate?.('edit')}
-              className="group/editbtn relative p-2.5 rounded-xl bg-gradient-to-br from-violet-600/90 to-purple-600/90 backdrop-blur-sm hover:from-violet-500 hover:to-purple-500 transition-all shadow-lg shadow-violet-500/30 border border-violet-400/30"
-            >
-              <Wand2 className="h-5 w-5 text-white" />
-              {/* Tooltip on hover */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/editbtn:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900/95 backdrop-blur-sm border border-violet-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
-                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Éditeur Magique' : 'Magic Editor'}</p>
-                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Fond, texture, texte...' : 'Background, texture, text...'}</p>
-                </div>
-              </div>
-            </button>
-          )}
-
-          {/* Animate Button - only for images */}
-          {!isVideo && onValidate && (
-            <button
-              onClick={() => onValidate?.('video')}
-              className="group/videobtn relative p-2.5 rounded-xl bg-gradient-to-br from-pink-600/90 to-rose-600/90 backdrop-blur-sm hover:from-pink-500 hover:to-rose-500 transition-all shadow-lg shadow-pink-500/30 border border-pink-400/30"
-            >
-              <Video className="h-5 w-5 text-white" />
-              {/* Tooltip on hover */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/videobtn:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900/95 backdrop-blur-sm border border-pink-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
-                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Animer ce visuel' : 'Animate this visual'}</p>
-                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Créer une vidéo animée' : 'Create animated video'}</p>
-                </div>
-              </div>
-            </button>
-          )}
-
-          {/* Crop Button - only for images */}
-          {!isVideo && (
-            <button
-              onClick={() => setShowCropModal(true)}
-              className="group/cropbtn relative p-2.5 rounded-xl bg-gradient-to-br from-blue-600/90 to-cyan-600/90 backdrop-blur-sm hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-500/30 border border-blue-400/30"
-            >
-              <Scissors className="h-5 w-5 text-white" />
-              {/* Tooltip on hover */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/cropbtn:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900/95 backdrop-blur-sm border border-blue-500/30 rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
-                  <p className="text-white text-xs font-medium">{language === 'fr' ? 'Découpe' : 'Crop'}</p>
-                  <p className="text-white/60 text-[10px] mt-0.5">{language === 'fr' ? 'Recadrer l\'image' : 'Crop the image'}</p>
-                </div>
-              </div>
             </button>
           )}
         </div>
@@ -296,6 +226,71 @@ export default function VisualCard({
         )}
 
       </div>
+
+      {/* Action Buttons - Outside image, top right */}
+      {!isVideo && (
+        <div className="absolute -top-2 -right-2 flex flex-col gap-2 z-10">
+          {/* Back to Image Button (only for videos) */}
+          {isVideo && onBackToImage && visual.parent_visual_id && (
+            <Button
+              size="sm"
+              onClick={onBackToImage}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg flex items-center gap-2"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-xs font-medium">{language === 'fr' ? 'Retour' : 'Back'}</span>
+            </Button>
+          )}
+
+          {/* Magic Editor Button */}
+          {onValidate && (
+            <Button
+              size="sm"
+              onClick={() => onValidate?.('edit')}
+              className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+            >
+              <Wand2 className="h-4 w-4" />
+              <span className="text-xs font-medium">{language === 'fr' ? 'Éditeur' : 'Editor'}</span>
+            </Button>
+          )}
+
+          {/* Animate Button */}
+          {onValidate && (
+            <Button
+              size="sm"
+              onClick={() => onValidate?.('video')}
+              className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+            >
+              <Video className="h-4 w-4" />
+              <span className="text-xs font-medium">{language === 'fr' ? 'Vidéo' : 'Video'}</span>
+            </Button>
+          )}
+
+          {/* Story Studio Button */}
+          {onValidate && (
+            <Button
+              size="sm"
+              onClick={() => setShowADSModal(true)}
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="text-xs font-medium">{language === 'fr' ? 'Story Studio' : 'Story Studio'}</span>
+            </Button>
+          )}
+
+          {/* Crop Button */}
+          <Button
+            size="sm"
+            onClick={() => setShowCropModal(true)}
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+          >
+            <Scissors className="h-4 w-4" />
+            <span className="text-xs font-medium">{language === 'fr' ? 'Découpe' : 'Crop'}</span>
+          </Button>
+        </div>
+      )}
 
       {/* Color Palette Bar - Just under image */}
       {visual.color_palette && visual.color_palette.length > 0 && (
