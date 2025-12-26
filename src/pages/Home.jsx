@@ -103,10 +103,12 @@ export default function Home() {
   const [tagsExpanded, setTagsExpanded] = useState(false);
   const [promptMode, setPromptMode] = useState(null); // 'modify' or 'new'
   const [showModeSelector, setShowModeSelector] = useState(false);
-  
+  const [isRecording, setIsRecording] = useState(false);
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const inputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -259,6 +261,59 @@ export default function Home() {
     if (file) {
       console.log('File selected:', file.name);
     }
+  };
+
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert(language === 'fr' 
+        ? 'La reconnaissance vocale n\'est pas supportée par votre navigateur' 
+        : 'Voice recognition is not supported by your browser');
+      return;
+    }
+
+    if (isRecording) {
+      // Stop recording
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecording(false);
+      return;
+    }
+
+    // Start recording
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = language === 'fr' ? 'fr-FR' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputValue(prev => prev + (prev ? ' ' : '') + transcript);
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.style.height = 'auto';
+          inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+          inputRef.current.focus();
+        }
+      }, 0);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   const handleSend = async () => {
@@ -1666,7 +1721,15 @@ export default function Home() {
                   style={{ height: '24px' }}
                 />
 
-                <button className="p-2 text-white/40 hover:text-white/60 transition-colors">
+                <button 
+                  onClick={handleVoiceInput}
+                  className={cn(
+                    "p-2 transition-colors",
+                    isRecording 
+                      ? "text-red-500 animate-pulse" 
+                      : "text-white/40 hover:text-white/60"
+                  )}
+                >
                   <Mic className="h-5 w-5" />
                 </button>
 
