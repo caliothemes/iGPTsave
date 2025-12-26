@@ -33,6 +33,8 @@ import LoginRequiredModal from '@/components/LoginRequiredModal';
 import NoCreditsModal from '@/components/NoCreditsModal';
 import GuestCreditsModal from '@/components/GuestCreditsModal';
 import Footer from '@/components/Footer';
+import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
+import CropModal from '@/components/chat/CropModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Home() {
@@ -104,6 +106,10 @@ export default function Home() {
   const [promptMode, setPromptMode] = useState(null); // 'modify' or 'new'
   const [showModeSelector, setShowModeSelector] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [videoVisual, setVideoVisual] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropVisual, setCropVisual] = useState(null);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -1297,10 +1303,51 @@ export default function Home() {
                                   {favoriteVisuals.length}
                                 </span>
                               )}
-                            </button>
-                          )}
+                              </button>
+                              )}
 
-                          <VisualCard
+                              {/* Action Buttons - Outside card, below favorites - Only on last visual */}
+                              {idx === messages.length - 1 && !msg.visual.video_url && !(msg.visual.image_url && (msg.visual.image_url.includes('.mp4') || msg.visual.image_url.includes('/video'))) && (
+                              <div className="absolute -right-3 top-16 z-40 flex flex-col gap-2 translate-x-full">
+                              {/* Magic Editor Button */}
+                              <Button
+                                size="sm"
+                                onClick={() => handleOpenEditor(msg.visual)}
+                                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+                              >
+                                <Wand2 className="h-4 w-4" />
+                                <span className="text-xs font-medium">{language === 'fr' ? 'Éditeur' : 'Editor'}</span>
+                              </Button>
+
+                              {/* Animate Button */}
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setVideoVisual(msg.visual);
+                                  setShowVideoModal(true);
+                                }}
+                                className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+                              >
+                                <Video className="h-4 w-4" />
+                                <span className="text-xs font-medium">{language === 'fr' ? 'Vidéo' : 'Video'}</span>
+                              </Button>
+
+                              {/* Crop Button */}
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setCropVisual(msg.visual);
+                                  setShowCropModal(true);
+                                }}
+                                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
+                              >
+                                <Scissors className="h-4 w-4" />
+                                <span className="text-xs font-medium">{language === 'fr' ? 'Découpe' : 'Crop'}</span>
+                              </Button>
+                              </div>
+                              )}
+
+                              <VisualCard
                             visual={msg.visual}
                             onRegenerate={handleRegenerate}
                             onDownload={handleDownload}
@@ -1937,6 +1984,28 @@ export default function Home() {
         onClose={() => setShowFavoritesModal(false)}
         favorites={favoriteVisuals}
         onSelectVisual={(visual) => setCurrentVisual(visual)}
+      />
+
+      {/* Video Generation Modal */}
+      <VideoGenerationModal
+        isOpen={showVideoModal}
+        onClose={() => {
+          setShowVideoModal(false);
+          setVideoVisual(null);
+        }}
+        visual={videoVisual}
+        onVideoGenerated={handleVideoGenerated}
+      />
+
+      {/* Crop Modal */}
+      <CropModal
+        isOpen={showCropModal}
+        onClose={() => {
+          setShowCropModal(false);
+          setCropVisual(null);
+        }}
+        visual={cropVisual}
+        onCropComplete={handleCropComplete}
       />
 
       {/* Mode Selector Modal */}
