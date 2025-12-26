@@ -1884,14 +1884,17 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowModeSelector(false)}
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowModeSelector(false);
+              }
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               className="bg-gray-900/95 backdrop-blur-xl border border-violet-500/30 rounded-2xl p-6 max-w-md mx-4"
-              onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-xl font-bold text-white mb-3">
                 {language === 'fr' ? '🎨 Que souhaitez-vous faire ?' : '🎨 What would you like to do?'}
@@ -1903,10 +1906,12 @@ export default function Home() {
               </p>
               <div className="space-y-3">
                 <button
-                  onClick={() => {
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setPromptMode('modify');
                     setShowModeSelector(false);
-                    inputRef.current?.focus();
+                    setTimeout(() => inputRef.current?.focus(), 100);
                   }}
                   className="w-full px-4 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition-colors flex items-center gap-3"
                 >
@@ -1918,10 +1923,12 @@ export default function Home() {
                   </span>
                 </button>
                 <button
-                  onClick={() => {
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setPromptMode('new');
                     setShowModeSelector(false);
-                    inputRef.current?.focus();
+                    setTimeout(() => inputRef.current?.focus(), 100);
                   }}
                   className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors flex items-center gap-3"
                 >
