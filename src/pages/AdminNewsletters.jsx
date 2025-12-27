@@ -56,11 +56,20 @@ export default function AdminNewsletters() {
     const categories = await base44.entities.StoreCategory.filter({ is_active: true }, 'order');
     const storeItems = await base44.entities.StoreItem.filter({ is_active: true }, '-created_date');
 
+    // Catégories principales alignées avec CategorySelector
+    const mainCategories = [
+      { slug: 'logo_picto', name: 'Logo Pictogramme' },
+      { slug: 'logo_complet', name: 'Logo Complet' },
+      { slug: 'image', name: 'Images' },
+      { slug: 'print', name: 'Print / Impression' },
+      { slug: 'social', name: 'Posts & Story' },
+      { slug: 'mockup', name: 'Mockup' },
+      { slug: 'product', name: 'Produit' },
+      { slug: 'design_3d', name: 'Design 3D' }
+    ];
+
     let visualsByCategory = {};
-    categories.forEach(cat => {
-      // Exclure les catégories vidéo
-      if (cat.slug && cat.slug.toLowerCase().includes('video')) return;
-      
+    mainCategories.forEach(cat => {
       const categoryItems = storeItems
         .filter(item => {
           // Exclure les items avec vidéo
@@ -69,10 +78,10 @@ export default function AdminNewsletters() {
           }
           return item.category_slugs && item.category_slugs.includes(cat.slug);
         })
-        .slice(0, 4); // 4 items (2x2)
+        .slice(0, 10); // 10 items par catégorie
       if (categoryItems.length > 0) {
         visualsByCategory[cat.slug] = {
-          name: cat.name_fr,
+          name: cat.name,
           items: categoryItems
         };
       }
