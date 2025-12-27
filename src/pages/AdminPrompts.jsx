@@ -29,6 +29,7 @@ export default function AdminPrompts() {
   const [showDialog, setShowDialog] = useState(false);
   const [showExampleDialog, setShowExampleDialog] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
+  const [filterExampleCategory, setFilterExampleCategory] = useState('all');
   const [adsPrompt, setAdsPrompt] = useState('');
   const [savingAds, setSavingAds] = useState(false);
 
