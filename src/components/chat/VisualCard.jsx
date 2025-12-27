@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Feather, Sparkles, Video, X, Info, Expand, Scissors } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Feather, Sparkles, Film, X, Info, Expand, Scissors } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
