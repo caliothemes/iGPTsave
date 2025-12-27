@@ -754,6 +754,8 @@ export default function Home() {
           image_prompt: isModification ? finalPrompt : enhancedPrompt,
           dimensions: dimensions,
           visual_type: activeCategory?.id,
+          format_name: selectedFormat?.name || null,
+          category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
           style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
           color_palette: extractedColors,
           editor_layers: editorLayers.length > 0 ? editorLayers : undefined

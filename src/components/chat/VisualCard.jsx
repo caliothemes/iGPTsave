@@ -260,14 +260,19 @@ export default function VisualCard({
           )}
           
           <div className="flex items-center gap-2 text-xs flex-wrap">
+            {visual.dimensions && (
+              <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
+                {visual.dimensions}
+              </span>
+            )}
             {visual.format_name && (
               <span className="px-2 py-1 rounded-full bg-violet-500/20 text-violet-300">
                 {visual.format_name}
               </span>
             )}
-            {!visual.format_name && visual.dimensions && (
-              <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
-                {visual.dimensions}
+            {visual.category_name && (
+              <span className="px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300">
+                {visual.category_name}
               </span>
             )}
             {visual.style && (
