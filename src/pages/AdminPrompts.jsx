@@ -342,8 +342,23 @@ export default function AdminPrompts() {
             </Button>
           </div>
 
+          {/* Filter for Examples */}
+          <div className="flex items-center gap-4 mb-6">
+            <Select value={filterExampleCategory} onValueChange={setFilterExampleCategory}>
+              <SelectTrigger className="w-48 bg-white/5 border-white/10 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes catégories</SelectItem>
+                {exampleCategories.map(cat => (
+                  <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid gap-3">
-            {examples.map((example) => (
+            {examples.filter(ex => filterExampleCategory === 'all' || ex.category === filterExampleCategory).map((example) => (
               <div key={example.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
