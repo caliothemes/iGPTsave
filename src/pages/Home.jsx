@@ -1308,45 +1308,42 @@ export default function Home() {
                               </button>
                               )}
 
-                              {/* Action Buttons - Outside card, below favorites - Only on last visual */}
+                              {/* Action Icons - Stuck to card edge - Only on last visual */}
                               {idx === messages.length - 1 && !msg.visual.video_url && !(msg.visual.image_url && (msg.visual.image_url.includes('.mp4') || msg.visual.image_url.includes('/video'))) && (
-                              <div className="absolute -right-3 top-16 z-40 flex flex-col gap-2 translate-x-full">
-                              {/* Magic Editor Button */}
-                              <Button
-                                size="sm"
-                                onClick={() => handleOpenEditor(msg.visual)}
-                                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
-                              >
-                                <Wand2 className="h-4 w-4" />
-                                <span className="text-xs font-medium">{language === 'fr' ? 'Éditeur' : 'Editor'}</span>
-                              </Button>
+                                <div className="absolute -right-2 top-16 z-40 flex flex-col gap-2">
+                                  {/* Magic Editor Icon */}
+                                  <button
+                                    onClick={() => handleOpenEditor(msg.visual)}
+                                    className="p-2.5 rounded-l-xl bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg transition-all hover:scale-110 border border-r-0 border-violet-500/30"
+                                    title={language === 'fr' ? 'Éditeur' : 'Editor'}
+                                  >
+                                    <Wand2 className="h-4 w-4" />
+                                  </button>
 
-                              {/* Animate Button */}
-                              <Button
-                                size="sm"
-                                onClick={() => {
-                                  setVideoVisual(msg.visual);
-                                  setShowVideoModal(true);
-                                }}
-                                className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
-                              >
-                                <Video className="h-4 w-4" />
-                                <span className="text-xs font-medium">{language === 'fr' ? 'Vidéo' : 'Video'}</span>
-                              </Button>
+                                  {/* Animate Icon */}
+                                  <button
+                                    onClick={() => {
+                                      setVideoVisual(msg.visual);
+                                      setShowVideoModal(true);
+                                    }}
+                                    className="p-2.5 rounded-l-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg transition-all hover:scale-110 border border-r-0 border-pink-500/30"
+                                    title={language === 'fr' ? 'Vidéo' : 'Video'}
+                                  >
+                                    <Video className="h-4 w-4" />
+                                  </button>
 
-                              {/* Crop Button */}
-                              <Button
-                                size="sm"
-                                onClick={() => {
-                                  setCropVisual(msg.visual);
-                                  setShowCropModal(true);
-                                }}
-                                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg flex items-center gap-2 whitespace-nowrap"
-                              >
-                                <Scissors className="h-4 w-4" />
-                                <span className="text-xs font-medium">{language === 'fr' ? 'Découpe' : 'Crop'}</span>
-                              </Button>
-                              </div>
+                                  {/* Crop Icon */}
+                                  <button
+                                    onClick={() => {
+                                      setCropVisual(msg.visual);
+                                      setShowCropModal(true);
+                                    }}
+                                    className="p-2.5 rounded-l-xl bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg transition-all hover:scale-110 border border-r-0 border-blue-500/30"
+                                    title={language === 'fr' ? 'Découpe' : 'Crop'}
+                                  >
+                                    <Scissors className="h-4 w-4" />
+                                  </button>
+                                </div>
                               )}
 
                               <VisualCard
