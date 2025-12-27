@@ -91,15 +91,22 @@ export default function AdminNewsletters() {
     let html = template.html_content;
     html = html.replace('{{DATE}}', new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }));
 
-    // Build visuals sections
+    // Build visuals sections - 10 items per category (5x2 grid)
     let visualsHtml = '';
     Object.values(visualsByCategory).forEach(category => {
       visualsHtml += `
         <div style="margin-bottom: 40px;">
           <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px; font-weight: bold; background: linear-gradient(to right, #a78bfa, #f0abfc, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: #a78bfa;">${category.name}</h2>
-          <table width="100%" cellpadding="0" cellspacing="0">
+          <table width="100%" cellpadding="0" cellspacing="0">`;
+      
+      // Generate 5 rows of 2 items each (10 items total)
+      for (let i = 0; i < Math.min(5, Math.ceil(category.items.length / 2)); i++) {
+        const startIdx = i * 2;
+        const rowItems = category.items.slice(startIdx, startIdx + 2);
+        
+        visualsHtml += `
             <tr>
-              ${category.items.slice(0, 2).map(item => `
+              ${rowItems.map(item => `
                 <td width="50%" style="padding: 10px;" valign="top">
                   <div style="background: #1f2937; border-radius: 12px; overflow: hidden; border: 1px solid #374151;">
                     <img src="${item.image_url}" alt="${item.title}" style="width: 100%; height: 250px; object-fit: cover; display: block;" />
@@ -113,25 +120,11 @@ export default function AdminNewsletters() {
                   </div>
                 </td>
               `).join('')}
-            </tr>
-            ${category.items.length > 2 ? `
-            <tr>
-              ${category.items.slice(2, 4).map(item => `
-                <td width="50%" style="padding: 10px;" valign="top">
-                  <div style="background: #1f2937; border-radius: 12px; overflow: hidden; border: 1px solid #374151;">
-                    <img src="${item.image_url}" alt="${item.title}" style="width: 100%; height: 250px; object-fit: cover; display: block;" />
-                    <div style="padding: 15px;">
-                      <h3 style="color: #fff; font-size: 14px; margin: 0 0 8px 0; font-weight: 600;">${item.title}</h3>
-                      <div style="display: flex; align-items: center; gap: 5px;">
-                        <span style="color: #fbbf24; font-size: 16px; font-weight: bold;">${item.price_credits}</span>
-                        <span style="color: #9ca3af; font-size: 12px;">crédits</span>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              `).join('')}
-            </tr>
-            ` : ''}
+              ${rowItems.length === 1 ? '<td width="50%"></td>' : ''}
+            </tr>`;
+      }
+      
+      visualsHtml += `
           </table>
         </div>
       `;
