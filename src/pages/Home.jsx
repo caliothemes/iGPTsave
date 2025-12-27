@@ -1308,13 +1308,13 @@ export default function Home() {
                               </button>
                               )}
 
-                              {/* Action Icons - Stuck to right edge - Only on last visual */}
+                              {/* Action Icons - Outside card, stuck to right edge - Only on last visual */}
                               {idx === messages.length - 1 && !msg.visual.video_url && !(msg.visual.image_url && (msg.visual.image_url.includes('.mp4') || msg.visual.image_url.includes('/video'))) && (
-                                <div className="absolute -right-2 top-16 z-40 flex flex-col gap-2">
+                                <div className="absolute right-0 top-16 translate-x-full z-40 flex flex-col gap-2">
                                   {/* Magic Editor Icon */}
                                   <button
                                     onClick={() => handleOpenEditor(msg.visual)}
-                                    className="p-2.5 rounded-l-xl bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg transition-all hover:scale-110 border border-r-0 border-violet-500/30"
+                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-violet-500/30"
                                     title={language === 'fr' ? 'Éditeur' : 'Editor'}
                                   >
                                     <Wand2 className="h-4 w-4" />
@@ -1326,7 +1326,7 @@ export default function Home() {
                                       setVideoVisual(msg.visual);
                                       setShowVideoModal(true);
                                     }}
-                                    className="p-2.5 rounded-l-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg transition-all hover:scale-110 border border-r-0 border-pink-500/30"
+                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-pink-500/30"
                                     title={language === 'fr' ? 'Vidéo' : 'Video'}
                                   >
                                     <Video className="h-4 w-4" />
@@ -1338,7 +1338,7 @@ export default function Home() {
                                       setCropVisual(msg.visual);
                                       setShowCropModal(true);
                                     }}
-                                    className="p-2.5 rounded-l-xl bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg transition-all hover:scale-110 border border-r-0 border-blue-500/30"
+                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-blue-500/30"
                                     title={language === 'fr' ? 'Découpe' : 'Crop'}
                                   >
                                     <Scissors className="h-4 w-4" />
