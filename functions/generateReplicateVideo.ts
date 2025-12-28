@@ -60,22 +60,21 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'REPLICATE_API_KEY not configured' }, { status: 500 });
     }
 
-    console.log('Starting Replicate prediction...');
+    console.log('Starting Kling v2.5 Turbo Pro prediction...');
 
-    // Use Kling v2.5 Turbo Pro model
-    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
+    // Use Kling v2.5 Turbo Pro - must use run API endpoint
+    const response = await fetch('https://api.replicate.com/v1/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'wait'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        version: "kwaivgi/kling-v2.5-turbo-pro",
         input: {
-          prompt: prompt,
+          prompt: prompt || 'Cinematic motion, smooth camera movement',
           start_image: image_url,
-          duration: duration === 10 ? 10 : 5,
-          aspect_ratio: aspect_ratio
+          duration: duration === 10 ? 10 : 5
         }
       })
     });
