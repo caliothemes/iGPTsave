@@ -184,8 +184,8 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload, vid
               <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
                 <p className="text-blue-200 text-sm mb-2">
                   {language === 'fr' 
-                    ? 'La vidéo sera téléchargée en format 16:9 (paysage).'
-                    : 'The video will be downloaded in 16:9 format (landscape).'}
+                    ? `La vidéo sera téléchargée en format ${visual.dimensions || '16:9'}.`
+                    : `The video will be downloaded in ${visual.dimensions || '16:9'} format.`}
                 </p>
                 <p className="text-blue-200/60 text-xs">
                   {language === 'fr'
