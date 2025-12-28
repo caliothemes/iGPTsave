@@ -427,11 +427,11 @@ export default function MyVisuals() {
                       }}
                       isRegenerating={false}
                       canDownload={true}
-                      compact
+                      compact={false}
                       hideInfoMessage={true}
-                      showActions={false}
+                      showActions={true}
                       showValidation={false}
-                      hideEditButton={false}
+                      hideEditButton={true}
                     />
                     
                     {/* Action buttons below card */}
