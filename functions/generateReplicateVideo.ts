@@ -61,21 +61,26 @@ Deno.serve(async (req) => {
     }
 
     console.log('Starting Replicate prediction...');
+    console.log('Request body:', JSON.stringify({
+      input: {
+        prompt: prompt,
+        image: image_url,
+        aspect_ratio: aspect_ratio,
+        duration: duration === 10 ? "10" : "5"
+      }
+    }));
 
-    // Start Replicate prediction
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
+    // Use Replicate model endpoint directly
+    const response = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+        'Authorization': `Token ${REPLICATE_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        version: "aa1bf6e1577ce4e4e39876f4568deb0b939cdb9ebb3c6fdbe78226c5c9ea4094",
         input: {
           prompt: prompt,
-          image: image_url,
-          aspect_ratio: aspect_ratio,
-          duration: duration === 10 ? "10" : "5"
+          first_frame_image: image_url
         }
       })
     });
