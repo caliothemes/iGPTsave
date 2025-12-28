@@ -62,8 +62,8 @@ Deno.serve(async (req) => {
 
     console.log('Starting Replicate prediction...');
 
-    // Use Kling AI v1.6 Standard model
-    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v1.6-standard/predictions', {
+    // Use Kling v2.5 Turbo Pro model
+    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
@@ -73,8 +73,8 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         input: {
           prompt: prompt,
-          image_input: image_url,
-          duration: duration === 10 ? "10" : "5",
+          start_image: image_url,
+          duration: duration === 10 ? 10 : 5,
           aspect_ratio: aspect_ratio
         }
       })
