@@ -7,7 +7,9 @@ import { base44 } from '@/api/base44Client';
 
 export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated }) {
   const { language } = useLanguage();
+  const [provider, setProvider] = useState('replicate'); // 'replicate' or 'runway'
   const [prompt, setPrompt] = useState('');
+  const [aspectRatio, setAspectRatio] = useState('16:9');
   const [duration, setDuration] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -25,66 +27,89 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     setProgress(0);
 
     try {
-      // Start video generation
-      const response = await base44.functions.invoke('generateVideo', {
-        image_url: visual.image_url,
-        prompt: finalPrompt,
-        duration: duration,
-        dimensions: visual.dimensions
-      });
+      if (provider === 'replicate') {
+        // Replicate Kling generation
+        setProgress(10);
+        const response = await base44.functions.invoke('generateReplicateVideo', {
+          image_url: visual.image_url,
+          prompt: finalPrompt,
+          aspect_ratio: aspectRatio
+        });
 
-      console.log('Generate video response:', response);
+        console.log('Replicate response:', response);
 
-      if (!response.data || response.data.error) {
-        throw new Error(response.data?.error || 'Erreur serveur');
-      }
-
-      if (!response.data.task_id) {
-        throw new Error('Pas de task_id retourné');
-      }
-
-      const { task_id } = response.data;
-      console.log('Task ID:', task_id);
-
-      // Poll for status
-      const pollInterval = setInterval(async () => {
-        try {
-          const statusResponse = await base44.functions.invoke('checkVideoStatus', { task_id });
-          console.log('Status response:', statusResponse);
-
-          if (!statusResponse.data) {
-            clearInterval(pollInterval);
-            setIsGenerating(false);
-            alert(language === 'fr' ? 'Erreur: pas de données reçues' : 'Error: no data received');
-            return;
-          }
-
-          const { status, progress: currentProgress, video_url, failure } = statusResponse.data;
-
-          // Progress is a decimal (0.0 to 1.0), convert to percentage
-          if (currentProgress !== undefined && currentProgress !== null) {
-            setProgress(currentProgress * 100);
-          }
-
-          if (status === 'SUCCEEDED' && video_url) {
-            clearInterval(pollInterval);
-            setIsGenerating(false);
-            onVideoGenerated(video_url, finalPrompt);
-            onClose();
-          } else if (status === 'FAILED') {
-            clearInterval(pollInterval);
-            setIsGenerating(false);
-            alert(language === 'fr' 
-              ? `Erreur: ${failure || 'Échec de génération'}` 
-              : `Error: ${failure || 'Generation failed'}`);
-          }
-        } catch (pollError) {
-          console.error('Poll error:', pollError);
-          clearInterval(pollInterval);
-          setIsGenerating(false);
-          alert(language === 'fr' ? `Erreur de vérification: ${pollError.message}` : `Status check error: ${pollError.message}`);
+        if (response.data.error) {
+          throw new Error(response.data.error);
         }
-      }, 3000);
+
+        setProgress(100);
+        setTimeout(() => {
+          onVideoGenerated(response.data.video_url, finalPrompt);
+          onClose();
+        }, 500);
+
+      } else {
+        // Runway generation (existing code)
+        const response = await base44.functions.invoke('generateVideo', {
+          image_url: visual.image_url,
+          prompt: finalPrompt,
+          duration: duration,
+          dimensions: visual.dimensions
+        });
+
+        console.log('Generate video response:', response);
+
+        if (!response.data || response.data.error) {
+          throw new Error(response.data?.error || 'Erreur serveur');
+        }
+
+        if (!response.data.task_id) {
+          throw new Error('Pas de task_id retourné');
+        }
+
+        const { task_id } = response.data;
+        console.log('Task ID:', task_id);
+
+        // Poll for status
+        const pollInterval = setInterval(async () => {
+          try {
+            const statusResponse = await base44.functions.invoke('checkVideoStatus', { task_id });
+            console.log('Status response:', statusResponse);
+
+            if (!statusResponse.data) {
+              clearInterval(pollInterval);
+              setIsGenerating(false);
+              alert(language === 'fr' ? 'Erreur: pas de données reçues' : 'Error: no data received');
+              return;
+            }
+
+            const { status, progress: currentProgress, video_url, failure } = statusResponse.data;
+
+            // Progress is a decimal (0.0 to 1.0), convert to percentage
+            if (currentProgress !== undefined && currentProgress !== null) {
+              setProgress(currentProgress * 100);
+            }
+
+            if (status === 'SUCCEEDED' && video_url) {
+              clearInterval(pollInterval);
+              setIsGenerating(false);
+              onVideoGenerated(video_url, finalPrompt);
+              onClose();
+            } else if (status === 'FAILED') {
+              clearInterval(pollInterval);
+              setIsGenerating(false);
+              alert(language === 'fr' 
+                ? `Erreur: ${failure || 'Échec de génération'}` 
+                : `Error: ${failure || 'Generation failed'}`);
+            }
+          } catch (pollError) {
+            console.error('Poll error:', pollError);
+            clearInterval(pollInterval);
+            setIsGenerating(false);
+            alert(language === 'fr' ? `Erreur de vérification: ${pollError.message}` : `Status check error: ${pollError.message}`);
+          }
+        }, 3000);
+      }
 
     } catch (error) {
       console.error('Generation error:', error);
@@ -138,17 +163,96 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             />
           </div>
 
-          {/* Format Notice */}
-          <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          {/* Provider Selection */}
+          <div className="mb-4">
+            <label className="text-white/80 text-sm mb-2 block">
+              {language === 'fr' ? 'Service de génération' : 'Generation service'}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setProvider('replicate')}
+                disabled={isGenerating}
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                  provider === 'replicate'
+                    ? 'bg-violet-600 border-violet-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                }`}
+              >
+                <div className="font-bold">Replicate Kling</div>
+                <div className="text-xs opacity-80">10 crédits</div>
+              </button>
+              <button
+                onClick={() => setProvider('runway')}
+                disabled={isGenerating}
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                  provider === 'runway'
+                    ? 'bg-violet-600 border-violet-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                }`}
+              >
+                <div className="font-bold">RunwayML</div>
+                <div className="text-xs opacity-80">20-35 crédits</div>
+              </button>
+            </div>
+          </div>
+
+          {/* Aspect Ratio - Only for Replicate */}
+          {provider === 'replicate' && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Format vidéo' : 'Video format'}
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {['16:9', '9:16', '1:1'].map(ratio => (
+                  <button
+                    key={ratio}
+                    onClick={() => setAspectRatio(ratio)}
+                    disabled={isGenerating}
+                    className={`px-3 py-2 rounded-lg border transition-all text-sm disabled:opacity-50 ${
+                      aspectRatio === ratio
+                        ? 'bg-violet-600 border-violet-500 text-white'
+                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    }`}
+                  >
+                    {ratio}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Service Info */}
+          <div className={`mb-4 p-3 rounded-xl border ${
+            provider === 'replicate' 
+              ? 'bg-violet-500/10 border-violet-500/20'
+              : 'bg-amber-500/10 border-amber-500/20'
+          }`}>
             <div className="flex items-start gap-2">
-              <svg className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className={`h-4 w-4 flex-shrink-0 mt-0.5 ${
+                provider === 'replicate' ? 'text-violet-400' : 'text-amber-400'
+              }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-amber-200 text-xs leading-relaxed">
-                {language === 'fr'
-                  ? 'Les vidéos sont générées au format 16:9 (paysage) pour une compatibilité optimale.'
-                  : 'Videos are generated in 16:9 format (landscape) for optimal compatibility.'}
-              </p>
+              <div>
+                <p className={`font-medium text-xs mb-0.5 ${
+                  provider === 'replicate' ? 'text-violet-200' : 'text-amber-200'
+                }`}>
+                  {provider === 'replicate' 
+                    ? 'Kling v2.5 Turbo Pro' 
+                    : 'RunwayML Gen-3 Alpha Turbo'}
+                </p>
+                <p className={`text-xs leading-relaxed ${
+                  provider === 'replicate' ? 'text-violet-300/80' : 'text-amber-200/80'
+                }`}>
+                  {provider === 'replicate'
+                    ? (language === 'fr' 
+                        ? 'Vidéo cinématographique pro. Coût : 10 crédits (~0.50-1€)' 
+                        : 'Professional cinematic video. Cost: 10 credits (~0.50-1€)')
+                    : (language === 'fr'
+                        ? 'Animation fluide HD. Format 16:9 uniquement.'
+                        : 'Smooth HD animation. 16:9 format only.')}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -247,46 +351,48 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           )}
 
-          {/* Duration Selector */}
-          <div className="mb-6">
-            <label className="text-white/80 text-sm mb-2 block">
-              {language === 'fr' ? 'Durée' : 'Duration'}
-            </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setDuration(5)}
-                disabled={isGenerating}
-                className={`flex-1 px-4 py-2 rounded-lg transition-all ${
-                  duration === 5 
-                    ? 'bg-violet-600 text-white' 
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                } disabled:opacity-50`}
-              >
-                5s
-              </button>
-              <button
-                onClick={() => setDuration(10)}
-                disabled={isGenerating}
-                className={`flex-1 px-4 py-2 rounded-lg transition-all ${
-                  duration === 10 
-                    ? 'bg-violet-600 text-white' 
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                } disabled:opacity-50`}
-              >
-                10s
-              </button>
+          {/* Duration Selector - Only for Runway */}
+          {provider === 'runway' && (
+            <div className="mb-6">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Durée' : 'Duration'}
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDuration(5)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 5 
+                      ? 'bg-violet-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  5s
+                </button>
+                <button
+                  onClick={() => setDuration(10)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 10 
+                      ? 'bg-violet-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  10s
+                </button>
+              </div>
+              <div className="flex justify-center mt-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-medium">
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {duration === 5 
+                    ? (language === 'fr' ? '20 crédits' : '20 credits') 
+                    : (language === 'fr' ? '35 crédits' : '35 credits')}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-center mt-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-medium">
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {duration === 5 
-                  ? (language === 'fr' ? '20 crédits' : '20 credits') 
-                  : (language === 'fr' ? '35 crédits' : '35 credits')}
-              </span>
-            </div>
-          </div>
+          )}
 
           {/* Progress Bar */}
           {isGenerating && (
@@ -333,31 +439,49 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </Button>
           </div>
 
-          {/* RunwayML Footer */}
+          {/* Provider Footer */}
           <div className="mt-6 pt-4 border-t border-white/10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/fafb0401f_runwayLM.png"
-                  alt="RunwayML"
-                  className="h-8 w-8 rounded-lg"
-                />
-                <div>
-                  <p className="text-white/90 text-xs font-medium">
-                    {language === 'fr' ? 'Vidéo générée par RunwayML' : 'Video generated by RunwayML'}
-                  </p>
-                  <p className="text-white/50 text-[10px]">
-                    {language === 'fr' ? 'Vidéo HD • Gen-3 Alpha Turbo' : 'HD Video • Gen-3 Alpha Turbo'}
-                  </p>
-                </div>
+                {provider === 'replicate' ? (
+                  <>
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white/90 text-xs font-medium">
+                        {language === 'fr' ? 'Vidéo générée par Kling AI' : 'Video generated by Kling AI'}
+                      </p>
+                      <p className="text-white/50 text-[10px]">
+                        {language === 'fr' ? 'Qualité cinématographique • v2.5 Turbo Pro' : 'Cinematic quality • v2.5 Turbo Pro'}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/fafb0401f_runwayLM.png"
+                      alt="RunwayML"
+                      className="h-8 w-8 rounded-lg"
+                    />
+                    <div>
+                      <p className="text-white/90 text-xs font-medium">
+                        {language === 'fr' ? 'Vidéo générée par RunwayML' : 'Video generated by RunwayML'}
+                      </p>
+                      <p className="text-white/50 text-[10px]">
+                        {language === 'fr' ? 'Vidéo HD • Gen-3 Alpha Turbo' : 'HD Video • Gen-3 Alpha Turbo'}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
               <a 
-                href="https://runwayml.com" 
+                href={provider === 'replicate' ? 'https://replicate.com' : 'https://runwayml.com'}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-violet-400 hover:text-violet-300 text-xs transition-colors"
               >
-                runwayml.com →
+                {provider === 'replicate' ? 'replicate.com →' : 'runwayml.com →'}
               </a>
             </div>
           </div>
