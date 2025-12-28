@@ -181,7 +181,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">Replicate Kling</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
-                <div className="text-xs opacity-80 mt-0.5">5s: 15 • 10s: 25 crédits</div>
               </button>
               <button
                 onClick={() => setProvider('runway')}
@@ -194,7 +193,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">RunwayML</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Animation d\'image' : 'Image animation'}</div>
-                <div className="text-xs opacity-80 mt-0.5">5s: 20 • 10s: 30 crédits</div>
               </button>
             </div>
           </div>
@@ -271,7 +269,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               </div>
               <div className="flex-1 text-left">
                 <p className="text-white text-sm font-medium">
-                  {language === 'fr' ? 'Laissez iGPT gérer l\'animation' : 'Let iGPT handle the animation'}
+                  {language === 'fr' ? 'Laissez iGPT gérer la vidéo' : 'Let iGPT handle the video'}
                 </p>
                 <p className="text-white/50 text-xs">
                   {language === 'fr' 
@@ -349,6 +347,18 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                   {language === 'fr'
                     ? '↔️ Panoramique horizontal fluide de gauche à droite, flou de mouvement...'
                     : '↔️ Smooth horizontal pan from left to right, elegant motion blur...'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrompt(language === 'fr'
+                    ? 'Zoom cinématographique lent vers le centre, mouvement de caméra fluide, le mockup arrive en glissade sur le comptoir. La pancarte tombe sur le comptoir avec un effet incroyable.'
+                    : 'Slow cinematic zoom to center, smooth camera movement, mockup slides onto the counter. The sign falls onto the counter with an incredible effect.')}
+                  disabled={isGenerating}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
+                >
+                  {language === 'fr'
+                    ? '🎬 Zoom cinématographique lent vers le centre, le mockup arrive en glissade...'
+                    : '🎬 Slow cinematic zoom to center, mockup slides onto the counter...'}
                 </button>
               </div>
             </div>
