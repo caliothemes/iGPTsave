@@ -14,6 +14,21 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [autoPrompt, setAutoPrompt] = useState(false);
+  const [promptExamples, setPromptExamples] = useState([]);
+
+  React.useEffect(() => {
+    const loadPromptExamples = async () => {
+      try {
+        const examples = await base44.entities.VideoPromptExample.filter({ is_active: true }, 'order');
+        setPromptExamples(examples);
+      } catch (e) {
+        console.error('Failed to load prompt examples:', e);
+      }
+    };
+    if (isOpen) {
+      loadPromptExamples();
+    }
+  }, [isOpen]);
 
   const handleGenerate = async () => {
     // Define final prompt first
@@ -45,7 +60,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
         setProgress(100);
         setTimeout(() => {
-          onVideoGenerated(response.data.video_url, finalPrompt, aspectRatio);
+          // Add metadata to prompt for badge display
+          const promptWithMetadata = `[Kling v2.5 Pro] [${duration}s] ${finalPrompt}`;
+          onVideoGenerated(response.data.video_url, promptWithMetadata, aspectRatio);
           onClose();
         }, 500);
 
@@ -94,7 +111,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             if (status === 'SUCCEEDED' && video_url) {
               clearInterval(pollInterval);
               setIsGenerating(false);
-              onVideoGenerated(video_url, finalPrompt);
+              // Add metadata to prompt for badge display
+              const promptWithMetadata = `[RunwayML Gen-3] [${duration}s] ${finalPrompt}`;
+              onVideoGenerated(video_url, promptWithMetadata);
               onClose();
             } else if (status === 'FAILED') {
               clearInterval(pollInterval);
@@ -307,60 +326,27 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 rows={4}
               />
 
-              {/* Example Prompts */}
-              <div className="mt-2 space-y-1.5">
-                <p className="text-white/40 text-[10px] mb-1">
-                  {language === 'fr' ? 'Exemples de prompts :' : 'Prompt examples:'}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setPrompt(language === 'fr' 
-                    ? 'Zoom cinématographique lent vers le centre, mouvement de caméra fluide, éclairage dramatique, effet bokeh subtil, transitions douces'
-                    : 'Slow cinematic zoom to center, smooth camera movement, dramatic lighting, subtle bokeh effect, soft transitions')}
-                  disabled={isGenerating}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
-                >
-                  {language === 'fr' 
-                    ? '📸 Zoom cinématographique lent vers le centre, mouvement de caméra fluide...'
-                    : '📸 Slow cinematic zoom to center, smooth camera movement...'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPrompt(language === 'fr'
-                    ? 'Rotation douce dans le sens horaire, parallaxe sur les éléments, profondeur de champ progressive, lumières scintillantes, ambiance mystérieuse'
-                    : 'Gentle clockwise rotation, parallax on elements, progressive depth of field, twinkling lights, mysterious atmosphere')}
-                  disabled={isGenerating}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
-                >
-                  {language === 'fr'
-                    ? '🔄 Rotation douce dans le sens horaire, parallaxe sur les éléments...'
-                    : '🔄 Gentle clockwise rotation, parallax on elements...'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPrompt(language === 'fr'
-                    ? 'Panoramique horizontal fluide de gauche à droite, flou de mouvement élégant, étalonnage des couleurs cinématique, effets de lumière dynamiques'
-                    : 'Smooth horizontal pan from left to right, elegant motion blur, cinematic color grading, dynamic light effects')}
-                  disabled={isGenerating}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
-                >
-                  {language === 'fr'
-                    ? '↔️ Panoramique horizontal fluide de gauche à droite, flou de mouvement...'
-                    : '↔️ Smooth horizontal pan from left to right, elegant motion blur...'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPrompt(language === 'fr'
-                    ? 'Zoom cinématographique lent vers le centre, mouvement de caméra fluide, le mockup arrive en glissade sur le comptoir. La pancarte tombe sur le comptoir avec un effet incroyable.'
-                    : 'Slow cinematic zoom to center, smooth camera movement, mockup slides onto the counter. The sign falls onto the counter with an incredible effect.')}
-                  disabled={isGenerating}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
-                >
-                  {language === 'fr'
-                    ? '🎬 Zoom cinématographique lent vers le centre, le mockup arrive en glissade...'
-                    : '🎬 Slow cinematic zoom to center, mockup slides onto the counter...'}
-                </button>
-              </div>
+              {/* Example Prompts - Dynamic from DB */}
+              {promptExamples.length > 0 && (
+                <div className="mt-2 space-y-1.5">
+                  <p className="text-white/40 text-[10px] mb-1">
+                    {language === 'fr' ? 'Exemples de prompts :' : 'Prompt examples:'}
+                  </p>
+                  {promptExamples
+                    .filter(ex => ex.provider === 'both' || ex.provider === provider)
+                    .map((example, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setPrompt(language === 'fr' ? example.prompt_fr : (example.prompt_en || example.prompt_fr))}
+                        disabled={isGenerating}
+                        className="w-full text-left px-3 py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-200 text-xs transition-all disabled:opacity-50"
+                      >
+                        {example.icon} {language === 'fr' ? example.short_desc_fr : (example.short_desc_en || example.short_desc_fr)}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
           )}
 

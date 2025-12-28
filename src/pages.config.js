@@ -24,6 +24,7 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
+import AdminVideoPrompts from './pages/AdminVideoPrompts';
 import __Layout from './Layout.jsx';
 
 
@@ -54,6 +55,7 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
+    "AdminVideoPrompts": AdminVideoPrompts,
 }
 
 export const pagesConfig = {
