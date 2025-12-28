@@ -260,22 +260,49 @@ export default function VisualCard({
           )}
           
           <div className="flex items-center gap-2 text-xs flex-wrap">
+            {/* Format Badge */}
             {visual.dimensions && (
-              <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-xs font-medium border border-blue-500/30">
                 {visual.dimensions}
               </span>
             )}
-            {visual.format_name && (
+            
+            {/* Video-specific badges */}
+            {isVideo && visual.original_prompt && (
+              <>
+                {/* Model Badge */}
+                {visual.original_prompt.toLowerCase().includes('kling') && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 text-xs font-medium border border-violet-500/30">
+                    Kling v2.5 Pro
+                  </span>
+                )}
+                {visual.original_prompt.toLowerCase().includes('runway') && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-500/30">
+                    RunwayML Gen-3
+                  </span>
+                )}
+                
+                {/* Duration Badge */}
+                {(visual.original_prompt.match(/(\d+)s/) || visual.title?.match(/(\d+)s/)) && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium border border-emerald-500/30">
+                    {(visual.original_prompt.match(/(\d+)s/) || visual.title?.match(/(\d+)s/))[1]}s
+                  </span>
+                )}
+              </>
+            )}
+            
+            {/* Other badges for images */}
+            {!isVideo && visual.format_name && (
               <span className="px-2 py-1 rounded-full bg-violet-500/20 text-violet-300">
                 {visual.format_name}
               </span>
             )}
-            {visual.category_name && (
+            {!isVideo && visual.category_name && (
               <span className="px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300">
                 {visual.category_name}
               </span>
             )}
-            {visual.style && (
+            {!isVideo && visual.style && (
               <span className="px-2 py-1 rounded-full bg-amber-500/20 text-amber-300">
                 {visual.style}
               </span>
