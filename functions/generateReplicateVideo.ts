@@ -62,17 +62,18 @@ Deno.serve(async (req) => {
 
     console.log('Starting Replicate prediction...');
 
-    // Use model-specific endpoint
-    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2-5-turbo-pro/predictions', {
+    // Use Minimax Video-01 model (confirmed working on Replicate)
+    const response = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Prefer': 'wait'
       },
       body: JSON.stringify({
         input: {
           prompt: prompt,
-          image: image_url
+          first_frame_image: image_url
         }
       })
     });
