@@ -13,7 +13,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [duration, setDuration] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [autoPrompt, setAutoPrompt] = useState(true);
+  const [autoPrompt, setAutoPrompt] = useState(false);
 
   const handleGenerate = async () => {
     // Define final prompt first
@@ -33,7 +33,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         const response = await base44.functions.invoke('generateReplicateVideo', {
           image_url: visual.image_url,
           prompt: finalPrompt,
-          aspect_ratio: aspectRatio
+          aspect_ratio: aspectRatio,
+          duration: duration
         });
 
         console.log('Replicate response:', response);
@@ -180,7 +181,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">Replicate Kling</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
-                <div className="text-xs opacity-80 mt-0.5">10 crédits</div>
+                <div className="text-xs opacity-80 mt-0.5">15-25 crédits</div>
               </button>
               <button
                 onClick={() => setProvider('runway')}
@@ -193,7 +194,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">RunwayML</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Animation d\'image' : 'Image animation'}</div>
-                <div className="text-xs opacity-80 mt-0.5">20-35 crédits</div>
+                <div className="text-xs opacity-80 mt-0.5">20-30 crédits</div>
               </button>
             </div>
           </div>
@@ -248,11 +249,11 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}>
                   {provider === 'replicate'
                     ? (language === 'fr' 
-                        ? 'Vidéo cinématographique pro. Coût : 10 crédits (~0.50-1€)' 
-                        : 'Professional cinematic video. Cost: 10 credits (~0.50-1€)')
+                        ? 'Vidéo cinématographique pro. 5s = 15 crédits, 10s = 25 crédits' 
+                        : 'Professional cinematic video. 5s = 15 credits, 10s = 25 credits')
                     : (language === 'fr'
-                        ? 'Animation fluide HD. Format 16:9 uniquement.'
-                        : 'Smooth HD animation. 16:9 format only.')}
+                        ? 'Animation fluide HD. 5s = 20 crédits, 10s = 30 crédits'
+                        : 'Smooth HD animation. 5s = 20 credits, 10s = 30 credits')}
                 </p>
               </div>
             </div>
@@ -353,48 +354,50 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           )}
 
-          {/* Duration Selector - Only for Runway */}
-          {provider === 'runway' && (
-            <div className="mb-6">
-              <label className="text-white/80 text-sm mb-2 block">
-                {language === 'fr' ? 'Durée' : 'Duration'}
-              </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setDuration(5)}
-                  disabled={isGenerating}
-                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
-                    duration === 5 
-                      ? 'bg-violet-600 text-white' 
-                      : 'bg-white/5 text-white/60 hover:bg-white/10'
-                  } disabled:opacity-50`}
-                >
-                  5s
-                </button>
-                <button
-                  onClick={() => setDuration(10)}
-                  disabled={isGenerating}
-                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
-                    duration === 10 
-                      ? 'bg-violet-600 text-white' 
-                      : 'bg-white/5 text-white/60 hover:bg-white/10'
-                  } disabled:opacity-50`}
-                >
-                  10s
-                </button>
-              </div>
-              <div className="flex justify-center mt-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-medium">
-                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {duration === 5 
-                    ? (language === 'fr' ? '20 crédits' : '20 credits') 
-                    : (language === 'fr' ? '35 crédits' : '35 credits')}
-                </span>
-              </div>
+          {/* Duration Selector */}
+          <div className="mb-6">
+            <label className="text-white/80 text-sm mb-2 block">
+              {language === 'fr' ? 'Durée' : 'Duration'}
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDuration(5)}
+                disabled={isGenerating}
+                className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                  duration === 5 
+                    ? 'bg-violet-600 text-white' 
+                    : 'bg-white/5 text-white/60 hover:bg-white/10'
+                } disabled:opacity-50`}
+              >
+                5s
+              </button>
+              <button
+                onClick={() => setDuration(10)}
+                disabled={isGenerating}
+                className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                  duration === 10 
+                    ? 'bg-violet-600 text-white' 
+                    : 'bg-white/5 text-white/60 hover:bg-white/10'
+                } disabled:opacity-50`}
+              >
+                10s
+              </button>
             </div>
-          )}
+            <div className="flex justify-center mt-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-medium">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {provider === 'replicate' 
+                  ? (duration === 5 
+                      ? (language === 'fr' ? '15 crédits' : '15 credits') 
+                      : (language === 'fr' ? '25 crédits' : '25 credits'))
+                  : (duration === 5 
+                      ? (language === 'fr' ? '20 crédits' : '20 credits') 
+                      : (language === 'fr' ? '30 crédits' : '30 credits'))}
+              </span>
+            </div>
+          </div>
 
           {/* Progress Bar */}
           {isGenerating && (

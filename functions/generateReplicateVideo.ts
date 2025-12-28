@@ -9,13 +9,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { image_url, prompt, aspect_ratio = "16:9" } = await req.json();
+    const { image_url, prompt, aspect_ratio = "16:9", duration = 5 } = await req.json();
 
     if (!image_url || !prompt) {
       return Response.json({ error: 'Missing image_url or prompt' }, { status: 400 });
     }
 
-    // Check credits (10 credits required)
+    // Calculate credits based on duration
+    const creditsRequired = duration === 10 ? 25 : 15;
+
+    // Check credits
     const userCredits = await base44.entities.UserCredits.filter({ user_email: user.email });
     if (userCredits.length === 0) {
       return Response.json({ error: 'No credits found' }, { status: 400 });
@@ -26,25 +29,25 @@ Deno.serve(async (req) => {
     const isUnlimited = credits.subscription_type === 'unlimited';
     const isAdmin = user.role === 'admin';
 
-    if (!isAdmin && !isUnlimited && totalCredits < 10) {
-      return Response.json({ error: 'Insufficient credits. 10 credits required.' }, { status: 400 });
+    if (!isAdmin && !isUnlimited && totalCredits < creditsRequired) {
+      return Response.json({ error: `Insufficient credits. ${creditsRequired} credits required.` }, { status: 400 });
     }
 
-    // Deduct 10 credits
+    // Deduct credits
     if (!isAdmin && !isUnlimited) {
-      if (credits.free_downloads >= 10) {
+      if (credits.free_downloads >= creditsRequired) {
         await base44.asServiceRole.entities.UserCredits.update(credits.id, {
-          free_downloads: credits.free_downloads - 10
+          free_downloads: credits.free_downloads - creditsRequired
         });
       } else if (credits.free_downloads > 0) {
-        const remaining = 10 - credits.free_downloads;
+        const remaining = creditsRequired - credits.free_downloads;
         await base44.asServiceRole.entities.UserCredits.update(credits.id, {
           free_downloads: 0,
           paid_credits: credits.paid_credits - remaining
         });
       } else {
         await base44.asServiceRole.entities.UserCredits.update(credits.id, {
-          paid_credits: credits.paid_credits - 10
+          paid_credits: credits.paid_credits - creditsRequired
         });
       }
     }
@@ -66,7 +69,8 @@ Deno.serve(async (req) => {
         input: {
           prompt: prompt,
           image: image_url,
-          aspect_ratio: aspect_ratio
+          aspect_ratio: aspect_ratio,
+          duration: duration === 10 ? "10" : "5"
         }
       })
     });
@@ -132,7 +136,7 @@ Deno.serve(async (req) => {
     return Response.json({ 
       video_url: videoUrl,
       status: 'success',
-      credits_used: 10
+      credits_used: creditsRequired
     });
 
   } catch (error) {
