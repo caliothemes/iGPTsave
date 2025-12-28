@@ -54,18 +54,18 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'REPLICATE_API_KEY not configured' }, { status: 500 });
     }
 
-    // Start Replicate prediction
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
+    // Start Replicate prediction - Kling model
+    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-video/predictions', {
       method: 'POST',
       headers: {
-        'Authorization': `Token ${REPLICATE_API_KEY}`,
+        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
         'Content-Type': 'application/json',
+        'Prefer': 'wait'
       },
       body: JSON.stringify({
-        version: '22c3e4ca634c46c4c46bdddb3d4f6af7b6a61ad03fc04dd6e0f0dae1b7f85ea4',
         input: {
-          image: image_url,
           prompt: prompt,
+          image_url: image_url,
           aspect_ratio: aspect_ratio,
           duration: "5"
         }
