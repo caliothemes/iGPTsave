@@ -354,8 +354,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           )}
 
-          {/* Duration Selector - Only when auto prompt is enabled */}
-          {autoPrompt && (
+          {/* Duration Selector */}
           <div className="mb-6">
             <label className="text-white/80 text-sm mb-2 block">
               {language === 'fr' ? 'Durée' : 'Duration'}
@@ -399,7 +398,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               </span>
             </div>
           </div>
-          )}
 
           {/* Progress Bar */}
           {isGenerating && (
