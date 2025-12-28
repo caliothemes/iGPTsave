@@ -45,7 +45,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
         setProgress(100);
         setTimeout(() => {
-          onVideoGenerated(response.data.video_url, finalPrompt);
+          onVideoGenerated(response.data.video_url, finalPrompt, aspectRatio);
           onClose();
         }, 500);
 
