@@ -72,8 +72,9 @@ Deno.serve(async (req) => {
     const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2-5-turbo-pro/predictions', {
       method: 'POST',
       headers: {
-        'Authorization': `Token ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'wait'
       },
       body: JSON.stringify({
         input: {
