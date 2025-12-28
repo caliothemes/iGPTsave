@@ -65,9 +65,8 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         input: {
           prompt: prompt,
-          image_url: image_url,
-          aspect_ratio: aspect_ratio,
-          duration: "5"
+          image: image_url,
+          aspect_ratio: aspect_ratio
         }
       })
     });
