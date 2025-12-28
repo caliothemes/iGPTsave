@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Loader2, X, Sparkles } from 'lucide-react';
+import { Loader2, X, Sparkles, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { base44 } from '@/api/base44Client';
+import VideoExamplesModal from './VideoExamplesModal';
 
 export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated }) {
   const { language } = useLanguage();
@@ -15,6 +16,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [progress, setProgress] = useState(0);
   const [autoPrompt, setAutoPrompt] = useState(false);
   const [promptExamples, setPromptExamples] = useState([]);
+  const [showExamplesModal, setShowExamplesModal] = useState(false);
 
   React.useEffect(() => {
     const loadPromptExamples = async () => {
@@ -500,6 +502,12 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Examples Modal */}
+      <VideoExamplesModal
+        isOpen={showExamplesModal}
+        onClose={() => setShowExamplesModal(false)}
+      />
     </AnimatePresence>
   );
 }

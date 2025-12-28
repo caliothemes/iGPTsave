@@ -29,6 +29,7 @@ const navItems = [
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
   { id: 'files', label: 'Gestion Fichiers', icon: FolderOpen, page: 'AdminFiles' },
   { id: 'video-prompts', label: 'Gestion Vidéo', icon: Video, page: 'AdminVideoPrompts' },
+  { id: 'video-examples', label: 'Exemples Vidéo', icon: Video, page: 'AdminVideoExamples' },
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
   { id: 'story-animations', label: 'Story Animations', icon: Wand2, page: 'AdminStoryAnimations' },
   { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
