@@ -179,7 +179,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}
               >
                 <div className="font-bold">Replicate Kling</div>
-                <div className="text-xs opacity-80">10 crédits</div>
+                <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
+                <div className="text-xs opacity-80 mt-0.5">10 crédits</div>
               </button>
               <button
                 onClick={() => setProvider('runway')}
@@ -191,7 +192,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}
               >
                 <div className="font-bold">RunwayML</div>
-                <div className="text-xs opacity-80">20-35 crédits</div>
+                <div className="text-xs opacity-70">{language === 'fr' ? 'Animation d\'image' : 'Image animation'}</div>
+                <div className="text-xs opacity-80 mt-0.5">20-35 crédits</div>
               </button>
             </div>
           </div>
