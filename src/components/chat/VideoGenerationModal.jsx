@@ -181,7 +181,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">Replicate Kling</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
-                <div className="text-xs opacity-80 mt-0.5">15-25 crédits</div>
+                <div className="text-xs opacity-80 mt-0.5">5s: 15 • 10s: 25 crédits</div>
               </button>
               <button
                 onClick={() => setProvider('runway')}
@@ -194,7 +194,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">RunwayML</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Animation d\'image' : 'Image animation'}</div>
-                <div className="text-xs opacity-80 mt-0.5">20-30 crédits</div>
+                <div className="text-xs opacity-80 mt-0.5">5s: 20 • 10s: 30 crédits</div>
               </button>
             </div>
           </div>
@@ -354,7 +354,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           )}
 
-          {/* Duration Selector */}
+          {/* Duration Selector - Only when auto prompt is enabled */}
+          {autoPrompt && (
           <div className="mb-6">
             <label className="text-white/80 text-sm mb-2 block">
               {language === 'fr' ? 'Durée' : 'Duration'}
@@ -398,6 +399,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               </span>
             </div>
           </div>
+          )}
 
           {/* Progress Bar */}
           {isGenerating && (
