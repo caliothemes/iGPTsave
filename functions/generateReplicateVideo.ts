@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
 Deno.serve(async (req) => {
   try {
@@ -10,6 +10,8 @@ Deno.serve(async (req) => {
     }
 
     const { image_url, prompt, aspect_ratio = "16:9", duration = 5 } = await req.json();
+    
+    console.log('Video generation request:', { image_url, prompt, aspect_ratio, duration });
 
     if (!image_url || !prompt) {
       return Response.json({ error: 'Missing image_url or prompt' }, { status: 400 });
@@ -54,8 +56,11 @@ Deno.serve(async (req) => {
 
     const REPLICATE_API_KEY = Deno.env.get('REPLICATE_API_KEY');
     if (!REPLICATE_API_KEY) {
+      console.error('REPLICATE_API_KEY not set');
       return Response.json({ error: 'REPLICATE_API_KEY not configured' }, { status: 500 });
     }
+
+    console.log('Starting Replicate prediction...');
 
     // Start Replicate prediction with correct endpoint
     const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
