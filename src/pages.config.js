@@ -1,6 +1,7 @@
 import Account from './pages/Account';
 import Admin from './pages/Admin';
 import AdminAssets from './pages/AdminAssets';
+import AdminFiles from './pages/AdminFiles';
 import AdminLegal from './pages/AdminLegal';
 import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
 import AdminNewsletters from './pages/AdminNewsletters';
@@ -13,6 +14,7 @@ import AdminStoryAnimations from './pages/AdminStoryAnimations';
 import AdminSupport from './pages/AdminSupport';
 import AdminUserDetail from './pages/AdminUserDetail';
 import AdminUsers from './pages/AdminUsers';
+import AdminVideoPrompts from './pages/AdminVideoPrompts';
 import AdminVisuals from './pages/AdminVisuals';
 import Home from './pages/Home';
 import homeBackup from './pages/Home_backup';
@@ -24,8 +26,6 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
-import AdminVideoPrompts from './pages/AdminVideoPrompts';
-import AdminFiles from './pages/AdminFiles';
 import __Layout from './Layout.jsx';
 
 
@@ -33,6 +33,7 @@ export const PAGES = {
     "Account": Account,
     "Admin": Admin,
     "AdminAssets": AdminAssets,
+    "AdminFiles": AdminFiles,
     "AdminLegal": AdminLegal,
     "AdminNewsletterTemplates": AdminNewsletterTemplates,
     "AdminNewsletters": AdminNewsletters,
@@ -45,6 +46,7 @@ export const PAGES = {
     "AdminSupport": AdminSupport,
     "AdminUserDetail": AdminUserDetail,
     "AdminUsers": AdminUsers,
+    "AdminVideoPrompts": AdminVideoPrompts,
     "AdminVisuals": AdminVisuals,
     "Home": Home,
     "Home_backup": homeBackup,
@@ -56,8 +58,6 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
-    "AdminVideoPrompts": AdminVideoPrompts,
-    "AdminFiles": AdminFiles,
 }
 
 export const pagesConfig = {

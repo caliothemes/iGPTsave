@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight, Wand2, Video, Scissors } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
 import { useLanguage } from '@/components/LanguageContext';
@@ -411,6 +411,7 @@ export default function MyVisuals() {
                       visual={visual}
                       onDownload={() => handleDownload(visual, credits)}
                       onToggleFavorite={handleToggleFavorite}
+                      onEdit={handleEdit}
                       onValidate={(action) => {
                         if (action === 'edit') handleEdit(visual);
                         else if (action === 'video') handleOpenVideo(visual);
@@ -424,10 +425,46 @@ export default function MyVisuals() {
                       canDownload={true}
                       compact
                       hideInfoMessage={true}
-                      showActions={true}
-                      showValidation={true}
-                      hideEditButton={true}
+                      showActions={false}
+                      showValidation={false}
+                      hideEditButton={false}
                     />
+                    
+                    {/* Action buttons below card */}
+                    {!visual.video_url && !visual.image_url?.includes('.mp4') && (
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          onClick={() => handleEdit(visual)}
+                          className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5"
+                          title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
+                        >
+                          <Wand2 className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">{language === 'fr' ? 'Éditer' : 'Edit'}</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setVideoVisual(visual);
+                            setShowVideoModal(true);
+                          }}
+                          className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5"
+                          title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
+                        >
+                          <Video className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">{language === 'fr' ? 'Vidéo' : 'Video'}</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setCropVisual(visual);
+                            setShowCropModal(true);
+                          }}
+                          className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5"
+                          title={language === 'fr' ? 'Découper' : 'Crop'}
+                        >
+                          <Scissors className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">{language === 'fr' ? 'Découpe' : 'Crop'}</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
