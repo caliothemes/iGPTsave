@@ -62,16 +62,15 @@ Deno.serve(async (req) => {
 
     console.log('Starting Replicate prediction...');
 
-    // Start Replicate prediction - using standard predictions endpoint
+    // Start Replicate prediction
     const response = await fetch('https://api.replicate.com/v1/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'wait'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "kwaivgi/kling-v2-5-turbo-pro",
+        version: "aa1bf6e1577ce4e4e39876f4568deb0b939cdb9ebb3c6fdbe78226c5c9ea4094",
         input: {
           prompt: prompt,
           image: image_url,
