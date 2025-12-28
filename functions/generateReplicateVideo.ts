@@ -64,14 +64,12 @@ Deno.serve(async (req) => {
     console.log('Request body:', JSON.stringify({
       input: {
         prompt: prompt,
-        image: image_url,
-        aspect_ratio: aspect_ratio,
-        duration: duration === 10 ? "10" : "5"
+        first_frame_image: image_url
       }
     }));
 
-    // Use Replicate model endpoint directly
-    const response = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
+    // Use Kling v2.5 Turbo Pro model endpoint
+    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2-5-turbo-pro/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Token ${REPLICATE_API_KEY}`,
