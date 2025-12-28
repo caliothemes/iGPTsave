@@ -62,12 +62,12 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        version: 'kwaivgi/kling-v2.5-turbo-pro',
+        version: '22c3e4ca634c46c4c46bdddb3d4f6af7b6a61ad03fc04dd6e0f0dae1b7f85ea4',
         input: {
           image: image_url,
           prompt: prompt,
           aspect_ratio: aspect_ratio,
-          duration: "5" // 5 seconds par défaut
+          duration: "5"
         }
       })
     });
