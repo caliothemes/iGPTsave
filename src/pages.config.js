@@ -25,6 +25,7 @@ import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
 import AdminVideoPrompts from './pages/AdminVideoPrompts';
+import AdminFiles from './pages/AdminFiles';
 import __Layout from './Layout.jsx';
 
 
@@ -56,6 +57,7 @@ export const PAGES = {
     "StoryStudio": StoryStudio,
     "Support": Support,
     "AdminVideoPrompts": AdminVideoPrompts,
+    "AdminFiles": AdminFiles,
 }
 
 export const pagesConfig = {
