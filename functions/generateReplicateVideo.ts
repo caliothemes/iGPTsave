@@ -62,8 +62,8 @@ Deno.serve(async (req) => {
 
     console.log('Starting Replicate prediction...');
 
-    // Start Replicate prediction with correct endpoint
-    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
+    // Start Replicate prediction - using deployment endpoint
+    const response = await fetch('https://api.replicate.com/v1/deployments/kwaivgi/kling-v2-5-turbo-pro/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
