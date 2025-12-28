@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
     console.log('Request body:', JSON.stringify({
       input: {
         prompt: prompt,
-        first_frame_image: image_url
+        image: image_url
       }
     }));
 
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         input: {
           prompt: prompt,
-          first_frame_image: image_url
+          image: image_url
         }
       })
     });
