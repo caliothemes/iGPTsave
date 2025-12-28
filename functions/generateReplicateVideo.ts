@@ -62,8 +62,8 @@ Deno.serve(async (req) => {
 
     console.log('Starting Replicate prediction...');
 
-    // Use Minimax Video-01 model (confirmed working on Replicate)
-    const response = await fetch('https://api.replicate.com/v1/models/minimax/video-01/predictions', {
+    // Use Kling AI v1.6 Standard model
+    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v1.6-standard/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
@@ -73,7 +73,9 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         input: {
           prompt: prompt,
-          first_frame_image: image_url
+          image_input: image_url,
+          duration: duration === 10 ? "10" : "5",
+          aspect_ratio: aspect_ratio
         }
       })
     });
