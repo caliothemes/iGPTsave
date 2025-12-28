@@ -1065,7 +1065,7 @@ export default function Home() {
     }
   };
 
-  const handleVideoGenerated = async (videoUrl, animationPrompt) => {
+  const handleVideoGenerated = async (videoUrl, animationPrompt, aspectRatio) => {
     // Create new visual with video
     const videoVisualData = {
       user_email: user?.email || 'anonymous',
@@ -1074,7 +1074,7 @@ export default function Home() {
       video_url: videoUrl,
       title: currentVisual.title + ' (Vidéo)',
       original_prompt: animationPrompt,
-      dimensions: currentVisual.dimensions,
+      dimensions: aspectRatio || currentVisual.dimensions || '16:9',
       visual_type: currentVisual.visual_type,
       parent_visual_id: currentVisual.id
     };
