@@ -209,24 +209,28 @@ export default function MyVisuals() {
     if (selectedVisual?.id === visual.id) setSelectedVisual(prev => ({ ...prev, is_favorite: newState }));
   };
 
-  // Main categories to display
-  const mainCategories = [
-    { id: 'logo_picto', name: language === 'fr' ? 'Logo Pictogramme' : 'Logo Pictogram' },
-    { id: 'logo_complet', name: language === 'fr' ? 'Logo complet' : 'Full Logo' },
-    { id: 'image', name: language === 'fr' ? 'Image réaliste' : 'Realistic Image' },
-    { id: 'print', name: language === 'fr' ? 'Design Print' : 'Print Design' },
-    { id: 'social', name: language === 'fr' ? 'Réseaux sociaux' : 'Social Media' },
-    { id: 'mockup', name: 'Mockups' },
-    { id: 'product', name: language === 'fr' ? 'Produit' : 'Product' },
-    { id: 'design_3d', name: 'Design 3D' },
-    { id: 'textures', name: 'Textures' },
-    { id: 'illustrations', name: 'Illustrations' },
-    { id: 'icones_picto', name: language === 'fr' ? 'Icônes Picto' : 'Icons Picto' },
-    { id: 'free_prompt', name: language === 'fr' ? 'Prompt 100% libre' : '100% Free Prompt' }
-  ];
+  // Main categories from CATEGORIES (same as prompt selector)
+  const mainCategories = CATEGORIES.filter(c => 
+    ['logo_picto', 'logo_complet', 'image', 'print', 'social', 'pub_ads', 'mockup', 'product', 'design_3d', 'textures', 'illustrations', 'icones_picto', 'free_prompt'].includes(c.id)
+  ).map(c => ({
+    id: c.id,
+    name: c.name?.[language] || c.name?.fr || c.id
+  }));
+  
+  // Add video category for generated videos
+  mainCategories.push({
+    id: 'video',
+    name: language === 'fr' ? 'Vidéos' : 'Videos'
+  });
 
   // Map visual_type to main category
-  const getMainCategory = (visualType) => {
+  const getMainCategory = (visual) => {
+    // Check if it's a video
+    if (visual.video_url || visual.image_url?.includes('.mp4') || visual.image_url?.includes('/video')) {
+      return 'video';
+    }
+    
+    const visualType = visual.visual_type;
     if (!visualType) return null;
     
     // Direct match
@@ -250,7 +254,7 @@ export default function MyVisuals() {
 
   // Count visuals by main category
   const categoryCounts = visuals.reduce((acc, v) => {
-    const mainCat = getMainCategory(v.visual_type);
+    const mainCat = getMainCategory(v);
     if (mainCat) {
       acc[mainCat] = (acc[mainCat] || 0) + 1;
     }
@@ -273,7 +277,7 @@ export default function MyVisuals() {
   const filteredVisuals = visuals.filter(v => {
     const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || (filter === 'favorites' && v.is_favorite) || (filter === 'downloaded' && v.downloaded);
-    const mainCat = getMainCategory(v.visual_type);
+    const mainCat = getMainCategory(v);
     const matchesType = typeFilter === 'all' || mainCat === typeFilter;
     const aspectRatio = getAspectRatio(v.dimensions);
     const matchesFormat = formatFilter === 'all' || aspectRatio === formatFilter;
@@ -431,40 +435,46 @@ export default function MyVisuals() {
                     />
                     
                     {/* Action buttons below card */}
-                    {!visual.video_url && !visual.image_url?.includes('.mp4') && (
-                      <div className="mt-2 flex gap-2">
-                        <button
-                          onClick={() => handleEdit(visual)}
-                          className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5"
-                          title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
-                        >
-                          <Wand2 className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">{language === 'fr' ? 'Éditer' : 'Edit'}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setVideoVisual(visual);
-                            setShowVideoModal(true);
-                          }}
-                          className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5"
-                          title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
-                        >
-                          <Video className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">{language === 'fr' ? 'Vidéo' : 'Video'}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setCropVisual(visual);
-                            setShowCropModal(true);
-                          }}
-                          className="flex-1 px-3 py-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-xs font-medium transition-all flex items-center justify-center gap-1.5"
-                          title={language === 'fr' ? 'Découper' : 'Crop'}
-                        >
-                          <Scissors className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">{language === 'fr' ? 'Découpe' : 'Crop'}</span>
-                        </button>
-                      </div>
-                    )}
+                    <div className="mt-2 flex gap-2">
+                      {!visual.video_url && !visual.image_url?.includes('.mp4') && (
+                        <>
+                          <button
+                            onClick={() => handleEdit(visual)}
+                            className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all"
+                            title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
+                          >
+                            <Wand2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setVideoVisual(visual);
+                              setShowVideoModal(true);
+                            }}
+                            className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all"
+                            title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
+                          >
+                            <Video className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setCropVisual(visual);
+                              setShowCropModal(true);
+                            }}
+                            className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all"
+                            title={language === 'fr' ? 'Découper' : 'Crop'}
+                          >
+                            <Scissors className="h-4 w-4" />
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={() => handleDownload(visual, credits)}
+                        className="flex-1 p-2 rounded-lg bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all"
+                        title={language === 'fr' ? 'Télécharger' : 'Download'}
+                      >
+                        <Download className="h-4 w-4 mx-auto" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
