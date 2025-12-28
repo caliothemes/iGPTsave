@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
-  Mail
+  Mail,
+  Video
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -25,6 +26,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, page: 'Admin' },
   { id: 'users', label: 'Utilisateurs', icon: Users, page: 'AdminUsers' },
   { id: 'visuals', label: 'Visuels', icon: Image, page: 'AdminVisuals' },
+  { id: 'video-prompts', label: 'Gestion Vidéo', icon: Video, page: 'AdminVideoPrompts' },
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
   { id: 'story-animations', label: 'Story Animations', icon: Wand2, page: 'AdminStoryAnimations' },
   { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
