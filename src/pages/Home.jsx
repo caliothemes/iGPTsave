@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Film } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -1329,7 +1329,7 @@ export default function Home() {
                                     className="p-2.5 rounded-r-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-pink-500/30"
                                     title={language === 'fr' ? 'Vidéo' : 'Video'}
                                   >
-                                    <Film className="h-4 w-4" />
+                                    <Video className="h-4 w-4" />
                                   </button>
 
                                   {/* Crop Icon */}

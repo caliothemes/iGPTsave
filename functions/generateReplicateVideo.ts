@@ -54,61 +54,68 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'REPLICATE_API_KEY not configured' }, { status: 500 });
     }
 
-    // Start Replicate prediction - Kling model
-    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-video/predictions', {
+    // Start Replicate prediction
+    const response = await fetch('https://api.replicate.com/v1/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'wait'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        version: "kwaivgi/kling-video:latest",
         input: {
           prompt: prompt,
-          image_url: image_url,
-          aspect_ratio: aspect_ratio,
-          duration: "5"
+          image: image_url,
+          aspect_ratio: aspect_ratio
         }
       })
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Replicate API error:', error);
-      return Response.json({ error: 'Failed to start video generation', details: error }, { status: 500 });
+      const errorText = await response.text();
+      console.error('Replicate API error:', errorText);
+      return Response.json({ 
+        error: 'Failed to start video generation', 
+        details: errorText 
+      }, { status: 500 });
     }
 
     const prediction = await response.json();
+    console.log('Replicate prediction started:', prediction.id);
 
     // Poll status until completed
     let videoUrl = null;
     let status = prediction.status;
     let pollCount = 0;
-    const maxPolls = 120; // 4 minutes max (2s interval)
+    const maxPolls = 180; // 6 minutes max
 
     while (status !== 'succeeded' && status !== 'failed' && pollCount < maxPolls) {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
         headers: {
-          'Authorization': `Token ${REPLICATE_API_KEY}`,
+          'Authorization': `Bearer ${REPLICATE_API_KEY}`
         }
       });
 
       if (!statusResponse.ok) {
+        const errorText = await statusResponse.text();
+        console.error('Poll error:', errorText);
         break;
       }
 
       const statusData = await statusResponse.json();
       status = statusData.status;
+      console.log('Status:', status, 'Poll:', pollCount);
 
       if (status === 'succeeded') {
         videoUrl = statusData.output;
         break;
       } else if (status === 'failed') {
+        console.error('Generation failed:', statusData.error);
         return Response.json({ 
           error: 'Video generation failed', 
-          details: statusData.error 
+          details: statusData.error || 'Unknown error'
         }, { status: 500 });
       }
 
@@ -116,7 +123,10 @@ Deno.serve(async (req) => {
     }
 
     if (!videoUrl) {
-      return Response.json({ error: 'Video generation timeout or failed' }, { status: 500 });
+      return Response.json({ 
+        error: 'Video generation timeout',
+        details: `Timeout after ${pollCount} polls`
+      }, { status: 500 });
     }
 
     return Response.json({ 
