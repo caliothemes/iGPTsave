@@ -236,10 +236,22 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                   >
                     {ratio}
                   </button>
-                ))}
-              </div>
-            </div>
-          )}
+                  ))}
+                  </div>
+
+                  {/* Button to see concrete examples */}
+                  <div className="mt-4 text-center">
+                  <Button
+                  variant="outline"
+                  onClick={() => setShowExamplesModal(true)}
+                  className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                  >
+                  <Eye className="h-4 w-4 mr-2" />
+                  {language === 'fr' ? 'Voir des exemples concrets' : 'See real examples'}
+                  </Button>
+                  </div>
+                  </div>
+                  )}
 
           {/* Service Info */}
           <div className={`mb-4 p-3 rounded-xl border ${
