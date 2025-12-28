@@ -80,17 +80,20 @@ Deno.serve(async (req) => {
       })
     });
 
+    const responseText = await response.text();
+    console.log('Replicate response status:', response.status);
+    console.log('Replicate response body:', responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Replicate API error:', errorText);
+      console.error('Replicate API error:', responseText);
       return Response.json({ 
         error: 'Failed to start video generation', 
-        details: errorText 
-      }, { status: 500 });
+        details: responseText 
+      }, { status: response.status });
     }
 
-    const prediction = await response.json();
-    console.log('Replicate prediction started:', prediction.id);
+    const prediction = JSON.parse(responseText);
+    console.log('Replicate prediction:', prediction);
 
     // Poll status until completed
     let videoUrl = null;
@@ -103,14 +106,18 @@ Deno.serve(async (req) => {
       
       const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
         headers: {
-          'Authorization': `Bearer ${REPLICATE_API_KEY}`
+          'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+          'Content-Type': 'application/json'
         }
       });
 
       if (!statusResponse.ok) {
         const errorText = await statusResponse.text();
         console.error('Poll error:', errorText);
-        break;
+        return Response.json({ 
+          error: 'Failed to check video status', 
+          details: errorText 
+        }, { status: 500 });
       }
 
       const statusData = await statusResponse.json();
