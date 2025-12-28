@@ -71,12 +71,12 @@ Deno.serve(async (req) => {
     console.log('Base64 image length:', base64Image.length);
 
     // Build request body for Runway API with base64 image
-    // Note: Runway only supports 16:9 format
     const requestBody = {
       promptImage: base64Image,
       promptText: finalPrompt,
       model: 'gen3a_turbo',
-      duration: duration || 5
+      duration: duration || 5,
+      watermark: false
     };
     
     console.log('Request body prepared (image converted to base64)');
