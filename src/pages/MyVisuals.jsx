@@ -415,14 +415,13 @@ export default function MyVisuals() {
                       visual={visual}
                       onDownload={() => handleDownload(visual, credits)}
                       onToggleFavorite={handleToggleFavorite}
-                      onEdit={handleEdit}
-                      onValidate={(action) => {
-                        if (action === 'edit') handleEdit(visual);
-                        else if (action === 'video') handleOpenVideo(visual);
-                        else if (action === 'ads') handleOpenADS(visual);
+                      onEdit={() => handleEdit(visual)}
+                      onVideoOpen={() => {
+                        setVideoVisual(visual);
+                        setShowVideoModal(true);
                       }}
-                      onCropOpen={(v) => {
-                        setCropVisual(v);
+                      onCropOpen={() => {
+                        setCropVisual(visual);
                         setShowCropModal(true);
                       }}
                       isRegenerating={false}
@@ -433,48 +432,6 @@ export default function MyVisuals() {
                       showValidation={false}
                       hideEditButton={true}
                     />
-                    
-                    {/* Action buttons below card */}
-                    <div className="mt-2 flex gap-2">
-                      {!visual.video_url && !visual.image_url?.includes('.mp4') && (
-                        <>
-                          <button
-                            onClick={() => handleEdit(visual)}
-                            className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all"
-                            title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
-                          >
-                            <Wand2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setVideoVisual(visual);
-                              setShowVideoModal(true);
-                            }}
-                            className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all"
-                            title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
-                          >
-                            <Video className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setCropVisual(visual);
-                              setShowCropModal(true);
-                            }}
-                            className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all"
-                            title={language === 'fr' ? 'Découper' : 'Crop'}
-                          >
-                            <Scissors className="h-4 w-4" />
-                          </button>
-                        </>
-                      )}
-                      <button
-                        onClick={() => handleDownload(visual, credits)}
-                        className="flex-1 p-2 rounded-lg bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all"
-                        title={language === 'fr' ? 'Télécharger' : 'Download'}
-                      >
-                        <Download className="h-4 w-4 mx-auto" />
-                      </button>
-                    </div>
                   </div>
                 ))}
               </div>

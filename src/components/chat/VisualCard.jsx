@@ -34,6 +34,7 @@ export default function VisualCard({
   onVideoGenerated,
   onCropComplete,
   onCropOpen,
+  onVideoOpen,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -352,44 +353,46 @@ export default function VisualCard({
           {/* Download Button (when not in validation mode) */}
           {!showValidation && (
             <>
-              {/* Edit Button - compact mode shows icon only in a row */}
-              {onEdit && !hideEditButton && compact ? (
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
+              {/* Action buttons row */}
+              <div className="flex gap-2">
+                {/* Edit/Video/Crop icons - only for images */}
+                {!isVideo && onEdit && (
+                  <button
                     onClick={() => onEdit(visual)}
-                    className="flex-1 bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600"
+                    className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all"
+                    title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
                   >
-                    <Feather className="h-4 w-4 mr-1" />
-                    <span className="text-xs">{language === 'fr' ? 'Éditer' : 'Edit'}</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleDownloadClick}
-                    disabled={!canDownload}
-                    className={cn(
-                      "flex-1 transition-all",
-                      canDownload 
-                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
-                        : "bg-white/10 cursor-not-allowed"
-                    )}
+                    <Wand2 className="h-4 w-4" />
+                  </button>
+                )}
+
+                {!isVideo && onVideoOpen && (
+                  <button
+                    onClick={() => onVideoOpen(visual)}
+                    className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all"
+                    title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
                   >
-                    {downloaded ? (
-                      <Check className="h-4 w-4" />
-                    ) : !canDownload ? (
-                      <Lock className="h-4 w-4" />
-                    ) : (
-                      <Download className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              ) : compact && hideEditButton ? (
+                    <Video className="h-4 w-4" />
+                  </button>
+                )}
+
+                {!isVideo && onCropOpen && (
+                  <button
+                    onClick={() => onCropOpen(visual)}
+                    className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all"
+                    title={language === 'fr' ? 'Découper' : 'Crop'}
+                  >
+                    <Scissors className="h-4 w-4" />
+                  </button>
+                )}
+
+                {/* Download button - takes remaining space */}
                 <Button
                   size="sm"
                   onClick={handleDownloadClick}
                   disabled={!canDownload}
                   className={cn(
-                    "w-full transition-all",
+                    "flex-1 transition-all",
                     canDownload 
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
                       : "bg-white/10 cursor-not-allowed"
@@ -404,44 +407,10 @@ export default function VisualCard({
                   )}
                   <span className="text-xs">{downloaded ? t('downloaded') : t('download')}</span>
                 </Button>
-              ) : (
-                <>
-                  {onEdit && !hideEditButton && (
-                    <Button
-                      size="sm"
-                      onClick={() => onEdit(visual)}
-                      className="w-full bg-gradient-to-r from-violet-600/80 to-purple-600/80 hover:from-violet-600 hover:to-purple-600 mb-2"
-                    >
-                      <Feather className="h-4 w-4 mr-2" />
-                      {language === 'fr' ? 'Personnaliser' : 'Customize'}
-                    </Button>
-                  )}
-                  
-                  <Button
-                    size="sm"
-                    onClick={handleDownloadClick}
-                    disabled={!canDownload}
-                    className={cn(
-                      "w-full transition-all",
-                      canDownload 
-                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
-                        : "bg-white/10 cursor-not-allowed"
-                    )}
-                  >
-                    {downloaded ? (
-                      <Check className="h-4 w-4 mr-2" />
-                    ) : !canDownload ? (
-                      <Lock className="h-4 w-4 mr-2" />
-                    ) : (
-                      <Download className="h-4 w-4 mr-2" />
-                    )}
-                    {downloaded ? t('downloaded') : t('download')}
-                  </Button>
-                </>
-              )}
+              </div>
 
               {!canDownload && (
-                <p className="text-xs text-amber-400/80 text-center">
+                <p className="text-xs text-amber-400/80 text-center mt-2">
                   {t('noCredits')}
                 </p>
               )}
