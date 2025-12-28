@@ -62,15 +62,14 @@ Deno.serve(async (req) => {
 
     console.log('Starting Kling v2.5 Turbo Pro prediction...');
 
-    // Use Kling v2.5 Turbo Pro - must use run API endpoint
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
+    // Use Kling v2.5 Turbo Pro model endpoint
+    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        version: "kwaivgi/kling-v2.5-turbo-pro",
         input: {
           prompt: prompt || 'Cinematic motion, smooth camera movement',
           start_image: image_url,
