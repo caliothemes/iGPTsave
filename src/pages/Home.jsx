@@ -1246,7 +1246,7 @@ export default function Home() {
             )}
 
             {/* Button: Image to Video */}
-            <div className="mb-6 mt-2">
+            <div className="mb-10">
               <button
                 onClick={() => setShowVideoExamplesModal(true)}
                 className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl font-medium shadow-md transition-all flex items-center gap-2 relative"
