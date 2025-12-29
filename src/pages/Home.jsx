@@ -1246,13 +1246,13 @@ export default function Home() {
             )}
 
             {/* Button: Image to Video */}
-            <div className="mb-4">
+            <div className="mb-6 mt-2">
               <button
                 onClick={() => setShowVideoExamplesModal(true)}
                 className="px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl font-medium shadow-md transition-all flex items-center gap-2 relative"
               >
                 <Video className="h-5 w-5" />
-                {language === 'fr' ? 'Image générée > Vidéo' : 'Generated Image > Video'}
+                {language === 'fr' ? 'Générez une image et transformez-la en vidéo' : 'Generate an image and turn it into a video'}
                 <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-bold rounded-full shadow-lg">
                   {language === 'fr' ? 'NOUVEAU' : 'NEW'}
                 </span>
