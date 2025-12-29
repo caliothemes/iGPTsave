@@ -76,6 +76,15 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
           </DialogTitle>
         </DialogHeader>
 
+        {/* Instructions */}
+        <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4 mb-4">
+          <p className="text-white/90 text-sm leading-relaxed">
+            {language === 'fr' 
+              ? '✨ Générez une image dans iGPT, cliquez sur l\'icône vidéo rouge, choisissez vos options (prompt, durée, format) et cliquez sur générer pour transformer votre visuel en vidéo animée.'
+              : '✨ Generate an image in iGPT, click on the red video icon, choose your options (prompt, duration, format) and click generate to transform your visual into an animated video.'}
+          </p>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-8 w-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
@@ -134,16 +143,7 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                         1
                       </span>
                       <p className="text-sm font-medium text-white/80">{t.imageStart}</p>
-                      {/* Badge - Above image */}
-                      <div className="inline-flex px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600/95 to-purple-600/95 backdrop-blur-sm border border-violet-400/30 shadow-lg mt-2 mb-2">
-                        <p className="text-white text-xs font-medium flex items-center gap-1.5">
-                          <Sparkles className="h-3 w-3" />
-                          {language === 'fr' ? 'Générez une image dans iGPT et cliquez sur l\'icône' : 'Generate an image in iGPT and click on the icon'}
-                          {' '}
-                          <span className="text-red-500 font-bold">vidéo</span>
-                        </p>
                       </div>
-                    </div>
                     <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg">
                       <img
                         src={currentExample.image_url}
