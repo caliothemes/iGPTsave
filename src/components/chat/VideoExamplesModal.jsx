@@ -135,12 +135,19 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                       </span>
                       <p className="text-sm font-medium text-white/80">{t.imageStart}</p>
                     </div>
-                    <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg">
+                    <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg relative">
                       <img
                         src={currentExample.image_url}
                         alt="Starting image"
                         className="w-full h-full object-cover"
                       />
+                      {/* Badge */}
+                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600/95 to-purple-600/95 backdrop-blur-sm border border-violet-400/30 shadow-lg">
+                        <p className="text-white text-xs font-medium flex items-center gap-1.5">
+                          <Sparkles className="h-3 w-3" />
+                          {language === 'fr' ? 'Générez une image dans iGPT' : 'Generate an image in iGPT'}
+                        </p>
+                      </div>
                     </div>
                   </div>
 

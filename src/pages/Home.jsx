@@ -34,6 +34,7 @@ import NoCreditsModal from '@/components/NoCreditsModal';
 import GuestCreditsModal from '@/components/GuestCreditsModal';
 import Footer from '@/components/Footer';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
+import VideoExamplesModal from '@/components/chat/VideoExamplesModal';
 import CropModal from '@/components/chat/CropModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -108,6 +109,7 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [videoVisual, setVideoVisual] = useState(null);
+  const [showVideoExamplesModal, setShowVideoExamplesModal] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropVisual, setCropVisual] = useState(null);
 
@@ -1243,6 +1245,17 @@ export default function Home() {
               <div className="mb-12" />
             )}
 
+            {/* Button: Image to Video */}
+            <div className="mb-8">
+              <button
+                onClick={() => setShowVideoExamplesModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white rounded-xl font-medium shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transition-all flex items-center gap-2"
+              >
+                <Video className="h-5 w-5" />
+                {language === 'fr' ? 'Image générée > Vidéo' : 'Generated Image > Video'}
+              </button>
+            </div>
+
             {/* Welcome Message Bubble */}
             <div className="w-full max-w-2xl mb-8">
               <div className="flex items-start gap-3">
@@ -2006,6 +2019,12 @@ export default function Home() {
         }}
         visual={videoVisual}
         onVideoGenerated={handleVideoGenerated}
+      />
+
+      {/* Video Examples Modal */}
+      <VideoExamplesModal
+        isOpen={showVideoExamplesModal}
+        onClose={() => setShowVideoExamplesModal(false)}
       />
 
       {/* Crop Modal */}
