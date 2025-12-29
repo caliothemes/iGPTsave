@@ -118,7 +118,7 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-6"
+                className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6"
               >
                 {/* Title */}
                 <h3 className="text-xl font-semibold text-center">
@@ -138,7 +138,11 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                       <div className="inline-flex px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600/95 to-purple-600/95 backdrop-blur-sm border border-violet-400/30 shadow-lg mt-2 mb-2">
                         <p className="text-white text-xs font-medium flex items-center gap-1.5">
                           <Sparkles className="h-3 w-3" />
-                          {language === 'fr' ? 'Générez une image dans iGPT' : 'Generate an image in iGPT'}
+                          {language === 'fr' ? 'Générez une image dans iGPT et cliquez sur l\'icône' : 'Generate an image in iGPT and click on the icon'}
+                          {' '}
+                          <svg className="h-3 w-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
                         </p>
                       </div>
                     </div>
