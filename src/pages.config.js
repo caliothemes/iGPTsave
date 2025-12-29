@@ -14,6 +14,7 @@ import AdminStoryAnimations from './pages/AdminStoryAnimations';
 import AdminSupport from './pages/AdminSupport';
 import AdminUserDetail from './pages/AdminUserDetail';
 import AdminUsers from './pages/AdminUsers';
+import AdminVideoExamples from './pages/AdminVideoExamples';
 import AdminVideoPrompts from './pages/AdminVideoPrompts';
 import AdminVisuals from './pages/AdminVisuals';
 import Home from './pages/Home';
@@ -26,7 +27,6 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
-import AdminVideoExamples from './pages/AdminVideoExamples';
 import __Layout from './Layout.jsx';
 
 
@@ -47,6 +47,7 @@ export const PAGES = {
     "AdminSupport": AdminSupport,
     "AdminUserDetail": AdminUserDetail,
     "AdminUsers": AdminUsers,
+    "AdminVideoExamples": AdminVideoExamples,
     "AdminVideoPrompts": AdminVideoPrompts,
     "AdminVisuals": AdminVisuals,
     "Home": Home,
@@ -59,7 +60,6 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
-    "AdminVideoExamples": AdminVideoExamples,
 }
 
 export const pagesConfig = {

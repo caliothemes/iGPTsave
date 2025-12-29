@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { base44 } from '@/api/base44Client';
 import VideoExamplesModal from './VideoExamplesModal';
+import NoCreditsModal from '@/components/NoCreditsModal';
+import GuestCreditsModal from '@/components/GuestCreditsModal';
+import { createPageUrl } from '@/utils';
 
-export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated }) {
+export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated, user, credits, guestPrompts }) {
   const { language } = useLanguage();
   const [provider, setProvider] = useState('replicate'); // 'replicate' or 'runway'
   const [prompt, setPrompt] = useState('');
@@ -17,6 +20,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [autoPrompt, setAutoPrompt] = useState(false);
   const [promptExamples, setPromptExamples] = useState([]);
   const [showExamplesModal, setShowExamplesModal] = useState(false);
+  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
+  const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
 
   React.useEffect(() => {
     const loadPromptExamples = async () => {
@@ -33,6 +38,25 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   }, [isOpen]);
 
   const handleGenerate = async () => {
+    // Vérification des crédits AVANT la génération
+    if (!user) {
+      // Guest : max 3 prompts
+      if (guestPrompts >= 3) {
+        setShowGuestCreditsModal(true);
+        return;
+      }
+    } else if (credits) {
+      // User connecté : vérifier les crédits
+      const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+      const isUnlimited = credits?.subscription_type === 'unlimited';
+      const isAdmin = user?.role === 'admin';
+      
+      if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+        setShowNoCreditsModal(true);
+        return;
+      }
+    }
+
     // Define final prompt first
     const finalPrompt = autoPrompt 
       ? 'Dynamic cinematic camera movement with slow zoom in, elegant smooth panning motion, professional color grading with rich contrast, dramatic lighting transitions, subtle depth of field effects, film-like motion blur, atmospheric glow and bokeh, sophisticated parallax effect, seamless fluid animation, premium production quality'
@@ -507,6 +531,23 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         isOpen={showExamplesModal}
         onClose={() => setShowExamplesModal(false)}
       />
-    </AnimatePresence>
-  );
-}
+
+      {/* No Credits Modal */}
+      <NoCreditsModal
+        isOpen={showNoCreditsModal}
+        onClose={() => setShowNoCreditsModal(false)}
+        onRecharge={() => window.location.href = createPageUrl('Pricing')}
+      />
+
+      {/* Guest Credits Modal */}
+      <GuestCreditsModal
+        isOpen={showGuestCreditsModal}
+        onClose={() => setShowGuestCreditsModal(false)}
+        onCreateAccount={() => {
+          const base44Client = { auth: { redirectToLogin: () => window.location.href = createPageUrl('Home') + '?login=true' } };
+          base44Client.auth.redirectToLogin(createPageUrl('Home'));
+        }}
+      />
+      </AnimatePresence>
+      );
+      }

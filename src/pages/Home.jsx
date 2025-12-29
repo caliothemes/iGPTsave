@@ -2022,6 +2022,9 @@ export default function Home() {
         }}
         visual={videoVisual}
         onVideoGenerated={handleVideoGenerated}
+        user={user}
+        credits={credits}
+        guestPrompts={guestPrompts}
       />
 
       {/* Video Examples Modal */}
