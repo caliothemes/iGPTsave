@@ -21,9 +21,29 @@ Deno.serve(async (req) => {
     }
 
     console.log('Starting PrunaAI image edit...');
-    console.log('Image URL:', image_url);
+    console.log('Original Image URL:', image_url);
     console.log('Prompt:', prompt);
     console.log('Aspect Ratio:', aspect_ratio);
+
+    // Download image and re-upload to ensure public accessibility
+    let publicImageUrl = image_url;
+    try {
+      console.log('Downloading image to ensure public access...');
+      const imageResponse = await fetch(image_url);
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to fetch image: ${imageResponse.status}`);
+      }
+      const imageBlob = await imageResponse.blob();
+      const imageFile = new File([imageBlob], 'temp.png', { type: 'image/png' });
+      
+      // Re-upload to Base44 public storage
+      const uploadResult = await base44.integrations.Core.UploadFile({ file: imageFile });
+      publicImageUrl = uploadResult.file_url;
+      console.log('Re-uploaded image URL (public):', publicImageUrl);
+    } catch (uploadError) {
+      console.error('Image re-upload failed:', uploadError);
+      // Continue with original URL if re-upload fails
+    }
 
     // Call Replicate API - prunaai/p-image-edit
     const replicateResponse = await fetch('https://api.replicate.com/v1/predictions', {
@@ -36,7 +56,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         version: '2a5f07a4c5b0e9e5e2b5f4f1c0e6c1b5e3e7e8e9e0e1e2e3e4e5e6e7e8e9e0e1',
         input: {
-          image: image_url,
+          image: publicImageUrl,
           prompt: prompt,
           aspect_ratio: aspect_ratio || '1:1',
           turbo: true,
