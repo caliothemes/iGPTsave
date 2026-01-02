@@ -36,6 +36,7 @@ import Footer from '@/components/Footer';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import VideoExamplesModal from '@/components/chat/VideoExamplesModal';
 import CropModal from '@/components/chat/CropModal';
+import ImageEditModal from '@/components/chat/ImageEditModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Home() {
@@ -112,6 +113,8 @@ export default function Home() {
   const [showVideoExamplesModal, setShowVideoExamplesModal] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropVisual, setCropVisual] = useState(null);
+  const [showImageEditModal, setShowImageEditModal] = useState(false);
+  const [imageEditVisual, setImageEditVisual] = useState(null);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -1327,6 +1330,18 @@ export default function Home() {
                               {/* Action Icons - Outside card, stuck to right edge - Only on last visual */}
                               {idx === messages.length - 1 && !msg.visual.video_url && !(msg.visual.image_url && (msg.visual.image_url.includes('.mp4') || msg.visual.image_url.includes('/video'))) && (
                                 <div className="absolute right-0 top-16 translate-x-full z-40 flex flex-col gap-2">
+                                  {/* Image Edit Icon - ORANGE */}
+                                  <button
+                                    onClick={() => {
+                                      setImageEditVisual(msg.visual);
+                                      setShowImageEditModal(true);
+                                    }}
+                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-orange-500/30"
+                                    title={language === 'fr' ? 'Modifier l\'image' : 'Edit image'}
+                                  >
+                                    <Wand2 className="h-4 w-4" />
+                                  </button>
+
                                   {/* Magic Editor Icon */}
                                   <button
                                     onClick={() => handleOpenEditor(msg.visual)}
@@ -2042,6 +2057,17 @@ export default function Home() {
         }}
         visual={cropVisual}
         onCropComplete={handleCropComplete}
+      />
+
+      {/* Image Edit Modal */}
+      <ImageEditModal
+        isOpen={showImageEditModal}
+        onClose={() => {
+          setShowImageEditModal(false);
+          setImageEditVisual(null);
+        }}
+        visual={imageEditVisual}
+        onEditComplete={handleImageEditComplete}
       />
 
       {/* Mode Selector Modal */}
