@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video, Pencil } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -1369,7 +1369,7 @@ export default function Home() {
                                     className="p-2.5 rounded-r-xl bg-gradient-to-br from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-orange-500/30"
                                     title={language === 'fr' ? 'Modifier l\'image' : 'Edit image'}
                                   >
-                                    <Wand2 className="h-4 w-4" />
+                                    <Pencil className="h-4 w-4" />
                                   </button>
 
                                   {/* Magic Editor Icon */}
