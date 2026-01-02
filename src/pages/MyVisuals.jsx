@@ -42,6 +42,7 @@ export default function MyVisuals() {
   const [showImageEditModal, setShowImageEditModal] = useState(false);
   const [imageEditVisual, setImageEditVisual] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const VISUALS_PER_PAGE = 15;
   const visualRefs = useRef({});
 
@@ -90,6 +91,8 @@ export default function MyVisuals() {
         setHasMore(false);
       } catch (e) {
         console.error(e);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadAllVisuals();
@@ -412,7 +415,11 @@ export default function MyVisuals() {
           </div>
 
           {/* Grid */}
-          {filteredVisuals.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12 text-white/40">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-white/20 border-t-white"></div>
+            </div>
+          ) : filteredVisuals.length === 0 ? (
             <div className="text-center py-12 text-white/40">{t.noVisuals}</div>
           ) : (
             <>
