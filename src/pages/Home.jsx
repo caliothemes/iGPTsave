@@ -1099,6 +1099,36 @@ export default function Home() {
     ]);
   };
 
+  const handleImageEditComplete = async (newImageUrl, editPrompt) => {
+    // Create new visual with edited image
+    const editedVisualData = {
+      user_email: user?.email || 'anonymous',
+      conversation_id: currentConversation?.id,
+      image_url: newImageUrl,
+      original_image_url: newImageUrl,
+      title: currentVisual.title + ' (Modifié)',
+      original_prompt: `${currentVisual.original_prompt} • EDIT: ${editPrompt}`,
+      dimensions: currentVisual.dimensions,
+      visual_type: currentVisual.visual_type,
+      parent_visual_id: currentVisual.id,
+      version: (currentVisual.version || 1) + 1
+    };
+
+    let newVisual = editedVisualData;
+    if (user) {
+      newVisual = await base44.entities.Visual.create(editedVisualData);
+      setSessionVisuals(prev => [newVisual, ...prev]);
+    }
+
+    setCurrentVisual(newVisual);
+    setVisualsHistory(prev => [...prev, newVisual]);
+    setMessages(prev => [
+      ...prev,
+      { role: 'assistant', content: `✨ ${language === 'fr' ? 'Image modifiée avec succès !' : 'Image edited successfully!'}` },
+      { role: 'assistant', content: '', visual: newVisual }
+    ]);
+  };
+
   const handleBackToImage = async () => {
     if (currentVisual?.parent_visual_id) {
       try {
