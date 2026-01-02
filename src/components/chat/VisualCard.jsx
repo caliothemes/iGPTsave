@@ -36,6 +36,7 @@ export default function VisualCard({
   onCropComplete,
   onCropOpen,
   onVideoOpen,
+  onImageEditOpen,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -365,7 +366,7 @@ export default function VisualCard({
             <>
               {/* Action buttons row */}
               <div className="flex gap-2">
-                {/* Edit/Video/Crop icons - only for images */}
+                {/* Edit/Video/Crop/ImageEdit icons - only for images */}
                 {!isVideo && onEdit && (
                   <button
                     onClick={() => onEdit(visual)}
@@ -373,6 +374,16 @@ export default function VisualCard({
                     title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
                   >
                     <Wand2 className="h-4 w-4" />
+                  </button>
+                )}
+
+                {!isVideo && onImageEditOpen && (
+                  <button
+                    onClick={() => onImageEditOpen(visual)}
+                    className="p-2 rounded-lg bg-gradient-to-br from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white transition-all"
+                    title={language === 'fr' ? 'Éditer l\'image' : 'Edit image'}
+                  >
+                    <Pencil className="h-4 w-4" />
                   </button>
                 )}
 

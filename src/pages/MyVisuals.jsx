@@ -14,6 +14,7 @@ import VisualEditor from '@/components/chat/VisualEditor';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import ADSModal from '@/components/chat/ADSModal';
 import CropModal from '@/components/chat/CropModal';
+import ImageEditModal from '@/components/chat/ImageEditModal';
 
 export default function MyVisuals() {
   const { language } = useLanguage();
@@ -38,6 +39,8 @@ export default function MyVisuals() {
   const [adsVisual, setAdsVisual] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropVisual, setCropVisual] = useState(null);
+  const [showImageEditModal, setShowImageEditModal] = useState(false);
+  const [imageEditVisual, setImageEditVisual] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const VISUALS_PER_PAGE = 15;
   const visualRefs = useRef({});
@@ -198,6 +201,24 @@ export default function MyVisuals() {
     
     setShowCropModal(false);
     setCropVisual(null);
+  };
+
+  const handleImageEditComplete = async (newImageUrl, editPrompt) => {
+    if (!imageEditVisual?.id) return;
+    
+    await base44.entities.Visual.update(imageEditVisual.id, {
+      image_url: newImageUrl,
+      original_image_url: imageEditVisual.original_image_url || imageEditVisual.image_url
+    });
+    
+    setVisuals(prev => prev.map(v => 
+      v.id === imageEditVisual.id 
+        ? { ...v, image_url: newImageUrl, original_image_url: imageEditVisual.original_image_url || imageEditVisual.image_url }
+        : v
+    ));
+    
+    setShowImageEditModal(false);
+    setImageEditVisual(null);
   };
 
 
@@ -424,6 +445,10 @@ export default function MyVisuals() {
                         setCropVisual(visual);
                         setShowCropModal(true);
                       }}
+                      onImageEditOpen={() => {
+                        setImageEditVisual(visual);
+                        setShowImageEditModal(true);
+                      }}
                       isRegenerating={false}
                       canDownload={true}
                       compact={false}
@@ -564,6 +589,16 @@ export default function MyVisuals() {
             }}
             visual={cropVisual}
             onCropComplete={handleCropComplete}
+          />
+
+          <ImageEditModal
+            isOpen={showImageEditModal}
+            onClose={() => {
+              setShowImageEditModal(false);
+              setImageEditVisual(null);
+            }}
+            visual={imageEditVisual}
+            onEditComplete={handleImageEditComplete}
           />
         </div>
       )}
