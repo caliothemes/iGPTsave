@@ -206,6 +206,26 @@ export default function MyVisuals() {
     setCropVisual(null);
   };
 
+  const handleOpenImageEdit = async (visual, credits) => {
+    // Check credits
+    const user = await base44.auth.me();
+    const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+    const isUnlimited = credits?.subscription_type === 'unlimited';
+    const isAdmin = user?.role === 'admin';
+    
+    if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+      alert(language === 'fr' ? 'Vous n\'avez plus de crédits' : 'No credits available');
+      return;
+    }
+    
+    // Deduct credit
+    await deductCredit(credits);
+    
+    // Open modal
+    setImageEditVisual(visual);
+    setShowImageEditModal(true);
+  };
+
   const handleImageEditComplete = async (newImageUrl, editPrompt) => {
     if (!imageEditVisual?.id) return;
     
@@ -452,10 +472,7 @@ export default function MyVisuals() {
                         setCropVisual(visual);
                         setShowCropModal(true);
                       }}
-                      onImageEditOpen={() => {
-                        setImageEditVisual(visual);
-                        setShowImageEditModal(true);
-                      }}
+                      onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
                       isRegenerating={false}
                       canDownload={true}
                       compact={false}
