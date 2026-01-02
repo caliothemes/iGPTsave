@@ -274,8 +274,8 @@ export default function VisualCard({
           <div className="flex items-center gap-2 text-xs flex-wrap">
             {/* Uploaded Badge */}
             {(visual.original_prompt === 'Image uploadée' || visual.original_prompt === 'Uploaded image') && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-xs font-medium border border-orange-500/30">
-                📤 {visual.original_prompt}
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-600/90 text-white text-xs font-medium border border-orange-500/20">
+                {visual.original_prompt}
               </span>
             )}
 
