@@ -272,6 +272,13 @@ export default function VisualCard({
           )}
           
           <div className="flex items-center gap-2 text-xs flex-wrap">
+            {/* Uploaded Badge */}
+            {(visual.original_prompt === 'Image uploadée' || visual.original_prompt === 'Uploaded image') && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 text-xs font-medium border border-orange-500/30">
+                📤 {visual.original_prompt}
+              </span>
+            )}
+
             {/* Format Badge */}
             {visual.dimensions && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-xs font-medium border border-blue-500/30">
