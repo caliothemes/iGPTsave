@@ -55,11 +55,9 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         input: {
-          image: publicImageUrl,
+          images: [publicImageUrl],
           prompt: prompt,
-          aspect_ratio: aspect_ratio || '1:1',
-          turbo: true,
-          num_inference_steps: 4
+          aspect_ratio: aspect_ratio || '1:1'
         }
       })
     });
