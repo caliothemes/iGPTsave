@@ -7,6 +7,7 @@ import DownloadModal from '@/components/DownloadModal';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import ADSModal from '@/components/chat/ADSModal';
 import CropModal from '@/components/chat/CropModal';
+import ImageEditModal from '@/components/chat/ImageEditModal';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -51,6 +52,7 @@ export default function VisualCard({
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showADSModal, setShowADSModal] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [showImageEditModal, setShowImageEditModal] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [showWatermarkBanner, setShowWatermarkBanner] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
@@ -100,6 +102,14 @@ export default function VisualCard({
   const handleCropComplete = (newImageUrl) => {
     setShowCropModal(false);
     // Notify parent to update visual
+    if (onCropComplete) {
+      onCropComplete(newImageUrl);
+    }
+  };
+
+  const handleImageEditComplete = (newImageUrl, editPrompt) => {
+    setShowImageEditModal(false);
+    // Notify parent to update visual with edited image
     if (onCropComplete) {
       onCropComplete(newImageUrl);
     }
@@ -452,6 +462,14 @@ export default function VisualCard({
         onClose={() => setShowCropModal(false)}
         visual={visual}
         onCropComplete={handleCropComplete}
+      />
+
+      {/* Image Edit Modal */}
+      <ImageEditModal
+        isOpen={showImageEditModal}
+        onClose={() => setShowImageEditModal(false)}
+        visual={visual}
+        onEditComplete={handleImageEditComplete}
       />
 
       {/* Prompt Modal */}
