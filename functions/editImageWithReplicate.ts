@@ -45,8 +45,8 @@ Deno.serve(async (req) => {
       // Continue with original URL if re-upload fails
     }
 
-    // Call Replicate API - prunaai/p-image-edit
-    const replicateResponse = await fetch('https://api.replicate.com/v1/predictions', {
+    // Call Replicate API - prunaai/p-image-edit using model name directly
+    const replicateResponse = await fetch('https://api.replicate.com/v1/models/prunaai/p-image-edit/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
@@ -54,7 +54,6 @@ Deno.serve(async (req) => {
         'Prefer': 'wait'
       },
       body: JSON.stringify({
-        version: '2a5f07a4c5b0e9e5e2b5f4f1c0e6c1b5e3e7e8e9e0e1e2e3e4e5e6e7e8e9e0e1',
         input: {
           image: publicImageUrl,
           prompt: prompt,
