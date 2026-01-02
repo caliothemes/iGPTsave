@@ -267,10 +267,81 @@ export default function Home() {
     setExpertMode(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      console.log('File selected:', file.name);
+    if (!file) return;
+
+    // Check if it's an image
+    if (!file.type.startsWith('image/')) {
+      alert(language === 'fr' ? 'Veuillez sélectionner une image' : 'Please select an image');
+      return;
+    }
+
+    setIsGenerating(true);
+    setMessages(prev => [...prev, { 
+      role: 'assistant', 
+      content: language === 'fr' ? '📤 Upload de votre image...' : '📤 Uploading your image...', 
+      isStreaming: true 
+    }]);
+
+    try {
+      // Upload image
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+
+      // Get image dimensions
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = file_url;
+      });
+      const dimensions = `${img.width}x${img.height}`;
+
+      // Create visual
+      const visualData = {
+        user_email: user?.email || 'anonymous',
+        image_url: file_url,
+        original_image_url: file_url,
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        original_prompt: language === 'fr' ? 'Image uploadée' : 'Uploaded image',
+        dimensions: dimensions,
+        visual_type: 'image'
+      };
+
+      let savedVisual = visualData;
+      if (user) {
+        savedVisual = await base44.entities.Visual.create(visualData);
+        setSessionVisuals(prev => [savedVisual, ...prev]);
+      }
+
+      setCurrentVisual(savedVisual);
+      setVisualsHistory(prev => [...prev, savedVisual]);
+
+      // Add success message + visual card
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { role: 'assistant', content: language === 'fr' 
+          ? '✨ Image uploadée ! Vous pouvez maintenant la modifier ou la transformer.' 
+          : '✨ Image uploaded! You can now edit or transform it.' 
+        },
+        { role: 'assistant', content: '', visual: savedVisual }
+      ]);
+
+      // Set category to enable editing
+      setSelectedCategory({ id: 'image' });
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { role: 'assistant', content: language === 'fr' 
+          ? '❌ Erreur lors de l\'upload. Veuillez réessayer.' 
+          : '❌ Upload error. Please try again.' 
+        }
+      ]);
+    } finally {
+      setIsGenerating(false);
+      // Reset file input
+      e.target.value = '';
     }
   };
 
@@ -1945,6 +2016,15 @@ export default function Home() {
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                {/* Tag Upload */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-orange-600/90 hover:bg-orange-600 border border-orange-500/20 hover:border-orange-500/40 text-white shadow-md flex items-center gap-1"
+                >
+                  <Upload className="w-3 h-3" />
+                  {language === 'fr' ? 'Upload' : 'Upload'}
+                </button>
 
                 {/* Tag iGPT Store */}
                 <Link
