@@ -781,7 +781,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               if (layer.reflection) {
                 ctx.save();
                 
-                const reflectionGap = 2;
+                const reflectionGap = layer.reflectionGap || 2;
                 const reflectY = layer.y + layer.height + reflectionGap;
                 const reflectionHeight = layer.height * 0.6;
                 
@@ -2401,7 +2401,7 @@ Réponds en JSON avec:
             if (layer.reflection) {
               exportCtx.save();
               
-              const reflectionGap = 2;
+              const reflectionGap = layer.reflectionGap || 2;
               const reflectY = layer.y + layer.height + reflectionGap;
               const reflectionHeight = layer.height * 0.6;
               
