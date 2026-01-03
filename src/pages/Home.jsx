@@ -1352,38 +1352,38 @@ export default function Home() {
             )}
 
             {/* Buttons: Image to Video + Image Edit */}
-            <div className="mb-10 flex flex-col gap-3 items-center justify-center">
-              <button
-                onClick={() => setShowVideoExamplesModal(true)}
-                className="px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2 relative"
-              >
-                <Video className="h-4 w-4" />
-                <span className="hidden sm:inline">
-                  {language === 'fr' ? 'Générez ou uploadez une image et transformez-la en vidéo' : 'Generate or upload an image and turn it into a video'}
-                </span>
-                <span className="sm:hidden">
-                  {language === 'fr' ? 'Image vers vidéo' : 'Image to video'}
-                </span>
-                <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
-                  {language === 'fr' ? 'NOUVEAU' : 'NEW'}
-                </span>
-              </button>
+            <div className="mb-10 relative">
+              <div className="flex flex-col gap-3 items-center justify-center bg-white/5 border border-white/10 rounded-xl p-4">
+                <button
+                  onClick={() => setShowVideoExamplesModal(true)}
+                  className="w-full px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2"
+                >
+                  <Video className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {language === 'fr' ? 'Générez ou uploadez une image et transformez-la en vidéo' : 'Generate or upload an image and turn it into a video'}
+                  </span>
+                  <span className="sm:hidden">
+                    {language === 'fr' ? 'Image vers vidéo' : 'Image to video'}
+                  </span>
+                </button>
 
-              <button
-                onClick={() => setShowImageEditExamplesModal(true)}
-                className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2 relative"
-              >
-                <Pencil className="h-4 w-4" />
-                <span className="hidden sm:inline">
-                  {language === 'fr' ? 'Apportez des modifications à une image avec l\'IA' : 'Make AI-powered modifications to an image'}
-                </span>
-                <span className="sm:hidden">
-                  {language === 'fr' ? 'Modifier une image' : 'Edit image'}
-                </span>
-                <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
-                  {language === 'fr' ? 'NOUVEAU' : 'NEW'}
-                </span>
-              </button>
+                <button
+                  onClick={() => setShowImageEditExamplesModal(true)}
+                  className="w-full px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2"
+                >
+                  <Pencil className="h-4 w-4" />
+                  <span className="hidden sm:inline">
+                    {language === 'fr' ? 'Apportez des modifications à une image avec l\'IA' : 'Make AI-powered modifications to an image'}
+                  </span>
+                  <span className="sm:hidden">
+                    {language === 'fr' ? 'Modifier une image' : 'Edit image'}
+                  </span>
+                </button>
+              </div>
+              
+              <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
+                {language === 'fr' ? 'NOUVEAU' : 'NEW'}
+              </span>
             </div>
 
             {/* Welcome Message Bubble */}
