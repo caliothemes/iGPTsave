@@ -777,6 +777,59 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
               }
               
+              // Reflection effect for images (mirrored image below with gradient fade)
+              if (layer.reflection) {
+                ctx.save();
+                
+                const reflectionGap = 2;
+                const reflectY = layer.y + layer.height + reflectionGap;
+                const reflectionHeight = layer.height * 0.6;
+                
+                // Create a temporary canvas for the reflection
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = layer.width;
+                tempCanvas.height = reflectionHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Flip and draw image on temp canvas
+                tempCtx.save();
+                tempCtx.translate(0, reflectionHeight);
+                tempCtx.scale(1, -1);
+                
+                // Draw the image (either tinted or normal)
+                if (layer.tintColor && layer.tintOpacity) {
+                  const tintCanvas = document.createElement('canvas');
+                  tintCanvas.width = layer.width;
+                  tintCanvas.height = layer.height;
+                  const tintCtx = tintCanvas.getContext('2d');
+                  tintCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
+                  tintCtx.globalCompositeOperation = 'overlay';
+                  tintCtx.globalAlpha = layer.tintOpacity / 100;
+                  tintCtx.fillStyle = layer.tintColor;
+                  tintCtx.fillRect(0, 0, layer.width, layer.height);
+                  tempCtx.drawImage(tintCanvas, 0, 0, layer.width, reflectionHeight);
+                } else {
+                  tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, reflectionHeight);
+                }
+                
+                tempCtx.restore();
+                
+                // Apply fade gradient mask
+                tempCtx.globalCompositeOperation = 'destination-out';
+                const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
+                fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
+                fadeGradient.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+                fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
+                tempCtx.fillStyle = fadeGradient;
+                tempCtx.fillRect(0, 0, layer.width, reflectionHeight);
+                
+                // Draw the reflection on main canvas
+                ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+                ctx.drawImage(tempCanvas, layer.x, reflectY);
+                
+                ctx.restore();
+              }
+              
               // Draw border on top
               if (layer.stroke) {
                 ctx.restore();
@@ -2342,6 +2395,54 @@ Réponds en JSON avec:
               exportCtx.drawImage(tempCanvas, layer.x, layer.y);
             } else {
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+            }
+            
+            // Reflection effect for images (export version)
+            if (layer.reflection) {
+              exportCtx.save();
+              
+              const reflectionGap = 2;
+              const reflectY = layer.y + layer.height + reflectionGap;
+              const reflectionHeight = layer.height * 0.6;
+              
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = layer.width;
+              tempCanvas.height = reflectionHeight;
+              const tempCtx = tempCanvas.getContext('2d');
+              
+              tempCtx.save();
+              tempCtx.translate(0, reflectionHeight);
+              tempCtx.scale(1, -1);
+              
+              if (layer.tintColor && layer.tintOpacity) {
+                const tintCanvas = document.createElement('canvas');
+                tintCanvas.width = layer.width;
+                tintCanvas.height = layer.height;
+                const tintCtx = tintCanvas.getContext('2d');
+                tintCtx.drawImage(layerImg, 0, 0, layer.width, layer.height);
+                tintCtx.globalCompositeOperation = 'overlay';
+                tintCtx.globalAlpha = layer.tintOpacity / 100;
+                tintCtx.fillStyle = layer.tintColor;
+                tintCtx.fillRect(0, 0, layer.width, layer.height);
+                tempCtx.drawImage(tintCanvas, 0, 0, layer.width, reflectionHeight);
+              } else {
+                tempCtx.drawImage(layerImg, 0, 0, layer.width, reflectionHeight);
+              }
+              
+              tempCtx.restore();
+              
+              tempCtx.globalCompositeOperation = 'destination-out';
+              const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
+              fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
+              fadeGradient.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+              fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
+              tempCtx.fillStyle = fadeGradient;
+              tempCtx.fillRect(0, 0, layer.width, reflectionHeight);
+              
+              exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              exportCtx.drawImage(tempCanvas, layer.x, reflectY);
+              
+              exportCtx.restore();
             }
             
             if (layer.stroke) {
@@ -4360,6 +4461,9 @@ Réponds en JSON avec:
                     <button onClick={() => updateLayer(selectedLayer, { halo: !currentLayer.halo })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
                       Halo
                     </button>
+                    <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-1.5 rounded text-xs flex items-center justify-center gap-1", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                      {language === 'fr' ? 'Reflet' : 'Reflect'}
+                    </button>
                   </div>
                   
                   {/* Border options */}
@@ -4408,7 +4512,16 @@ Réponds en JSON avec:
                       <span className="text-white/40 text-xs w-6">{currentLayer.haloSize || 15}</span>
                     </div>
                   )}
-                </div>
+
+                  {/* Reflection options */}
+                  {currentLayer.reflection && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Reflet:' : 'Reflect:'}</span>
+                      <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
+                      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
+                    </div>
+                  )}
+                  </div>
                 
               </div>
             )}
@@ -5239,6 +5352,9 @@ Réponds en JSON avec:
                         <button onClick={() => updateLayer(propertiesModalLayer, { halo: !layer.halo })} className={cn("p-2 rounded-lg text-sm", layer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
                           Halo
                         </button>
+                        <button onClick={() => updateLayer(propertiesModalLayer, { reflection: !layer.reflection })} className={cn("p-2 rounded-lg text-sm", layer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/5 text-white/60")}>
+                          {language === 'fr' ? 'Reflet' : 'Reflect'}
+                        </button>
                       </div>
                     </div>
 
@@ -5286,6 +5402,16 @@ Réponds en JSON avec:
                           <input type="color" value={layer.haloColor || '#FFD700'} onChange={(e) => updateLayer(propertiesModalLayer, { haloColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
                           <Slider value={[layer.haloSize || 15]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { haloSize: v })} min={5} max={50} step={1} className="flex-1" />
                           <span className="text-white/60 text-sm w-12">{layer.haloSize || 15}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {layer.reflection && (
+                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                        <label className="text-white/60 text-sm">{language === 'fr' ? 'Reflet' : 'Reflection'}</label>
+                        <div className="flex gap-2 items-center">
+                          <Slider value={[layer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+                          <span className="text-white/60 text-sm w-12">{layer.reflectionOpacity || 40}%</span>
                         </div>
                       </div>
                     )}
