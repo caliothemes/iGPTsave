@@ -1356,7 +1356,7 @@ export default function Home() {
               <div className="flex flex-col gap-3 items-center justify-center bg-white/5 border border-white/10 rounded-xl p-4">
                 <button
                   onClick={() => setShowVideoExamplesModal(true)}
-                  className="w-full px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2"
+                  className="w-full px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2"
                 >
                   <Video className="h-4 w-4" />
                   <span className="hidden sm:inline">
