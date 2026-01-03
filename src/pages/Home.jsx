@@ -1357,7 +1357,7 @@ export default function Home() {
               >
                 <Video className="h-4 w-4" />
                 {language === 'fr' ? 'Générez ou uploadez une image et transformez-la en vidéo.' : 'Generate or upload an image and turn it into a video.'}
-                <span className="absolute -top-3 -right-2 px-1.5 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[9px] font-bold rounded-full shadow-lg">
+                <span className="absolute -top-3 -right-2 px-1.5 py-[2px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
                   {language === 'fr' ? 'NOUVEAU' : 'NEW'}
                 </span>
               </button>
