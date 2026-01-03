@@ -35,6 +35,7 @@ import GuestCreditsModal from '@/components/GuestCreditsModal';
 import Footer from '@/components/Footer';
 import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import VideoExamplesModal from '@/components/chat/VideoExamplesModal';
+import ImageEditExamplesModal from '@/components/chat/ImageEditExamplesModal';
 import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -111,6 +112,7 @@ export default function Home() {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [videoVisual, setVideoVisual] = useState(null);
   const [showVideoExamplesModal, setShowVideoExamplesModal] = useState(false);
+  const [showImageEditExamplesModal, setShowImageEditExamplesModal] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [cropVisual, setCropVisual] = useState(null);
   const [showImageEditModal, setShowImageEditModal] = useState(false);
@@ -1349,14 +1351,35 @@ export default function Home() {
               <div className="mb-12" />
             )}
 
-            {/* Button: Image to Video */}
-            <div className="mb-10">
+            {/* Buttons: Image to Video + Image Edit */}
+            <div className="mb-10 flex flex-col sm:flex-row gap-3 items-center justify-center">
               <button
                 onClick={() => setShowVideoExamplesModal(true)}
                 className="px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2 relative"
               >
                 <Video className="h-4 w-4" />
-                {language === 'fr' ? 'Générez ou uploadez une image et transformez-la en vidéo.' : 'Generate or upload an image and turn it into a video.'}
+                <span className="hidden sm:inline">
+                  {language === 'fr' ? 'Générez ou uploadez une image et transformez-la en vidéo' : 'Generate or upload an image and turn it into a video'}
+                </span>
+                <span className="sm:hidden">
+                  {language === 'fr' ? 'Image vers vidéo' : 'Image to video'}
+                </span>
+                <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
+                  {language === 'fr' ? 'NOUVEAU' : 'NEW'}
+                </span>
+              </button>
+
+              <button
+                onClick={() => setShowImageEditExamplesModal(true)}
+                className="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2 relative"
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="hidden sm:inline">
+                  {language === 'fr' ? 'Apportez des modifications à une image avec l\'IA' : 'Make AI-powered modifications to an image'}
+                </span>
+                <span className="sm:hidden">
+                  {language === 'fr' ? 'Modifier une image' : 'Edit image'}
+                </span>
                 <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
                   {language === 'fr' ? 'NOUVEAU' : 'NEW'}
                 </span>
@@ -2156,6 +2179,12 @@ export default function Home() {
       <VideoExamplesModal
         isOpen={showVideoExamplesModal}
         onClose={() => setShowVideoExamplesModal(false)}
+      />
+
+      {/* Image Edit Examples Modal */}
+      <ImageEditExamplesModal
+        isOpen={showImageEditExamplesModal}
+        onClose={() => setShowImageEditExamplesModal(false)}
       />
 
       {/* Crop Modal */}
