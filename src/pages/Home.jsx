@@ -1372,7 +1372,7 @@ export default function Home() {
             </div>
 
             {/* Buttons: Image to Video + Image Edit */}
-            <div className="w-full max-w-2xl mb-10 relative">
+            <div className="w-full max-w-xl mb-10 relative">
               <div className="flex flex-col gap-3 items-center justify-center bg-white/5 border border-white/10 rounded-xl p-4">
                 <button
                   onClick={() => setShowVideoExamplesModal(true)}
