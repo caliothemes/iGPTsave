@@ -4513,14 +4513,21 @@ Réponds en JSON avec:
                     </div>
                   )}
 
-                  {/* Reflection options */}
-                  {currentLayer.reflection && (
-                    <div className="flex gap-2 items-center">
-                      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Reflet:' : 'Reflect:'}</span>
-                      <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
-                      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
-                    </div>
-                  )}
+{/* Reflection options */}
+{currentLayer.reflection && (
+  <div className="space-y-2">
+    <div className="flex gap-2 items-center">
+      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Opacité:' : 'Opacity:'}</span>
+      <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
+      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionOpacity || 40}%</span>
+    </div>
+    <div className="flex gap-2 items-center">
+      <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Distance:' : 'Distance:'}</span>
+      <Slider value={[currentLayer.reflectionGap || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-20} max={50} step={1} className="flex-1" />
+      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionGap || 2}px</span>
+    </div>
+  </div>
+)}
                   </div>
                 
               </div>
@@ -5407,11 +5414,19 @@ Réponds en JSON avec:
                     )}
 
                     {layer.reflection && (
-                      <div className="space-y-2 p-3 bg-white/5 rounded-lg">
+                      <div className="space-y-3 p-3 bg-white/5 rounded-lg">
                         <label className="text-white/60 text-sm">{language === 'fr' ? 'Reflet' : 'Reflection'}</label>
-                        <div className="flex gap-2 items-center">
-                          <Slider value={[layer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-                          <span className="text-white/60 text-sm w-12">{layer.reflectionOpacity || 40}%</span>
+                        <div className="space-y-2">
+                          <div className="flex gap-2 items-center">
+                            <span className="text-white/40 text-xs w-20">{language === 'fr' ? 'Opacité' : 'Opacity'}</span>
+                            <Slider value={[layer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+                            <span className="text-white/60 text-sm w-12">{layer.reflectionOpacity || 40}%</span>
+                          </div>
+                          <div className="flex gap-2 items-center">
+                            <span className="text-white/40 text-xs w-20">{language === 'fr' ? 'Distance' : 'Distance'}</span>
+                            <Slider value={[layer.reflectionGap || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionGap: v })} min={-20} max={50} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+                            <span className="text-white/60 text-sm w-12">{layer.reflectionGap || 2}px</span>
+                          </div>
                         </div>
                       </div>
                     )}
