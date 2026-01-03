@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Plus, Eye, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ArrowLeft, Code, Layout, Image as ImageIcon, Type, Columns, MoveUp, MoveDown, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,12 +16,68 @@ export default function AdminNewsletterTemplates() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [previewHtml, setPreviewHtml] = useState('');
+  const [editorMode, setEditorMode] = useState('code'); // 'code' ou 'visual'
+  const [blocks, setBlocks] = useState([]);
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     html_content: ''
   });
+
+  // Blocs prédéfinis
+  const BLOCK_TEMPLATES = {
+    text: {
+      name: 'Texte simple',
+      icon: Type,
+      html: `<div style="padding: 20px; background: #f9fafb; border-radius: 8px; margin: 10px 0;">
+  <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">Votre texte ici...</p>
+</div>`
+    },
+    image: {
+      name: 'Image simple',
+      icon: ImageIcon,
+      html: `<div style="padding: 20px; text-align: center; margin: 10px 0;">
+  <img src="https://via.placeholder.com/600x400" alt="Image" style="max-width: 100%; border-radius: 8px; height: auto;" />
+</div>`
+    },
+    imageText: {
+      name: 'Titre + Image + Texte',
+      icon: Layout,
+      html: `<div style="padding: 20px; background: #f9fafb; border-radius: 8px; margin: 10px 0;">
+  <h2 style="color: #1f2937; font-size: 24px; margin: 0 0 15px 0;">Titre de la section</h2>
+  <img src="https://via.placeholder.com/600x300" alt="Image" style="max-width: 100%; border-radius: 8px; margin-bottom: 15px; height: auto;" />
+  <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">Description ou contenu textuel ici...</p>
+</div>`
+    },
+    twoImagesText: {
+      name: '2 Images + Texte',
+      icon: Columns,
+      html: `<div style="padding: 20px; background: #f9fafb; border-radius: 8px; margin: 10px 0;">
+  <div style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
+    <img src="https://via.placeholder.com/280x200" alt="Image 1" style="flex: 1; min-width: 250px; border-radius: 8px; height: auto;" />
+    <img src="https://via.placeholder.com/280x200" alt="Image 2" style="flex: 1; min-width: 250px; border-radius: 8px; height: auto;" />
+  </div>
+  <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0; text-align: center;">Texte descriptif entre les deux images</p>
+</div>`
+    },
+    columns: {
+      name: '2 Colonnes',
+      icon: Columns,
+      html: `<div style="padding: 20px; margin: 10px 0;">
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 250px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+      <h3 style="color: #1f2937; font-size: 20px; margin: 0 0 10px 0;">Colonne 1</h3>
+      <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;">Contenu de la première colonne...</p>
+    </div>
+    <div style="flex: 1; min-width: 250px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+      <h3 style="color: #1f2937; font-size: 20px; margin: 0 0 10px 0;">Colonne 2</h3>
+      <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;">Contenu de la seconde colonne...</p>
+    </div>
+  </div>
+</div>`
+    }
+  };
 
   useEffect(() => {
     loadTemplates();
@@ -68,7 +124,44 @@ export default function AdminNewsletterTemplates() {
       description: template.description || '',
       html_content: template.html_content
     });
+    setEditorMode('code');
+    setBlocks([]);
     setShowModal(true);
+  };
+
+  const addBlock = (type) => {
+    const newBlock = {
+      id: Date.now(),
+      type,
+      html: BLOCK_TEMPLATES[type].html
+    };
+    setBlocks([...blocks, newBlock]);
+  };
+
+  const removeBlock = (id) => {
+    setBlocks(blocks.filter(b => b.id !== id));
+  };
+
+  const moveBlock = (id, direction) => {
+    const index = blocks.findIndex(b => b.id === id);
+    if ((direction === 'up' && index > 0) || (direction === 'down' && index < blocks.length - 1)) {
+      const newBlocks = [...blocks];
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+      [newBlocks[index], newBlocks[newIndex]] = [newBlocks[newIndex], newBlocks[index]];
+      setBlocks(newBlocks);
+    }
+  };
+
+  const switchToCodeMode = () => {
+    // Generate HTML from blocks
+    const blocksHtml = blocks.map(b => b.html).join('\n');
+    setFormData({ ...formData, html_content: blocksHtml });
+    setEditorMode('code');
+  };
+
+  const switchToVisualMode = () => {
+    // Parse HTML to blocks (simple parsing)
+    setEditorMode('visual');
   };
 
   const handleDelete = async (id) => {
@@ -176,9 +269,31 @@ export default function AdminNewsletterTemplates() {
 
       {/* Edit/Create Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 text-white max-w-4xl max-h-[90vh]">
+        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 text-white max-w-6xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>{editingTemplate ? 'Modifier' : 'Nouveau'} template</DialogTitle>
+            <DialogTitle className="flex items-center justify-between">
+              <span>{editingTemplate ? 'Modifier' : 'Nouveau'} template</span>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={editorMode === 'code' ? 'default' : 'outline'}
+                  onClick={() => editorMode === 'visual' ? switchToCodeMode() : setEditorMode('code')}
+                  className={editorMode === 'code' ? 'bg-violet-600' : 'bg-white/5 border-white/20'}
+                >
+                  <Code className="h-4 w-4 mr-2" />
+                  Code
+                </Button>
+                <Button
+                  size="sm"
+                  variant={editorMode === 'visual' ? 'default' : 'outline'}
+                  onClick={switchToVisualMode}
+                  className={editorMode === 'visual' ? 'bg-violet-600' : 'bg-white/5 border-white/20'}
+                >
+                  <Layout className="h-4 w-4 mr-2" />
+                  Visuel
+                </Button>
+              </div>
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 overflow-y-auto max-h-[70vh]">
             <div>
@@ -199,18 +314,100 @@ export default function AdminNewsletterTemplates() {
                 className="bg-white/5 border-white/20 text-white"
               />
             </div>
-            <div>
-              <label className="text-sm text-white/60 mb-2 block">HTML</label>
-              <Textarea
-                value={formData.html_content}
-                onChange={(e) => setFormData({ ...formData, html_content: e.target.value })}
-                placeholder="<html>...</html>"
-                className="bg-white/5 border-white/20 text-white font-mono text-xs min-h-[400px]"
-              />
-              <p className="text-xs text-white/40 mt-2">
-                Variables disponibles : {'{'}{'{'} DATE {'}'}{'}'}, {'{'}{'{'} VISUALS_CONTENT {'}'}{'}'}
-              </p>
-            </div>
+
+            {/* MODE CODE */}
+            {editorMode === 'code' && (
+              <div>
+                <label className="text-sm text-white/60 mb-2 block">HTML</label>
+                <Textarea
+                  value={formData.html_content}
+                  onChange={(e) => setFormData({ ...formData, html_content: e.target.value })}
+                  placeholder="<html>...</html>"
+                  className="bg-white/5 border-white/20 text-white font-mono text-xs min-h-[400px]"
+                />
+                <p className="text-xs text-white/40 mt-2">
+                  Variables disponibles : {'{'}{'{'} DATE {'}'}{'}'}, {'{'}{'{'} VISUALS_CONTENT {'}'}{'}'}
+                </p>
+              </div>
+            )}
+
+            {/* MODE VISUEL */}
+            {editorMode === 'visual' && (
+              <div>
+                <label className="text-sm text-white/60 mb-2 block">Blocs</label>
+                
+                {/* Palette de blocs */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4 p-4 bg-white/5 border border-white/10 rounded-lg">
+                  {Object.entries(BLOCK_TEMPLATES).map(([key, block]) => {
+                    const Icon = block.icon;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => addBlock(key)}
+                        className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/50 rounded-lg transition-all"
+                      >
+                        <Icon className="h-5 w-5 text-violet-400" />
+                        <span className="text-xs text-white/80">{block.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Liste des blocs ajoutés */}
+                <div className="space-y-3 min-h-[300px] p-4 bg-black/20 border border-white/10 rounded-lg">
+                  {blocks.length === 0 ? (
+                    <div className="text-center text-white/40 py-12">
+                      <Layout className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                      <p>Aucun bloc ajouté</p>
+                      <p className="text-xs mt-1">Cliquez sur un bloc ci-dessus pour l'ajouter</p>
+                    </div>
+                  ) : (
+                    blocks.map((block, index) => (
+                      <div key={block.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm text-white/80">
+                            {BLOCK_TEMPLATES[block.type].name}
+                          </span>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => moveBlock(block.id, 'up')}
+                              disabled={index === 0}
+                              className="h-7 w-7 p-0 text-white/60 hover:text-white disabled:opacity-30"
+                            >
+                              <MoveUp className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => moveBlock(block.id, 'down')}
+                              disabled={index === blocks.length - 1}
+                              className="h-7 w-7 p-0 text-white/60 hover:text-white disabled:opacity-30"
+                            >
+                              <MoveDown className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => removeBlock(block.id)}
+                              className="h-7 w-7 p-0 text-red-400 hover:text-red-300"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {/* Aperçu du bloc */}
+                        <div className="bg-white rounded p-3 text-xs overflow-auto max-h-40">
+                          <div dangerouslySetInnerHTML={{ __html: block.html }} />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
             <Button onClick={handleSave} className="w-full bg-gradient-to-r from-violet-600 to-purple-600">
               {editingTemplate ? 'Mettre à jour' : 'Créer'}
             </Button>
