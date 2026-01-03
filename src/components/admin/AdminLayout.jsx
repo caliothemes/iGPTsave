@@ -18,7 +18,8 @@ import {
   HelpCircle,
   Mail,
   Video,
-  FolderOpen
+  FolderOpen,
+  Pencil
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -30,6 +31,7 @@ const navItems = [
   { id: 'files', label: 'Gestion Fichiers', icon: FolderOpen, page: 'AdminFiles' },
   { id: 'video-prompts', label: 'Gestion Vidéo', icon: Video, page: 'AdminVideoPrompts' },
   { id: 'video-examples', label: 'Exemples Vidéo', icon: Video, page: 'AdminVideoExamples' },
+  { id: 'image-edit-examples', label: 'Exemples Édition IA', icon: Pencil, page: 'AdminImageEditExamples' },
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
   { id: 'story-animations', label: 'Story Animations', icon: Wand2, page: 'AdminStoryAnimations' },
   { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
