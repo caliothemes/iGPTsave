@@ -94,22 +94,39 @@ export default function AdminNewsletterTemplates() {
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.html_content) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
+    if (!formData.name) {
+      toast.error('Veuillez remplir le nom du template');
+      return;
+    }
+
+    // Générer le HTML à partir des blocs si en mode visuel
+    let finalHtml = formData.html_content;
+    if (editorMode === 'visual' && blocks.length > 0) {
+      finalHtml = blocks.map(b => b.html).join('\n\n');
+    }
+
+    if (!finalHtml) {
+      toast.error('Ajoutez au moins un bloc ou du contenu HTML');
       return;
     }
 
     try {
+      const dataToSave = {
+        ...formData,
+        html_content: finalHtml
+      };
+
       if (editingTemplate) {
-        await base44.entities.NewsletterTemplate.update(editingTemplate.id, formData);
+        await base44.entities.NewsletterTemplate.update(editingTemplate.id, dataToSave);
         toast.success('Template mis à jour');
       } else {
-        await base44.entities.NewsletterTemplate.create(formData);
+        await base44.entities.NewsletterTemplate.create(dataToSave);
         toast.success('Template créé');
       }
       setShowModal(false);
       setEditingTemplate(null);
       setFormData({ name: '', description: '', html_content: '' });
+      setBlocks([]);
       loadTemplates();
     } catch (e) {
       console.error(e);
