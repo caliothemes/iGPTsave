@@ -3573,7 +3573,7 @@ Réponds en JSON avec:
             <GradientIcon className="h-5 w-5" />
           </button>
           <button
-            onClick={() => setActiveTab('images')}
+            onClick={() => imageUploadRef.current?.click()}
             className={cn(
               "p-2.5 rounded-lg transition-all",
               activeTab === 'images' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
