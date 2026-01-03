@@ -94,26 +94,16 @@ export default function AdminNewsletterTemplates() {
   };
 
   const handleSave = async () => {
-    if (!formData.name) {
-      toast.error('Veuillez remplir le nom du template');
-      return;
-    }
-
-    // Générer le HTML à partir des blocs si en mode visuel
-    let finalHtml = formData.html_content;
-    if (editorMode === 'visual' && blocks.length > 0) {
-      finalHtml = blocks.map(b => b.html).join('\n\n');
-    }
-
-    if (!finalHtml) {
-      toast.error('Ajoutez au moins un bloc ou du contenu HTML');
+    if (!formData.name || !formData.html_content) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
     try {
+      // Sauvegarder le template avec les blocs en JSON
       const dataToSave = {
         ...formData,
-        html_content: finalHtml
+        blocks_json: blocks.length > 0 ? JSON.stringify(blocks) : null
       };
 
       if (editingTemplate) {
@@ -142,7 +132,16 @@ export default function AdminNewsletterTemplates() {
       html_content: template.html_content
     });
     setEditorMode('code');
-    setBlocks([]);
+    // Charger les blocs si ils existent
+    if (template.blocks_json) {
+      try {
+        setBlocks(JSON.parse(template.blocks_json));
+      } catch (e) {
+        setBlocks([]);
+      }
+    } else {
+      setBlocks([]);
+    }
     setShowModal(true);
   };
 
@@ -153,6 +152,10 @@ export default function AdminNewsletterTemplates() {
       html: BLOCK_TEMPLATES[type].html
     };
     setBlocks([...blocks, newBlock]);
+  };
+
+  const updateBlockHtml = (id, newHtml) => {
+    setBlocks(blocks.map(b => b.id === id ? { ...b, html: newHtml } : b));
   };
 
   const removeBlock = (id) => {
@@ -170,14 +173,10 @@ export default function AdminNewsletterTemplates() {
   };
 
   const switchToCodeMode = () => {
-    // Generate HTML from blocks
-    const blocksHtml = blocks.map(b => b.html).join('\n');
-    setFormData({ ...formData, html_content: blocksHtml });
     setEditorMode('code');
   };
 
   const switchToVisualMode = () => {
-    // Parse HTML to blocks (simple parsing)
     setEditorMode('visual');
   };
 
@@ -197,6 +196,20 @@ export default function AdminNewsletterTemplates() {
     let html = template.html_content;
     html = html.replace('{{DATE}}', new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }));
     html = html.replace('{{VISUALS_CONTENT}}', '<p style="color: #9ca3af; text-align: center; padding: 40px;">Les visuels seront chargés lors de la génération de la newsletter</p>');
+    
+    // Remplacer {{BLOCKS}} par le HTML des blocs
+    if (template.blocks_json) {
+      try {
+        const loadedBlocks = JSON.parse(template.blocks_json);
+        const blocksHtml = loadedBlocks.map(b => b.html).join('\n\n');
+        html = html.replace('{{BLOCKS}}', blocksHtml);
+      } catch (e) {
+        html = html.replace('{{BLOCKS}}', '');
+      }
+    } else {
+      html = html.replace('{{BLOCKS}}', '');
+    }
+    
     setPreviewHtml(html);
     setShowPreviewModal(true);
   };
@@ -343,7 +356,7 @@ export default function AdminNewsletterTemplates() {
                   className="bg-white/5 border-white/20 text-white font-mono text-xs min-h-[400px]"
                 />
                 <p className="text-xs text-white/40 mt-2">
-                  Variables disponibles : {'{'}{'{'} DATE {'}'}{'}'}, {'{'}{'{'} VISUALS_CONTENT {'}'}{'}'}
+                  Variables disponibles : {'{'}{'{'} DATE {'}'}{'}'}, {'{'}{'{'} VISUALS_CONTENT {'}'}{'}'}, {'{'}{'{'} BLOCKS {'}'}{'}'}
                 </p>
               </div>
             )}
@@ -377,6 +390,7 @@ export default function AdminNewsletterTemplates() {
                       <Layout className="h-12 w-12 mx-auto mb-3 opacity-30" />
                       <p>Aucun bloc ajouté</p>
                       <p className="text-xs mt-1">Cliquez sur un bloc ci-dessus pour l'ajouter</p>
+                      <p className="text-xs mt-2 text-violet-400">💡 Ajoutez {'{'}{'{'} BLOCKS {'}'}{'}'} dans votre HTML pour afficher les blocs</p>
                     </div>
                   ) : (
                     blocks.map((block, index) => (
@@ -414,6 +428,17 @@ export default function AdminNewsletterTemplates() {
                             </Button>
                           </div>
                         </div>
+                        
+                        {/* Édition du HTML du bloc */}
+                        <div className="mb-3">
+                          <label className="text-xs text-white/60 mb-1 block">Style HTML (modifiable)</label>
+                          <Textarea
+                            value={block.html}
+                            onChange={(e) => updateBlockHtml(block.id, e.target.value)}
+                            className="bg-black/30 border-white/20 text-white font-mono text-xs min-h-[100px]"
+                          />
+                        </div>
+                        
                         {/* Aperçu du bloc */}
                         <div className="bg-white rounded p-3 text-xs overflow-auto max-h-40">
                           <div dangerouslySetInnerHTML={{ __html: block.html }} />
