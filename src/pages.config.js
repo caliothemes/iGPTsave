@@ -2,6 +2,7 @@ import Account from './pages/Account';
 import Admin from './pages/Admin';
 import AdminAssets from './pages/AdminAssets';
 import AdminFiles from './pages/AdminFiles';
+import AdminImageEditExamples from './pages/AdminImageEditExamples';
 import AdminLegal from './pages/AdminLegal';
 import AdminNewsletterTemplates from './pages/AdminNewsletterTemplates';
 import AdminNewsletters from './pages/AdminNewsletters';
@@ -27,7 +28,6 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
-import AdminImageEditExamples from './pages/AdminImageEditExamples';
 import __Layout from './Layout.jsx';
 
 
@@ -36,6 +36,7 @@ export const PAGES = {
     "Admin": Admin,
     "AdminAssets": AdminAssets,
     "AdminFiles": AdminFiles,
+    "AdminImageEditExamples": AdminImageEditExamples,
     "AdminLegal": AdminLegal,
     "AdminNewsletterTemplates": AdminNewsletterTemplates,
     "AdminNewsletters": AdminNewsletters,
@@ -61,7 +62,6 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
-    "AdminImageEditExamples": AdminImageEditExamples,
 }
 
 export const pagesConfig = {

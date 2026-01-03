@@ -1352,7 +1352,7 @@ export default function Home() {
             )}
 
             {/* Buttons: Image to Video + Image Edit */}
-            <div className="mb-10 flex flex-col sm:flex-row gap-3 items-center justify-center">
+            <div className="mb-10 flex flex-col gap-3 items-center justify-center">
               <button
                 onClick={() => setShowVideoExamplesModal(true)}
                 className="px-4 py-2 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white rounded-xl text-sm shadow-md transition-all flex items-center gap-2 relative"
