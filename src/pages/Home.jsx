@@ -1351,8 +1351,28 @@ export default function Home() {
               <div className="mb-12" />
             )}
 
+            {/* Welcome Message Bubble */}
+            <div className="w-full max-w-2xl mb-8">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
+                      alt="iGPT" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 rounded-2xl px-5 py-4 max-w-lg shadow-lg shadow-violet-500/5">
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {getWelcomeMessage()}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Buttons: Image to Video + Image Edit */}
-            <div className="mb-10 relative">
+            <div className="w-full max-w-2xl mb-10 relative">
               <div className="flex flex-col gap-3 items-center justify-center bg-white/5 border border-white/10 rounded-xl p-4">
                 <button
                   onClick={() => setShowVideoExamplesModal(true)}
@@ -1385,27 +1405,6 @@ export default function Home() {
                 {language === 'fr' ? 'NOUVEAU' : 'NEW'}
               </span>
             </div>
-
-            {/* Welcome Message Bubble */}
-            <div className="w-full max-w-2xl mb-8">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
-                    <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
-                      alt="iGPT" 
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 rounded-2xl px-5 py-4 max-w-lg shadow-lg shadow-violet-500/5">
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    {getWelcomeMessage()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
 
           </div>
         ) : (
