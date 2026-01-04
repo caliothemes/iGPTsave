@@ -20,6 +20,7 @@ export default function AdminNewsletterTemplates() {
   const [blocks, setBlocks] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentBlockId, setCurrentBlockId] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [myVisuals, setMyVisuals] = useState([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef(null);
@@ -165,13 +166,14 @@ export default function AdminNewsletterTemplates() {
       id: Date.now(),
       type,
       html: BLOCK_TEMPLATES[type].html,
-      image_url: null
+      image_urls: []
     };
     setBlocks([...blocks, newBlock]);
   };
 
-  const openImageSelector = (blockId) => {
+  const openImageSelector = (blockId, imageIndex = 0) => {
     setCurrentBlockId(blockId);
+    setCurrentImageIndex(imageIndex);
     setShowImageModal(true);
   };
 
@@ -181,18 +183,38 @@ export default function AdminNewsletterTemplates() {
     const block = blocks.find(b => b.id === currentBlockId);
     if (!block) return;
 
-    // Remplacer l'URL de l'image dans le HTML du bloc
     let updatedHtml = block.html;
-    updatedHtml = updatedHtml.replace(/src="[^"]*"/g, `src="${imageUrl}"`);
+    const imgTags = updatedHtml.match(/src="[^"]*"/g);
+    
+    if (imgTags && imgTags[currentImageIndex]) {
+      // Remplacer uniquement l'image à l'index spécifié
+      let count = 0;
+      updatedHtml = updatedHtml.replace(/src="[^"]*"/g, (match) => {
+        if (count === currentImageIndex) {
+          count++;
+          return `src="${imageUrl}"`;
+        }
+        count++;
+        return match;
+      });
+    } else {
+      // Si pas assez d'images, remplacer la première
+      updatedHtml = updatedHtml.replace(/src="[^"]*"/, `src="${imageUrl}"`);
+    }
+    
+    // Mettre à jour le tableau d'URLs
+    const newImageUrls = [...(block.image_urls || [])];
+    newImageUrls[currentImageIndex] = imageUrl;
     
     setBlocks(blocks.map(b => 
       b.id === currentBlockId 
-        ? { ...b, html: updatedHtml, image_url: imageUrl } 
+        ? { ...b, html: updatedHtml, image_urls: newImageUrls } 
         : b
     ));
     
     setShowImageModal(false);
     setCurrentBlockId(null);
+    setCurrentImageIndex(0);
   };
 
   const handleImageUpload = async (e) => {
@@ -489,18 +511,59 @@ export default function AdminNewsletterTemplates() {
                         </div>
                         
                         {/* Sélection d'image si le bloc contient une image */}
-                        {(block.type === 'image' || block.type === 'imageText' || block.type === 'twoImagesText') && (
+                        {block.type === 'image' && (
                           <div className="mb-3">
                             <label className="text-xs text-white/60 mb-1 block">Image du bloc</label>
                             <Button
-                              onClick={() => openImageSelector(block.id)}
+                              onClick={() => openImageSelector(block.id, 0)}
                               variant="outline"
                               size="sm"
                               className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
                             >
                               <ImageIcon className="h-4 w-4 mr-2" />
-                              {block.image_url ? 'Changer l\'image' : 'Sélectionner une image'}
+                              {block.image_urls?.[0] ? 'Changer l\'image' : 'Sélectionner une image'}
                             </Button>
+                          </div>
+                        )}
+                        
+                        {block.type === 'imageText' && (
+                          <div className="mb-3">
+                            <label className="text-xs text-white/60 mb-1 block">Image du bloc</label>
+                            <Button
+                              onClick={() => openImageSelector(block.id, 0)}
+                              variant="outline"
+                              size="sm"
+                              className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
+                            >
+                              <ImageIcon className="h-4 w-4 mr-2" />
+                              {block.image_urls?.[0] ? 'Changer l\'image' : 'Sélectionner une image'}
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {block.type === 'twoImagesText' && (
+                          <div className="mb-3">
+                            <label className="text-xs text-white/60 mb-1 block">Images du bloc</label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button
+                                onClick={() => openImageSelector(block.id, 0)}
+                                variant="outline"
+                                size="sm"
+                                className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+                              >
+                                <ImageIcon className="h-4 w-4 mr-2" />
+                                Image 1
+                              </Button>
+                              <Button
+                                onClick={() => openImageSelector(block.id, 1)}
+                                variant="outline"
+                                size="sm"
+                                className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+                              >
+                                <ImageIcon className="h-4 w-4 mr-2" />
+                                Image 2
+                              </Button>
+                            </div>
                           </div>
                         )}
 
