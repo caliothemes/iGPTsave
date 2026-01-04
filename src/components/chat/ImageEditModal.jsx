@@ -221,8 +221,8 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
                   </p>
                   <p className="text-xs leading-relaxed text-blue-200/70">
                     {language === 'fr' 
-                      ? 'Ajoutez des images de référence pour guider la modification (style, éléments à ajouter, etc.)' 
-                      : 'Add reference images to guide the edit (style, elements to add, etc.)'}
+                      ? 'Ajoutez des images pour guider la modification (Produit, style, éléments à ajouter, etc.)' 
+                      : 'Add images to guide the edit (Product, style, elements to add, etc.)'}
                   </p>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
                 className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white mb-3"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {language === 'fr' ? 'Ajouter des images de référence' : 'Add reference images'}
+                {language === 'fr' ? 'Ajouter une image' : 'Add image'}
               </Button>
 
               {/* Uploaded Images Grid */}
