@@ -302,6 +302,17 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           </div>
 
+          {/* Examples Button - Only show for Replicate */}
+          {provider === 'replicate' && (
+            <button
+              onClick={() => setShowExamplesModal(true)}
+              className="w-full mb-4 px-4 py-3 rounded-lg bg-gradient-to-r from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30 border border-violet-500/30 text-violet-300 hover:text-violet-200 transition-all text-sm font-medium"
+            >
+              <Eye className="h-4 w-4 inline mr-2" />
+              {language === 'fr' ? 'Voir des exemples concrets' : 'See real examples'}
+            </button>
+          )}
+
           {/* Auto Prompt Toggle */}
           <div className="mb-4">
             <button
@@ -371,17 +382,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                         {example.icon} {language === 'fr' ? example.short_desc_fr : (example.short_desc_en || example.short_desc_fr)}
                       </button>
                       ))}
-
-                      {/* Button to see concrete examples */}
-                      <div className="mt-3 text-center">
-                      <button
-                      onClick={() => setShowExamplesModal(true)}
-                      className="text-xs px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30 border border-violet-500/30 text-violet-300 hover:text-violet-200 transition-all"
-                      >
-                      <Eye className="h-3 w-3 inline mr-1.5" />
-                      {language === 'fr' ? 'Voir des exemples concrets' : 'See real examples'}
-                      </button>
-                      </div>
                       </div>
                       )}
                       </div>
