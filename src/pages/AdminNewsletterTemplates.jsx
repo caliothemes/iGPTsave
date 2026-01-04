@@ -81,7 +81,17 @@ export default function AdminNewsletterTemplates() {
 
   useEffect(() => {
     loadTemplates();
+    loadMyVisuals();
   }, []);
+
+  const loadMyVisuals = async () => {
+    try {
+      const visuals = await base44.entities.Visual.list('-created_date', 50);
+      setMyVisuals(visuals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const loadTemplates = async () => {
     try {
@@ -149,9 +159,53 @@ export default function AdminNewsletterTemplates() {
     const newBlock = {
       id: Date.now(),
       type,
-      html: BLOCK_TEMPLATES[type].html
+      html: BLOCK_TEMPLATES[type].html,
+      image_url: null
     };
     setBlocks([...blocks, newBlock]);
+  };
+
+  const openImageSelector = (blockId) => {
+    setCurrentBlockId(blockId);
+    setShowImageModal(true);
+  };
+
+  const selectImageForBlock = (imageUrl) => {
+    if (!currentBlockId) return;
+    
+    const block = blocks.find(b => b.id === currentBlockId);
+    if (!block) return;
+
+    // Remplacer l'URL de l'image dans le HTML du bloc
+    let updatedHtml = block.html;
+    updatedHtml = updatedHtml.replace(/src="[^"]*"/g, `src="${imageUrl}"`);
+    
+    setBlocks(blocks.map(b => 
+      b.id === currentBlockId 
+        ? { ...b, html: updatedHtml, image_url: imageUrl } 
+        : b
+    ));
+    
+    setShowImageModal(false);
+    setCurrentBlockId(null);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      selectImageForBlock(file_url);
+      toast.success('Image uploadée');
+    } catch (error) {
+      console.error(error);
+      toast.error('Erreur lors de l\'upload');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
   };
 
   const updateBlockHtml = (id, newHtml) => {
@@ -429,6 +483,22 @@ export default function AdminNewsletterTemplates() {
                           </div>
                         </div>
                         
+                        {/* Sélection d'image si le bloc contient une image */}
+                        {(block.type === 'image' || block.type === 'text_image' || block.type === 'two_images') && (
+                          <div className="mb-3">
+                            <label className="text-xs text-white/60 mb-1 block">Image du bloc</label>
+                            <Button
+                              onClick={() => openImageSelector(block.id)}
+                              variant="outline"
+                              size="sm"
+                              className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
+                            >
+                              <Image className="h-4 w-4 mr-2" />
+                              {block.image_url ? 'Changer l\'image' : 'Sélectionner une image'}
+                            </Button>
+                          </div>
+                        )}
+
                         {/* Édition du HTML du bloc */}
                         <div className="mb-3">
                           <label className="text-xs text-white/60 mb-1 block">Style HTML (modifiable)</label>
