@@ -132,8 +132,8 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
                 </p>
                 <p className="text-xs leading-relaxed text-orange-200/80">
                   {language === 'fr' 
-                    ? 'Modifiez votre image avec des instructions précises. Le modèle conserve la structure de base et applique vos modifications.' 
-                    : 'Modify your image with precise instructions. The model keeps the base structure and applies your changes.'}
+                    ? 'Modifiez votre image avec des instructions précises. Vous pouvez aussi ajouter d\'autres images (ex: un produit) pour enrichir la composition. Le modèle conserve la structure de base et applique vos modifications.' 
+                    : 'Modify your image with precise instructions. You can also add other images (e.g., a product) to enrich the composition. The model keeps the base structure and applies your changes.'}
                 </p>
               </div>
             </div>
@@ -322,28 +322,18 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
 
           {/* Provider Footer */}
           <div className="mt-6 pt-4 border-t border-white/10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
-                  <Wand2 className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-white/90 text-xs font-medium">
-                    {language === 'fr' ? 'Modifié par PrunaAI' : 'Edited by PrunaAI'}
-                  </p>
-                  <p className="text-white/50 text-[10px]">
-                    {language === 'fr' ? 'Edition IA ultra-rapide • Turbo Mode' : 'Ultra-fast AI editing • Turbo Mode'}
-                  </p>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
+                <Wand2 className="h-5 w-5 text-white" />
               </div>
-              <a 
-                href="https://replicate.com/prunaai/p-image-edit"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-orange-400 hover:text-orange-300 text-xs transition-colors"
-              >
-                replicate.com →
-              </a>
+              <div>
+                <p className="text-white/90 text-xs font-medium">
+                  {language === 'fr' ? 'Modifié par PrunaAI' : 'Edited by PrunaAI'}
+                </p>
+                <p className="text-white/50 text-[10px]">
+                  {language === 'fr' ? 'Edition IA ultra-rapide • Turbo Mode' : 'Ultra-fast AI editing • Turbo Mode'}
+                </p>
+              </div>
             </div>
           </div>
         </motion.div>
