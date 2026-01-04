@@ -79,6 +79,7 @@ export default function Admin() {
     avgMessagesPerConv: 0,
     totalVisuals: 0,
     visualsToday: 0,
+    visualsYesterday: 0,
     visualsThisWeek: 0,
     visualsThisMonth: 0,
     visualsThisYear: 0,
@@ -129,7 +130,7 @@ export default function Admin() {
         const [users, allCredits, allVisuals, allTransactions, allConversations, allVisits, allStorePurchases, allStoreItems] = await Promise.all([
           base44.entities.User.list(),
           base44.entities.UserCredits.list(),
-          base44.entities.Visual.list('-created_date', 2000),
+          base44.entities.Visual.list(),
           base44.entities.Transaction.list(),
           base44.entities.Conversation.list(),
           base44.entities.Visit.list('-created_date', 5000),
@@ -186,15 +187,24 @@ export default function Admin() {
         yesterdayStart.setDate(yesterdayStart.getDate() - 1);
         const yesterdayEnd = new Date(todayStart);
         
-        const weekAgo = new Date(now);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        const lastWeekStart = new Date(weekAgo);
-        lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+        // Cette semaine : du lundi au dimanche
+        const thisWeekStart = new Date(now);
+        const dayOfWeek = thisWeekStart.getDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0 = dimanche
+        thisWeekStart.setDate(thisWeekStart.getDate() - daysToMonday);
+        thisWeekStart.setHours(0, 0, 0, 0);
         
-        const monthAgo = new Date(now);
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        const lastMonthStart = new Date(monthAgo);
-        lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
+        // Semaine dernière : lundi au dimanche de la semaine précédente
+        const lastWeekStart = new Date(thisWeekStart);
+        lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+        const lastWeekEnd = new Date(thisWeekStart);
+        
+        // Ce mois : du 1er du mois à aujourd'hui
+        const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        // Mois dernier : du 1er au dernier jour du mois précédent
+        const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
         
         const threeMonthsAgo = new Date(now);
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -233,10 +243,10 @@ export default function Admin() {
           currentVisitors: Math.max(1, recentActivity),
           today: getUniqueUsers(allItems, todayStart),
           yesterday: getUniqueUsers(allItems, yesterdayStart, yesterdayEnd),
-          thisWeek: getUniqueUsers(allItems, weekAgo),
-          lastWeek: getUniqueUsers(allItems, lastWeekStart, weekAgo),
-          thisMonth: getUniqueUsers(allItems, monthAgo),
-          lastMonth: getUniqueUsers(allItems, lastMonthStart, monthAgo),
+          thisWeek: getUniqueUsers(allItems, thisWeekStart),
+          lastWeek: getUniqueUsers(allItems, lastWeekStart, lastWeekEnd),
+          thisMonth: getUniqueUsers(allItems, thisMonthStart),
+          lastMonth: getUniqueUsers(allItems, lastMonthStart, lastMonthEnd),
           last3Months: getUniqueUsers(allItems, threeMonthsAgo),
           thisYear: getUniqueUsers(allItems, yearAgo)
         });
@@ -268,21 +278,21 @@ export default function Admin() {
           total: allVisits.length,
           today: countVisits(allVisits, todayStart),
           yesterday: countVisits(allVisits, yesterdayStart, yesterdayEnd),
-          thisWeek: countVisits(allVisits, weekAgo),
-          lastWeek: countVisits(allVisits, lastWeekStart, weekAgo),
-          thisMonth: countVisits(allVisits, monthAgo),
-          lastMonth: countVisits(allVisits, lastMonthStart, monthAgo),
+          thisWeek: countVisits(allVisits, thisWeekStart),
+          lastWeek: countVisits(allVisits, lastWeekStart, lastWeekEnd),
+          thisMonth: countVisits(allVisits, thisMonthStart),
+          lastMonth: countVisits(allVisits, lastMonthStart, lastMonthEnd),
           last3Months: countVisits(allVisits, threeMonthsAgo),
           thisYear: countVisits(allVisits, yearAgo),
           uniqueToday: countUniqueVisitors(allVisits, todayStart),
-          uniqueThisWeek: countUniqueVisitors(allVisits, weekAgo),
-          uniqueThisMonth: countUniqueVisitors(allVisits, monthAgo)
+          uniqueThisWeek: countUniqueVisitors(allVisits, thisWeekStart),
+          uniqueThisMonth: countUniqueVisitors(allVisits, thisMonthStart)
         });
 
         // User & Subscription Stats
         const newUsersToday = users.filter(u => u.created_date?.startsWith(todayStr)).length;
-        const newUsersWeek = users.filter(u => new Date(u.created_date) > weekAgo).length;
-        const newUsersMonth = users.filter(u => new Date(u.created_date) > monthAgo).length;
+        const newUsersWeek = users.filter(u => new Date(u.created_date) >= thisWeekStart).length;
+        const newUsersMonth = users.filter(u => new Date(u.created_date) >= thisMonthStart).length;
         const newUsersYear = users.filter(u => new Date(u.created_date) > yearAgo).length;
 
         // Count subscriptions by type
@@ -293,8 +303,8 @@ export default function Admin() {
 
         // Revenue stats
         const revenueToday = allTransactions.filter(t => t.status === 'completed' && t.created_date?.startsWith(todayStr)).reduce((sum, t) => sum + (t.amount || 0), 0);
-        const revenueThisWeek = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) > weekAgo).reduce((sum, t) => sum + (t.amount || 0), 0);
-        const revenueThisMonth = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) > monthAgo).reduce((sum, t) => sum + (t.amount || 0), 0);
+        const revenueThisWeek = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) >= thisWeekStart).reduce((sum, t) => sum + (t.amount || 0), 0);
+        const revenueThisMonth = allTransactions.filter(t => t.status === 'completed' && new Date(t.created_date) >= thisMonthStart).reduce((sum, t) => sum + (t.amount || 0), 0);
         const payingUsers = new Set(allTransactions.filter(t => t.status === 'completed').map(t => t.user_email)).size;
         const avgRevenuePerUser = payingUsers > 0 ? totalRevenue / payingUsers : 0;
 
@@ -319,8 +329,8 @@ export default function Admin() {
 
         // Conversation Stats
         const convsToday = allConversations.filter(c => c.created_date?.startsWith(todayStr)).length;
-        const convsThisWeek = allConversations.filter(c => new Date(c.created_date) > weekAgo).length;
-        const convsThisMonth = allConversations.filter(c => new Date(c.created_date) > monthAgo).length;
+        const convsThisWeek = allConversations.filter(c => new Date(c.created_date) >= thisWeekStart).length;
+        const convsThisMonth = allConversations.filter(c => new Date(c.created_date) >= thisMonthStart).length;
         const totalMessages = allConversations.reduce((sum, c) => sum + (c.messages?.length || 0), 0);
         const avgMessagesPerConv = allConversations.length > 0 ? totalMessages / allConversations.length : 0;
         const activeUserCount = new Set(allConversations.map(c => c.user_email)).size;
@@ -329,11 +339,15 @@ export default function Admin() {
         const convsThisYear = allConversations.filter(c => new Date(c.created_date) > yearAgo).length;
 
         const visualsToday = allVisuals.filter(v => v.created_date?.startsWith(todayStr)).length;
-        const visualsThisWeek = allVisuals.filter(v => new Date(v.created_date) > weekAgo).length;
-        const visualsThisMonth = allVisuals.filter(v => new Date(v.created_date) > monthAgo).length;
+        const visualsYesterday = allVisuals.filter(v => {
+          const vDate = new Date(v.created_date);
+          return vDate >= yesterdayStart && vDate < yesterdayEnd;
+        }).length;
+        const visualsThisWeek = allVisuals.filter(v => new Date(v.created_date) >= thisWeekStart).length;
+        const visualsThisMonth = allVisuals.filter(v => new Date(v.created_date) >= thisMonthStart).length;
         const visualsThisYear = allVisuals.filter(v => new Date(v.created_date) > yearAgo).length;
         const downloadsToday = allVisuals.filter(v => v.downloaded && v.updated_date?.startsWith(todayStr)).length;
-        const downloadsThisWeek = allVisuals.filter(v => v.downloaded && new Date(v.updated_date) > weekAgo).length;
+        const downloadsThisWeek = allVisuals.filter(v => v.downloaded && new Date(v.updated_date) >= thisWeekStart).length;
 
         setConversationStats({
           total: allConversations.length,
@@ -346,6 +360,7 @@ export default function Admin() {
           avgMessagesPerConv,
           totalVisuals: allVisuals.length,
           visualsToday,
+          visualsYesterday,
           visualsThisWeek,
           visualsThisMonth,
           visualsThisYear,
@@ -353,7 +368,7 @@ export default function Admin() {
           downloadsThisWeek
         });
 
-        // Extract ALL user messages from conversations (excluding admins)
+        // Extract ALL user messages from conversations (including guests, excluding admins)
         const allUserMessages = [];
         allConversations
           .filter(c => !adminEmailsSet.has(c.user_email))
@@ -369,7 +384,7 @@ export default function Admin() {
                   
                   allUserMessages.push({
                     question: m.content,
-                    user_email: c.user_email,
+                    user_email: c.user_email || 'anonymous',
                     created_date: messageDate.toISOString(),
                     conv_id: c.id
                   });
@@ -409,15 +424,15 @@ export default function Admin() {
         const storeVisits = allVisits.filter(v => v.page === 'Store');
         const storeVisitsToday = countVisits(storeVisits, todayStart);
         const storeVisitsYesterday = countVisits(storeVisits, yesterdayStart, yesterdayEnd);
-        const storeVisitsThisWeek = countVisits(storeVisits, weekAgo);
-        const storeVisitsLastWeek = countVisits(storeVisits, lastWeekStart, weekAgo);
-        const storeVisitsThisMonth = countVisits(storeVisits, monthAgo);
-        const storeVisitsLastMonth = countVisits(storeVisits, lastMonthStart, monthAgo);
+        const storeVisitsThisWeek = countVisits(storeVisits, thisWeekStart);
+        const storeVisitsLastWeek = countVisits(storeVisits, lastWeekStart, lastWeekEnd);
+        const storeVisitsThisMonth = countVisits(storeVisits, thisMonthStart);
+        const storeVisitsLastMonth = countVisits(storeVisits, lastMonthStart, lastMonthEnd);
         const storeVisitsThisYear = countVisits(storeVisits, yearAgo);
 
         const purchasesToday = allStorePurchases.filter(p => p.created_date?.startsWith(todayStr)).length;
-        const purchasesThisWeek = allStorePurchases.filter(p => new Date(p.created_date) > weekAgo).length;
-        const purchasesThisMonth = allStorePurchases.filter(p => new Date(p.created_date) > monthAgo).length;
+        const purchasesThisWeek = allStorePurchases.filter(p => new Date(p.created_date) >= thisWeekStart).length;
+        const purchasesThisMonth = allStorePurchases.filter(p => new Date(p.created_date) >= thisMonthStart).length;
         const purchasesThisYear = allStorePurchases.filter(p => new Date(p.created_date) > yearAgo).length;
         const storeRevenue = allStorePurchases.reduce((sum, p) => sum + (p.price_paid || 0), 0);
 
@@ -953,7 +968,7 @@ export default function Admin() {
           {/* Visuals Section */}
           <div className="mb-4">
             <p className="text-white/40 text-xs mb-2">🎨 Visuels générés</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <div className="p-3 rounded-xl bg-pink-600/20 border border-pink-500/30">
                 <p className="text-pink-300 text-xs mb-1">Total</p>
                 <p className="text-xl font-bold text-white">{conversationStats.totalVisuals}</p>
@@ -961,6 +976,10 @@ export default function Admin() {
               <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                 <p className="text-white/50 text-xs mb-1">Aujourd'hui</p>
                 <p className="text-xl font-bold text-white">{conversationStats.visualsToday}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-white/50 text-xs mb-1">Hier</p>
+                <p className="text-xl font-bold text-white">{conversationStats.visualsYesterday}</p>
               </div>
               <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                 <p className="text-white/50 text-xs mb-1">Cette semaine</p>
