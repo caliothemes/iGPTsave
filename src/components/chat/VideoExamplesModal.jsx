@@ -135,7 +135,7 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                 </h3>
 
                 {/* Timeline */}
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_2fr_auto_1fr] gap-6 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-[1.5fr_auto_1fr_auto_1.5fr] gap-6 items-center">
                   {/* Step 1: Image */}
                   <div className="space-y-3">
                     <div className="text-center">
@@ -167,10 +167,10 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                       <p className="text-sm font-medium text-white/80">{t.prompt}</p>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                      <p className="text-sm text-white/90 leading-relaxed">
+                      <p className="text-sm text-white/90 leading-relaxed text-center max-w-xs mx-auto">
                         {currentExample.prompt}
                       </p>
-                      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-white/10 text-xs text-white/60">
+                      <div className="flex flex-col items-center gap-2 mt-3 pt-3 border-t border-white/10 text-xs text-white/60">
                         <span>
                           {t.provider}: <span className="text-violet-400 font-medium">
                             {currentExample.provider === 'replicate' ? 'Kling v2.5 Pro' : 'RunwayML Gen-3'}
