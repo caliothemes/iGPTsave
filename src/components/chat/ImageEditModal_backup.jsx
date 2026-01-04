@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Loader2, X, Sparkles, Wand2, Upload, Trash2 } from 'lucide-react';
+import { Loader2, X, Sparkles, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { base44 } from '@/api/base44Client';
@@ -11,29 +11,6 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [additionalImages, setAdditionalImages] = useState([]);
-  const fileInputRef = React.useRef(null);
-
-  const handleFileUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const uploaded = [];
-
-    for (const file of files) {
-      try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        uploaded.push(file_url);
-      } catch (err) {
-        console.error('Upload error:', err);
-      }
-    }
-
-    setAdditionalImages(prev => [...prev, ...uploaded]);
-    e.target.value = '';
-  };
-
-  const handleRemoveImage = (index) => {
-    setAdditionalImages(prev => prev.filter((_, idx) => idx !== index));
-  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -44,12 +21,8 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
     try {
       setProgress(10);
       
-      // Build images array: original image + additional images
-      const allImages = [visual.image_url, ...additionalImages];
-      
       const response = await base44.functions.invoke('editImageWithReplicate', {
         image_url: visual.image_url,
-        additional_images: additionalImages,
         prompt: prompt.trim(),
         aspect_ratio: aspectRatio
       });
@@ -205,68 +178,6 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
                   {language === 'fr' ? example.fr : example.en}
                 </button>
               ))}
-            </div>
-          </div>
-
-          {/* Additional Images Upload Section */}
-          <div className="mb-6">
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-              <div className="flex items-start gap-2 mb-3">
-                <svg className="h-4 w-4 flex-shrink-0 mt-0.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div className="flex-1">
-                  <p className="font-medium text-xs text-blue-200 mb-1">
-                    {language === 'fr' ? 'Images supplémentaires (optionnel)' : 'Additional images (optional)'}
-                  </p>
-                  <p className="text-xs leading-relaxed text-blue-200/70">
-                    {language === 'fr' 
-                      ? 'Ajoutez des images de référence pour guider la modification (style, éléments à ajouter, etc.)' 
-                      : 'Add reference images to guide the edit (style, elements to add, etc.)'}
-                  </p>
-                </div>
-              </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isGenerating}
-                variant="outline"
-                size="sm"
-                className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white mb-3"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                {language === 'fr' ? 'Ajouter des images de référence' : 'Add reference images'}
-              </Button>
-
-              {/* Uploaded Images Grid */}
-              {additionalImages.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  {additionalImages.map((imgUrl, idx) => (
-                    <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-white/10">
-                      <img
-                        src={imgUrl}
-                        alt={`Additional ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        onClick={() => handleRemoveImage(idx)}
-                        className="absolute top-1 right-1 p-1 bg-red-600 hover:bg-red-700 rounded-md opacity-0 group-hover:opacity-100 transition-all"
-                      >
-                        <Trash2 className="h-3 w-3 text-white" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 

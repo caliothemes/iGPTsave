@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { image_url, prompt, aspect_ratio } = await req.json();
+    const { image_url, prompt, aspect_ratio, additional_images } = await req.json();
 
     if (!image_url || !prompt) {
       return Response.json({ error: 'Missing required parameters' }, { status: 400 });
@@ -45,6 +45,24 @@ Deno.serve(async (req) => {
       // Continue with original URL if re-upload fails
     }
 
+    // Process additional images if provided
+    const publicAdditionalImages = [];
+    if (additional_images && Array.isArray(additional_images)) {
+      for (const addImgUrl of additional_images) {
+        try {
+          const imgResponse = await fetch(addImgUrl);
+          if (imgResponse.ok) {
+            const imgBlob = await imgResponse.blob();
+            const imgFile = new File([imgBlob], 'additional.png', { type: 'image/png' });
+            const uploadResult = await base44.integrations.Core.UploadFile({ file: imgFile });
+            publicAdditionalImages.push(uploadResult.file_url);
+          }
+        } catch (err) {
+          console.error('Additional image upload failed:', err);
+        }
+      }
+    }
+
     // Call Replicate API - prunaai/p-image-edit using model name directly
     const replicateResponse = await fetch('https://api.replicate.com/v1/models/prunaai/p-image-edit/predictions', {
       method: 'POST',
@@ -55,7 +73,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         input: {
-          images: [publicImageUrl],
+          images: [publicImageUrl, ...publicAdditionalImages],
           prompt: prompt,
           aspect_ratio: aspect_ratio || '1:1'
         }
