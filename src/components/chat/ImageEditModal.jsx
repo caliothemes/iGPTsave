@@ -4,6 +4,7 @@ import { Loader2, X, Sparkles, Wand2, Upload, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { base44 } from '@/api/base44Client';
+import ImageEditExamplesModal from '@/components/chat/ImageEditExamplesModal';
 
 export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete }) {
   const { language } = useLanguage();
@@ -12,6 +13,7 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [additionalImages, setAdditionalImages] = useState([]);
+  const [showExamplesModal, setShowExamplesModal] = useState(false);
   const fileInputRef = React.useRef(null);
 
   const handleFileUpload = async (e) => {
@@ -138,6 +140,16 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
               </div>
             </div>
           </div>
+
+          {/* Examples Button */}
+          <Button
+            onClick={() => setShowExamplesModal(true)}
+            variant="outline"
+            className="w-full mb-4 bg-violet-500/10 hover:bg-violet-500/20 border-violet-500/30 text-violet-200"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            {language === 'fr' ? 'Voir des exemples de modifications' : 'See edit examples'}
+          </Button>
 
           {/* Aspect Ratio */}
           <div className="mb-4">
@@ -338,6 +350,12 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Examples Modal */}
+      <ImageEditExamplesModal
+        isOpen={showExamplesModal}
+        onClose={() => setShowExamplesModal(false)}
+      />
     </AnimatePresence>
   );
 }
