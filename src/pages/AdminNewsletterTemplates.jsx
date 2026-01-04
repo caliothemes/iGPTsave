@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Plus, Eye, Edit, Trash2, ArrowLeft, Code, Layout, Image as ImageIcon, Type, Columns, MoveUp, MoveDown, X } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ArrowLeft, Code, Layout, Image as ImageIcon, Type, Columns, MoveUp, MoveDown, X, Upload } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,6 +18,11 @@ export default function AdminNewsletterTemplates() {
   const [previewHtml, setPreviewHtml] = useState('');
   const [editorMode, setEditorMode] = useState('code'); // 'code' ou 'visual'
   const [blocks, setBlocks] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentBlockId, setCurrentBlockId] = useState(null);
+  const [myVisuals, setMyVisuals] = useState([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -484,7 +489,7 @@ export default function AdminNewsletterTemplates() {
                         </div>
                         
                         {/* Sélection d'image si le bloc contient une image */}
-                        {(block.type === 'image' || block.type === 'text_image' || block.type === 'two_images') && (
+                        {(block.type === 'image' || block.type === 'imageText' || block.type === 'twoImagesText') && (
                           <div className="mb-3">
                             <label className="text-xs text-white/60 mb-1 block">Image du bloc</label>
                             <Button
@@ -493,7 +498,7 @@ export default function AdminNewsletterTemplates() {
                               size="sm"
                               className="w-full bg-white/5 border-white/20 text-white hover:bg-white/10"
                             >
-                              <Image className="h-4 w-4 mr-2" />
+                              <ImageIcon className="h-4 w-4 mr-2" />
                               {block.image_url ? 'Changer l\'image' : 'Sélectionner une image'}
                             </Button>
                           </div>
@@ -539,6 +544,63 @@ export default function AdminNewsletterTemplates() {
               className="w-full h-[600px] border-0"
               title="Template Preview"
             />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Selector Modal */}
+      <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 text-white max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Sélectionner une image</DialogTitle>
+          </DialogHeader>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+
+          <div className="space-y-4 overflow-y-auto max-h-[70vh]">
+            {/* Upload Section */}
+            <div>
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                className="w-full bg-violet-600 hover:bg-violet-700"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {uploadingImage ? 'Upload en cours...' : 'Uploader une nouvelle image'}
+              </Button>
+            </div>
+
+            <div className="border-t border-white/10 pt-4">
+              <h3 className="text-white text-sm font-medium mb-3">Mes visuels</h3>
+              {myVisuals.length === 0 ? (
+                <div className="text-center text-white/40 py-8">
+                  <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                  <p>Aucun visuel disponible</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  {myVisuals.map(visual => (
+                    <button
+                      key={visual.id}
+                      onClick={() => selectImageForBlock(visual.image_url)}
+                      className="aspect-square rounded-lg overflow-hidden border-2 border-white/10 hover:border-violet-500 transition-all"
+                    >
+                      <img
+                        src={visual.image_url}
+                        alt={visual.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
