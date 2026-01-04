@@ -2042,7 +2042,7 @@ export default function Home() {
                 {/* Tag Upload */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-orange-600/90 hover:bg-orange-600 border border-orange-500/20 hover:border-orange-500/40 text-white shadow-md flex items-center gap-1"
+                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-300 shadow-md flex items-center gap-1"
                 >
                   <Upload className="w-3 h-3" />
                   {language === 'fr' ? 'Upload' : 'Upload'}
