@@ -513,6 +513,31 @@ export default function StoryStudio() {
                               {img.transition.name}
                             </p>
                           )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newImages = [...selectedImages];
+                                newImages[idx] = { ...newImages[idx], duration: Math.max(1, (newImages[idx].duration || 3) - 1) };
+                                setSelectedImages(newImages);
+                              }}
+                              className="px-2 py-0.5 bg-white/5 hover:bg-white/10 rounded text-white/60 text-xs"
+                            >
+                              -
+                            </button>
+                            <span className="text-white/60 text-xs">{img.duration || 3}s</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newImages = [...selectedImages];
+                                newImages[idx] = { ...newImages[idx], duration: Math.min(10, (newImages[idx].duration || 3) + 1) };
+                                setSelectedImages(newImages);
+                              }}
+                              className="px-2 py-0.5 bg-white/5 hover:bg-white/10 rounded text-white/60 text-xs"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                         <button
                           onClick={() => handleRemoveImage(img.id)}
@@ -767,6 +792,7 @@ export default function StoryStudio() {
                       const dims = visual.dimensions || '1080x1080';
                       const [w, h] = dims.split('x').map(n => parseInt(n));
                       const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
+                      const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
                       
                       return (
                         <button
@@ -775,15 +801,31 @@ export default function StoryStudio() {
                           className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
                         >
                           <div style={{ aspectRatio }}>
-                            <img
-                              src={visual.image_url}
-                              alt={visual.title}
-                              className="w-full h-full object-cover"
-                            />
+                            {isVideo ? (
+                              <video
+                                src={visual.video_url || visual.image_url}
+                                className="w-full h-full object-cover"
+                                muted
+                                loop
+                                playsInline
+                              />
+                            ) : (
+                              <img
+                                src={visual.image_url}
+                                alt={visual.title}
+                                className="w-full h-full object-cover"
+                                crossOrigin="anonymous"
+                              />
+                            )}
                           </div>
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
                             <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
                           </div>
+                          {isVideo && (
+                            <div className="absolute top-2 right-2 px-2 py-1 bg-pink-600/80 backdrop-blur-sm rounded-md">
+                              <Video className="h-3 w-3 text-white" />
+                            </div>
+                          )}
                         </button>
                       );
                     })}
