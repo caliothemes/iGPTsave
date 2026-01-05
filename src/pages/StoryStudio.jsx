@@ -42,7 +42,7 @@ export default function StoryStudio() {
   const [showTransitionsModal, setShowTransitionsModal] = useState(false);
   const [selectedTransitionIndex, setSelectedTransitionIndex] = useState(null);
   const [editingTextId, setEditingTextId] = useState(null);
-  const [currentStep, setCurrentStep] = useState('select');
+  const [currentStep, setCurrentStep] = useState('format');
   const [exporting, setExporting] = useState(false);
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
@@ -53,6 +53,7 @@ export default function StoryStudio() {
   const [myStories, setMyStories] = useState([]);
   const [showStoriesModal, setShowStoriesModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [videoFormat, setVideoFormat] = useState('1:1');
   const fileInputRef = useRef(null);
   const previewIntervalRef = useRef(null);
 
@@ -70,13 +71,8 @@ export default function StoryStudio() {
           base44.entities.Story.filter({ user_email: currentUser.email }, '-created_date', 50)
         ]);
 
-        // Filter for story format (9:16 or vertical)
-        const storyVisuals = visuals.filter(v => {
-          if (!v.dimensions) return false;
-          const [w, h] = v.dimensions.split('x').map(n => parseInt(n));
-          const ratio = w / h;
-          return ratio < 1; // Vertical formats only
-        });
+        // No filter - show all visuals (images and videos)
+        const storyVisuals = visuals;
 
         setMyVisuals(storyVisuals);
         setUserVisuals(visuals);
@@ -99,11 +95,14 @@ export default function StoryStudio() {
     for (const file of files) {
       try {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const isVideo = file.type.startsWith('video/');
         uploaded.push({
           id: Date.now() + Math.random(),
           image_url: file_url,
+          video_url: isVideo ? file_url : null,
           title: file.name,
-          isUploaded: true
+          isUploaded: true,
+          isVideo
         });
       } catch (err) {
         toast.error('Erreur lors de l\'upload');
@@ -397,10 +396,10 @@ export default function StoryStudio() {
               </Button>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                  iGPT Story Studio
+                  Studio Vidéo, Stories, Réels
                 </h1>
                 <p className="text-white/60 text-sm">
-                  {language === 'fr' ? 'Créez des stories vidéo 9:16 professionnelles' : 'Create professional 9:16 video stories'}
+                  {language === 'fr' ? 'Créez des vidéos, stories et réels professionnels' : 'Create professional videos, stories and reels'}
                 </p>
               </div>
             </div>
@@ -439,14 +438,90 @@ export default function StoryStudio() {
         "relative z-10 max-w-7xl mx-auto px-6 py-8 pb-32 transition-all duration-300",
         sidebarOpen && "md:ml-64"
       )}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Format Selection Step */}
+        {currentStep === 'format' && (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-white mb-2 text-center">
+                {language === 'fr' ? 'Choisissez le format de votre vidéo' : 'Choose your video format'}
+              </h2>
+              <p className="text-white/60 text-center mb-8">
+                {language === 'fr' ? 'Sélectionnez le format qui correspond à votre besoin' : 'Select the format that fits your needs'}
+              </p>
+
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <button
+                  onClick={() => setVideoFormat('1:1')}
+                  className={cn(
+                    "p-6 rounded-xl border-2 transition-all",
+                    videoFormat === '1:1'
+                      ? "border-violet-500 bg-violet-500/10"
+                      : "border-white/10 bg-white/5 hover:border-white/20"
+                  )}
+                >
+                  <div className="w-full aspect-square bg-white/10 rounded-lg mb-3" />
+                  <p className="text-white font-medium text-sm">Carré 1:1</p>
+                  <p className="text-white/60 text-xs mt-1">Posts classiques</p>
+                </button>
+
+                <button
+                  onClick={() => setVideoFormat('9:16')}
+                  className={cn(
+                    "p-6 rounded-xl border-2 transition-all",
+                    videoFormat === '9:16'
+                      ? "border-violet-500 bg-violet-500/10"
+                      : "border-white/10 bg-white/5 hover:border-white/20"
+                  )}
+                >
+                  <div className="w-full aspect-[9/16] bg-white/10 rounded-lg mb-3 mx-auto max-h-32" />
+                  <p className="text-white font-medium text-sm">Story 9:16</p>
+                  <p className="text-white/60 text-xs mt-1">Stories, Réels</p>
+                </button>
+
+                <button
+                  onClick={() => setVideoFormat('16:9')}
+                  className={cn(
+                    "p-6 rounded-xl border-2 transition-all",
+                    videoFormat === '16:9'
+                      ? "border-violet-500 bg-violet-500/10"
+                      : "border-white/10 bg-white/5 hover:border-white/20"
+                  )}
+                >
+                  <div className="w-full aspect-[16/9] bg-white/10 rounded-lg mb-3" />
+                  <p className="text-white font-medium text-sm">Paysage 16:9</p>
+                  <p className="text-white/60 text-xs mt-1">YouTube, Vimeo</p>
+                </button>
+              </div>
+
+              <Button
+                onClick={() => setCurrentStep('select')}
+                className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-lg py-6"
+              >
+                {language === 'fr' ? 'Continuer' : 'Continue'}
+                <ChevronRight className="h-5 w-5 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 'select' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Panel - Image Selection */}
           <div className="lg:col-span-1">
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-              <h2 className="text-white font-bold mb-4 flex items-center gap-2">
-                <ImageIcon className="h-5 w-5 text-violet-400" />
-                Images ({selectedImages.length})
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-white font-bold flex items-center gap-2">
+                  <Video className="h-5 w-5 text-violet-400" />
+                  Médias ({selectedImages.length})
+                </h2>
+                <button
+                  onClick={() => setCurrentStep('format')}
+                  className="text-white/60 hover:text-white text-xs flex items-center gap-1 transition-colors"
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                  Changer format
+                </button>
+              </div>
 
               {/* Add Images Buttons */}
               <div className="space-y-3 mb-6">
@@ -456,7 +531,7 @@ export default function StoryStudio() {
                   className="w-full bg-white/5 border-white/20 text-white"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  Uploader des images
+                  Uploader (images/vidéos)
                 </Button>
                 <Button
                   onClick={() => setShowVisualsModal(true)}
@@ -480,7 +555,7 @@ export default function StoryStudio() {
                 ref={fileInputRef}
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={handleFileUpload}
                 className="hidden"
               />
@@ -497,16 +572,30 @@ export default function StoryStudio() {
                       className="relative bg-white/5 rounded-xl border border-white/10 p-3"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-                          <img
-                            src={img.image_url}
-                            alt={img.title}
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 relative">
+                          {img.isVideo || img.video_url ? (
+                            <>
+                              <video
+                                src={img.video_url || img.image_url}
+                                className="w-full h-full object-cover"
+                                muted
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                <Video className="h-4 w-4 text-white" />
+                              </div>
+                            </>
+                          ) : (
+                            <img
+                              src={img.image_url}
+                              alt={img.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-white text-sm font-medium truncate">
-                            Image {idx + 1}
+                          <p className="text-white text-sm font-medium truncate flex items-center gap-1">
+                            {img.isVideo || img.video_url ? <Video className="h-3 w-3" /> : <ImageIcon className="h-3 w-3" />}
+                            {img.isVideo || img.video_url ? 'Vidéo' : 'Image'} {idx + 1}
                           </p>
                           {img.transition && (
                             <p className="text-violet-400 text-xs">
@@ -559,9 +648,9 @@ export default function StoryStudio() {
 
                 {selectedImages.length === 0 && (
                   <div className="text-center py-12">
-                    <ImageIcon className="h-12 w-12 text-white/20 mx-auto mb-3" />
+                    <Video className="h-12 w-12 text-white/20 mx-auto mb-3" />
                     <p className="text-white/40 text-sm">
-                      Aucune image sélectionnée
+                      Aucun média sélectionné
                     </p>
                   </div>
                 )}
@@ -574,24 +663,39 @@ export default function StoryStudio() {
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
               <h2 className="text-white font-bold mb-4 flex items-center gap-2">
                 <Video className="h-5 w-5 text-pink-400" />
-                Prévisualisation Story (9:16)
+                Prévisualisation ({videoFormat})
               </h2>
 
               {/* Story Preview */}
-              <div className="relative bg-black rounded-2xl overflow-hidden mx-auto" style={{ aspectRatio: '9/16', maxHeight: '600px' }}>
+              <div className="relative bg-black rounded-2xl overflow-hidden mx-auto" style={{ aspectRatio: videoFormat.replace(':', '/'), maxHeight: '600px' }}>
                 {selectedImages.length > 0 ? (
                   <div className="relative w-full h-full overflow-hidden">
                     <AnimatePresence mode="wait">
-                      <motion.img
-                        key={previewIndex}
-                        src={selectedImages[previewIndex]?.image_url || selectedImages[0].image_url}
-                        alt="Preview"
-                        className="w-full h-full object-cover absolute inset-0"
-                        initial={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').initial}
-                        animate={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').animate}
-                        exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').exit}
-                        transition={{ duration: selectedImages[previewIndex]?.transition?.duration || 0.8, ease: "easeInOut" }}
-                      />
+                      {selectedImages[previewIndex]?.isVideo || selectedImages[previewIndex]?.video_url ? (
+                        <motion.video
+                          key={previewIndex}
+                          src={selectedImages[previewIndex]?.video_url || selectedImages[previewIndex]?.image_url}
+                          className="w-full h-full object-cover absolute inset-0"
+                          autoPlay
+                          muted
+                          loop
+                          initial={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').initial}
+                          animate={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').animate}
+                          exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').exit}
+                          transition={{ duration: selectedImages[previewIndex]?.transition?.duration || 0.8, ease: "easeInOut" }}
+                        />
+                      ) : (
+                        <motion.img
+                          key={previewIndex}
+                          src={selectedImages[previewIndex]?.image_url || selectedImages[0].image_url}
+                          alt="Preview"
+                          className="w-full h-full object-cover absolute inset-0"
+                          initial={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').initial}
+                          animate={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').animate}
+                          exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').exit}
+                          transition={{ duration: selectedImages[previewIndex]?.transition?.duration || 0.8, ease: "easeInOut" }}
+                        />
+                      )}
                     </AnimatePresence>
                     
                     {/* Text Overlays */}
@@ -780,9 +884,9 @@ export default function StoryStudio() {
             <div className="flex-1 overflow-y-auto p-6">
               {myVisuals.length === 0 ? (
                 <div className="text-center py-12">
-                  <ImageIcon className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                  <Video className="h-16 w-16 text-white/20 mx-auto mb-4" />
                   <p className="text-white/40">
-                    {language === 'fr' ? 'Aucun visuel vertical (9:16)' : 'No vertical visuals (9:16)'}
+                    {language === 'fr' ? 'Aucun visuel disponible' : 'No visuals available'}
                   </p>
                 </div>
               ) : (
@@ -799,6 +903,17 @@ export default function StoryStudio() {
                           key={visual.id}
                           onClick={() => handleSelectFromVisuals(visual)}
                           className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                          onMouseEnter={(e) => {
+                            const video = e.currentTarget.querySelector('video');
+                            if (video) video.play();
+                          }}
+                          onMouseLeave={(e) => {
+                            const video = e.currentTarget.querySelector('video');
+                            if (video) {
+                              video.pause();
+                              video.currentTime = 0;
+                            }
+                          }}
                         >
                           <div style={{ aspectRatio }}>
                             {isVideo ? (
@@ -822,8 +937,9 @@ export default function StoryStudio() {
                             <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
                           </div>
                           {isVideo && (
-                            <div className="absolute top-2 right-2 px-2 py-1 bg-pink-600/80 backdrop-blur-sm rounded-md">
+                            <div className="absolute top-2 right-2 px-2 py-1 bg-pink-600/80 backdrop-blur-sm rounded-md flex items-center gap-1">
                               <Video className="h-3 w-3 text-white" />
+                              <span className="text-white text-[10px] font-medium">VIDÉO</span>
                             </div>
                           )}
                         </button>
