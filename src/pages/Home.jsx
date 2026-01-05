@@ -1022,11 +1022,11 @@ export default function Home() {
         setCurrentVisual(newVisual);
         setVisualsHistory(prev => [...prev, newVisual]); // Add regenerated to history
 
-        // Add new version message + visual card
+        // Update messages - replace the generating message and add visual card
         setMessages(prev => [
           ...prev.slice(0, -1), // Remove "generating" message
           { role: 'assistant', content: t('newVersion') },
-          { role: 'assistant', content: '', visual: newVisual } // Separate visual message
+          { role: 'assistant', content: '', visual: newVisual }
         ]);
       }
     } catch (error) {
