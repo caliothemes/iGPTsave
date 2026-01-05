@@ -118,8 +118,9 @@ export default function StoryStudio() {
       return;
     }
     
-    // Detect if it's a video
-    const isVideo = !!(visual.video_url || (visual.image_url && visual.image_url.match(/\.(mp4|webm|mov)$/i)));
+    // Detect if it's a video - safe check
+    const imageUrl = visual.image_url || '';
+    const isVideo = !!(visual.video_url || imageUrl.match(/\.(mp4|webm|mov)$/i));
     
     const mediaToAdd = {
       ...visual,
