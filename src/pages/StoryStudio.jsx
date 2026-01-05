@@ -1428,10 +1428,21 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
       });
 
       if (result.url) {
+        // Retirer le fond pour avoir un sticker transparent
+        toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'removing-bg' });
+        
+        const removeBgResult = await base44.functions.invoke('removeBg', {
+          image_url: result.url
+        });
+
+        toast.dismiss('removing-bg');
+        
+        const finalImageUrl = removeBgResult.data?.no_bg_url || result.url;
+        
         const isAdmin = user?.role === 'admin';
         const stickerData = {
           title: prompt.slice(0, 50),
-          image_url: result.url,
+          image_url: finalImageUrl,
           prompt: prompt,
           user_email: isAdmin ? null : user.email,
           is_shared: isAdmin,
@@ -1444,8 +1455,8 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
         toast.success(<span className="flex items-center gap-1.5">
           <span className="text-green-500">✓</span> 
           {isAdmin 
-            ? (language === 'fr' ? 'Sticker ajouté à la bibliothèque iGPT' : 'Sticker added to iGPT library')
-            : (language === 'fr' ? 'Sticker sauvegardé' : 'Sticker saved')}
+            ? (language === 'fr' ? 'Sticker transparent ajouté à la bibliothèque iGPT' : 'Transparent sticker added to iGPT library')
+            : (language === 'fr' ? 'Sticker transparent sauvegardé' : 'Transparent sticker saved')}
         </span>);
         
         setPrompt('');
