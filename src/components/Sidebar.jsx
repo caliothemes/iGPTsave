@@ -147,7 +147,7 @@ export default function Sidebar({
                 {visuals.length > 4 && (
                  <button
                    onClick={() => onSelectVisual && onSelectVisual({ openModal: true })}
-                   className="block w-full mt-1 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs text-center transition-all"
+                   className="mt-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs transition-all inline-block"
                  >
                    {t('seeAll')} ({visuals.length})
                  </button>
