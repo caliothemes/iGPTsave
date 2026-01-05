@@ -576,7 +576,7 @@ export default function StoryStudio() {
                           {img.isVideo || img.video_url ? (
                             <>
                               <video
-                                src={img.video_url || img.image_url}
+                                src={(img.video_url || img.image_url) + '#t=0.1'}
                                 className="w-full h-full object-cover"
                                 muted
                                 playsInline
