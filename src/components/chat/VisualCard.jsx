@@ -330,11 +330,12 @@ export default function VisualCard({
 
           {/* Action Buttons - Icons and Regenerate on same line */}
           <div className="flex gap-2">
-            {/* Action Icons - only for images */}
+            {/* Action Icons - only for images, always visible */}
             {!isVideo && onEdit && (
               <button
                 onClick={() => onEdit(visual)}
-                className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all"
+                disabled={isRegenerating}
+                className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
               >
                 <Wand2 className="h-4 w-4" />
@@ -344,7 +345,8 @@ export default function VisualCard({
             {!isVideo && onImageEditOpen && (
               <button
                 onClick={() => onImageEditOpen(visual)}
-                className="p-2 rounded-lg bg-gradient-to-br from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white transition-all"
+                disabled={isRegenerating}
+                className="p-2 rounded-lg bg-gradient-to-br from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title={language === 'fr' ? 'Éditer l\'image' : 'Edit image'}
               >
                 <Pencil className="h-4 w-4" />
@@ -354,7 +356,8 @@ export default function VisualCard({
             {!isVideo && onVideoOpen && (
               <button
                 onClick={() => onVideoOpen(visual)}
-                className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all"
+                disabled={isRegenerating}
+                className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
               >
                 <Video className="h-4 w-4" />
@@ -364,20 +367,21 @@ export default function VisualCard({
             {!isVideo && onCropOpen && (
               <button
                 onClick={() => onCropOpen(visual)}
-                className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all"
+                disabled={isRegenerating}
+                className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title={language === 'fr' ? 'Découper' : 'Crop'}
               >
                 <Scissors className="h-4 w-4" />
               </button>
             )}
 
-            {/* Regenerate Button - only for images */}
+            {/* Regenerate Button - takes remaining space */}
             {!isVideo && onRegenerate && (
               <Button
                 size="sm"
                 onClick={() => onRegenerate(visual)}
                 disabled={isRegenerating}
-                className="flex-1 bg-gradient-to-r from-blue-600/80 to-cyan-600/80 hover:from-blue-700 hover:to-cyan-700 text-white border-0"
+                className="flex-1 bg-gradient-to-r from-blue-600/80 to-cyan-600/80 hover:from-blue-700 hover:to-cyan-700 text-white border-0 disabled:opacity-50"
               >
                 <RefreshCw className={cn("h-4 w-4 mr-1.5", isRegenerating && "animate-spin")} />
                 <span className="text-xs">{t('regenerate')}</span>
