@@ -328,19 +328,47 @@ export default function VisualCard({
             )}
           </div>
 
-          {/* Action Buttons - Variation, Regenerate, Download on same line */}
+          {/* Action Buttons - Icons and Regenerate on same line */}
           <div className="flex gap-2">
-            {/* Variation Button - only for images */}
-            {!isVideo && onVariation && (
-              <Button
-                size="sm"
-                onClick={() => onVariation(visual)}
-                disabled={isRegenerating}
-                className="flex-1 bg-gradient-to-r from-amber-600/80 to-orange-600/80 hover:from-amber-600 hover:to-orange-600 text-white border-0"
+            {/* Action Icons - only for images */}
+            {!isVideo && onEdit && (
+              <button
+                onClick={() => onEdit(visual)}
+                className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all"
+                title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
               >
-                <Wand2 className="h-4 w-4 mr-1.5" />
-                <span className="text-xs">{language === 'fr' ? 'Variation' : 'Variation'}</span>
-              </Button>
+                <Wand2 className="h-4 w-4" />
+              </button>
+            )}
+
+            {!isVideo && onImageEditOpen && (
+              <button
+                onClick={() => onImageEditOpen(visual)}
+                className="p-2 rounded-lg bg-gradient-to-br from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white transition-all"
+                title={language === 'fr' ? 'Éditer l\'image' : 'Edit image'}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            )}
+
+            {!isVideo && onVideoOpen && (
+              <button
+                onClick={() => onVideoOpen(visual)}
+                className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all"
+                title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
+              >
+                <Video className="h-4 w-4" />
+              </button>
+            )}
+
+            {!isVideo && onCropOpen && (
+              <button
+                onClick={() => onCropOpen(visual)}
+                className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all"
+                title={language === 'fr' ? 'Découper' : 'Crop'}
+              >
+                <Scissors className="h-4 w-4" />
+              </button>
             )}
 
             {/* Regenerate Button - only for images */}
@@ -371,71 +399,26 @@ export default function VisualCard({
           {/* Download Button (when not in validation mode) */}
           {!showValidation && (
             <>
-              {/* Action buttons row */}
-              <div className="flex gap-2">
-                {/* Edit/Video/Crop/ImageEdit icons - only for images */}
-                {!isVideo && onEdit && (
-                  <button
-                    onClick={() => onEdit(visual)}
-                    className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all"
-                    title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
-                  >
-                    <Wand2 className="h-4 w-4" />
-                  </button>
+              <Button
+                size="sm"
+                onClick={handleDownloadClick}
+                disabled={!canDownload}
+                className={cn(
+                  "w-full transition-all",
+                  canDownload 
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
+                    : "bg-white/10 cursor-not-allowed"
                 )}
-
-                {!isVideo && onImageEditOpen && (
-                  <button
-                    onClick={() => onImageEditOpen(visual)}
-                    className="p-2 rounded-lg bg-gradient-to-br from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white transition-all"
-                    title={language === 'fr' ? 'Éditer l\'image' : 'Edit image'}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
+              >
+                {downloaded ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : !canDownload ? (
+                  <Lock className="h-4 w-4 mr-2" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
                 )}
-
-                {!isVideo && onVideoOpen && (
-                  <button
-                    onClick={() => onVideoOpen(visual)}
-                    className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white transition-all"
-                    title={language === 'fr' ? 'Créer vidéo' : 'Create video'}
-                  >
-                    <Video className="h-4 w-4" />
-                  </button>
-                )}
-
-                {!isVideo && onCropOpen && (
-                  <button
-                    onClick={() => onCropOpen(visual)}
-                    className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all"
-                    title={language === 'fr' ? 'Découper' : 'Crop'}
-                  >
-                    <Scissors className="h-4 w-4" />
-                  </button>
-                )}
-
-                {/* Download button - takes remaining space */}
-                <Button
-                  size="sm"
-                  onClick={handleDownloadClick}
-                  disabled={!canDownload}
-                  className={cn(
-                    "flex-1 transition-all",
-                    canDownload 
-                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700" 
-                      : "bg-white/10 cursor-not-allowed"
-                  )}
-                >
-                  {downloaded ? (
-                    <Check className="h-4 w-4 mr-2" />
-                  ) : !canDownload ? (
-                    <Lock className="h-4 w-4 mr-2" />
-                  ) : (
-                    <Download className="h-4 w-4 mr-2" />
-                  )}
-                  <span className="text-xs">{downloaded ? t('downloaded') : t('download')}</span>
-                </Button>
-              </div>
+                <span className="text-xs">{downloaded ? t('downloaded') : t('download')}</span>
+              </Button>
 
               {!canDownload && (
                 <p className="text-xs text-amber-400/80 text-center mt-2">
