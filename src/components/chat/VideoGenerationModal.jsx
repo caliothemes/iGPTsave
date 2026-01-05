@@ -297,8 +297,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                         ? 'Vidéo cinématographique pro. 5s = 15 crédits, 10s = 25 crédits' 
                         : 'Professional cinematic video. 5s = 15 credits, 10s = 25 credits')
                     : (language === 'fr'
-                        ? 'Animation fluide HD uniquement en 16:9. 5s = 20 crédits, 10s = 30 crédits'
-                        : 'Smooth HD animation 16:9 only. 5s = 20 credits, 10s = 30 credits')}
+                        ? <>Animation fluide HD uniquement en 16:9.<br />5s = 20 crédits, 10s = 30 crédits</>
+                        : <>Smooth HD animation 16:9 only.<br />5s = 20 credits, 10s = 30 credits</>)}
                 </p>
               </div>
             </div>
