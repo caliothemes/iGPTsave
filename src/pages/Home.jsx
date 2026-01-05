@@ -2333,7 +2333,7 @@ export default function Home() {
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">1</span>
                       <p className="text-white/80 text-sm">
                         {language === 'fr' 
-                          ? 'Générez une image avec iGPT ou uploadez une image sur votre appareil.' 
+                          ? 'Générez une image avec iGPT ou uploadez une image depuis votre appareil.' 
                           : 'Generate an image with iGPT or upload an image from your device.'}
                       </p>
                     </div>
@@ -2359,8 +2359,8 @@ export default function Home() {
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">3</span>
                       <p className="text-white/80 text-sm">
                         {language === 'fr' 
-                          ? 'Configurez vos options et transformez votre image en vidéo incroyable !' 
-                          : 'Configure your options and transform your image into an incredible video!'}
+                          ? 'Configurez vos options et transformez votre image ou produit en vidéo incroyable !' 
+                          : 'Configure your options and transform your image or product into an incredible video!'}
                       </p>
                     </div>
                   </div>
