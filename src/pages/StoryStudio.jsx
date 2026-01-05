@@ -854,7 +854,6 @@ export default function StoryStudio() {
         </div>
         )}
       </div>
-      </div>
 
       {/* Footer */}
       <div className={cn(
