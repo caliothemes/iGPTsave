@@ -2318,7 +2318,6 @@ export default function Home() {
                   <h3 className="text-xl font-bold text-white">
                     {language === 'fr' ? 'Génération de vidéo' : 'Video generation'}
                   </h3>
-                  <p className="text-violet-300 text-sm">Kling AI v2.5 Turbo Pro</p>
                 </div>
               </div>
 
@@ -2326,32 +2325,42 @@ export default function Home() {
                 <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4">
                   <p className="text-white/90 text-sm leading-relaxed mb-3">
                     {language === 'fr' 
-                      ? 'Pour générer une vidéo avec Kling AI, suivez ces étapes :' 
-                      : 'To generate a video with Kling AI, follow these steps:'}
+                      ? 'Pour générer une vidéo, suivez ces étapes :' 
+                      : 'To generate a video, follow these steps:'}
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">1</span>
                       <p className="text-white/80 text-sm">
                         {language === 'fr' 
-                          ? 'Générez une image avec iGPT ou uploadez une image existante' 
-                          : 'Generate an image with iGPT or upload an existing image'}
+                          ? 'Générez une image avec iGPT ou uploadez une image sur votre appareil.' 
+                          : 'Generate an image with iGPT or upload an image from your device.'}
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">2</span>
-                      <p className="text-white/80 text-sm">
-                        {language === 'fr' 
-                          ? 'Cliquez sur l\'icône vidéo rouge 🎬 qui apparaît sur l\'image' 
-                          : 'Click on the red video icon 🎬 that appears on the image'}
-                      </p>
+                      <div className="flex-1">
+                        <p className="text-white/80 text-sm inline">
+                          {language === 'fr' 
+                            ? 'Cliquez sur l\'icône vidéo ' 
+                            : 'Click on the video icon '}
+                        </p>
+                        <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-gradient-to-br from-pink-600 to-rose-600 mx-1">
+                          <Video className="h-3 w-3 text-white" />
+                        </span>
+                        <p className="text-white/80 text-sm inline">
+                          {language === 'fr' 
+                            ? ' qui apparaît sous l\'image.' 
+                            : ' that appears below the image.'}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">3</span>
                       <p className="text-white/80 text-sm">
                         {language === 'fr' 
-                          ? 'Configurez vos options et transformez votre image en vidéo animée !' 
-                          : 'Configure your options and transform your image into an animated video!'}
+                          ? 'Configurez vos options et transformez votre image en vidéo incroyable !' 
+                          : 'Configure your options and transform your image into an incredible video!'}
                       </p>
                     </div>
                   </div>
