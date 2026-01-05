@@ -916,7 +916,8 @@ export default function StoryStudio() {
                       const dims = visual.dimensions || '1080x1080';
                       const [w, h] = dims.split('x').map(n => parseInt(n));
                       const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
-                      const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
+                      const imageUrl = visual.image_url || '';
+                      const isVideo = visual.video_url || (imageUrl && (imageUrl.includes('.mp4') || imageUrl.includes('/video')));
                       
                       return (
                         <button
