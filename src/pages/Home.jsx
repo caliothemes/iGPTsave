@@ -502,7 +502,6 @@ export default function Home() {
     try {
       // CAS SPÉCIAL: Génération vidéo avec Kling
       if (activeCategory?.id === 'video' && videoConfig) {
-        setProgress(10);
         
         const payload = {
           prompt: userMessage,
@@ -527,8 +526,6 @@ export default function Home() {
         if (response.data.error) {
           throw new Error(response.data.error);
         }
-
-        setProgress(100);
 
         // Créer un visuel avec la vidéo
         const videoVisualData = {
