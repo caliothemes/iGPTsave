@@ -224,7 +224,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
-                <div className="font-bold">Replicate Kling</div>
+                <div className="font-bold">Kling-v2.5-turbo-pro</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
               </button>
               <button
