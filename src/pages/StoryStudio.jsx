@@ -788,7 +788,7 @@ export default function StoryStudio() {
                     <div className="text-center">
                       <Video className="h-16 w-16 text-white/20 mx-auto mb-4" />
                       <p className="text-white/40">
-                        Ajoutez des images pour voir la prévisualisation
+                        Ajoutez des médias pour voir la prévisualisation
                       </p>
                     </div>
                   </div>
@@ -852,6 +852,8 @@ export default function StoryStudio() {
             </div>
           </div>
         </div>
+        )}
+      </div>
       </div>
 
       {/* Footer */}
