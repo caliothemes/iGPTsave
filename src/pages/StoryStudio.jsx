@@ -512,50 +512,53 @@ export default function StoryStudio() {
         "relative z-10 border-b border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300 mt-16",
         sidebarOpen && "md:ml-64"
       )}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
+            <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => window.location.href = createPageUrl('Home')}
-                className="text-white/60 hover:text-white"
+                className="text-white/60 hover:text-white flex-shrink-0"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-blue-400 bg-clip-text text-transparent truncate">
                   Studio Vidéo, Stories, Réels
                 </h1>
-                <p className="text-white/60 text-sm">
+                <p className="text-white/60 text-xs md:text-sm hidden md:block">
                   {language === 'fr' ? 'Créez des vidéos, stories et réels professionnels' : 'Create professional videos, stories and reels'}
                 </p>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 md:gap-3 w-full md:w-auto">
               <Button
                 onClick={handleAutoCut}
                 disabled={selectedImages.length === 0}
-                className="bg-gradient-to-r from-violet-600 to-blue-600"
+                className="bg-gradient-to-r from-violet-600 to-blue-600 flex-1 md:flex-none"
+                size="sm"
               >
-                <Wand2 className="h-4 w-4 mr-2" />
-                Auto Cut
+                <Wand2 className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Auto Cut</span>
               </Button>
               <Button
                 onClick={handleSaveStory}
                 disabled={selectedImages.length === 0 || saving}
-                className="bg-gradient-to-r from-amber-600 to-orange-600"
+                className="bg-gradient-to-r from-amber-600 to-orange-600 flex-1 md:flex-none"
+                size="sm"
               >
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? (language === 'fr' ? 'Sauvegarde...' : 'Saving...') : (language === 'fr' ? 'Sauvegarder' : 'Save')}
+                <Save className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">{saving ? (language === 'fr' ? 'Sauvegarde...' : 'Saving...') : (language === 'fr' ? 'Sauvegarder' : 'Save')}</span>
               </Button>
               <Button
                 onClick={handleExport}
                 disabled={selectedImages.length === 0 || exporting}
-                className="bg-gradient-to-r from-green-600 to-emerald-600"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 flex-1 md:flex-none"
+                size="sm"
               >
-                <Download className="h-4 w-4 mr-2" />
-                {exporting ? 'Export...' : 'Exporter'}
+                <Download className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">{exporting ? (language === 'fr' ? 'Téléchargement...' : 'Downloading...') : (language === 'fr' ? 'Télécharger' : 'Download')}</span>
               </Button>
             </div>
           </div>
@@ -564,7 +567,7 @@ export default function StoryStudio() {
 
       {/* Main Content */}
       <div className={cn(
-        "relative z-10 max-w-7xl mx-auto px-6 py-8 pb-32 transition-all duration-300",
+        "relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8 pb-32 transition-all duration-300",
         sidebarOpen && "md:ml-64"
       )}>
         {/* Format Selection Step */}
@@ -634,10 +637,10 @@ export default function StoryStudio() {
         )}
 
         {currentStep === 'select' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Left Panel - Image Selection */}
           <div className="lg:col-span-1">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-white font-bold flex items-center gap-2">
                   <Video className="h-5 w-5 text-violet-400" />
@@ -793,7 +796,7 @@ export default function StoryStudio() {
 
           {/* Center Panel - Preview */}
           <div className="lg:col-span-2">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-6">
               <h2 className="text-white font-bold mb-4 flex items-center gap-2">
                 <Video className="h-5 w-5 text-pink-400" />
                 Prévisualisation ({videoFormat})
@@ -1006,29 +1009,31 @@ export default function StoryStudio() {
               </div>
 
               {/* Tools */}
-              <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="grid grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
                 <Button
                   onClick={() => setShowTextModal(true)}
-                  className="bg-gradient-to-r from-blue-600 to-cyan-600"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 h-12 md:h-10"
+                  title={language === 'fr' ? 'Texte' : 'Text'}
                 >
-                  <Type className="h-4 w-4 mr-2" />
-                  {language === 'fr' ? 'Texte' : 'Text'}
+                  <Type className="h-5 w-5 md:h-4 md:w-4" />
                 </Button>
                 <Button
                   onClick={() => setShowStickersModal(true)}
-                  className="bg-gradient-to-r from-pink-600 to-rose-600"
+                  className="bg-gradient-to-r from-pink-600 to-rose-600 h-12 md:h-10"
+                  title={language === 'fr' ? 'Stickers' : 'Stickers'}
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  {language === 'fr' ? 'Stickers' : 'Stickers'}
+                  <svg className="h-5 w-5 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
                 </Button>
                 <Button
                   onClick={() => setShowTransitionsModal(true)}
                   disabled={selectedImages.length < 2}
                   variant="outline"
-                  className="bg-white/5 border-white/20 text-white"
+                  className="bg-white/5 border-white/20 text-white h-12 md:h-10"
+                  title={language === 'fr' ? 'Transitions' : 'Transitions'}
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  {language === 'fr' ? 'Transitions' : 'Transitions'}
+                  <Sparkles className="h-5 w-5 md:h-4 md:w-4" />
                 </Button>
               </div>
               
