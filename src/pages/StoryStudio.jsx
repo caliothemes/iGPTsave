@@ -845,15 +845,43 @@ export default function StoryStudio() {
                           className="w-full h-full object-contain pointer-events-none"
                           draggable="false"
                         />
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setStickerLayers(prev => prev.filter(s => s.id !== sticker.id));
-                          }}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
-                        >
-                          <X className="h-4 w-4 text-white" />
-                        </button>
+                        <div className="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'remove-bg' });
+                                const result = await base44.functions.invoke('removeBg', {
+                                  image_url: sticker.image_url
+                                });
+                                toast.dismiss('remove-bg');
+
+                                if (result.data?.no_bg_url) {
+                                  setStickerLayers(prev => prev.map(s => 
+                                    s.id === sticker.id ? { ...s, image_url: result.data.no_bg_url } : s
+                                  ));
+                                  toast.success(language === 'fr' ? 'Fond supprimé !' : 'Background removed!');
+                                }
+                              } catch (error) {
+                                toast.dismiss('remove-bg');
+                                toast.error(language === 'fr' ? 'Erreur lors de la suppression du fond' : 'Error removing background');
+                              }
+                            }}
+                            className="w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center"
+                            title={language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+                          >
+                            <Sparkles className="h-3 w-3 text-white" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setStickerLayers(prev => prev.filter(s => s.id !== sticker.id));
+                            }}
+                            className="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center"
+                          >
+                            <X className="h-4 w-4 text-white" />
+                          </button>
+                        </div>
                       </div>
                     ))}
 
@@ -1487,31 +1515,10 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
       });
 
       if (result.url) {
-        // Retirer le fond pour avoir un sticker transparent
-        let finalImageUrl = result.url;
-        
-        try {
-          toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'removing-bg' });
-          
-          const removeBgResult = await base44.functions.invoke('removeBg', {
-            image_url: result.url
-          });
-
-          toast.dismiss('removing-bg');
-          
-          if (removeBgResult.data?.no_bg_url) {
-            finalImageUrl = removeBgResult.data.no_bg_url;
-          }
-        } catch (bgError) {
-          console.error('Background removal failed:', bgError);
-          toast.dismiss('removing-bg');
-          toast.error(language === 'fr' ? 'Impossible de retirer le fond, sticker créé sans transparence' : 'Could not remove background, sticker created without transparency');
-        }
-        
         const isAdmin = user?.role === 'admin';
         const stickerData = {
           title: prompt.slice(0, 50),
-          image_url: finalImageUrl,
+          image_url: result.url,
           prompt: prompt,
           user_email: isAdmin ? null : user.email,
           is_shared: isAdmin,
@@ -1520,14 +1527,14 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
 
         const savedSticker = await base44.entities.Sticker.create(stickerData);
         onStickerGenerated(savedSticker);
-        
+
         toast.success(<span className="flex items-center gap-1.5">
           <span className="text-green-500">✓</span> 
           {isAdmin 
-            ? (language === 'fr' ? 'Sticker transparent ajouté à la bibliothèque iGPT' : 'Transparent sticker added to iGPT library')
-            : (language === 'fr' ? 'Sticker transparent sauvegardé' : 'Transparent sticker saved')}
+            ? (language === 'fr' ? 'Sticker ajouté à la bibliothèque iGPT' : 'Sticker added to iGPT library')
+            : (language === 'fr' ? 'Sticker sauvegardé' : 'Sticker saved')}
         </span>);
-        
+
         setPrompt('');
         setActiveTab('my');
       }
