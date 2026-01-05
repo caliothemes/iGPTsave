@@ -764,7 +764,7 @@ export default function StoryStudio() {
                 style={{ aspectRatio: videoFormat ? videoFormat.replace(':', '/') : '1 / 1', maxHeight: '600px' }}
               >
                 {selectedImages.length > 0 ? (
-                  <div className="relative w-full h-full overflow-hidden"
+                  <div className="relative w-full h-full overflow-hidden">
                     <AnimatePresence mode="wait">
                       {selectedImages[previewIndex]?.isVideo || selectedImages[previewIndex]?.video_url ? (
                         <motion.video
