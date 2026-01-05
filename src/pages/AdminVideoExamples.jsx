@@ -17,6 +17,7 @@ export default function AdminVideoExamples() {
     title_fr: '',
     title_en: '',
     image_url: '',
+    image_url_2: '',
     prompt: '',
     video_url: '',
     provider: 'replicate',
@@ -24,7 +25,7 @@ export default function AdminVideoExamples() {
     order: 0,
     is_active: true
   });
-  const [uploading, setUploading] = useState({ image: false, video: false });
+  const [uploading, setUploading] = useState({ image: false, image2: false, video: false });
 
   useEffect(() => {
     loadExamples();
@@ -44,11 +45,25 @@ export default function AdminVideoExamples() {
     try {
       setUploading(prev => ({ ...prev, [type]: true }));
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      
+      const fieldMap = {
+        image: 'image_url',
+        image2: 'image_url_2',
+        video: 'video_url'
+      };
+      
       setFormData(prev => ({
         ...prev,
-        [type === 'image' ? 'image_url' : 'video_url']: file_url
+        [fieldMap[type]]: file_url
       }));
-      toast.success(`${type === 'image' ? 'Image' : 'Vidéo'} uploadée`);
+      
+      const labelMap = {
+        image: 'Image',
+        image2: 'Image 2',
+        video: 'Vidéo'
+      };
+      
+      toast.success(`${labelMap[type]} uploadée`);
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Erreur upload');
@@ -88,6 +103,7 @@ export default function AdminVideoExamples() {
       title_fr: example.title_fr || '',
       title_en: example.title_en || '',
       image_url: example.image_url || '',
+      image_url_2: example.image_url_2 || '',
       prompt: example.prompt || '',
       video_url: example.video_url || '',
       provider: example.provider || 'replicate',
@@ -115,6 +131,7 @@ export default function AdminVideoExamples() {
       title_fr: '',
       title_en: '',
       image_url: '',
+      image_url_2: '',
       prompt: '',
       video_url: '',
       provider: 'replicate',
@@ -150,16 +167,35 @@ export default function AdminVideoExamples() {
               className="bg-white/5 border border-white/10 rounded-lg p-4"
             >
               <div className="grid grid-cols-1 md:grid-cols-[200px_auto_200px] gap-4 items-center">
-                {/* Image */}
+                {/* Image(s) */}
                 <div className="space-y-2">
-                  <p className="text-xs text-white/60 text-center">Image de départ</p>
-                  <div className="aspect-square rounded-lg overflow-hidden border border-white/10">
-                    <img
-                      src={example.image_url}
-                      alt="Starting"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <p className="text-xs text-white/60 text-center">Image{example.image_url_2 ? 's' : ''} de départ</p>
+                  {example.image_url_2 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="aspect-square rounded-lg overflow-hidden border border-white/10">
+                        <img
+                          src={example.image_url}
+                          alt="Starting 1"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="aspect-square rounded-lg overflow-hidden border border-white/10">
+                        <img
+                          src={example.image_url_2}
+                          alt="Starting 2"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="aspect-square rounded-lg overflow-hidden border border-white/10">
+                      <img
+                        src={example.image_url}
+                        alt="Starting"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Prompt + Arrow */}
@@ -262,26 +298,50 @@ export default function AdminVideoExamples() {
               </div>
 
               {/* Image Upload */}
-              <div>
-                <label className="text-sm text-white/60 mb-1 block">Image de départ</label>
-                <div className="flex gap-3">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, 'image');
-                    }}
-                    className="bg-white/5 border-white/10 text-white"
-                    disabled={uploading.image}
-                  />
-                  {uploading.image && <div className="h-5 w-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />}
-                </div>
-                {formData.image_url && (
-                  <div className="mt-2 w-32 h-32 rounded-lg overflow-hidden border border-white/10">
-                    <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Image de départ 1</label>
+                  <div className="flex gap-3">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, 'image');
+                      }}
+                      className="bg-white/5 border-white/10 text-white"
+                      disabled={uploading.image}
+                    />
+                    {uploading.image && <div className="h-5 w-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />}
                   </div>
-                )}
+                  {formData.image_url && (
+                    <div className="mt-2 w-32 h-32 rounded-lg overflow-hidden border border-white/10">
+                      <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Image de départ 2 (optionnel)</label>
+                  <div className="flex gap-3">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, 'image2');
+                      }}
+                      className="bg-white/5 border-white/10 text-white"
+                      disabled={uploading.image2}
+                    />
+                    {uploading.image2 && <div className="h-5 w-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />}
+                  </div>
+                  {formData.image_url_2 && (
+                    <div className="mt-2 w-32 h-32 rounded-lg overflow-hidden border border-white/10">
+                      <img src={formData.image_url_2} alt="Preview 2" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Prompt */}
