@@ -379,32 +379,43 @@ export default function Home() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = language === 'fr' ? 'fr-FR' : 'en-US';
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.continuous = true;
+    recognition.interimResults = true;
 
     recognition.onstart = () => {
       setIsRecording(true);
     };
 
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setInputValue(prev => prev + (prev ? ' ' : '') + transcript);
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.style.height = 'auto';
-          inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-          inputRef.current.focus();
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
         }
-      }, 0);
+      }
+
+      if (finalTranscript) {
+        setInputValue(prev => prev + (prev ? ' ' : '') + finalTranscript.trim());
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+            inputRef.current.focus();
+          }
+        }, 0);
+      }
     };
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
-      setIsRecording(false);
+      if (event.error !== 'no-speech') {
+        setIsRecording(false);
+      }
     };
 
     recognition.onend = () => {
-      setIsRecording(false);
+      // Ne s'arrête que si on a cliqué pour arrêter
     };
 
     recognitionRef.current = recognition;
@@ -1910,17 +1921,31 @@ export default function Home() {
                   style={{ height: '24px' }}
                 />
 
-                <button 
-                  onClick={handleVoiceInput}
-                  className={cn(
-                    "p-2 transition-colors",
-                    isRecording 
-                      ? "text-red-500 animate-pulse" 
-                      : "text-white/40 hover:text-white/60"
+                <div className="relative flex items-center gap-2">
+                  <button 
+                    onClick={handleVoiceInput}
+                    className={cn(
+                      "p-2 transition-colors",
+                      isRecording 
+                        ? "text-red-500 animate-pulse" 
+                        : "text-white/40 hover:text-white/60"
+                    )}
+                  >
+                    <Mic className="h-5 w-5" />
+                  </button>
+
+                  {/* Infobulle quand actif */}
+                  {isRecording && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="absolute left-full ml-2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg"
+                    >
+                      {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
+                    </motion.div>
                   )}
-                >
-                  <Mic className="h-5 w-5" />
-                </button>
+                </div>
 
                 <Button
                   onClick={handleSend}
