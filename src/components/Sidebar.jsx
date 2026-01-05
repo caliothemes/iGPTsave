@@ -33,7 +33,7 @@ export default function Sidebar({
   sidebarTitle,
   onUpdateConversation
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [visualsOpen, setVisualsOpen] = useState(true);
   const [historyOpen, setHistoryOpen] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
