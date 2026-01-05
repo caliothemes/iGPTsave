@@ -1931,8 +1931,7 @@ export default function Home() {
                       animate={{ scale: 1 }}
                       className="absolute inset-0 flex items-center justify-center"
                     >
-                      <div className="w-10 h-10 bg-red-500/20 flex items-center justify-center" 
-                           style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}>
+                      <div className="w-10 h-10 rounded-full bg-red-500/30 animate-pulse flex items-center justify-center">
                       </div>
                     </motion.div>
                   )}
