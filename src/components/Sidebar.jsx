@@ -118,13 +118,13 @@ export default function Sidebar({
 
         {/* Content */}
         <ScrollArea className="flex-1 px-3 bg-gradient-to-b from-violet-950/30 via-purple-950/20 to-violet-950/30">
-          {/* Current Session Visuals */}
+          {/* Recent Visuals */}
           {visuals.length > 0 && (
             <Collapsible open={visualsOpen} onOpenChange={setVisualsOpen} className="mb-4 mt-4">
               <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg bg-violet-500/10 hover:bg-violet-500/20">
                 <span className="flex items-center gap-2">
                   <Image className="h-4 w-4 text-violet-400" />
-                  {t('visualsInProgress')} ({visuals.length > 4 ? '4+' : visuals.length})
+                  {language === 'fr' ? 'Mes derniers visuels' : 'My recent visuals'} ({visuals.length > 4 ? '4+' : visuals.length})
                 </span>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", visualsOpen && "rotate-180")} />
               </CollapsibleTrigger>
@@ -145,12 +145,12 @@ export default function Sidebar({
                   ))}
                 </div>
                 {visuals.length > 4 && (
-                  <a 
-                    href={createPageUrl('MyVisuals')}
-                    className="block text-violet-400 text-xs text-left py-2 hover:text-violet-300 transition-colors px-2"
-                  >
-                    {t('seeAll')} ({visuals.length})
-                  </a>
+                 <button
+                   onClick={() => onSelectVisual && onSelectVisual({ openModal: true })}
+                   className="block w-full mt-1 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs text-center transition-all"
+                 >
+                   {t('seeAll')} ({visuals.length})
+                 </button>
                 )}
               </CollapsibleContent>
             </Collapsible>

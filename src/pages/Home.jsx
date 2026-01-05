@@ -40,6 +40,7 @@ import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -119,6 +120,8 @@ export default function Home() {
   const [showImageEditModal, setShowImageEditModal] = useState(false);
   const [imageEditVisual, setImageEditVisual] = useState(null);
   const [showVideoInfoModal, setShowVideoInfoModal] = useState(false);
+  const [showRecentVisualsModal, setShowRecentVisualsModal] = useState(false);
+  const [recentVisuals, setRecentVisuals] = useState([]);
 
 
   const messagesEndRef = useRef(null);
@@ -1299,7 +1302,15 @@ export default function Home() {
             setCurrentConversation(prev => ({ ...prev, ...updates }));
           }
         }}
-        onSelectVisual={(v) => {
+        onSelectVisual={async (v) => {
+          // If modal requested, show modal instead
+          if (v?.openModal) {
+            const allVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-created_date', 25);
+            setRecentVisuals(allVisuals);
+            setShowRecentVisualsModal(true);
+            return;
+          }
+          
           setCurrentVisual(v);
           setVisualsHistory([v]);
           // Add visual to chat messages
@@ -2361,6 +2372,55 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Recent Visuals Modal */}
+      <Dialog open={showRecentVisualsModal} onOpenChange={setShowRecentVisualsModal}>
+        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-violet-500/30 text-white max-w-4xl max-h-[85vh]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              {language === 'fr' ? 'Mes derniers visuels' : 'My recent visuals'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-5 gap-2">
+              {recentVisuals.map((visual) => {
+                const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
+                return (
+                  <button
+                    key={visual.id}
+                    onClick={() => {
+                      setCurrentVisual(visual);
+                      setVisualsHistory([visual]);
+                      setMessages([{ 
+                        role: 'assistant', 
+                        content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.'),
+                        visual: visual
+                      }]);
+                      if (visual.visual_type) {
+                        setSelectedCategory({ id: visual.visual_type });
+                      }
+                      setShowRecentVisualsModal(false);
+                    }}
+                    className="aspect-square rounded overflow-hidden cursor-pointer border border-white/10 hover:border-violet-500/50 transition-all hover:scale-105"
+                  >
+                    {isVideo ? (
+                      <video src={visual.video_url || visual.image_url} muted loop autoPlay className="w-full h-full object-cover" />
+                    ) : (
+                      <img src={visual.image_url} alt={visual.title} className="w-full h-full object-cover" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <Link
+              to={createPageUrl('MyVisuals')}
+              className="block w-full px-4 py-3 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-center font-medium transition-all"
+            >
+              {language === 'fr' ? 'Voir tous mes visuels' : 'View all my visuals'}
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Examples Modal */}
       <Dialog open={showExamplesModal} onOpenChange={setShowExamplesModal}>

@@ -3573,12 +3573,13 @@ Réponds en JSON avec:
             <GradientIcon className="h-5 w-5" />
           </button>
           <button
-            onClick={() => imageUploadRef.current?.click()}
-            className={cn(
-              "p-2.5 rounded-lg transition-all",
-              activeTab === 'images' ? "bg-violet-500/40 text-white" : "bg-white/10 text-white/60 hover:text-white hover:bg-white/20"
-            )}
-            title={language === 'fr' ? 'Importer' : 'Upload'}
+            onClick={() => {
+              if (imageUploadRef.current) {
+                imageUploadRef.current.click();
+              }
+            }}
+            className="p-2.5 rounded-lg bg-white/10 text-white/60 hover:text-white hover:bg-white/20 transition-all"
+            title={language === 'fr' ? 'Importer une image' : 'Upload image'}
           >
             <Upload className="h-5 w-5" />
           </button>
