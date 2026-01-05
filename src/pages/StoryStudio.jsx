@@ -63,6 +63,8 @@ export default function StoryStudio() {
   const [sharedStickers, setSharedStickers] = useState([]);
   const [draggingItem, setDraggingItem] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [resizingSticker, setResizingSticker] = useState(null);
+  const [resizeStart, setResizeStart] = useState({ size: 0, mouseX: 0, mouseY: 0 });
   const fileInputRef = useRef(null);
   const previewIntervalRef = useRef(null);
   const previewRef = useRef(null);
@@ -228,6 +230,35 @@ export default function StoryStudio() {
     setDragOffset({ x: 0, y: 0 });
   };
 
+  const handleResizeStart = (e, sticker) => {
+    e.stopPropagation();
+    setResizingSticker(sticker);
+    setResizeStart({
+      size: sticker.size || 100,
+      mouseX: e.clientX,
+      mouseY: e.clientY
+    });
+  };
+
+  const handleResizeMove = (e) => {
+    if (!resizingSticker) return;
+    
+    const deltaX = e.clientX - resizeStart.mouseX;
+    const deltaY = e.clientY - resizeStart.mouseY;
+    const delta = Math.sqrt(deltaX * deltaX + deltaY * deltaY) * (deltaX + deltaY > 0 ? 1 : -1);
+    
+    const newSize = Math.max(30, Math.min(300, resizeStart.size + delta));
+    
+    setStickerLayers(prev => prev.map(s => 
+      s.id === resizingSticker.id ? { ...s, size: newSize } : s
+    ));
+  };
+
+  const handleResizeEnd = () => {
+    setResizingSticker(null);
+    setResizeStart({ size: 0, mouseX: 0, mouseY: 0 });
+  };
+
   useEffect(() => {
     if (draggingItem) {
       window.addEventListener('mousemove', handleDragMove);
@@ -238,6 +269,17 @@ export default function StoryStudio() {
       };
     }
   }, [draggingItem, dragOffset]);
+
+  useEffect(() => {
+    if (resizingSticker) {
+      window.addEventListener('mousemove', handleResizeMove);
+      window.addEventListener('mouseup', handleResizeEnd);
+      return () => {
+        window.removeEventListener('mousemove', handleResizeMove);
+        window.removeEventListener('mouseup', handleResizeEnd);
+      };
+    }
+  }, [resizingSticker, resizeStart]);
 
   const handleSaveStory = async () => {
     if (selectedImages.length === 0) {
@@ -845,84 +887,64 @@ export default function StoryStudio() {
                           className="w-full h-full object-contain pointer-events-none"
                           draggable="false"
                         />
-                        <div className="absolute -top-2 -right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                          <div className="flex gap-1">
-                            <button
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                try {
-                                  toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'remove-bg' });
+                        <div className="absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'remove-bg' });
 
-                                  const formData = new FormData();
-                                  const blob = await fetch(sticker.image_url).then(r => r.blob());
-                                  formData.append('image_file', blob, 'sticker.png');
+                                const formData = new FormData();
+                                const blob = await fetch(sticker.image_url).then(r => r.blob());
+                                formData.append('image_file', blob, 'sticker.png');
 
-                                  const response = await fetch('https://api.noBG.me/v1/removebg', {
-                                    method: 'POST',
-                                    headers: {
-                                      'X-API-Key': 'nBG_dd25dfe1b4fd43a2a8f0ab89e8bef2c9'
-                                    },
-                                    body: formData
-                                  });
+                                const response = await fetch('https://api.noBG.me/v1/removebg', {
+                                  method: 'POST',
+                                  headers: {
+                                    'X-API-Key': 'nBG_dd25dfe1b4fd43a2a8f0ab89e8bef2c9'
+                                  },
+                                  body: formData
+                                });
 
-                                  if (!response.ok) throw new Error('Failed to remove background');
+                                if (!response.ok) throw new Error('Failed to remove background');
 
-                                  const resultBlob = await response.blob();
-                                  const uploadResult = await base44.integrations.Core.UploadFile({ file: resultBlob });
+                                const resultBlob = await response.blob();
+                                const uploadResult = await base44.integrations.Core.UploadFile({ file: resultBlob });
 
-                                  toast.dismiss('remove-bg');
+                                toast.dismiss('remove-bg');
 
-                                  if (uploadResult.file_url) {
-                                    setStickerLayers(prev => prev.map(s => 
-                                      s.id === sticker.id ? { ...s, image_url: uploadResult.file_url } : s
-                                    ));
-                                    toast.success(language === 'fr' ? 'Fond supprimé !' : 'Background removed!');
-                                  }
-                                } catch (error) {
-                                  toast.dismiss('remove-bg');
-                                  toast.error(language === 'fr' ? 'Erreur lors de la suppression du fond' : 'Error removing background');
+                                if (uploadResult.file_url) {
+                                  setStickerLayers(prev => prev.map(s => 
+                                    s.id === sticker.id ? { ...s, image_url: uploadResult.file_url } : s
+                                  ));
+                                  toast.success(language === 'fr' ? 'Fond supprimé !' : 'Background removed!');
                                 }
-                              }}
-                              className="w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center"
-                              title={language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
-                            >
-                              <Sparkles className="h-3 w-3 text-white" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setStickerLayers(prev => prev.filter(s => s.id !== sticker.id));
-                              }}
-                              className="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center"
-                            >
-                              <X className="h-4 w-4 text-white" />
-                            </button>
-                          </div>
-                          <div className="flex gap-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setStickerLayers(prev => prev.map(s => 
-                                  s.id === sticker.id ? { ...s, size: Math.max(30, (s.size || 100) - 20) } : s
-                                ));
-                              }}
-                              className="w-6 h-6 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white font-bold"
-                            >
-                              -
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setStickerLayers(prev => prev.map(s => 
-                                  s.id === sticker.id ? { ...s, size: Math.min(300, (s.size || 100) + 20) } : s
-                                ));
-                              }}
-                              className="w-6 h-6 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white font-bold"
-                            >
-                              +
-                            </button>
-                          </div>
+                              } catch (error) {
+                                toast.dismiss('remove-bg');
+                                toast.error(language === 'fr' ? 'Erreur lors de la suppression du fond' : 'Error removing background');
+                              }
+                            }}
+                            className="w-6 h-6 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center"
+                            title={language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+                          >
+                            <Sparkles className="h-3 w-3 text-white" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setStickerLayers(prev => prev.filter(s => s.id !== sticker.id));
+                            }}
+                            className="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center"
+                          >
+                            <X className="h-4 w-4 text-white" />
+                          </button>
                         </div>
+                        {/* Resize Handle */}
+                        <div
+                          onMouseDown={(e) => handleResizeStart(e, sticker)}
+                          className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full border-2 border-pink-500 cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                          title={language === 'fr' ? 'Redimensionner' : 'Resize'}
+                        />
                       </div>
                     ))}
 
