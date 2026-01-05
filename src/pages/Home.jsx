@@ -1284,6 +1284,7 @@ export default function Home() {
         credits={credits}
         conversations={conversations}
         visuals={sessionVisuals}
+        totalVisualsCount={totalVisualsCount}
         currentConversationId={currentConversation?.id}
         onNewChat={handleNewChat}
         onSelectConversation={handleSelectConversation}
