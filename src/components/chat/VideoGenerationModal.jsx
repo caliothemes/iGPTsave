@@ -226,6 +226,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">Kling-v2.5-turbo-pro</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
+                <div className="text-[10px] opacity-60 mt-0.5">{language === 'fr' ? 'Vidéos de 5s ou 10s' : 'Videos of 5s or 10s'}</div>
               </button>
               <button
                 onClick={() => setProvider('runway')}
@@ -238,6 +239,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               >
                 <div className="font-bold">RunwayML</div>
                 <div className="text-xs opacity-70">{language === 'fr' ? 'Animation d\'image' : 'Image animation'}</div>
+                <div className="text-[10px] opacity-60 mt-0.5">{language === 'fr' ? 'Vidéos de 5s ou 10s' : 'Videos of 5s or 10s'}</div>
               </button>
             </div>
           </div>
