@@ -143,11 +143,39 @@ Deno.serve(async (req) => {
       }, { status: 500 });
     }
 
-    return Response.json({ 
-      video_url: videoUrl,
-      status: 'success',
-      credits_used: creditsRequired
-    });
+    // Download and store video permanently
+    console.log('Downloading video from Replicate...');
+    try {
+      const videoResponse = await fetch(videoUrl);
+      if (!videoResponse.ok) {
+        throw new Error('Failed to download video');
+      }
+      
+      const videoBlob = await videoResponse.blob();
+      const videoFile = new File([videoBlob], `video_${Date.now()}.mp4`, { type: 'video/mp4' });
+      
+      console.log('Uploading video to permanent storage...');
+      const { file_url: permanentUrl } = await base44.asServiceRole.integrations.Core.UploadFile({ 
+        file: videoFile 
+      });
+      
+      console.log('Video stored permanently:', permanentUrl);
+      
+      return Response.json({ 
+        video_url: permanentUrl,
+        status: 'success',
+        credits_used: creditsRequired
+      });
+    } catch (uploadError) {
+      console.error('Failed to store video permanently:', uploadError);
+      // Fallback to temporary URL if upload fails
+      return Response.json({ 
+        video_url: videoUrl,
+        status: 'success',
+        credits_used: creditsRequired,
+        warning: 'Video stored with temporary URL'
+      });
+    }
 
   } catch (error) {
     console.error('Error:', error);
