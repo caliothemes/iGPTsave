@@ -41,6 +41,7 @@ export default function StoryStudio() {
   const [showVisualsModal, setShowVisualsModal] = useState(false);
   const [animations, setAnimations] = useState([]);
   const [textLayers, setTextLayers] = useState([]);
+  const [stickerLayers, setStickerLayers] = useState([]);
   const [showTextModal, setShowTextModal] = useState(false);
   const [showTransitionsModal, setShowTransitionsModal] = useState(false);
   const [selectedTransitionIndex, setSelectedTransitionIndex] = useState(null);
@@ -177,6 +178,18 @@ export default function StoryStudio() {
     setShowTextModal(false);
   };
 
+  const handleAddSticker = (sticker) => {
+    setStickerLayers(prev => [...prev, {
+      id: Date.now(),
+      image_url: sticker.image_url,
+      title: sticker.title,
+      position: { x: 50, y: 50 },
+      size: 100
+    }]);
+    setShowStickersModal(false);
+    toast.success(language === 'fr' ? 'Sticker ajouté !' : 'Sticker added!');
+  };
+
   const handleSaveStory = async () => {
     if (selectedImages.length === 0) {
       toast.error(language === 'fr' ? 'Ajoutez au moins une image' : 'Add at least one image');
@@ -192,6 +205,7 @@ export default function StoryStudio() {
         title: `Story ${new Date().toLocaleDateString('fr-FR')}`,
         images: selectedImages,
         text_layers: textLayers,
+        sticker_layers: stickerLayers,
         thumbnail_url: selectedImages[0].image_url,
         duration: totalDuration
       });
@@ -208,6 +222,7 @@ export default function StoryStudio() {
   const handleLoadStory = (story) => {
     setSelectedImages(story.images || []);
     setTextLayers(story.text_layers || []);
+    setStickerLayers(story.sticker_layers || []);
     setShowStoriesModal(false);
     toast.success(language === 'fr' ? 'Story chargée !' : 'Story loaded!');
   };
@@ -756,6 +771,33 @@ export default function StoryStudio() {
                       </button>
                     ))}
 
+                    {/* Sticker Overlays */}
+                    {stickerLayers.map(sticker => (
+                      <div
+                        key={sticker.id}
+                        className="absolute cursor-move hover:ring-2 hover:ring-pink-500 transition-all"
+                        style={{
+                          top: `${sticker.position?.y || 50}%`,
+                          left: `${sticker.position?.x || 50}%`,
+                          transform: 'translate(-50%, -50%)',
+                          width: `${sticker.size || 100}px`,
+                          height: `${sticker.size || 100}px`
+                        }}
+                      >
+                        <img
+                          src={sticker.image_url}
+                          alt={sticker.title}
+                          className="w-full h-full object-contain"
+                        />
+                        <button
+                          onClick={() => setStickerLayers(prev => prev.filter(s => s.id !== sticker.id))}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-4 w-4 text-white" />
+                        </button>
+                      </div>
+                    ))}
+
                     {/* Play Button Overlay */}
                     {!previewPlaying && (
                       <button
@@ -877,6 +919,30 @@ export default function StoryStudio() {
                       <span className="text-white text-sm">{text.content}</span>
                       <button
                         onClick={() => setTextLayers(prev => prev.filter(t => t.id !== text.id))}
+                        className="p-1 hover:bg-red-500/20 rounded"
+                      >
+                        <Trash2 className="h-3 w-3 text-red-400" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Sticker Layers List */}
+              {stickerLayers.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-white/60 text-xs font-semibold">Stickers ajoutés:</p>
+                  {stickerLayers.map((sticker, idx) => (
+                    <div
+                      key={sticker.id}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
+                    >
+                      <div className="flex items-center gap-2">
+                        <img src={sticker.image_url} alt={sticker.title} className="w-8 h-8 object-contain" />
+                        <span className="text-white text-sm">{sticker.title}</span>
+                      </div>
+                      <button
+                        onClick={() => setStickerLayers(prev => prev.filter(s => s.id !== sticker.id))}
                         className="p-1 hover:bg-red-500/20 rounded"
                       >
                         <Trash2 className="h-3 w-3 text-red-400" />
@@ -1030,6 +1096,7 @@ export default function StoryStudio() {
               setMyStickers(prev => [sticker, ...prev]);
             }
           }}
+          onStickerClick={handleAddSticker}
           user={user}
           language={language}
         />
@@ -1340,7 +1407,7 @@ function TransitionsModal({ animations, selectedImages, onApply, onClose, langua
 }
 
 // Stickers Modal Component
-function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated, user, language }) {
+function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated, onStickerClick, user, language }) {
   const [activeTab, setActiveTab] = useState('generate');
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
@@ -1561,7 +1628,8 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
                   {myStickers.map(sticker => (
                     <button
                       key={sticker.id}
-                      className="relative group aspect-square rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 bg-white/5 transition-all"
+                      onClick={() => onStickerClick(sticker)}
+                      className="relative group aspect-square rounded-xl overflow-hidden border-2 border-white/10 hover:border-pink-500/50 bg-white/5 transition-all cursor-pointer"
                     >
                       <img
                         src={sticker.image_url}
@@ -1570,6 +1638,7 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="text-center p-2">
+                          <Plus className="h-8 w-8 text-white mb-1" />
                           <p className="text-white text-xs font-medium">{sticker.title}</p>
                         </div>
                       </div>
@@ -1594,7 +1663,8 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
                   {sharedStickers.map(sticker => (
                     <button
                       key={sticker.id}
-                      className="relative group aspect-square rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 bg-white/5 transition-all"
+                      onClick={() => onStickerClick(sticker)}
+                      className="relative group aspect-square rounded-xl overflow-hidden border-2 border-white/10 hover:border-pink-500/50 bg-white/5 transition-all cursor-pointer"
                     >
                       <img
                         src={sticker.image_url}
@@ -1603,6 +1673,7 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="text-center p-2">
+                          <Plus className="h-8 w-8 text-white mb-1" />
                           <p className="text-white text-xs font-medium">{sticker.title}</p>
                         </div>
                       </div>
