@@ -46,7 +46,7 @@ export default function StoryStudio() {
   const [showTransitionsModal, setShowTransitionsModal] = useState(false);
   const [selectedTransitionIndex, setSelectedTransitionIndex] = useState(null);
   const [editingTextId, setEditingTextId] = useState(null);
-  const [currentStep, setCurrentStep] = useState('format');
+  const [currentStep, setCurrentStep] = useState('select');
   const [exporting, setExporting] = useState(false);
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
@@ -570,71 +570,6 @@ export default function StoryStudio() {
         "relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8 pb-32 transition-all duration-300",
         sidebarOpen && "md:ml-64"
       )}>
-        {/* Format Selection Step */}
-        {currentStep === 'format' && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <h2 className="text-2xl font-bold text-white mb-2 text-center">
-                {language === 'fr' ? 'Choisissez le format de votre vidéo' : 'Choose your video format'}
-              </h2>
-              <p className="text-white/60 text-center mb-8">
-                {language === 'fr' ? 'Sélectionnez le format qui correspond à votre besoin' : 'Select the format that fits your needs'}
-              </p>
-
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <button
-                  onClick={() => setVideoFormat('1:1')}
-                  className={cn(
-                    "p-6 rounded-xl border-2 transition-all",
-                    videoFormat === '1:1'
-                      ? "border-violet-500 bg-violet-500/10"
-                      : "border-white/10 bg-white/5 hover:border-white/20"
-                  )}
-                >
-                  <div className="w-full aspect-square bg-white/10 rounded-lg mb-3" />
-                  <p className="text-white font-medium text-sm">Carré 1:1</p>
-                  <p className="text-white/60 text-xs mt-1">Posts classiques</p>
-                </button>
-
-                <button
-                  onClick={() => setVideoFormat('9:16')}
-                  className={cn(
-                    "p-6 rounded-xl border-2 transition-all",
-                    videoFormat === '9:16'
-                      ? "border-violet-500 bg-violet-500/10"
-                      : "border-white/10 bg-white/5 hover:border-white/20"
-                  )}
-                >
-                  <div className="w-full aspect-[9/16] bg-white/10 rounded-lg mb-3 mx-auto max-h-32" />
-                  <p className="text-white font-medium text-sm">Story 9:16</p>
-                  <p className="text-white/60 text-xs mt-1">Stories, Réels</p>
-                </button>
-
-                <button
-                  onClick={() => setVideoFormat('16:9')}
-                  className={cn(
-                    "p-6 rounded-xl border-2 transition-all",
-                    videoFormat === '16:9'
-                      ? "border-violet-500 bg-violet-500/10"
-                      : "border-white/10 bg-white/5 hover:border-white/20"
-                  )}
-                >
-                  <div className="w-full aspect-[16/9] bg-white/10 rounded-lg mb-3" />
-                  <p className="text-white font-medium text-sm">Paysage 16:9</p>
-                  <p className="text-white/60 text-xs mt-1">YouTube, Vimeo</p>
-                </button>
-              </div>
-
-              <Button
-                onClick={() => setCurrentStep('select')}
-                className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-lg py-6"
-              >
-                {language === 'fr' ? 'Continuer' : 'Continue'}
-                <ChevronRight className="h-5 w-5 ml-2" />
-              </Button>
-            </div>
-          </div>
-        )}
 
         {currentStep === 'select' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
@@ -646,13 +581,6 @@ export default function StoryStudio() {
                   <Video className="h-5 w-5 text-violet-400" />
                   Médias ({selectedImages.length})
                 </h2>
-                <button
-                  onClick={() => setCurrentStep('format')}
-                  className="text-white/60 hover:text-white text-xs flex items-center gap-1 transition-colors"
-                >
-                  <ChevronLeft className="h-3 w-3" />
-                  Changer format
-                </button>
               </div>
 
               {/* Add Images Buttons */}
