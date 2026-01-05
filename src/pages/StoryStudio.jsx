@@ -579,9 +579,13 @@ export default function StoryStudio() {
                                 src={img.video_url || img.image_url}
                                 className="w-full h-full object-cover"
                                 muted
+                                playsInline
+                                preload="metadata"
                               />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                <Video className="h-4 w-4 text-white" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+                                <div className="bg-white/90 rounded-full p-1">
+                                  <Video className="h-3 w-3 text-gray-900" />
+                                </div>
                               </div>
                             </>
                           ) : (
@@ -679,6 +683,8 @@ export default function StoryStudio() {
                           autoPlay
                           muted
                           loop
+                          playsInline
+                          preload="auto"
                           initial={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').initial}
                           animate={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').animate}
                           exit={getTransitionAnimation(selectedImages[previewIndex]?.transition?.css_animation || 'fadeIn').exit}
