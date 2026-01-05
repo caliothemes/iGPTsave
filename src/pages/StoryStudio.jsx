@@ -260,7 +260,7 @@ export default function StoryStudio() {
       });
 
       setMyStories(prev => [story, ...prev]);
-      toast.success(<span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {language === 'fr' ? 'Sauvegardé' : 'Saved'}</span>);
+      toast.success(<span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {language === 'fr' ? 'Vidéo sauvegardée' : 'Video saved'}</span>);
     } catch (e) {
       console.error(e);
       toast.error(language === 'fr' ? 'Erreur lors de la sauvegarde' : 'Save error');
@@ -1776,7 +1776,7 @@ function TextEditorModal({ onClose, onAdd, language }) {
   const [color, setColor] = useState('#ffffff');
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
-  const [bgColor, setBgColor] = useState('transparent');
+  const [bgColor, setBgColor] = useState(null);
   const [fontFamily, setFontFamily] = useState('inherit');
   const [borderWidth, setBorderWidth] = useState(0);
   const [borderColor, setBorderColor] = useState('#ffffff');
@@ -1794,7 +1794,7 @@ function TextEditorModal({ onClose, onAdd, language }) {
       color,
       bold,
       italic,
-      bgColor: bgColor === 'transparent' ? null : bgColor,
+      bgColor: bgColor,
       fontFamily,
       borderWidth,
       borderColor,
@@ -1864,7 +1864,7 @@ function TextEditorModal({ onClose, onAdd, language }) {
               </label>
               <input
                 type="color"
-                value={bgColor === 'transparent' ? '#000000' : bgColor}
+                value={bgColor || '#000000'}
                 onChange={(e) => setBgColor(e.target.value)}
                 className="w-full h-10 rounded-lg cursor-pointer"
               />
