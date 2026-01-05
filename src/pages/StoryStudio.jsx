@@ -61,8 +61,11 @@ export default function StoryStudio() {
   const [showStickersModal, setShowStickersModal] = useState(false);
   const [myStickers, setMyStickers] = useState([]);
   const [sharedStickers, setSharedStickers] = useState([]);
+  const [draggingItem, setDraggingItem] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const fileInputRef = useRef(null);
   const previewIntervalRef = useRef(null);
+  const previewRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -189,6 +192,52 @@ export default function StoryStudio() {
     setShowStickersModal(false);
     toast.success(language === 'fr' ? 'Sticker ajouté !' : 'Sticker added!');
   };
+
+  const handleDragStart = (e, item, type) => {
+    e.stopPropagation();
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const offsetX = e.clientX - (rect.left + (item.position.x / 100) * rect.width);
+    const offsetY = e.clientY - (rect.top + (item.position.y / 100) * rect.height);
+    
+    setDraggingItem({ ...item, type });
+    setDragOffset({ x: offsetX, y: offsetY });
+  };
+
+  const handleDragMove = (e) => {
+    if (!draggingItem || !previewRef.current) return;
+    
+    const rect = previewRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100;
+    const y = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100;
+    
+    if (draggingItem.type === 'text') {
+      setTextLayers(prev => prev.map(t => 
+        t.id === draggingItem.id ? { ...t, position: { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) } } : t
+      ));
+    } else if (draggingItem.type === 'sticker') {
+      setStickerLayers(prev => prev.map(s => 
+        s.id === draggingItem.id ? { ...s, position: { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) } } : s
+      ));
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggingItem(null);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  useEffect(() => {
+    if (draggingItem) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      return () => {
+        window.removeEventListener('mousemove', handleDragMove);
+        window.removeEventListener('mouseup', handleDragEnd);
+      };
+    }
+  }, [draggingItem, dragOffset]);
 
   const handleSaveStory = async () => {
     if (selectedImages.length === 0) {
@@ -709,9 +758,13 @@ export default function StoryStudio() {
               </h2>
 
               {/* Story Preview */}
-              <div className="relative bg-black rounded-2xl overflow-hidden mx-auto" style={{ aspectRatio: videoFormat ? videoFormat.replace(':', '/') : '1 / 1', maxHeight: '600px' }}>
+              <div 
+                ref={previewRef}
+                className="relative bg-black rounded-2xl overflow-hidden mx-auto" 
+                style={{ aspectRatio: videoFormat ? videoFormat.replace(':', '/') : '1 / 1', maxHeight: '600px' }}
+              >
                 {selectedImages.length > 0 ? (
-                  <div className="relative w-full h-full overflow-hidden">
+                  <div className="relative w-full h-full overflow-hidden"
                     <AnimatePresence mode="wait">
                       {selectedImages[previewIndex]?.isVideo || selectedImages[previewIndex]?.video_url ? (
                         <motion.video
@@ -744,11 +797,12 @@ export default function StoryStudio() {
                     
                     {/* Text Overlays */}
                     {textLayers.map(text => (
-                      <button
+                      <div
                         key={text.id}
+                        onMouseDown={(e) => handleDragStart(e, text, 'text')}
                         onClick={() => setEditingTextId(text.id)}
                         className={cn(
-                          "absolute cursor-move hover:ring-2 hover:ring-violet-500 transition-all",
+                          "absolute cursor-move hover:ring-2 hover:ring-violet-500 transition-all select-none z-10",
                           editingTextId === text.id && "ring-2 ring-violet-500"
                         )}
                         style={{
@@ -768,14 +822,15 @@ export default function StoryStudio() {
                         }}
                       >
                         {text.content}
-                      </button>
+                      </div>
                     ))}
 
                     {/* Sticker Overlays */}
                     {stickerLayers.map(sticker => (
                       <div
                         key={sticker.id}
-                        className="absolute cursor-move hover:ring-2 hover:ring-pink-500 transition-all"
+                        onMouseDown={(e) => handleDragStart(e, sticker, 'sticker')}
+                        className="absolute cursor-move hover:ring-2 hover:ring-pink-500 transition-all select-none group z-10"
                         style={{
                           top: `${sticker.position?.y || 50}%`,
                           left: `${sticker.position?.x || 50}%`,
@@ -787,11 +842,15 @@ export default function StoryStudio() {
                         <img
                           src={sticker.image_url}
                           alt={sticker.title}
-                          className="w-full h-full object-contain"
+                          className="w-full h-full object-contain pointer-events-none"
+                          draggable="false"
                         />
                         <button
-                          onClick={() => setStickerLayers(prev => prev.filter(s => s.id !== sticker.id))}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStickerLayers(prev => prev.filter(s => s.id !== sticker.id));
+                          }}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
                         >
                           <X className="h-4 w-4 text-white" />
                         </button>
@@ -1429,15 +1488,25 @@ function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated
 
       if (result.url) {
         // Retirer le fond pour avoir un sticker transparent
-        toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'removing-bg' });
+        let finalImageUrl = result.url;
         
-        const removeBgResult = await base44.functions.invoke('removeBg', {
-          image_url: result.url
-        });
+        try {
+          toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'removing-bg' });
+          
+          const removeBgResult = await base44.functions.invoke('removeBg', {
+            image_url: result.url
+          });
 
-        toast.dismiss('removing-bg');
-        
-        const finalImageUrl = removeBgResult.data?.no_bg_url || result.url;
+          toast.dismiss('removing-bg');
+          
+          if (removeBgResult.data?.no_bg_url) {
+            finalImageUrl = removeBgResult.data.no_bg_url;
+          }
+        } catch (bgError) {
+          console.error('Background removal failed:', bgError);
+          toast.dismiss('removing-bg');
+          toast.error(language === 'fr' ? 'Impossible de retirer le fond, sticker créé sans transparence' : 'Could not remove background, sticker created without transparency');
+        }
         
         const isAdmin = user?.role === 'admin';
         const stickerData = {
