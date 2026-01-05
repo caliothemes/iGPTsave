@@ -1108,7 +1108,7 @@ export default function StoryStudio() {
                         onClick={() => handleLoadStory(story)}
                         className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
                       >
-                        <div style={{ aspectRatio: '9/16' }}>
+                        <div style={{ aspectRatio: formatRatio.replace(':', '/') }}>
                           {isVideo ? (
                             <video
                               src={mediaUrl + '#t=0.1'}
