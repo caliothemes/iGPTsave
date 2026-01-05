@@ -2376,19 +2376,19 @@ export default function Home() {
       <Dialog open={showRecentVisualsModal} onOpenChange={setShowRecentVisualsModal}>
         <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-violet-500/30 text-white max-w-4xl max-h-[85vh]">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-                {language === 'fr' ? 'Mes derniers visuels' : 'My recent visuals'}
-              </DialogTitle>
-              <a
-                href={createPageUrl('MyVisuals')}
-                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs transition-all"
-              >
-                {language === 'fr' ? 'Voir tous mes visuels' : 'View all my visuals'}
-              </a>
-            </div>
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              {language === 'fr' ? 'Mes derniers visuels' : 'My recent visuals'}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto">
+          <div className="space-y-4 mt-2">
+            <a
+              href={createPageUrl('MyVisuals')}
+              className="inline-block px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs transition-all"
+            >
+              {language === 'fr' ? 'Voir tous mes visuels' : 'View all my visuals'}
+            </a>
+          </div>
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div className="grid grid-cols-5 gap-2">
               {recentVisuals.map((visual) => {
                 const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
