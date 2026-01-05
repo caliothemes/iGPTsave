@@ -1490,19 +1490,19 @@ export default function Home() {
                                 }
                               }
                             }}
-                            onEdit={idx === messages.length - 1 ? () => handleOpenEditor(msg.visual) : undefined}
-                            onImageEditOpen={idx === messages.length - 1 ? (v) => {
+                            onEdit={() => handleOpenEditor(msg.visual)}
+                            onImageEditOpen={(v) => {
                               setImageEditVisual(v);
                               setShowImageEditModal(true);
-                            } : undefined}
-                            onVideoOpen={idx === messages.length - 1 ? (v) => {
+                            }}
+                            onVideoOpen={(v) => {
                               setVideoVisual(v);
                               setShowVideoModal(true);
-                            } : undefined}
-                            onCropOpen={idx === messages.length - 1 ? (v) => {
+                            }}
+                            onCropOpen={(v) => {
                               setCropVisual(v);
                               setShowCropModal(true);
-                            } : undefined}
+                            }}
                             onPromptClick={(prompt) => {
                               setInputValue(prompt);
                               setTimeout(() => {
