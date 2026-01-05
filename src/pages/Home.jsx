@@ -40,7 +40,6 @@ import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Link } from 'react-router-dom';
 
 export default function Home() {
   const { t, language } = useLanguage();
