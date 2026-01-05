@@ -1921,7 +1921,19 @@ export default function Home() {
                   style={{ height: '24px' }}
                 />
 
-                <div className="relative flex items-center gap-2">
+                <div className="relative">
+                  {/* Infobulle quand actif */}
+                  {isRecording && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg"
+                    >
+                      {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
+                    </motion.div>
+                  )}
+
                   <button 
                     onClick={handleVoiceInput}
                     className={cn(
@@ -1933,18 +1945,6 @@ export default function Home() {
                   >
                     <Mic className="h-5 w-5" />
                   </button>
-
-                  {/* Infobulle quand actif */}
-                  {isRecording && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="absolute left-full ml-2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg"
-                    >
-                      {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
-                    </motion.div>
-                  )}
                 </div>
 
                 <Button
