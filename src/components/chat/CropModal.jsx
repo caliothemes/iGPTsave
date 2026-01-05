@@ -327,8 +327,10 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
 
       // Call callback with new URL
       onCropComplete(file_url);
+      onClose();
     } catch (error) {
       console.error('Crop failed:', error);
+      alert(language === 'fr' ? 'Erreur lors de la découpe' : 'Crop error');
     } finally {
       setIsCropping(false);
     }
