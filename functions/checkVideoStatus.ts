@@ -25,11 +25,57 @@ Deno.serve(async (req) => {
 
     const statusData = await statusResponse.json();
     
+    const status = statusData.status;
+    const videoUrl = statusData.output?.[0];
+    
+    // If video is ready, download and store it permanently
+    if (status === 'SUCCEEDED' && videoUrl) {
+      console.log('Video URL:', videoUrl);
+      
+      try {
+        const base44 = createClientFromRequest(req);
+        console.log('Downloading video from Runway...');
+        const videoResponse = await fetch(videoUrl);
+        if (!videoResponse.ok) {
+          throw new Error('Failed to download video');
+        }
+        
+        const videoBlob = await videoResponse.blob();
+        const videoFile = new File([videoBlob], `video_${Date.now()}.mp4`, { type: 'video/mp4' });
+        
+        console.log('Uploading video to permanent storage...');
+        const { file_url: permanentUrl } = await base44.asServiceRole.integrations.Core.UploadFile({ 
+          file: videoFile 
+        });
+        
+        console.log('Video stored permanently:', permanentUrl);
+        
+        return Response.json({ 
+          success: true,
+          status: status,
+          progress: statusData.progress || 1.0,
+          video_url: permanentUrl,
+          failure: statusData.failure || null
+        });
+      } catch (uploadError) {
+        console.error('Failed to store video permanently:', uploadError);
+        // Fallback to temporary URL if upload fails
+        return Response.json({ 
+          success: true,
+          status: status,
+          progress: statusData.progress || 1.0,
+          video_url: videoUrl,
+          failure: statusData.failure || null,
+          warning: 'Video stored with temporary URL'
+        });
+      }
+    }
+    
     return Response.json({ 
       success: true,
-      status: statusData.status,
+      status: status,
       progress: statusData.progress || 0,
-      video_url: statusData.output?.[0] || null,
+      video_url: videoUrl,
       failure: statusData.failure || null
     });
 
