@@ -953,7 +953,7 @@ export default function StoryStudio() {
               </div>
               
               {/* Text Editor Panel */}
-              {editingTextId && (
+              {editingTextId && textLayers.find(t => t.id === editingTextId) && (
                 <TextStyleEditor
                   text={textLayers.find(t => t.id === editingTextId)}
                   onUpdate={(updates) => {
