@@ -104,17 +104,28 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
                     {/* Images Comparison */}
                     <div className="p-5">
                       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                        {/* Before Image */}
+                        {/* Before Images */}
                         <div className="space-y-2">
                           <div className="text-xs font-medium text-white/60 uppercase tracking-wide">
                             {language === 'fr' ? 'Avant' : 'Before'}
                           </div>
-                          <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square">
-                            <img
-                              src={example.before_image_url}
-                              alt="Before"
-                              className="w-full h-full object-cover"
-                            />
+                          <div className={`grid ${example.before_image_url_2 ? 'grid-cols-2' : 'grid-cols-1'} gap-2`}>
+                            <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square">
+                              <img
+                                src={example.before_image_url}
+                                alt="Before 1"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            {example.before_image_url_2 && (
+                              <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square">
+                                <img
+                                  src={example.before_image_url_2}
+                                  alt="Before 2"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
 

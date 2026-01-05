@@ -20,6 +20,7 @@ export default function AdminImageEditExamples() {
     title_fr: '',
     title_en: '',
     before_image_url: '',
+    before_image_url_2: '',
     after_image_url: '',
     prompt: '',
     order: 0,
@@ -78,6 +79,7 @@ export default function AdminImageEditExamples() {
         title_fr: '',
         title_en: '',
         before_image_url: '',
+        before_image_url_2: '',
         after_image_url: '',
         prompt: '',
         order: 0,
@@ -96,6 +98,7 @@ export default function AdminImageEditExamples() {
       title_fr: example.title_fr || '',
       title_en: example.title_en || '',
       before_image_url: example.before_image_url || '',
+      before_image_url_2: example.before_image_url_2 || '',
       after_image_url: example.after_image_url || '',
       prompt: example.prompt || '',
       order: example.order || 0,
@@ -147,6 +150,7 @@ export default function AdminImageEditExamples() {
                 title_fr: '',
                 title_en: '',
                 before_image_url: '',
+                before_image_url_2: '',
                 after_image_url: '',
                 prompt: '',
                 order: examples.length,
@@ -180,8 +184,15 @@ export default function AdminImageEditExamples() {
                 <div className="flex items-start gap-4">
                   {/* Preview Images */}
                   <div className="flex items-center gap-3">
-                    <div className="w-24 h-24 rounded-lg overflow-hidden bg-black/20">
-                      <img src={example.before_image_url} alt="Before" className="w-full h-full object-cover" />
+                    <div className="flex gap-2">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-black/20">
+                        <img src={example.before_image_url} alt="Before 1" className="w-full h-full object-cover" />
+                      </div>
+                      {example.before_image_url_2 && (
+                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-black/20">
+                          <img src={example.before_image_url_2} alt="Before 2" className="w-full h-full object-cover" />
+                        </div>
+                      )}
                     </div>
                     <ArrowRight className="h-5 w-5 text-orange-500 flex-shrink-0" />
                     <div className="w-24 h-24 rounded-lg overflow-hidden bg-black/20">
@@ -281,41 +292,78 @@ export default function AdminImageEditExamples() {
               </div>
 
               {/* Images */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                {/* Before Images */}
                 <div>
-                  <label className="text-sm text-white/80 mb-2 block">Image AVANT *</label>
-                  {formData.before_image_url ? (
-                    <div className="relative">
-                      <img 
-                        src={formData.before_image_url} 
-                        alt="Before" 
-                        className="w-full h-40 object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => setFormData(prev => ({ ...prev, before_image_url: '' }))}
-                        className="absolute top-2 right-2 p-1 bg-red-600 rounded-full hover:bg-red-700"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                  <label className="text-sm text-white/80 mb-2 block">Images AVANT</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-white/60 mb-1 block">Image 1 *</label>
+                      {formData.before_image_url ? (
+                        <div className="relative">
+                          <img 
+                            src={formData.before_image_url} 
+                            alt="Before 1" 
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <button
+                            onClick={() => setFormData(prev => ({ ...prev, before_image_url: '' }))}
+                            className="absolute top-2 right-2 p-1 bg-red-600 rounded-full hover:bg-red-700"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-orange-500/50 transition-colors">
+                          <Upload className="h-6 w-6 text-white/40 mb-1" />
+                          <span className="text-white/60 text-xs">Uploader</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUploadImage(e, 'before_image_url')}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
                     </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-orange-500/50 transition-colors">
-                      <Upload className="h-8 w-8 text-white/40 mb-2" />
-                      <span className="text-white/60 text-xs">Cliquer pour uploader</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleUploadImage(e, 'before_image_url')}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
+
+                    <div>
+                      <label className="text-xs text-white/60 mb-1 block">Image 2 (optionnel)</label>
+                      {formData.before_image_url_2 ? (
+                        <div className="relative">
+                          <img 
+                            src={formData.before_image_url_2} 
+                            alt="Before 2" 
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <button
+                            onClick={() => setFormData(prev => ({ ...prev, before_image_url_2: '' }))}
+                            className="absolute top-2 right-2 p-1 bg-red-600 rounded-full hover:bg-red-700"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-orange-500/50 transition-colors">
+                          <Upload className="h-6 w-6 text-white/40 mb-1" />
+                          <span className="text-white/60 text-xs">Uploader</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleUploadImage(e, 'before_image_url_2')}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
+                {/* After Image */}
                 <div>
                   <label className="text-sm text-white/80 mb-2 block">Image APRÈS *</label>
                   {formData.after_image_url ? (
-                    <div className="relative">
+                    <div className="relative max-w-sm">
                       <img 
                         src={formData.after_image_url} 
                         alt="After" 
@@ -329,7 +377,7 @@ export default function AdminImageEditExamples() {
                       </button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-orange-500/50 transition-colors">
+                    <label className="flex flex-col items-center justify-center h-40 max-w-sm border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-orange-500/50 transition-colors">
                       <Upload className="h-8 w-8 text-white/40 mb-2" />
                       <span className="text-white/60 text-xs">Cliquer pour uploader</span>
                       <input
