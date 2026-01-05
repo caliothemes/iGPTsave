@@ -1776,7 +1776,8 @@ export default function Home() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg z-50"
+                  className="fixed bottom-24 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg"
+                  style={{ zIndex: 9999 }}
                 >
                   {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
                 </motion.div>
