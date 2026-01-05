@@ -894,30 +894,19 @@ export default function StoryStudio() {
                               try {
                                 toast.loading(language === 'fr' ? 'Suppression du fond...' : 'Removing background...', { id: 'remove-bg' });
 
-                                const formData = new FormData();
-                                const blob = await fetch(sticker.image_url).then(r => r.blob());
-                                formData.append('image_file', blob, 'sticker.png');
-
-                                const response = await fetch('https://api.noBG.me/v1/removebg', {
-                                  method: 'POST',
-                                  headers: {
-                                    'X-API-Key': 'nBG_dd25dfe1b4fd43a2a8f0ab89e8bef2c9'
-                                  },
-                                  body: formData
+                                const result = await base44.functions.invoke('removeBg', {
+                                  image_url: sticker.image_url
                                 });
-
-                                if (!response.ok) throw new Error('Failed to remove background');
-
-                                const resultBlob = await response.blob();
-                                const uploadResult = await base44.integrations.Core.UploadFile({ file: resultBlob });
 
                                 toast.dismiss('remove-bg');
 
-                                if (uploadResult.file_url) {
+                                if (result.data?.no_bg_url) {
                                   setStickerLayers(prev => prev.map(s => 
-                                    s.id === sticker.id ? { ...s, image_url: uploadResult.file_url } : s
+                                    s.id === sticker.id ? { ...s, image_url: result.data.no_bg_url } : s
                                   ));
                                   toast.success(language === 'fr' ? 'Fond supprimé !' : 'Background removed!');
+                                } else {
+                                  throw new Error('No result URL');
                                 }
                               } catch (error) {
                                 toast.dismiss('remove-bg');
