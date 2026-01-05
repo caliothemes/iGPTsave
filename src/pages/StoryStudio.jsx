@@ -667,7 +667,7 @@ export default function StoryStudio() {
               </h2>
 
               {/* Story Preview */}
-              <div className="relative bg-black rounded-2xl overflow-hidden mx-auto" style={{ aspectRatio: videoFormat.replace(':', '/'), maxHeight: '600px' }}>
+              <div className="relative bg-black rounded-2xl overflow-hidden mx-auto" style={{ aspectRatio: (videoFormat || '1:1').replace(':', '/'), maxHeight: '600px' }}>
                 {selectedImages.length > 0 ? (
                   <div className="relative w-full h-full overflow-hidden">
                     <AnimatePresence mode="wait">
