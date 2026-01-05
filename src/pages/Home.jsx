@@ -1769,6 +1769,20 @@ export default function Home() {
 
 
 
+            {/* Infobulle micro - au-dessus de tout */}
+            <AnimatePresence>
+              {isRecording && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg z-50"
+                >
+                  {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
               {/* Ligne principale - Textarea + boutons */}
@@ -1921,31 +1935,17 @@ export default function Home() {
                   style={{ height: '24px' }}
                 />
 
-                <div className="relative">
-                  {/* Infobulle quand actif */}
-                  {isRecording && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg"
-                    >
-                      {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
-                    </motion.div>
+                <button 
+                  onClick={handleVoiceInput}
+                  className={cn(
+                    "p-2 transition-colors",
+                    isRecording 
+                      ? "text-red-500 animate-pulse" 
+                      : "text-white/40 hover:text-white/60"
                   )}
-
-                  <button 
-                    onClick={handleVoiceInput}
-                    className={cn(
-                      "p-2 transition-colors",
-                      isRecording 
-                        ? "text-red-500 animate-pulse" 
-                        : "text-white/40 hover:text-white/60"
-                    )}
-                  >
-                    <Mic className="h-5 w-5" />
-                  </button>
-                </div>
+                >
+                  <Mic className="h-5 w-5" />
+                </button>
 
                 <Button
                   onClick={handleSend}
