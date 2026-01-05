@@ -1049,11 +1049,24 @@ export default function StoryStudio() {
               ) : (
                 <div className="grid grid-cols-3 gap-4">
                   {myStories.map(story => {
-                    // Detect if story has video content
-                    const hasVideo = story.images?.some(img => img.isVideo || img.video_url);
                     const firstMedia = story.images?.[0];
                     const mediaUrl = firstMedia?.video_url || firstMedia?.image_url || story.thumbnail_url;
                     const isVideo = firstMedia?.isVideo || firstMedia?.video_url;
+                    
+                    // Calculate format ratio
+                    let formatRatio = '9:16';
+                    if (firstMedia?.dimensions) {
+                      const dims = firstMedia.dimensions.split('x');
+                      if (dims.length === 2) {
+                        const w = parseInt(dims[0]);
+                        const h = parseInt(dims[1]);
+                        if (w && h) {
+                          const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+                          const divisor = gcd(w, h);
+                          formatRatio = `${w/divisor}:${h/divisor}`;
+                        }
+                      }
+                    }
                     
                     return (
                       <button
@@ -1080,12 +1093,7 @@ export default function StoryStudio() {
                         </div>
                         <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded-md">
                           <span className="text-white text-[10px] font-medium">
-                            {story.images?.[0]?.dimensions?.split('x').map(n => parseInt(n)).reduce((w, h) => {
-                              if (!h || !w) return '1:1';
-                              const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-                              const divisor = gcd(w, h);
-                              return `${w/divisor}:${h/divisor}`;
-                            }, '1:1') || '9:16'}
+                            {formatRatio}
                           </span>
                         </div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
