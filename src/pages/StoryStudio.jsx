@@ -130,7 +130,7 @@ export default function StoryStudio() {
     
     // Detect if it's a video - safe check
     const imageUrl = visual.image_url || '';
-    const isVideo = !!(visual.video_url || imageUrl.match(/\.(mp4|webm|mov)$/i));
+    const isVideo = !!(visual.video_url || (imageUrl && (imageUrl.includes('.mp4') || imageUrl.includes('.webm') || imageUrl.includes('.mov') || imageUrl.includes('/video'))));
     
     const mediaToAdd = {
       ...visual,
