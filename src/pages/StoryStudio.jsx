@@ -227,7 +227,11 @@ export default function StoryStudio() {
   };
 
   const handleAddText = (textData) => {
-    setTextLayers(prev => [...prev, { ...textData, id: Date.now() }]);
+    setTextLayers(prev => [...prev, { 
+      ...textData, 
+      id: Date.now(),
+      slideIndex: textData.displayMode === 'single' ? previewIndex : null
+    }]);
     setShowTextModal(false);
   };
 
@@ -833,34 +837,47 @@ export default function StoryStudio() {
                     </AnimatePresence>
                     
                     {/* Text Overlays */}
-                    {textLayers.map(text => (
-                      <div
-                        key={text.id}
-                        onMouseDown={(e) => handleDragStart(e, text, 'text')}
-                        onClick={() => setEditingTextId(text.id)}
-                        className={cn(
-                          "absolute cursor-move hover:ring-2 hover:ring-violet-500 transition-all select-none z-10",
-                          editingTextId === text.id && "ring-2 ring-violet-500"
-                        )}
-                        style={{
-                          top: `${text.position?.y || 50}%`,
-                          left: `${text.position?.x || 50}%`,
-                          transform: 'translate(-50%, -50%)',
-                          fontSize: `${text.fontSize || 24}px`,
-                          color: text.color || '#ffffff',
-                          fontWeight: text.bold ? 'bold' : 'normal',
-                          fontStyle: text.italic ? 'italic' : 'normal',
-                          textAlign: text.align || 'center',
-                          fontFamily: text.fontFamily || 'inherit',
-                          backgroundColor: text.bgColor || 'transparent',
-                          padding: text.bgColor ? '8px 16px' : '0',
-                          borderRadius: `${text.borderRadius || 0}px`,
-                          border: text.borderWidth ? `${text.borderWidth}px solid ${text.borderColor || '#ffffff'}` : 'none'
-                        }}
-                      >
-                        {text.content}
-                      </div>
-                    ))}
+                    {textLayers
+                      .filter(text => text.displayMode === 'all' || text.slideIndex === previewIndex)
+                      .map(text => {
+                        // Get animations
+                        const animIn = text.animationIn || 'fadeIn';
+                        const animOut = text.animationOut || 'fadeIn';
+                        const animConfig = getTransitionAnimation(animIn);
+                        
+                        return (
+                          <motion.div
+                            key={text.id}
+                            onMouseDown={(e) => handleDragStart(e, text, 'text')}
+                            onClick={() => setEditingTextId(text.id)}
+                            className={cn(
+                              "absolute cursor-move hover:ring-2 hover:ring-violet-500 transition-all select-none z-10",
+                              editingTextId === text.id && "ring-2 ring-violet-500"
+                            )}
+                            style={{
+                              top: `${text.position?.y || 50}%`,
+                              left: `${text.position?.x || 50}%`,
+                              transform: 'translate(-50%, -50%)',
+                              fontSize: `${text.fontSize || 24}px`,
+                              color: text.color || '#ffffff',
+                              fontWeight: text.bold ? 'bold' : 'normal',
+                              fontStyle: text.italic ? 'italic' : 'normal',
+                              textAlign: text.align || 'center',
+                              fontFamily: text.fontFamily || 'inherit',
+                              backgroundColor: text.bgColor ? text.bgColor.replace('rgb', 'rgba').replace(')', `, ${text.bgOpacity || 100}%)`) : 'transparent',
+                              padding: text.bgColor ? '8px 16px' : '0',
+                              borderRadius: `${text.borderRadius || 0}px`,
+                              border: text.borderWidth ? `${text.borderWidth}px solid ${text.borderColor || '#ffffff'}` : 'none'
+                            }}
+                            initial={animConfig.initial}
+                            animate={animConfig.animate}
+                            exit={getTransitionAnimation(animOut).exit}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                          >
+                            {text.content}
+                          </motion.div>
+                        );
+                      })}
 
                     {/* Sticker Overlays */}
                     {stickerLayers.map(sticker => (
@@ -1359,11 +1376,22 @@ export default function StoryStudio() {
 
 // Text Style Editor Component
 function TextStyleEditor({ text, onUpdate, onClose, language }) {
+  const animations = [
+    { id: 'fadeIn', name: language === 'fr' ? 'Fondu' : 'Fade' },
+    { id: 'slideInLeft', name: language === 'fr' ? 'Glisse gauche' : 'Slide left' },
+    { id: 'slideInRight', name: language === 'fr' ? 'Glisse droite' : 'Slide right' },
+    { id: 'slideInUp', name: language === 'fr' ? 'Glisse haut' : 'Slide up' },
+    { id: 'slideInDown', name: language === 'fr' ? 'Glisse bas' : 'Slide down' },
+    { id: 'zoomIn', name: language === 'fr' ? 'Zoom' : 'Zoom' },
+    { id: 'rotateIn', name: language === 'fr' ? 'Rotation' : 'Rotate' },
+    { id: 'scaleUp', name: language === 'fr' ? 'Échelle' : 'Scale' }
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-4 p-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl"
+      className="mt-4 p-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl max-h-96 overflow-y-auto"
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-semibold">{language === 'fr' ? 'Éditer le texte' : 'Edit text'}</h3>
@@ -1404,6 +1432,59 @@ function TextStyleEditor({ text, onUpdate, onClose, language }) {
               className="w-full h-8 rounded cursor-pointer"
             />
           </div>
+        </div>
+
+        {text.bgColor && (
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Opacité fond' : 'Background opacity'}: {text.bgOpacity || 100}%</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={text.bgOpacity || 100}
+              onChange={(e) => onUpdate({ bgOpacity: parseInt(e.target.value) })}
+              className="w-full"
+            />
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Animation entrée' : 'Entry animation'}</label>
+            <select
+              value={text.animationIn || 'fadeIn'}
+              onChange={(e) => onUpdate({ animationIn: e.target.value })}
+              className="w-full px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs"
+            >
+              {animations.map(anim => (
+                <option key={anim.id} value={anim.id}>{anim.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Animation sortie' : 'Exit animation'}</label>
+            <select
+              value={text.animationOut || 'fadeIn'}
+              onChange={(e) => onUpdate({ animationOut: e.target.value })}
+              className="w-full px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs"
+            >
+              {animations.map(anim => (
+                <option key={anim.id} value={anim.id}>{anim.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-white/60 text-xs mb-1 block">{language === 'fr' ? 'Affichage' : 'Display'}</label>
+          <select
+            value={text.displayMode || 'single'}
+            onChange={(e) => onUpdate({ displayMode: e.target.value })}
+            className="w-full px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs"
+          >
+            <option value="single">{language === 'fr' ? 'Ce slide uniquement' : 'This slide only'}</option>
+            <option value="all">{language === 'fr' ? 'Tous les slides' : 'All slides'}</option>
+          </select>
         </div>
 
         <div>
@@ -1833,10 +1914,25 @@ function TextEditorModal({ onClose, onAdd, language }) {
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
   const [bgColor, setBgColor] = useState(null);
+  const [bgOpacity, setBgOpacity] = useState(100);
   const [fontFamily, setFontFamily] = useState('inherit');
   const [borderWidth, setBorderWidth] = useState(0);
   const [borderColor, setBorderColor] = useState('#ffffff');
   const [borderRadius, setBorderRadius] = useState(0);
+  const [animationIn, setAnimationIn] = useState('fadeIn');
+  const [animationOut, setAnimationOut] = useState('fadeIn');
+  const [displayMode, setDisplayMode] = useState('single');
+
+  const animations = [
+    { id: 'fadeIn', name: language === 'fr' ? 'Fondu' : 'Fade' },
+    { id: 'slideInLeft', name: language === 'fr' ? 'Glisse gauche' : 'Slide left' },
+    { id: 'slideInRight', name: language === 'fr' ? 'Glisse droite' : 'Slide right' },
+    { id: 'slideInUp', name: language === 'fr' ? 'Glisse haut' : 'Slide up' },
+    { id: 'slideInDown', name: language === 'fr' ? 'Glisse bas' : 'Slide down' },
+    { id: 'zoomIn', name: language === 'fr' ? 'Zoom' : 'Zoom' },
+    { id: 'rotateIn', name: language === 'fr' ? 'Rotation' : 'Rotate' },
+    { id: 'scaleUp', name: language === 'fr' ? 'Échelle' : 'Scale' }
+  ];
 
   const handleAdd = () => {
     if (!text.trim()) {
@@ -1851,10 +1947,14 @@ function TextEditorModal({ onClose, onAdd, language }) {
       bold,
       italic,
       bgColor: bgColor,
+      bgOpacity,
       fontFamily,
       borderWidth,
       borderColor,
       borderRadius,
+      animationIn,
+      animationOut,
+      displayMode,
       position: { x: 50, y: 50 }
     });
   };
@@ -1925,6 +2025,67 @@ function TextEditorModal({ onClose, onAdd, language }) {
                 className="w-full h-10 rounded-lg cursor-pointer"
               />
             </div>
+          </div>
+
+          {bgColor && (
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Opacité fond' : 'Background opacity'}: {bgOpacity}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={bgOpacity}
+                onChange={(e) => setBgOpacity(parseInt(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Animation entrée' : 'Entry animation'}
+              </label>
+              <select
+                value={animationIn}
+                onChange={(e) => setAnimationIn(e.target.value)}
+                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+              >
+                {animations.map(anim => (
+                  <option key={anim.id} value={anim.id}>{anim.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-white/60 text-sm mb-2 block">
+                {language === 'fr' ? 'Animation sortie' : 'Exit animation'}
+              </label>
+              <select
+                value={animationOut}
+                onChange={(e) => setAnimationOut(e.target.value)}
+                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+              >
+                {animations.map(anim => (
+                  <option key={anim.id} value={anim.id}>{anim.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-white/60 text-sm mb-2 block">
+              {language === 'fr' ? 'Affichage' : 'Display'}
+            </label>
+            <select
+              value={displayMode}
+              onChange={(e) => setDisplayMode(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white"
+            >
+              <option value="single">{language === 'fr' ? 'Ce slide uniquement' : 'This slide only'}</option>
+              <option value="all">{language === 'fr' ? 'Tous les slides' : 'All slides'}</option>
+            </select>
           </div>
 
           <div>
