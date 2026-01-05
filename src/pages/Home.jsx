@@ -1461,60 +1461,10 @@ export default function Home() {
                                   {favoriteVisuals.length}
                                 </span>
                               )}
-                              </button>
-                              )}
+                            </button>
+                          )}
 
-                              {/* Action Icons - Outside card, stuck to right edge - Only on last visual */}
-                              {idx === messages.length - 1 && !msg.visual.video_url && !(msg.visual.image_url && (msg.visual.image_url.includes('.mp4') || msg.visual.image_url.includes('/video'))) && (
-                                <div className="absolute right-0 top-16 translate-x-full z-40 flex flex-col gap-2">
-                                  {/* Image Edit Icon - ORANGE */}
-                                  <button
-                                    onClick={() => {
-                                      setImageEditVisual(msg.visual);
-                                      setShowImageEditModal(true);
-                                    }}
-                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-orange-500/30"
-                                    title={language === 'fr' ? 'Modifier l\'image' : 'Edit image'}
-                                  >
-                                    <Pencil className="h-4 w-4" />
-                                  </button>
-
-                                  {/* Magic Editor Icon */}
-                                  <button
-                                    onClick={() => handleOpenEditor(msg.visual)}
-                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-violet-500/30"
-                                    title={language === 'fr' ? 'Éditeur' : 'Editor'}
-                                  >
-                                    <Wand2 className="h-4 w-4" />
-                                  </button>
-
-                                  {/* Video Icon */}
-                                  <button
-                                    onClick={() => {
-                                      setVideoVisual(msg.visual);
-                                      setShowVideoModal(true);
-                                    }}
-                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-pink-500/30"
-                                    title={language === 'fr' ? 'Vidéo' : 'Video'}
-                                  >
-                                    <Video className="h-4 w-4" />
-                                  </button>
-
-                                  {/* Crop Icon */}
-                                  <button
-                                    onClick={() => {
-                                      setCropVisual(msg.visual);
-                                      setShowCropModal(true);
-                                    }}
-                                    className="p-2.5 rounded-r-xl bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg transition-all hover:scale-110 border border-l-0 border-blue-500/30"
-                                    title={language === 'fr' ? 'Découpe' : 'Crop'}
-                                  >
-                                    <Scissors className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              )}
-
-                              <VisualCard
+                          <VisualCard
                             visual={msg.visual}
                             onRegenerate={handleRegenerate}
                             onDownload={handleDownload}
@@ -1559,7 +1509,57 @@ export default function Home() {
                                 handleOpenEditor(msg.visual);
                               }
                             }}
-                          />
+                            />
+
+                            {/* Action Icons - Below card, left side - Only on last visual */}
+                            {idx === messages.length - 1 && !msg.visual.video_url && !(msg.visual.image_url && (msg.visual.image_url.includes('.mp4') || msg.visual.image_url.includes('/video'))) && (
+                            <div className="flex items-center gap-2 mt-3">
+                              {/* Image Edit Icon - ORANGE */}
+                              <button
+                                onClick={() => {
+                                  setImageEditVisual(msg.visual);
+                                  setShowImageEditModal(true);
+                                }}
+                                className="p-2 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg transition-all hover:scale-105"
+                                title={language === 'fr' ? 'Modifier l\'image' : 'Edit image'}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </button>
+
+                              {/* Magic Editor Icon */}
+                              <button
+                                onClick={() => handleOpenEditor(msg.visual)}
+                                className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-lg transition-all hover:scale-105"
+                                title={language === 'fr' ? 'Éditeur' : 'Editor'}
+                              >
+                                <Wand2 className="h-4 w-4" />
+                              </button>
+
+                              {/* Video Icon */}
+                              <button
+                                onClick={() => {
+                                  setVideoVisual(msg.visual);
+                                  setShowVideoModal(true);
+                                }}
+                                className="p-2 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg transition-all hover:scale-105"
+                                title={language === 'fr' ? 'Vidéo' : 'Video'}
+                              >
+                                <Video className="h-4 w-4" />
+                              </button>
+
+                              {/* Crop Icon */}
+                              <button
+                                onClick={() => {
+                                  setCropVisual(msg.visual);
+                                  setShowCropModal(true);
+                                }}
+                                className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg transition-all hover:scale-105"
+                                title={language === 'fr' ? 'Découpe' : 'Crop'}
+                              >
+                                <Scissors className="h-4 w-4" />
+                              </button>
+                            </div>
+                            )}
                         </div>
                       </motion.div>
                     )}
