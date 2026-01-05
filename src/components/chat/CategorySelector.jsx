@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import { 
-  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles, Box, ShoppingBag
+  Gem, Printer, Image, Share2, ChevronDown, ChevronRight, Sparkles, Box, ShoppingBag, Video
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -127,6 +127,16 @@ const CATEGORIES = [
     ]
   },
   {
+    id: 'video',
+    icon: Video,
+    name: { fr: 'Vidéo', en: 'Video' },
+    description: { fr: 'Génération vidéo avec Kling AI', en: 'Video generation with Kling AI' },
+    hasSubmenu: false,
+    prompt: { fr: '', en: '' },
+    defaultExpertMode: true,
+    isVideo: true
+  },
+  {
     id: 'free_prompt',
     icon: Sparkles,
     name: { fr: 'Prompt 100% libre', en: '100% Free Prompt' },
@@ -210,6 +220,7 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
         const isSelected = selectedCategory?.id === category.id;
         const isFreePrompt = category.isFreePrompt;
         const isPrint = category.isPrint;
+        const isVideo = category.isVideo;
 
         return (
           <div key={category.id} className="relative">
@@ -219,9 +230,12 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
                 "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer",
                 isFreePrompt 
                   ? "bg-gradient-to-br from-orange-600/20 to-amber-600/20 hover:from-orange-600/30 hover:to-amber-600/30 border-2 border-orange-500/30 hover:border-orange-500/50"
-                  : "bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20",
-                isSelected && !isFreePrompt && "bg-violet-500/10 border-violet-500/30",
-                isSelected && isFreePrompt && "border-orange-500/70"
+                  : isVideo
+                    ? "bg-gradient-to-br from-pink-600/20 to-rose-600/20 hover:from-pink-600/30 hover:to-rose-600/30 border-2 border-pink-500/30 hover:border-pink-500/50"
+                    : "bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20",
+                isSelected && !isFreePrompt && !isVideo && "bg-violet-500/10 border-violet-500/30",
+                isSelected && isFreePrompt && "border-orange-500/70",
+                isSelected && isVideo && "border-pink-500/70"
               )}
             >
               <div className="p-2 rounded-lg bg-white/5">
@@ -240,7 +254,12 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
                   </div>
                   {/* Switch + Badge - side by side top right */}
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    {category.id === 'free_prompt' ? (
+                    {category.id === 'video' ? (
+                      // Video : pas de switch, badge spécial
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-bold rounded-full">
+                        KLING AI
+                      </span>
+                    ) : category.id === 'free_prompt' ? (
                       // Free prompt : mode expert fixe, pas de switch
                       <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
                         EXPERT
@@ -325,6 +344,17 @@ export default function CategorySelector({ onSelect, selectedCategory, visualsCo
                 </div>
                 <p className="text-white/40 text-xs truncate">{category.description[language]}</p>
                 
+                {/* Info for video */}
+                {category.id === 'video' && (
+                  <div className="mt-2 p-2 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                    <p className="text-[10px] text-pink-300 leading-tight">
+                      {language === 'fr'
+                        ? 'Générez des vidéos cinématiques avec Kling AI. 5s = 15 crédits, 10s = 25 crédits. Images de référence optionnelles.'
+                        : 'Generate cinematic videos with Kling AI. 5s = 15 credits, 10s = 25 credits. Optional reference images.'}
+                    </p>
+                  </div>
+                )}
+
                 {/* Info for free prompt */}
                 {category.id === 'free_prompt' && (
                   <div className="mt-2 p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">

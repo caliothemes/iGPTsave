@@ -38,6 +38,7 @@ import VideoExamplesModal from '@/components/chat/VideoExamplesModal';
 import ImageEditExamplesModal from '@/components/chat/ImageEditExamplesModal';
 import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
+import VideoConfigModal from '@/components/chat/VideoConfigModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Home() {
@@ -117,6 +118,8 @@ export default function Home() {
   const [cropVisual, setCropVisual] = useState(null);
   const [showImageEditModal, setShowImageEditModal] = useState(false);
   const [imageEditVisual, setImageEditVisual] = useState(null);
+  const [showVideoConfigModal, setShowVideoConfigModal] = useState(false);
+  const [videoConfig, setVideoConfig] = useState(null);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -247,6 +250,12 @@ export default function Home() {
   };
 
   const handleCategorySelect = async (category) => {
+    // Si c'est la catégorie vidéo, ouvrir le modal de config
+    if (category.id === 'video') {
+      setShowVideoConfigModal(true);
+      return;
+    }
+
     setSelectedCategory(category);
     const prompt = category.selectedSubmenu 
       ? (category.selectedSubmenu.prompt?.[language] || '')
@@ -261,6 +270,14 @@ export default function Home() {
     const examples = promptExamples.filter(e => e.category === categoryId);
     setCurrentPromptExamples(examples);
     
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const handleVideoConfigConfirm = (config) => {
+    // Sauvegarder la config et sélectionner la catégorie vidéo
+    setVideoConfig(config);
+    setSelectedCategory({ id: 'video', name: { fr: 'Vidéo', en: 'Video' } });
+    setShowVideoConfigModal(false);
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -483,6 +500,78 @@ export default function Home() {
     }
 
     try {
+      // CAS SPÉCIAL: Génération vidéo avec Kling
+      if (activeCategory?.id === 'video' && videoConfig) {
+        setProgress(10);
+        
+        const response = await base44.functions.invoke('generateReplicateVideo', {
+          image_url: videoConfig.images[0] || null,
+          additional_images: videoConfig.images.slice(1),
+          prompt: userMessage,
+          aspect_ratio: videoConfig.aspectRatio,
+          duration: videoConfig.duration
+        });
+
+        console.log('Video generation response:', response);
+
+        if (response.data.error) {
+          throw new Error(response.data.error);
+        }
+
+        setProgress(100);
+
+        // Créer un visuel avec la vidéo
+        const videoVisualData = {
+          user_email: user?.email || 'anonymous',
+          conversation_id: activeConversation?.id,
+          image_url: response.data.video_url,
+          video_url: response.data.video_url,
+          title: userMessage.slice(0, 50),
+          original_prompt: userMessage,
+          dimensions: videoConfig.aspectRatio,
+          visual_type: 'video'
+        };
+
+        let savedVisual = videoVisualData;
+        if (user) {
+          savedVisual = await base44.entities.Visual.create(videoVisualData);
+          setSessionVisuals(prev => [savedVisual, ...prev]);
+        }
+
+        setCurrentVisual(savedVisual);
+        setVisualsHistory(prev => [...prev, savedVisual]);
+
+        const successMessage = `✨ ${language === 'fr' ? 'Votre vidéo est prête !' : 'Your video is ready!'}`;
+
+        setMessages(prev => [
+          ...prev.slice(0, -1),
+          { role: 'assistant', content: successMessage },
+          { role: 'assistant', content: '', visual: savedVisual }
+        ]);
+
+        if (activeConversation && user) {
+          try {
+            const updatedMessages = [
+              ...(activeConversation.messages || []),
+              { role: 'user', content: userMessage },
+              { role: 'assistant', content: successMessage }
+            ];
+            await base44.entities.Conversation.update(activeConversation.id, {
+              messages: updatedMessages,
+              title: activeConversation.title || userMessage.slice(0, 50),
+              visual_id: savedVisual.id
+            });
+            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
+          } catch (e) {
+            console.error('Failed to update conversation:', e);
+          }
+        }
+
+        setIsGenerating(false);
+        return;
+      }
+
+      // CAS NORMAL: Génération d'image
       // Déduire 1 crédit AVANT la génération
       if (user && credits) {
         if (credits.free_downloads > 0) {
@@ -2206,6 +2295,13 @@ export default function Home() {
         }}
         visual={imageEditVisual}
         onEditComplete={handleImageEditComplete}
+      />
+
+      {/* Video Config Modal */}
+      <VideoConfigModal
+        isOpen={showVideoConfigModal}
+        onClose={() => setShowVideoConfigModal(false)}
+        onConfirm={handleVideoConfigConfirm}
       />
 
       {/* Mode Selector Modal */}
