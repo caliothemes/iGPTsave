@@ -136,21 +136,40 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
 
                 {/* Timeline */}
                 <div className="grid grid-cols-1 md:grid-cols-[1.5fr_auto_1fr_auto_1.5fr] gap-6 items-center">
-                  {/* Step 1: Image */}
+                  {/* Step 1: Image(s) */}
                   <div className="space-y-3">
                     <div className="text-center">
                       <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-violet-600 text-white text-sm font-bold mb-2">
                         1
                       </span>
                       <p className="text-sm font-medium text-white/80">{t.imageStart}</p>
-                      </div>
-                    <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg">
-                      <img
-                        src={currentExample.image_url}
-                        alt="Starting image"
-                        className="w-full h-full object-cover"
-                      />
                     </div>
+                    {currentExample.image_url_2 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg">
+                          <img
+                            src={currentExample.image_url}
+                            alt="Starting image 1"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg">
+                          <img
+                            src={currentExample.image_url_2}
+                            alt="Starting image 2"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-square rounded-xl overflow-hidden border-2 border-white/10 shadow-lg">
+                        <img
+                          src={currentExample.image_url}
+                          alt="Starting image"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Arrow 1 */}
