@@ -504,13 +504,23 @@ export default function Home() {
       if (activeCategory?.id === 'video' && videoConfig) {
         setProgress(10);
         
-        const response = await base44.functions.invoke('generateReplicateVideo', {
-          image_url: videoConfig.images[0] || null,
-          additional_images: videoConfig.images.slice(1),
+        const payload = {
           prompt: userMessage,
           aspect_ratio: videoConfig.aspectRatio,
           duration: videoConfig.duration
-        });
+        };
+
+        // Add images if provided
+        if (videoConfig.images && videoConfig.images.length > 0) {
+          payload.image_url = videoConfig.images[0];
+          if (videoConfig.images.length > 1) {
+            payload.additional_images = videoConfig.images.slice(1);
+          }
+        }
+
+        console.log('Sending video generation request:', payload);
+
+        const response = await base44.functions.invoke('generateReplicateVideo', payload);
 
         console.log('Video generation response:', response);
 

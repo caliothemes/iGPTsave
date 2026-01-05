@@ -9,12 +9,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { image_url, prompt, aspect_ratio = "16:9", duration = 5 } = await req.json();
+    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5 } = await req.json();
     
-    console.log('Video generation request:', { image_url, prompt, aspect_ratio, duration });
+    console.log('Video generation request:', { image_url, additional_images, prompt, aspect_ratio, duration });
 
-    if (!image_url || !prompt) {
-      return Response.json({ error: 'Missing image_url or prompt' }, { status: 400 });
+    if (!prompt) {
+      return Response.json({ error: 'Missing prompt' }, { status: 400 });
     }
 
     // Calculate credits based on duration
@@ -62,6 +62,25 @@ Deno.serve(async (req) => {
 
     console.log('Starting Kling v2.5 Turbo Pro prediction...');
 
+    // Prepare input for Kling API
+    const input = {
+      prompt: prompt || 'Cinematic motion, smooth camera movement',
+      duration: duration === 10 ? 10 : 5,
+      aspect_ratio: aspect_ratio
+    };
+
+    // Add images if provided
+    if (image_url) {
+      input.start_image = image_url;
+    }
+    
+    // Add end image if additional images provided
+    if (additional_images && additional_images.length > 0) {
+      input.end_image = additional_images[0];
+    }
+
+    console.log('Kling input:', input);
+
     // Use Kling v2.5 Turbo Pro model endpoint
     const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
       method: 'POST',
@@ -69,13 +88,7 @@ Deno.serve(async (req) => {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        input: {
-          prompt: prompt || 'Cinematic motion, smooth camera movement',
-          start_image: image_url,
-          duration: duration === 10 ? 10 : 5
-        }
-      })
+      body: JSON.stringify({ input })
     });
 
     const responseText = await response.text();
