@@ -112,20 +112,52 @@ export default function StoryStudio() {
       try {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         const isVideo = file.type.startsWith('video/');
+        
+        // Detect dimensions for first uploaded file
+        let dimensions = null;
+        if (!isVideo && files.length === 1) {
+          await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              dimensions = `${img.width}x${img.height}`;
+              resolve();
+            };
+            img.onerror = () => resolve();
+            img.src = file_url;
+          });
+        }
+        
         uploaded.push({
           id: Date.now() + Math.random(),
           image_url: file_url,
           video_url: isVideo ? file_url : null,
           title: file.name,
           isUploaded: true,
-          isVideo
+          isVideo,
+          dimensions
         });
       } catch (err) {
         toast.error('Erreur lors de l\'upload');
       }
     }
 
-    setSelectedImages(prev => [...prev, ...uploaded]);
+    setSelectedImages(prev => {
+      const newImages = [...prev, ...uploaded];
+      // Auto-detect format from first media
+      if (prev.length === 0 && uploaded.length > 0 && uploaded[0].dimensions) {
+        const dims = uploaded[0].dimensions.split('x');
+        if (dims.length === 2) {
+          const w = parseInt(dims[0]);
+          const h = parseInt(dims[1]);
+          if (w && h && !isNaN(w) && !isNaN(h)) {
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const divisor = gcd(w, h);
+            setVideoFormat(`${w/divisor}:${h/divisor}`);
+          }
+        }
+      }
+      return newImages;
+    });
   };
 
   const handleSelectFromVisuals = (visual) => {
@@ -146,7 +178,23 @@ export default function StoryStudio() {
       transition: null
     };
     
-    setSelectedImages(prev => [...prev, mediaToAdd]);
+    setSelectedImages(prev => {
+      const newImages = [...prev, mediaToAdd];
+      // Auto-detect format from first media
+      if (newImages.length === 1 && visual.dimensions && typeof visual.dimensions === 'string') {
+        const dims = visual.dimensions.split('x');
+        if (dims.length === 2) {
+          const w = parseInt(dims[0]);
+          const h = parseInt(dims[1]);
+          if (w && h && !isNaN(w) && !isNaN(h)) {
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const divisor = gcd(w, h);
+            setVideoFormat(`${w/divisor}:${h/divisor}`);
+          }
+        }
+      }
+      return newImages;
+    });
     setShowVisualsModal(false);
   };
 
@@ -311,9 +359,25 @@ export default function StoryStudio() {
   };
 
   const handleLoadStory = (story) => {
-    setSelectedImages(story.images || []);
+    const images = story.images || [];
+    setSelectedImages(images);
     setTextLayers(story.text_layers || []);
     setStickerLayers(story.sticker_layers || []);
+    
+    // Auto-detect format from first media
+    if (images.length > 0 && images[0].dimensions && typeof images[0].dimensions === 'string') {
+      const dims = images[0].dimensions.split('x');
+      if (dims.length === 2) {
+        const w = parseInt(dims[0]);
+        const h = parseInt(dims[1]);
+        if (w && h && !isNaN(w) && !isNaN(h)) {
+          const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+          const divisor = gcd(w, h);
+          setVideoFormat(`${w/divisor}:${h/divisor}`);
+        }
+      }
+    }
+    
     setShowStoriesModal(false);
     toast.success(language === 'fr' ? 'Story chargée !' : 'Story loaded!');
   };
