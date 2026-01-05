@@ -13,7 +13,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const { language } = useLanguage();
   const [provider, setProvider] = useState('replicate'); // 'replicate' or 'runway'
   const [prompt, setPrompt] = useState('');
-  const [aspectRatio, setAspectRatio] = useState('16:9');
+  const [aspectRatio, setAspectRatio] = useState('1:1');
   const [duration, setDuration] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -251,7 +251,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 {language === 'fr' ? 'Format vidéo' : 'Video format'}
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {['16:9', '9:16', '1:1'].map(ratio => (
+                {['1:1', '9:16', '16:9'].map(ratio => (
                   <button
                     key={ratio}
                     onClick={() => setAspectRatio(ratio)}
@@ -297,8 +297,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                         ? 'Vidéo cinématographique pro. 5s = 15 crédits, 10s = 25 crédits' 
                         : 'Professional cinematic video. 5s = 15 credits, 10s = 25 credits')
                     : (language === 'fr'
-                        ? 'Animation fluide HD. 5s = 20 crédits, 10s = 30 crédits'
-                        : 'Smooth HD animation. 5s = 20 credits, 10s = 30 credits')}
+                        ? 'Animation fluide HD uniquement en 16:9. 5s = 20 crédits, 10s = 30 crédits'
+                        : 'Smooth HD animation 16:9 only. 5s = 20 credits, 10s = 30 credits')}
                 </p>
               </div>
             </div>
