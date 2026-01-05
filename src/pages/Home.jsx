@@ -118,6 +118,7 @@ export default function Home() {
   const [cropVisual, setCropVisual] = useState(null);
   const [showImageEditModal, setShowImageEditModal] = useState(false);
   const [imageEditVisual, setImageEditVisual] = useState(null);
+  const [showVideoInfoModal, setShowVideoInfoModal] = useState(false);
 
 
   const messagesEndRef = useRef(null);
@@ -251,9 +252,7 @@ export default function Home() {
   const handleCategorySelect = async (category) => {
     // Si c'est la catégorie vidéo, ouvrir le modal explicatif
     if (category.id === 'video') {
-      alert(language === 'fr' 
-        ? '📹 Pour générer une vidéo :\n\n1. Générez d\'abord une image avec iGPT\n2. Ou uploadez une image existante\n3. Puis cliquez sur l\'icône vidéo rouge 🎬 qui apparaît sur l\'image\n\nVous pourrez alors transformer votre image en vidéo animée !'
-        : '📹 To generate a video:\n\n1. First generate an image with iGPT\n2. Or upload an existing image\n3. Then click on the red video icon 🎬 that appears on the image\n\nYou can then transform your image into an animated video!');
+      setShowVideoInfoModal(true);
       return;
     }
 
@@ -2289,6 +2288,82 @@ export default function Home() {
                   </span>
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Video Info Modal */}
+      <AnimatePresence>
+        {showVideoInfoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowVideoInfoModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-gray-900/95 backdrop-blur-xl border border-violet-500/30 rounded-2xl p-6 max-w-md mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-pink-600 to-rose-600 flex items-center justify-center">
+                  <Video className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    {language === 'fr' ? 'Génération de vidéo' : 'Video generation'}
+                  </h3>
+                  <p className="text-violet-300 text-sm">Kling AI v2.5 Turbo Pro</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4">
+                  <p className="text-white/90 text-sm leading-relaxed mb-3">
+                    {language === 'fr' 
+                      ? 'Pour générer une vidéo avec Kling AI, suivez ces étapes :' 
+                      : 'To generate a video with Kling AI, follow these steps:'}
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">1</span>
+                      <p className="text-white/80 text-sm">
+                        {language === 'fr' 
+                          ? 'Générez une image avec iGPT ou uploadez une image existante' 
+                          : 'Generate an image with iGPT or upload an existing image'}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">2</span>
+                      <p className="text-white/80 text-sm">
+                        {language === 'fr' 
+                          ? 'Cliquez sur l\'icône vidéo rouge 🎬 qui apparaît sur l\'image' 
+                          : 'Click on the red video icon 🎬 that appears on the image'}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center">3</span>
+                      <p className="text-white/80 text-sm">
+                        {language === 'fr' 
+                          ? 'Configurez vos options et transformez votre image en vidéo animée !' 
+                          : 'Configure your options and transform your image into an animated video!'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => setShowVideoInfoModal(false)}
+                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+              >
+                {language === 'fr' ? 'Compris !' : 'Got it!'}
+              </Button>
             </motion.div>
           </motion.div>
         )}
