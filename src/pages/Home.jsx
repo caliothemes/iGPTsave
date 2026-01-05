@@ -1769,21 +1769,6 @@ export default function Home() {
 
 
 
-            {/* Infobulle micro - au-dessus de tout */}
-            <AnimatePresence>
-              {isRecording && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="fixed bottom-24 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-red-600 text-white text-xs rounded-lg shadow-lg"
-                  style={{ zIndex: 9999 }}
-                >
-                  {language === 'fr' ? 'Cliquez pour arrêter' : 'Click to stop'}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
               {/* Ligne principale - Textarea + boutons */}
@@ -1938,14 +1923,25 @@ export default function Home() {
 
                 <button 
                   onClick={handleVoiceInput}
-                  className={cn(
-                    "p-2 transition-colors",
-                    isRecording 
-                      ? "text-red-500 animate-pulse" 
-                      : "text-white/40 hover:text-white/60"
-                  )}
+                  className="relative p-2 transition-all"
                 >
-                  <Mic className="h-5 w-5" />
+                  {isRecording && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <div className="w-10 h-10 bg-red-500/20 flex items-center justify-center" 
+                           style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}>
+                      </div>
+                    </motion.div>
+                  )}
+                  <Mic className={cn(
+                    "transition-all relative z-10",
+                    isRecording 
+                      ? "h-6 w-6 text-red-500" 
+                      : "h-5 w-5 text-white/40 hover:text-white/60"
+                  )} />
                 </button>
 
                 <Button
