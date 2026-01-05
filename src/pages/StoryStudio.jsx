@@ -117,7 +117,19 @@ export default function StoryStudio() {
       toast.error('Image déjà ajoutée');
       return;
     }
-    setSelectedImages(prev => [...prev, visual]);
+    
+    // Detect if it's a video
+    const isVideo = !!(visual.video_url || (visual.image_url && visual.image_url.match(/\.(mp4|webm|mov)$/i)));
+    
+    const mediaToAdd = {
+      ...visual,
+      isVideo: isVideo,
+      video_url: visual.video_url || (isVideo ? visual.image_url : null),
+      duration: 3,
+      transition: null
+    };
+    
+    setSelectedImages(prev => [...prev, mediaToAdd]);
     setShowVisualsModal(false);
   };
 
