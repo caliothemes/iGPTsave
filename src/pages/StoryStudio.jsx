@@ -187,7 +187,7 @@ export default function StoryStudio() {
       });
 
       setMyStories(prev => [story, ...prev]);
-      toast.success(language === 'fr' ? '✅ Story sauvegardée !' : '✅ Story saved!');
+      toast.success(<span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {language === 'fr' ? 'Sauvegardé' : 'Saved'}</span>);
     } catch (e) {
       console.error(e);
       toast.error(language === 'fr' ? 'Erreur lors de la sauvegarde' : 'Save error');
@@ -560,7 +560,7 @@ export default function StoryStudio() {
                   className="w-full bg-gradient-to-r from-violet-600/20 to-pink-600/20 border-violet-500/30 text-white"
                 >
                   <Video className="h-4 w-4 mr-2" />
-                  Mes Stories ({myStories.length})
+                  Mes Vidéos ({myStories.length})
                 </Button>
               </div>
 
@@ -1029,7 +1029,7 @@ export default function StoryStudio() {
           >
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-bold text-white">
-                {language === 'fr' ? 'Mes Stories' : 'My Stories'}
+                {language === 'fr' ? 'Mes Vidéos' : 'My Videos'}
               </h2>
               <button
                 onClick={() => setShowStoriesModal(false)}
@@ -1043,35 +1043,63 @@ export default function StoryStudio() {
                 <div className="text-center py-12">
                   <Video className="h-16 w-16 text-white/20 mx-auto mb-4" />
                   <p className="text-white/40">
-                    {language === 'fr' ? 'Aucune story sauvegardée' : 'No saved stories'}
+                    {language === 'fr' ? 'Aucune vidéo sauvegardée' : 'No saved videos'}
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-4">
-                  {myStories.map(story => (
-                    <button
-                      key={story.id}
-                      onClick={() => handleLoadStory(story)}
-                      className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
-                    >
-                      <div style={{ aspectRatio: '9/16' }}>
-                        <img
-                          src={story.thumbnail_url}
-                          alt={story.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
-                        <p className="text-white text-sm font-medium">{story.title}</p>
-                        <p className="text-white/60 text-xs">
-                          {story.images?.length || 0} {language === 'fr' ? 'images' : 'images'} • {story.duration}s
-                        </p>
-                      </div>
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                        <Play className="h-12 w-12 text-white opacity-0 group-hover:opacity-100 transition-all" />
-                      </div>
-                    </button>
-                  ))}
+                  {myStories.map(story => {
+                    // Detect if story has video content
+                    const hasVideo = story.images?.some(img => img.isVideo || img.video_url);
+                    const firstMedia = story.images?.[0];
+                    const mediaUrl = firstMedia?.video_url || firstMedia?.image_url || story.thumbnail_url;
+                    const isVideo = firstMedia?.isVideo || firstMedia?.video_url;
+                    
+                    return (
+                      <button
+                        key={story.id}
+                        onClick={() => handleLoadStory(story)}
+                        className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                      >
+                        <div style={{ aspectRatio: '9/16' }}>
+                          {isVideo ? (
+                            <video
+                              src={mediaUrl + '#t=0.1'}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
+                              preload="metadata"
+                            />
+                          ) : (
+                            <img
+                              src={mediaUrl}
+                              alt={story.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded-md">
+                          <span className="text-white text-[10px] font-medium">
+                            {story.images?.[0]?.dimensions?.split('x').map(n => parseInt(n)).reduce((w, h) => {
+                              if (!h || !w) return '1:1';
+                              const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+                              const divisor = gcd(w, h);
+                              return `${w/divisor}:${h/divisor}`;
+                            }, '1:1') || '9:16'}
+                          </span>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3">
+                          <p className="text-white text-sm font-medium">{story.title}</p>
+                          <p className="text-white/60 text-xs">
+                            {story.images?.length || 0} {language === 'fr' ? 'médias' : 'media'} • {story.duration}s
+                          </p>
+                        </div>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                          <Play className="h-12 w-12 text-white opacity-0 group-hover:opacity-100 transition-all" />
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
