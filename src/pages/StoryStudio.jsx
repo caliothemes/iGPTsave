@@ -16,7 +16,10 @@ import {
   Video,
   ChevronRight,
   ChevronLeft,
-  ArrowLeft
+  ArrowLeft,
+  Loader2,
+  Crown,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createPageUrl } from '@/utils';
@@ -54,6 +57,9 @@ export default function StoryStudio() {
   const [showStoriesModal, setShowStoriesModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [videoFormat, setVideoFormat] = useState('1:1');
+  const [showStickersModal, setShowStickersModal] = useState(false);
+  const [myStickers, setMyStickers] = useState([]);
+  const [sharedStickers, setSharedStickers] = useState([]);
   const fileInputRef = useRef(null);
   const previewIntervalRef = useRef(null);
 
@@ -63,12 +69,14 @@ export default function StoryStudio() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
 
-        const [visuals, anims, userCreds, convs, stories] = await Promise.all([
+        const [visuals, anims, userCreds, convs, stories, userStickers, iGPTStickers] = await Promise.all([
           base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 100),
           base44.entities.StoryAnimation.filter({ is_active: true }, 'order'),
           base44.entities.UserCredits.filter({ user_email: currentUser.email }),
           base44.entities.Conversation.filter({ user_email: currentUser.email }, '-updated_date', 20),
-          base44.entities.Story.filter({ user_email: currentUser.email }, '-created_date', 50)
+          base44.entities.Story.filter({ user_email: currentUser.email }, '-created_date', 50),
+          base44.entities.Sticker.filter({ user_email: currentUser.email, is_shared: false }, '-created_date'),
+          base44.entities.Sticker.filter({ is_shared: true }, '-created_date')
         ]);
 
         // No filter - show all visuals (images and videos)
@@ -79,6 +87,8 @@ export default function StoryStudio() {
         setAnimations(anims);
         setConversations(convs);
         setMyStories(stories);
+        setMyStickers(userStickers);
+        setSharedStickers(iGPTStickers);
         if (userCreds.length > 0) setCredits(userCreds[0]);
       } catch (e) {
         console.error(e);
@@ -815,13 +825,20 @@ export default function StoryStudio() {
               </div>
 
               {/* Tools */}
-              <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="grid grid-cols-3 gap-4 mt-6">
                 <Button
                   onClick={() => setShowTextModal(true)}
                   className="bg-gradient-to-r from-blue-600 to-cyan-600"
                 >
                   <Type className="h-4 w-4 mr-2" />
-                  {language === 'fr' ? 'Ajouter du texte' : 'Add text'}
+                  {language === 'fr' ? 'Texte' : 'Text'}
+                </Button>
+                <Button
+                  onClick={() => setShowStickersModal(true)}
+                  className="bg-gradient-to-r from-pink-600 to-rose-600"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {language === 'fr' ? 'Stickers' : 'Stickers'}
                 </Button>
                 <Button
                   onClick={() => setShowTransitionsModal(true)}
@@ -830,7 +847,7 @@ export default function StoryStudio() {
                   className="bg-white/5 border-white/20 text-white"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
-                  {language === 'fr' ? 'Effets & Transitions' : 'Effects & Transitions'}
+                  {language === 'fr' ? 'Transitions' : 'Transitions'}
                 </Button>
               </div>
               
@@ -997,6 +1014,24 @@ export default function StoryStudio() {
         <TextEditorModal
           onClose={() => setShowTextModal(false)}
           onAdd={handleAddText}
+          language={language}
+        />
+      )}
+
+      {/* Stickers Modal */}
+      {showStickersModal && (
+        <StickersModal
+          onClose={() => setShowStickersModal(false)}
+          myStickers={myStickers}
+          sharedStickers={sharedStickers}
+          onStickerGenerated={(sticker) => {
+            if (sticker.is_shared) {
+              setSharedStickers(prev => [sticker, ...prev]);
+            } else {
+              setMyStickers(prev => [sticker, ...prev]);
+            }
+          }}
+          user={user}
           language={language}
         />
       )}
