@@ -1340,6 +1340,285 @@ function TransitionsModal({ animations, selectedImages, onApply, onClose, langua
   );
 }
 
+// Stickers Modal Component
+function StickersModal({ onClose, myStickers, sharedStickers, onStickerGenerated, user, language }) {
+  const [activeTab, setActiveTab] = useState('generate');
+  const [prompt, setPrompt] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [category, setCategory] = useState('illustration');
+
+  const handleGenerate = async () => {
+    if (!prompt.trim()) {
+      toast.error(language === 'fr' ? 'Entrez une description' : 'Enter a description');
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      const enhancedPrompt = `${prompt}, sticker style, transparent background, isolated on white, clean edges, vibrant colors, professional quality`;
+      
+      const result = await base44.integrations.Core.GenerateImage({
+        prompt: enhancedPrompt
+      });
+
+      if (result.url) {
+        const isAdmin = user?.role === 'admin';
+        const stickerData = {
+          title: prompt.slice(0, 50),
+          image_url: result.url,
+          prompt: prompt,
+          user_email: isAdmin ? null : user.email,
+          is_shared: isAdmin,
+          category: category
+        };
+
+        const savedSticker = await base44.entities.Sticker.create(stickerData);
+        onStickerGenerated(savedSticker);
+        
+        toast.success(<span className="flex items-center gap-1.5">
+          <span className="text-green-500">✓</span> 
+          {isAdmin 
+            ? (language === 'fr' ? 'Sticker ajouté à la bibliothèque iGPT' : 'Sticker added to iGPT library')
+            : (language === 'fr' ? 'Sticker sauvegardé' : 'Sticker saved')}
+        </span>);
+        
+        setPrompt('');
+        setActiveTab('my');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(language === 'fr' ? 'Erreur lors de la génération' : 'Generation error');
+    }
+    setGenerating(false);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <h2 className="text-xl font-bold text-white">
+            {language === 'fr' ? 'Stickers & Illustrations' : 'Stickers & Illustrations'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <X className="h-5 w-5 text-white" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-white/10 px-6">
+          <button
+            onClick={() => setActiveTab('generate')}
+            className={cn(
+              "px-4 py-3 text-sm font-medium transition-colors border-b-2",
+              activeTab === 'generate'
+                ? "text-white border-violet-500"
+                : "text-white/60 border-transparent hover:text-white"
+            )}
+          >
+            <Sparkles className="h-4 w-4 inline mr-2" />
+            {language === 'fr' ? 'Générer' : 'Generate'}
+          </button>
+          <button
+            onClick={() => setActiveTab('my')}
+            className={cn(
+              "px-4 py-3 text-sm font-medium transition-colors border-b-2",
+              activeTab === 'my'
+                ? "text-white border-violet-500"
+                : "text-white/60 border-transparent hover:text-white"
+            )}
+          >
+            <User className="h-4 w-4 inline mr-2" />
+            {language === 'fr' ? `Mes stickers (${myStickers.length})` : `My stickers (${myStickers.length})`}
+          </button>
+          <button
+            onClick={() => setActiveTab('igpt')}
+            className={cn(
+              "px-4 py-3 text-sm font-medium transition-colors border-b-2",
+              activeTab === 'igpt'
+                ? "text-white border-violet-500"
+                : "text-white/60 border-transparent hover:text-white"
+            )}
+          >
+            <ImageIcon className="h-4 w-4 inline mr-2" />
+            {language === 'fr' ? 'Bibliothèque iGPT' : 'iGPT Library'}
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          {activeTab === 'generate' && (
+            <div className="space-y-6">
+              <div>
+                <label className="text-white text-sm font-medium mb-3 block">
+                  {language === 'fr' ? 'Décrivez votre sticker' : 'Describe your sticker'}
+                </label>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder={language === 'fr' ? 'Ex: un chat mignon avec des lunettes de soleil' : 'Ex: a cute cat with sunglasses'}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 outline-none focus:border-violet-500/50"
+                    disabled={generating}
+                  />
+                  
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-violet-500/50"
+                  >
+                    <option value="emoji">Emoji</option>
+                    <option value="illustration">Illustration</option>
+                    <option value="icon">Icône</option>
+                    <option value="decoratif">Décoratif</option>
+                    <option value="autre">Autre</option>
+                  </select>
+
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={!prompt.trim() || generating}
+                    className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-lg py-6"
+                  >
+                    {generating ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        {language === 'fr' ? 'Génération...' : 'Generating...'}
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-5 w-5 mr-2" />
+                        {language === 'fr' ? 'Générer le sticker' : 'Generate sticker'}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {user?.role === 'admin' && (
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                  <p className="text-amber-300 text-sm flex items-center gap-2">
+                    <Crown className="h-4 w-4" />
+                    {language === 'fr' 
+                      ? 'Mode Admin : Les stickers générés seront ajoutés à la bibliothèque iGPT partagée'
+                      : 'Admin Mode: Generated stickers will be added to the shared iGPT library'}
+                  </p>
+                </div>
+              )}
+
+              <div className="p-6 bg-white/5 border border-white/10 rounded-xl">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-400" />
+                  {language === 'fr' ? 'Exemples de prompts' : 'Prompt examples'}
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    language === 'fr' ? 'un cœur rouge brillant' : 'a shiny red heart',
+                    language === 'fr' ? 'une étoile dorée scintillante' : 'a golden sparkling star',
+                    language === 'fr' ? 'un smiley heureux coloré' : 'a colorful happy smiley',
+                    language === 'fr' ? 'une flèche dynamique' : 'a dynamic arrow',
+                    language === 'fr' ? 'un badge "NEW" moderne' : 'a modern "NEW" badge',
+                    language === 'fr' ? 'des confettis festifs' : 'festive confetti'
+                  ].map((example, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setPrompt(example)}
+                      className="text-left px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white/80 text-sm transition-colors"
+                    >
+                      {example}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'my' && (
+            <div>
+              {myStickers.length === 0 ? (
+                <div className="text-center py-12">
+                  <ImageIcon className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                  <p className="text-white/40">
+                    {language === 'fr' ? 'Aucun sticker personnel' : 'No personal stickers'}
+                  </p>
+                  <Button
+                    onClick={() => setActiveTab('generate')}
+                    className="mt-4 bg-gradient-to-r from-pink-600 to-rose-600"
+                  >
+                    {language === 'fr' ? 'Générer un sticker' : 'Generate a sticker'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-4">
+                  {myStickers.map(sticker => (
+                    <button
+                      key={sticker.id}
+                      className="relative group aspect-square rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 bg-white/5 transition-all"
+                    >
+                      <img
+                        src={sticker.image_url}
+                        alt={sticker.title}
+                        className="w-full h-full object-contain p-2"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="text-center p-2">
+                          <p className="text-white text-xs font-medium">{sticker.title}</p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'igpt' && (
+            <div>
+              {sharedStickers.length === 0 ? (
+                <div className="text-center py-12">
+                  <ImageIcon className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                  <p className="text-white/40">
+                    {language === 'fr' ? 'Bibliothèque iGPT vide' : 'iGPT library empty'}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-4">
+                  {sharedStickers.map(sticker => (
+                    <button
+                      key={sticker.id}
+                      className="relative group aspect-square rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 bg-white/5 transition-all"
+                    >
+                      <img
+                        src={sticker.image_url}
+                        alt={sticker.title}
+                        className="w-full h-full object-contain p-2"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="text-center p-2">
+                          <p className="text-white text-xs font-medium">{sticker.title}</p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 // Text Editor Modal Component
 function TextEditorModal({ onClose, onAdd, language }) {
   const [text, setText] = useState('');
