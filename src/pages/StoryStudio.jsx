@@ -1068,9 +1068,9 @@ export default function StoryStudio() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-3 gap-4">
                     {myVisuals.slice(0, visualsDisplayCount).map(visual => {
-                      const dims = visual.dimensions || '1080x1080';
+                      const dims = (visual.dimensions && typeof visual.dimensions === 'string') ? visual.dimensions : '1080x1080';
                       const [w, h] = dims.split('x').map(n => parseInt(n));
-                      const aspectRatio = w && h ? `${w} / ${h}` : '1 / 1';
+                      const aspectRatio = (w && h && !isNaN(w) && !isNaN(h)) ? `${w} / ${h}` : '1 / 1';
                       const imageUrl = visual.image_url || '';
                       const isVideo = visual.video_url || (imageUrl && (imageUrl.includes('.mp4') || imageUrl.includes('/video')));
                       
@@ -1228,12 +1228,12 @@ export default function StoryStudio() {
                     
                     // Calculate format ratio
                     let formatRatio = '9:16';
-                    if (firstMedia?.dimensions) {
+                    if (firstMedia?.dimensions && typeof firstMedia.dimensions === 'string') {
                       const dims = firstMedia.dimensions.split('x');
                       if (dims.length === 2) {
                         const w = parseInt(dims[0]);
                         const h = parseInt(dims[1]);
-                        if (w && h) {
+                        if (w && h && !isNaN(w) && !isNaN(h)) {
                           const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
                           const divisor = gcd(w, h);
                           formatRatio = `${w/divisor}:${h/divisor}`;
