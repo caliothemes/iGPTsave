@@ -941,6 +941,7 @@ export default function StoryStudio() {
                           key={visual.id}
                           onClick={() => handleSelectFromVisuals(visual)}
                           className="relative group rounded-xl overflow-hidden border-2 border-white/10 hover:border-violet-500/50 transition-all"
+                          style={{ aspectRatio }}
                           onMouseEnter={(e) => {
                             const video = e.currentTarget.querySelector('video');
                             if (video) video.play();
@@ -953,24 +954,22 @@ export default function StoryStudio() {
                             }
                           }}
                         >
-                          <div style={{ aspectRatio }}>
-                            {isVideo ? (
-                              <video
-                                src={visual.video_url || visual.image_url}
-                                className="w-full h-full object-cover"
-                                muted
-                                loop
-                                playsInline
-                              />
-                            ) : (
-                              <img
-                                src={visual.image_url}
-                                alt={visual.title}
-                                className="w-full h-full object-cover"
-                                crossOrigin="anonymous"
-                              />
-                            )}
-                          </div>
+                          {isVideo ? (
+                            <video
+                              src={visual.video_url || visual.image_url}
+                              className="w-full h-full object-cover"
+                              muted
+                              loop
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={visual.image_url}
+                              alt={visual.title}
+                              className="w-full h-full object-cover"
+                              crossOrigin="anonymous"
+                            />
+                          )}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
                             <Plus className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all" />
                           </div>
