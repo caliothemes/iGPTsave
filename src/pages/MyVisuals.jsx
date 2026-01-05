@@ -319,12 +319,22 @@ export default function MyVisuals() {
   };
 
   const filteredVisuals = visuals.filter(v => {
-    const matchesSearch = v.title?.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'favorites' && v.is_favorite) || (filter === 'downloaded' && v.downloaded);
+    // Search filter
+    const matchesSearch = !search || v.title?.toLowerCase().includes(search.toLowerCase()) || v.original_prompt?.toLowerCase().includes(search.toLowerCase());
+    
+    // Status filter
+    const matchesFilter = filter === 'all' || 
+                          (filter === 'favorites' && v.is_favorite === true) || 
+                          (filter === 'downloaded' && v.downloaded === true);
+    
+    // Category/type filter
     const mainCat = getMainCategory(v);
     const matchesType = typeFilter === 'all' || mainCat === typeFilter;
+    
+    // Format filter
     const aspectRatio = getAspectRatio(v.dimensions);
     const matchesFormat = formatFilter === 'all' || aspectRatio === formatFilter;
+    
     return matchesSearch && matchesFilter && matchesType && matchesFormat;
   });
 
@@ -389,11 +399,11 @@ export default function MyVisuals() {
             </div>
 
             {/* Category Tags */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => setTypeFilter('all')}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  "px-2 py-1 rounded-md text-[11px] font-medium transition-colors",
                   typeFilter === 'all' 
                     ? "bg-violet-600 text-white" 
                     : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
@@ -409,7 +419,7 @@ export default function MyVisuals() {
                     onClick={() => setTypeFilter(cat.id)}
                     disabled={count === 0}
                     className={cn(
-                      "px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5",
+                      "px-2 py-1 rounded-md text-[11px] font-medium transition-colors flex items-center gap-1",
                       typeFilter === cat.id 
                         ? "bg-violet-600 text-white" 
                         : count > 0
@@ -419,7 +429,7 @@ export default function MyVisuals() {
                   >
                     {cat.name}
                     <span className={cn(
-                      "px-1.5 py-0.5 rounded-full text-[10px]",
+                      "px-1 py-0.5 rounded-full text-[9px]",
                       typeFilter === cat.id
                         ? "bg-white/20"
                         : count > 0
