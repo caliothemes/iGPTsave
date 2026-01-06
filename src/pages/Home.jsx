@@ -149,7 +149,7 @@ export default function Home() {
           } else {
             const newCredits = await base44.entities.UserCredits.create({
               user_email: currentUser.email,
-              free_downloads: 25
+              free_downloads: 15
             });
             setCredits(newCredits);
           }
