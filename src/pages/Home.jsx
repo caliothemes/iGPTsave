@@ -197,7 +197,7 @@ export default function Home() {
           try {
           const [templates, examples] = await Promise.all([
           base44.entities.PromptTemplate.filter({ is_active: true }),
-          base44.entities.PromptExample.filter({ is_active: true })
+          base44.entities.PromptExample.filter({ is_active: true }, 'order')
           ]);
           setPromptTemplates(templates);
           setPromptExamples(examples);
