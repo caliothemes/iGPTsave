@@ -1677,7 +1677,7 @@ export default function Home() {
             <img 
               src={example.image_url} 
               alt="" 
-              className="w-16 h-16 object-cover rounded-md border border-violet-400/30 flex-shrink-0"
+              className="w-32 h-32 object-cover rounded-md border border-violet-400/30 flex-shrink-0"
             />
           )}
         </button>
@@ -2471,7 +2471,7 @@ export default function Home() {
                   <img 
                     src={example.image_url} 
                     alt="" 
-                    className="w-20 h-20 object-cover rounded-md border border-violet-400/30 flex-shrink-0"
+                    className="w-40 h-40 object-cover rounded-md border border-violet-400/30 flex-shrink-0"
                   />
                 )}
               </button>
