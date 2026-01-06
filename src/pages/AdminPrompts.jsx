@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Plus, Edit, Trash2, Save, X, Wand2 } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Save, X, Wand2, Upload, Image as ImageIcon } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ export default function AdminPrompts() {
   const [filterExampleCategory, setFilterExampleCategory] = useState('all');
   const [adsPrompt, setAdsPrompt] = useState('');
   const [savingAds, setSavingAds] = useState(false);
+  const fileInputRef = useRef(null);
 
   const categories = [
     { value: 'logo_picto', label: 'Logo Pictogramme', mode: 'assisté' },
@@ -139,9 +140,22 @@ export default function AdminPrompts() {
       category: 'logo_picto',
       example_text_fr: '',
       example_text_en: '',
+      image_url: '',
       is_active: true
     });
     setShowExampleDialog(true);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setEditingExample({ ...editingExample, image_url: file_url });
+    } catch (error) {
+      console.error('Upload error:', error);
+    }
   };
 
   const handleEditExample = (example) => {
@@ -360,7 +374,7 @@ export default function AdminPrompts() {
           <div className="grid gap-3">
             {examples.filter(ex => filterExampleCategory === 'all' || ex.category === filterExampleCategory).map((example) => (
               <div key={example.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 text-xs font-medium">
@@ -383,7 +397,16 @@ export default function AdminPrompts() {
                       </p>
                     )}
                   </div>
-                  <div className="flex gap-2 ml-4">
+                  {example.image_url && (
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={example.image_url} 
+                        alt="Exemple" 
+                        className="w-24 h-24 object-cover rounded-lg border border-white/10"
+                      />
+                    </div>
+                  )}
+                  <div className="flex gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -622,6 +645,60 @@ export default function AdminPrompts() {
                   placeholder="Ex: for a modern Italian restaurant with a warm atmosphere, orange and gold tones"
                   className="bg-white/5 border-white/10 text-white min-h-20"
                 />
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-2 block">Image thumbnail (optionnel)</label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+                {editingExample.image_url ? (
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={editingExample.image_url} 
+                      alt="Preview" 
+                      className="w-24 h-24 object-cover rounded-lg border border-white/10"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Changer
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingExample({ ...editingExample, image_url: '' })}
+                        className="bg-red-500/10 border-red-500/20 text-red-300 hover:bg-red-500/20"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10"
+                  >
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    Ajouter une image
+                  </Button>
+                )}
+                <p className="text-xs text-white/40 mt-2">
+                  L'image s'affichera à droite du texte dans l'assistant. Sans image, le texte prend toute la largeur.
+                </p>
               </div>
 
               <div className="flex items-center gap-2">

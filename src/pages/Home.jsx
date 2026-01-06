@@ -1666,11 +1666,20 @@ export default function Home() {
               }
             }, 0);
           }}
-          className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all"
+          className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all flex items-center gap-3"
         >
-          "{language === 'fr' 
-            ? example.example_text_fr 
-            : (example.example_text_en || example.example_text_fr)}"
+          <div className="flex-1">
+            "{language === 'fr' 
+              ? example.example_text_fr 
+              : (example.example_text_en || example.example_text_fr)}"
+          </div>
+          {example.image_url && (
+            <img 
+              src={example.image_url} 
+              alt="" 
+              className="w-16 h-16 object-cover rounded-md border border-violet-400/30 flex-shrink-0"
+            />
+          )}
         </button>
       ))}
     </div>
@@ -2450,12 +2459,21 @@ export default function Home() {
                     }
                   }, 100);
                 }}
-                className="text-left w-full px-4 py-3 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-sm transition-all"
+                className="text-left w-full px-4 py-3 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-sm transition-all flex items-center gap-3"
               >
-                <span className="text-violet-300 text-xs font-medium">#{idx + 1}</span>
-                <p className="mt-1">"{language === 'fr' 
-                  ? example.example_text_fr 
-                  : (example.example_text_en || example.example_text_fr)}"</p>
+                <div className="flex-1">
+                  <span className="text-violet-300 text-xs font-medium">#{idx + 1}</span>
+                  <p className="mt-1">"{language === 'fr' 
+                    ? example.example_text_fr 
+                    : (example.example_text_en || example.example_text_fr)}"</p>
+                </div>
+                {example.image_url && (
+                  <img 
+                    src={example.image_url} 
+                    alt="" 
+                    className="w-20 h-20 object-cover rounded-md border border-violet-400/30 flex-shrink-0"
+                  />
+                )}
               </button>
             ))}
           </div>
