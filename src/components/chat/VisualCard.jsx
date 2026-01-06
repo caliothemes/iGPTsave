@@ -120,7 +120,7 @@ export default function VisualCard({
     <>
       <div className="rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 group">
         {/* Image/Video Container */}
-        <div className="relative overflow-hidden bg-black/20" style={{ aspectRatio: getAspectRatio(visual.dimensions) }}>
+        <div className="relative overflow-hidden bg-black/20" style={{ aspectRatio: isVideo ? 'auto' : getAspectRatio(visual.dimensions) }}>
           {isVideo ? (
             <video 
               src={visual.video_url || visual.image_url}
@@ -128,7 +128,8 @@ export default function VisualCard({
               autoPlay
               loop
               muted
-              className="w-full h-full object-cover"
+              className="w-full h-auto"
+              style={{ aspectRatio: getAspectRatio(visual.dimensions) }}
             />
           ) : (
             <img 
