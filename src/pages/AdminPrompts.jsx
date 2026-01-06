@@ -68,7 +68,7 @@ export default function AdminPrompts() {
   const loadData = async () => {
     const [promptData, exampleData, settings] = await Promise.all([
       base44.entities.PromptTemplate.list('order'),
-      base44.entities.PromptExample.list(),
+      base44.entities.PromptExample.list('order'),
       base44.entities.AppSettings.list()
     ]);
     setPrompts(promptData);
@@ -141,6 +141,7 @@ export default function AdminPrompts() {
       example_text_fr: '',
       example_text_en: '',
       image_url: '',
+      order: 0,
       is_active: true
     });
     setShowExampleDialog(true);
@@ -701,7 +702,7 @@ export default function AdminPrompts() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -711,6 +712,16 @@ export default function AdminPrompts() {
                   />
                   <span className="text-white/80 text-sm">Actif</span>
                 </label>
+
+                <div className="flex items-center gap-2">
+                  <label className="text-white/60 text-sm">Ordre:</label>
+                  <Input
+                    type="number"
+                    value={editingExample.order || 0}
+                    onChange={(e) => setEditingExample({ ...editingExample, order: parseInt(e.target.value) })}
+                    className="bg-white/5 border-white/10 text-white w-20"
+                  />
+                </div>
               </div>
             </div>
           )}
