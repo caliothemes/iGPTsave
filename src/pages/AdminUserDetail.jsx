@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ArrowLeft, User, Mail, Crown, Zap, Image, Receipt, Download, FileText, Video } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Mail, Crown, Zap, Image, Receipt, Download, FileText, Video, Send } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useLanguage } from '@/components/LanguageContext';
 import moment from 'moment';
@@ -16,6 +16,10 @@ export default function AdminUserDetail() {
   const [visuals, setVisuals] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -74,6 +78,73 @@ export default function AdminUserDetail() {
       console.error('Error updating credits:', error);
     }
     setSaving(false);
+  };
+
+  const handleSendEmail = async () => {
+    if (!emailSubject.trim() || !emailBody.trim()) {
+      alert('Veuillez remplir le sujet et le message');
+      return;
+    }
+
+    setSendingEmail(true);
+    try {
+      // Generate HTML email with template
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; padding: 40px 20px; }
+            .email-container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); padding: 40px 30px; text-align: center; }
+            .logo { font-size: 32px; font-weight: 700; color: white; letter-spacing: -1px; margin-bottom: 10px; }
+            .header-title { color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 600; }
+            .content { padding: 40px 30px; }
+            .subject { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; }
+            .message { font-size: 16px; line-height: 1.6; color: #333; white-space: pre-wrap; }
+            .footer { background: #f8f7ff; padding: 30px; text-align: center; border-top: 1px solid #e5e5e5; }
+            .footer-text { font-size: 13px; color: #666; line-height: 1.6; }
+          </style>
+        </head>
+        <body>
+          <div class="email-container">
+            <div class="header">
+              <div class="logo">iGPT</div>
+              <div class="header-title">Message Administrateur</div>
+            </div>
+            <div class="content">
+              <div class="subject">${emailSubject}</div>
+              <div class="message">${emailBody.replace(/\n/g, '<br>')}</div>
+            </div>
+            <div class="footer">
+              <div class="footer-text">
+                Ce message vous a été envoyé par l'équipe iGPT<br>
+                Pour toute question, répondez directement à cet email
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      await base44.integrations.Core.SendEmail({
+        from_name: 'iGPT - Admin',
+        to: user.email,
+        subject: emailSubject,
+        body: emailHtml
+      });
+
+      alert('Email envoyé avec succès !');
+      setShowEmailModal(false);
+      setEmailSubject('');
+      setEmailBody('');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('Erreur lors de l\'envoi de l\'email');
+    }
+    setSendingEmail(false);
   };
 
   const getSubscriptionBadge = (credits) => {
@@ -151,10 +222,17 @@ export default function AdminUserDetail() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold text-white">{user.full_name || user.email}</h1>
             <p className="text-white/60 text-sm">Détails de l'utilisateur</p>
           </div>
+          <Button
+            onClick={() => setShowEmailModal(true)}
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+          >
+            <Send className="h-4 w-4 mr-2" />
+            Envoyer un email
+          </Button>
         </div>
 
         {/* User Info & Credits Grid */}
@@ -324,6 +402,82 @@ export default function AdminUserDetail() {
           )}
         </div>
       </div>
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowEmailModal(false)}>
+          <div className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Preview Header */}
+            <div className="bg-gradient-to-r from-violet-600 to-blue-600 p-8 text-center border-b border-white/10">
+              <div className="text-3xl font-bold text-white mb-2">iGPT</div>
+              <div className="text-white/90 text-sm font-medium">Message Administrateur</div>
+            </div>
+
+            {/* Form */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-white/80 text-sm mb-2 font-medium">Destinataire</label>
+                <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10">
+                  <Mail className="h-4 w-4 text-white/40" />
+                  <span className="text-white/60">{user.email}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-white/80 text-sm mb-2 font-medium">Sujet *</label>
+                <Input
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Entrez le sujet de l'email..."
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/80 text-sm mb-2 font-medium">Message *</label>
+                <textarea
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  placeholder="Rédigez votre message..."
+                  rows={12}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-violet-500/50 transition-all resize-none"
+                />
+                <p className="text-white/40 text-xs mt-2">
+                  Le message sera envoyé avec un template professionnel incluant le logo iGPT et un footer
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-white/10">
+                <Button
+                  onClick={() => setShowEmailModal(false)}
+                  variant="ghost"
+                  className="flex-1 text-white/60 hover:text-white hover:bg-white/10"
+                  disabled={sendingEmail}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleSendEmail}
+                  disabled={sendingEmail || !emailSubject.trim() || !emailBody.trim()}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                >
+                  {sendingEmail ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Envoi...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Envoyer l'email
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
