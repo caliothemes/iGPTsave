@@ -63,36 +63,154 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Call Replicate API - prunaai/p-image-edit using model name directly
-    const replicateResponse = await fetch('https://api.replicate.com/v1/models/prunaai/p-image-edit/predictions', {
+    // Build all images array
+    const allImages = [publicImageUrl, ...publicAdditionalImages];
+    console.log('All images for Replicate:', allImages);
+
+    // Call Replicate API - using the correct model version endpoint
+    // Use predictions endpoint with version instead of model name
+    const requestBody = {
+      version: "adirik/flux-cinestill:216a43b9975de96742a56e5e7c69504d13ab9f7f97ce6e5547920e4025e87818",
+      input: {
+        image: publicImageUrl,
+        prompt: prompt,
+        guidance_scale: 3.5,
+        num_inference_steps: 28,
+        strength: 0.85
+      }
+    };
+
+    // Try with black-forest-labs/flux-kontext-pro for image editing
+    const replicateResponse = await fetch('https://api.replicate.com/v1/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'wait'
+        'Prefer': 'wait=60'
       },
       body: JSON.stringify({
+        version: "kontext-dev/kontext-image-editing:latest",
         input: {
-          images: [publicImageUrl, ...publicAdditionalImages],
+          input_image: publicImageUrl,
           prompt: prompt,
           aspect_ratio: aspect_ratio || '1:1'
         }
       })
     });
 
+    console.log('Replicate response status:', replicateResponse.status);
+
     if (!replicateResponse.ok) {
       const errorText = await replicateResponse.text();
-      console.error('Replicate API error:', errorText);
-      return Response.json({ 
-        error: `Replicate API error: ${replicateResponse.status} - ${errorText}` 
-      }, { status: 500 });
+      console.error('Replicate API error response:', errorText);
+      
+      // Try alternative model if first one fails
+      console.log('Trying alternative model: black-forest-labs/flux-fill-pro');
+      
+      const altResponse = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-fill-pro/predictions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'wait=120'
+        },
+        body: JSON.stringify({
+          input: {
+            image: publicImageUrl,
+            prompt: prompt,
+            output_format: "png"
+          }
+        })
+      });
+
+      if (!altResponse.ok) {
+        const altErrorText = await altResponse.text();
+        console.error('Alternative model also failed:', altErrorText);
+        return Response.json({ 
+          error: `Image edit failed. Please try again later. Details: ${replicateResponse.status}` 
+        }, { status: 500 });
+      }
+
+      const altResult = await altResponse.json();
+      console.log('Alternative model response:', altResult);
+
+      // Handle polling if needed
+      if (altResult.status === 'starting' || altResult.status === 'processing') {
+        // Poll for result
+        let pollResult = altResult;
+        const maxAttempts = 60;
+        let attempts = 0;
+        
+        while ((pollResult.status === 'starting' || pollResult.status === 'processing') && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const pollResponse = await fetch(pollResult.urls.get, {
+            headers: {
+              'Authorization': `Bearer ${REPLICATE_API_KEY}`
+            }
+          });
+          pollResult = await pollResponse.json();
+          attempts++;
+          console.log(`Poll attempt ${attempts}, status: ${pollResult.status}`);
+        }
+
+        if (pollResult.status === 'succeeded') {
+          const outputUrl = Array.isArray(pollResult.output) ? pollResult.output[0] : pollResult.output;
+          return Response.json({ 
+            output_url: outputUrl,
+            status: 'succeeded'
+          });
+        } else {
+          return Response.json({ 
+            error: `Generation failed: ${pollResult.error || 'Unknown error'}` 
+          }, { status: 500 });
+        }
+      }
+
+      const altOutputUrl = Array.isArray(altResult.output) ? altResult.output[0] : altResult.output;
+      if (altOutputUrl) {
+        return Response.json({ 
+          output_url: altOutputUrl,
+          status: altResult.status
+        });
+      }
     }
 
     const result = await replicateResponse.json();
-    console.log('Replicate response:', result);
+    console.log('Replicate response:', JSON.stringify(result, null, 2));
 
     if (result.error) {
       return Response.json({ error: result.error }, { status: 500 });
+    }
+
+    // Handle polling if needed
+    if (result.status === 'starting' || result.status === 'processing') {
+      let pollResult = result;
+      const maxAttempts = 60;
+      let attempts = 0;
+      
+      while ((pollResult.status === 'starting' || pollResult.status === 'processing') && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const pollResponse = await fetch(pollResult.urls.get, {
+          headers: {
+            'Authorization': `Bearer ${REPLICATE_API_KEY}`
+          }
+        });
+        pollResult = await pollResponse.json();
+        attempts++;
+        console.log(`Poll attempt ${attempts}, status: ${pollResult.status}`);
+      }
+
+      if (pollResult.status === 'succeeded') {
+        const outputUrl = Array.isArray(pollResult.output) ? pollResult.output[0] : pollResult.output;
+        return Response.json({ 
+          output_url: outputUrl,
+          status: 'succeeded'
+        });
+      } else {
+        return Response.json({ 
+          error: `Generation failed: ${pollResult.error || 'Unknown error'}` 
+        }, { status: 500 });
+      }
     }
 
     // The output is a URL to the edited image
