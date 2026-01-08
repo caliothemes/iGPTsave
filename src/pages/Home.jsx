@@ -147,9 +147,13 @@ export default function Home() {
           if (userCredits.length > 0) {
             setCredits(userCredits[0]);
           } else {
+            // Nouvel utilisateur - créer le plan gratuit avec 15 crédits mensuels
             const newCredits = await base44.entities.UserCredits.create({
               user_email: currentUser.email,
-              free_downloads: 15
+              free_downloads: 15,
+              paid_credits: 0,
+              subscription_type: 'free',
+              last_free_reset: new Date().toISOString()
             });
             setCredits(newCredits);
           }
