@@ -99,8 +99,8 @@ export default function AdminUserDetail() {
             body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; padding: 40px 20px; }
             .email-container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
             .header { background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); padding: 40px 30px; text-align: center; }
-            .logo { font-size: 32px; font-weight: 700; color: white; letter-spacing: -1px; margin-bottom: 10px; }
-            .header-title { color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 600; }
+            .logo-img { width: 80px; height: 80px; margin: 0 auto 15px; }
+            .header-title { color: #ffffff; font-size: 18px; font-weight: 600; }
             .content { padding: 40px 30px; }
             .subject { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; }
             .message { font-size: 16px; line-height: 1.6; color: #333; white-space: pre-wrap; }
@@ -111,7 +111,7 @@ export default function AdminUserDetail() {
         <body>
           <div class="email-container">
             <div class="header">
-              <div class="logo">iGPT</div>
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" alt="iGPT" class="logo-img" />
               <div class="header-title">Message Administrateur</div>
             </div>
             <div class="content">
