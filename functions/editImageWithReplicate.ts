@@ -82,9 +82,16 @@ Deno.serve(async (req) => {
 
     if (!replicateResponse.ok) {
       const errorText = await replicateResponse.text();
-      console.error('Replicate API error:', errorText);
+      console.error('=== REPLICATE API ERROR ===');
+      console.error('Status:', replicateResponse.status);
+      console.error('Status Text:', replicateResponse.statusText);
+      console.error('Error Body:', errorText);
+      console.error('Request URL:', 'https://api.replicate.com/v1/models/prunaai/p-image-edit/predictions');
+      console.error('=========================');
       return Response.json({ 
-        error: `Replicate API error: ${replicateResponse.status} - ${errorText}` 
+        error: `Replicate API error: ${replicateResponse.status} - ${errorText}`,
+        replicate_status: replicateResponse.status,
+        replicate_message: errorText
       }, { status: 500 });
     }
 
@@ -108,9 +115,13 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Server error:', error);
+    console.error('=== FULL ERROR DETAILS ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Error object:', JSON.stringify(error, null, 2));
     return Response.json({ 
-      error: error.message || 'Internal server error' 
+      error: error.message || 'Internal server error',
+      details: error.stack
     }, { status: 500 });
   }
 });
