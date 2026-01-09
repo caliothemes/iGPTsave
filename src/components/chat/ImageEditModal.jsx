@@ -174,52 +174,6 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
             </div>
           </div>
 
-          {/* Prompt Input */}
-          <div className="mb-6">
-            <label className="text-white/80 text-sm mb-1 block">
-              {language === 'fr' 
-                ? 'Que voulez-vous modifier ?' 
-                : 'What do you want to modify?'}
-            </label>
-            <p className="text-white/40 text-xs mb-2">
-              {language === 'fr'
-                ? '✨ Soyez précis : ajoutez des éléments, changez des couleurs, modifiez l\'ambiance...'
-                : '✨ Be specific: add elements, change colors, modify atmosphere...'}
-            </p>
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              disabled={isGenerating}
-              placeholder={language === 'fr' 
-                ? 'Ex: Ajouter un ciel étoilé, changer la couleur en bleu, ajouter des reflets...' 
-                : 'Ex: Add starry sky, change color to blue, add reflections...'}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition-all resize-none disabled:opacity-50"
-              rows={4}
-            />
-
-            {/* Example Prompts */}
-            <div className="mt-2 space-y-1.5">
-              <p className="text-white/40 text-[10px] mb-1">
-                {language === 'fr' ? 'Exemples :' : 'Examples:'}
-              </p>
-              {[
-                { fr: '🎨 Changer les couleurs en tons chauds', en: '🎨 Change colors to warm tones' },
-                { fr: '✨ Ajouter des effets lumineux', en: '✨ Add light effects' },
-                { fr: '🌆 Transformer en version nocturne', en: '🌆 Transform to night version' },
-              ].map((example, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setPrompt(language === 'fr' ? example.fr : example.en)}
-                  disabled={isGenerating}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 text-orange-200 text-xs transition-all disabled:opacity-50"
-                >
-                  {language === 'fr' ? example.fr : example.en}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Additional Images Upload Section */}
           <div className="mb-6">
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
@@ -229,7 +183,7 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
                 </svg>
                 <div className="flex-1">
                   <p className="font-medium text-xs text-blue-200 mb-1">
-                    {language === 'fr' ? 'Images supplémentaires (optionnel)' : 'Additional images (optional)'}
+                    {language === 'fr' ? 'Images additionnelles (optionnel)' : 'Additional images (optional)'}
                   </p>
                   <p className="text-xs leading-relaxed text-blue-200/70">
                     {language === 'fr' 
@@ -279,6 +233,52 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Prompt Input */}
+          <div className="mb-6">
+            <label className="text-white/80 text-sm mb-1 block">
+              {language === 'fr' 
+                ? 'Que voulez-vous modifier ?' 
+                : 'What do you want to modify?'}
+            </label>
+            <p className="text-white/40 text-xs mb-2">
+              {language === 'fr'
+                ? '✨ Soyez précis : ajoutez des éléments, changez des couleurs, modifiez l\'ambiance...'
+                : '✨ Be specific: add elements, change colors, modify atmosphere...'}
+            </p>
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={isGenerating}
+              placeholder={language === 'fr' 
+                ? 'Ex: Ajouter un ciel étoilé, changer la couleur en bleu, ajouter des reflets...' 
+                : 'Ex: Add starry sky, change color to blue, add reflections...'}
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-orange-500/50 transition-all resize-none disabled:opacity-50"
+              rows={4}
+            />
+
+            {/* Example Prompts */}
+            <div className="mt-2 space-y-1.5">
+              <p className="text-white/40 text-[10px] mb-1">
+                {language === 'fr' ? 'Exemples :' : 'Examples:'}
+              </p>
+              {[
+                { fr: '🎨 Changer les couleurs en tons chauds', en: '🎨 Change colors to warm tones' },
+                { fr: '✨ Ajouter des effets lumineux', en: '✨ Add light effects' },
+                { fr: '🌆 Transformer en version nocturne', en: '🌆 Transform to night version' },
+              ].map((example, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setPrompt(language === 'fr' ? example.fr : example.en)}
+                  disabled={isGenerating}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 text-orange-200 text-xs transition-all disabled:opacity-50"
+                >
+                  {language === 'fr' ? example.fr : example.en}
+                </button>
+              ))}
             </div>
           </div>
 
