@@ -333,7 +333,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      {language === 'fr' ? 'Vidéo cinématique réaliste + Audio' : 'Realistic cinematic video + Audio'}
+                      {language === 'fr' ? 'Vidéo cinématique réaliste' : 'Realistic cinematic video'}
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
                       <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -341,7 +341,23 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      {language === 'fr' ? 'Vidéo produit incroyable + Audio' : 'Amazing product video + Audio'}
+                      {language === 'fr' ? 'Vidéo produit incroyable' : 'Amazing product video'}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      Audio
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      1080p
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
                       <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -405,12 +421,12 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}>
                   {provider === 'replicate'
                     ? (language === 'fr' 
-                        ? 'Vidéo cinématographique pro. 5s = 15 crédits, 10s = 25 crédits' 
-                        : 'Professional cinematic video. 5s = 15 credits, 10s = 25 credits')
+                        ? <>Vidéo cinématographique pro.<br />5s = 15 crédits, 10s = 25 crédits</> 
+                        : <>Professional cinematic video.<br />5s = 15 credits, 10s = 25 credits</>)
                     : provider === 'wan'
                     ? (language === 'fr'
-                        ? 'Vidéo produit en 1080p avec audio optionnel. 5s = 20 crédits, 10s = 30 crédits'
-                        : 'Product video in 1080p with optional audio. 5s = 20 credits, 10s = 30 credits')
+                        ? <>Vidéo produit en 1080p avec audio optionnel.<br />5s = 20 crédits, 10s = 30 crédits</>
+                        : <>Product video in 1080p with optional audio.<br />5s = 20 credits, 10s = 30 credits</>)
                     : (language === 'fr'
                         ? <>Animation fluide HD uniquement en 16:9.<br />5s = 20 crédits, 10s = 30 crédits</>
                         : <>Smooth HD animation 16:9 only.<br />5s = 20 credits, 10s = 30 credits</>)}
