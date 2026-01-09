@@ -242,44 +242,50 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               <button
                 onClick={() => setProvider('replicate')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`px-3 py-2.5 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
                   provider === 'replicate'
                     ? 'bg-violet-600 border-violet-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
-                <div className="font-bold">Kling v2.5</div>
-                <span className="inline-block mt-1 px-2 py-0.5 bg-white rounded-full text-violet-900 text-[10px] font-semibold">
-                  {language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}
-                </span>
+                <div className="font-bold mb-2">Kling v2.5</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1.5 space-y-0.5">
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Cinématique' : 'Cinematic'}</div>
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Haute qualité' : 'High quality'}</div>
+                </div>
               </button>
               <button
                 onClick={() => setProvider('wan')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`px-3 py-2.5 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
                   provider === 'wan'
                     ? 'bg-violet-600 border-violet-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
-                <div className="font-bold">Wan v2.5</div>
-                <span className="inline-block mt-1 px-2 py-0.5 bg-white rounded-full text-violet-900 text-[10px] font-semibold">
-                  {language === 'fr' ? 'Vidéo produit' : 'Product video'}
-                </span>
+                <div className="font-bold mb-2">Wan v2.5</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1.5 space-y-0.5">
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Vidéo produit' : 'Product video'}</div>
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Support audio' : 'Audio support'}</div>
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Full HD 1080p' : 'Full HD 1080p'}</div>
+                </div>
               </button>
               <button
                 onClick={() => setProvider('runway')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`px-3 py-2.5 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
                   provider === 'runway'
                     ? 'bg-violet-600 border-violet-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
-                <div className="font-bold">RunwayML</div>
-                <span className="inline-block mt-1 px-2 py-0.5 bg-white rounded-full text-violet-900 text-[10px] font-semibold">
-                  {language === 'fr' ? 'Animation d\'image' : 'Image animation'}
-                </span>
+                <div className="font-bold mb-2">RunwayML</div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1.5 space-y-0.5">
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Animation fluide' : 'Smooth animation'}</div>
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Format 16:9' : '16:9 format'}</div>
+                  <div className="text-violet-900 text-[9px] font-medium">• {language === 'fr' ? 'Gen-3 Turbo' : 'Gen-3 Turbo'}</div>
+                </div>
               </button>
             </div>
           </div>
