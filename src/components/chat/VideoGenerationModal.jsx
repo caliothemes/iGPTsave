@@ -450,6 +450,37 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           )}
 
+          {/* Warning Banner - Only during generation */}
+          <AnimatePresence>
+            {isGenerating && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-4"
+              >
+                <motion.div
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="px-4 py-3 rounded-xl bg-green-600/20 border border-green-500/30"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p className="text-green-100 text-sm leading-relaxed">
+                      {language === 'fr' 
+                        ? 'La génération de votre vidéo est en cours, cela peut prendre de 1min à 4min. Ne baissez/fermez pas cette fenêtre pendant le processus. iGPT vous remercie de votre patience...'
+                        : 'Your video generation is in progress, it may take 1min to 4min. Do not minimize/close this window during the process. iGPT thanks you for your patience...'}
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Actions */}
           <div className="flex gap-3">
             <Button
