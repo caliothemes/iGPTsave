@@ -303,7 +303,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    {language === 'fr' ? 'Ajout audio' : 'Audio support'}
+                    {language === 'fr' ? 'Cinématique + audio' : 'Cinematic + audio'}
                   </div>
                   <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
                     <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
