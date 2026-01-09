@@ -71,6 +71,15 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
       if (provider === 'replicate') {
         // Replicate Kling generation
         setProgress(10);
+        
+        // Simulate progressive loading
+        const progressInterval = setInterval(() => {
+          setProgress(prev => {
+            if (prev >= 95) return prev;
+            return prev + Math.random() * 5;
+          });
+        }, 1000);
+
         const response = await base44.functions.invoke('generateReplicateVideo', {
           image_url: visual.image_url,
           prompt: finalPrompt,
@@ -78,6 +87,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           duration: duration
         });
 
+        clearInterval(progressInterval);
         console.log('Replicate response:', response);
 
         if (response.data.error) {
@@ -460,9 +470,12 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 className="mb-4"
               >
                 <motion.div
-                  animate={{ opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="px-4 py-3 rounded-xl bg-green-600/20 border border-green-500/30"
+                  animate={{ 
+                    opacity: [0.5, 1, 0.5],
+                    scale: [1, 1.02, 1]
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="px-4 py-3 rounded-xl bg-green-600/30 border-2 border-green-400/50 shadow-lg shadow-green-500/20"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 mt-0.5">
