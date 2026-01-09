@@ -69,8 +69,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     setProgress(0);
 
     try {
-      if (provider === 'replicate') {
-        // Replicate Kling generation
+      if (provider === 'replicate' || provider === 'wan') {
+        // Replicate Kling/Wan generation
         setProgress(10);
         
         // Simulate progressive loading
@@ -81,12 +81,24 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           });
         }, 1000);
 
-        const response = await base44.functions.invoke('generateReplicateVideo', {
+        const payload = {
           image_url: visual.image_url,
           prompt: finalPrompt,
-          aspect_ratio: aspectRatio,
-          duration: duration
-        });
+          duration: duration,
+          model: provider === 'wan' ? 'wan' : 'kling'
+        };
+
+        if (provider === 'replicate') {
+          payload.aspect_ratio = aspectRatio;
+        }
+
+        if (provider === 'wan' && audioFile) {
+          // Upload audio first
+          const { file_url } = await base44.integrations.Core.UploadFile({ file: audioFile });
+          payload.audio_url = file_url;
+        }
+
+        const response = await base44.functions.invoke('generateReplicateVideo', payload);
 
         clearInterval(progressInterval);
         console.log('Replicate response:', response);
@@ -98,8 +110,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         setProgress(100);
         setTimeout(() => {
           // Add metadata to prompt for badge display
-          const promptWithMetadata = `[Kling v2.5 Pro] [${duration}s] ${finalPrompt}`;
-          onVideoGenerated(response.data.video_url, promptWithMetadata, aspectRatio);
+          const modelName = provider === 'wan' ? 'Wan v2.5 I2V' : 'Kling v2.5 Pro';
+          const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
+          onVideoGenerated(response.data.video_url, promptWithMetadata, provider === 'replicate' ? aspectRatio : '16:9');
           onClose();
         }, 500);
 
