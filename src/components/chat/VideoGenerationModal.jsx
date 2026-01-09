@@ -280,101 +280,101 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
             {/* Provider Features */}
             <div className="mb-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-              {provider === 'replicate' && (
-                <>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                {provider === 'replicate' && (
+                  <>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Vidéo cinématique réaliste' : 'Realistic cinematic video'}
                     </div>
-                    {language === 'fr' ? 'Vidéo cinématique réaliste' : 'Realistic cinematic video'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Vidéo produit' : 'Product video'}
                     </div>
-                    {language === 'fr' ? 'Vidéo produit' : 'Product video'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Produit 360°' : 'Product 360°'}
                     </div>
-                    {language === 'fr' ? 'Produit 360°' : 'Product 360°'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? '3 formats possibles' : '3 formats available'}
                     </div>
-                    {language === 'fr' ? '3 formats possibles' : '3 formats available'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      5s {language === 'fr' ? 'ou' : 'or'} 10s
                     </div>
-                    5s {language === 'fr' ? 'ou' : 'or'} 10s
-                  </div>
-                </>
-              )}
-              {provider === 'wan' && (
-                <>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                  </>
+                )}
+                {provider === 'wan' && (
+                  <>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Vidéo cinématique réaliste + Audio' : 'Realistic cinematic video + Audio'}
                     </div>
-                    {language === 'fr' ? 'Vidéo cinématique réaliste + Audio' : 'Realistic cinematic video + Audio'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Vidéo produit incroyable + Audio' : 'Amazing product video + Audio'}
                     </div>
-                    {language === 'fr' ? 'Vidéo produit incroyable + Audio' : 'Amazing product video + Audio'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      5s {language === 'fr' ? 'ou' : 'or'} 10s
                     </div>
-                    5s {language === 'fr' ? 'ou' : 'or'} 10s
-                  </div>
-                </>
-              )}
-              {provider === 'runway' && (
-                <>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                  </>
+                )}
+                {provider === 'runway' && (
+                  <>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Vidéo style animation' : 'Animation style video'}
                     </div>
-                    {language === 'fr' ? 'Vidéo style animation' : 'Animation style video'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      Format 16:9
                     </div>
-                    Format 16:9
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
 
           {/* Service Info */}
           <div className={`mb-4 p-3 rounded-xl border ${
