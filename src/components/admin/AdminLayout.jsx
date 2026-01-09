@@ -19,7 +19,8 @@ import {
   Mail,
   Video,
   FolderOpen,
-  Pencil
+  Pencil,
+  Database
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -41,6 +42,7 @@ const navItems = [
   { id: 'pricing', label: 'Tarification', icon: CreditCard, page: 'AdminPricing' },
   { id: 'support', label: 'Support & FAQ', icon: HelpCircle, page: 'AdminSupport' },
   { id: 'legal', label: 'Mentions légales', icon: Scale, page: 'AdminLegal' },
+  { id: 'backup', label: 'Sauvegarde', icon: Database, page: 'AdminBackup' },
   { id: 'settings', label: 'Paramètres', icon: Settings, page: 'AdminSettings' },
 ];
 
