@@ -271,31 +271,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           </div>
 
-          {/* Aspect Ratio - Only for Replicate */}
-          {provider === 'replicate' && (
-            <div className="mb-4">
-              <label className="text-white/80 text-sm mb-2 block">
-                {language === 'fr' ? 'Format vidéo' : 'Video format'}
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {['1:1', '9:16', '16:9'].map(ratio => (
-                  <button
-                    key={ratio}
-                    onClick={() => setAspectRatio(ratio)}
-                    disabled={isGenerating}
-                    className={`px-3 py-2 rounded-lg border transition-all text-sm disabled:opacity-50 ${
-                      aspectRatio === ratio
-                        ? 'bg-violet-600 border-violet-500 text-white'
-                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
-                    }`}
-                  >
-                    {ratio}
-                  </button>
-                  ))}
-                  </div>
-                  </div>
-                  )}
-
           {/* Service Info */}
           <div className={`mb-4 p-3 rounded-xl border ${
             provider === 'replicate' 
@@ -337,9 +312,34 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 </p>
               </div>
             </div>
-          </div>
+            </div>
 
-          {/* Audio Upload - Only show for Wan */}
+            {/* Aspect Ratio - Only for Replicate */}
+            {provider === 'replicate' && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Format vidéo' : 'Video format'}
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {['1:1', '9:16', '16:9'].map(ratio => (
+                  <button
+                    key={ratio}
+                    onClick={() => setAspectRatio(ratio)}
+                    disabled={isGenerating}
+                    className={`px-3 py-2 rounded-lg border transition-all text-sm disabled:opacity-50 ${
+                      aspectRatio === ratio
+                        ? 'bg-violet-600 border-violet-500 text-white'
+                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    }`}
+                  >
+                    {ratio}
+                  </button>
+                  ))}
+                  </div>
+                  </div>
+                  )}
+
+            {/* Audio Upload - Only show for Wan */}
           {provider === 'wan' && (
             <div className="mb-4">
               <label className="text-white/80 text-sm mb-2 block">
@@ -373,20 +373,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 </button>
               )}
             </div>
-          )}
+            )}
 
-          {/* Examples Button - Only show for Replicate */}
-          {provider === 'replicate' && (
-            <button
-              onClick={() => setShowExamplesModal(true)}
-              className="w-full mb-4 px-4 py-3 rounded-lg bg-gradient-to-r from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30 border border-violet-500/30 text-violet-300 hover:text-violet-200 transition-all text-sm font-medium"
-            >
-              <Eye className="h-4 w-4 inline mr-2" />
-              {language === 'fr' ? 'Voir des exemples concrets' : 'See real examples'}
-            </button>
-          )}
-
-          {/* Auto Prompt Toggle */}
+            {/* Auto Prompt Toggle */}
           <div className="mb-4">
             <button
               onClick={() => setAutoPrompt(!autoPrompt)}
@@ -457,10 +446,21 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                       ))}
                       </div>
                       )}
+
+                      {/* Examples Button - Only show for Replicate */}
+                      {provider === 'replicate' && promptExamples.length > 0 && (
+                        <button
+                          onClick={() => setShowExamplesModal(true)}
+                          className="w-full mt-2 px-4 py-3 rounded-lg bg-gradient-to-r from-violet-500/20 to-purple-500/20 hover:from-violet-500/30 hover:to-purple-500/30 border border-violet-500/30 text-violet-300 hover:text-violet-200 transition-all text-sm font-medium"
+                        >
+                          <Eye className="h-4 w-4 inline mr-2" />
+                          {language === 'fr' ? 'Voir des exemples concrets' : 'See real examples'}
+                        </button>
+                      )}
                       </div>
                       )}
 
-          {/* Duration Selector */}
+                      {/* Duration Selector */}
           <div className="mb-6">
             <label className="text-white/80 text-sm mb-2 block">
               {language === 'fr' ? 'Durée' : 'Duration'}
