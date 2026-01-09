@@ -242,70 +242,56 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               <button
                 onClick={() => setProvider('replicate')}
                 disabled={isGenerating}
-                className={`px-3 py-2.5 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
                   provider === 'replicate'
                     ? 'bg-violet-600 border-violet-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
                 <div className="font-bold">Kling v2.5</div>
-                <div className="text-[10px] text-white/70 mb-2">Turbo Pro</div>
-                <div className="bg-violet-900/60 backdrop-blur-sm rounded-lg px-2 py-1 space-y-0.5">
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    {language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    {language === 'fr' ? 'Cinématique' : 'Cinematic'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    {language === 'fr' ? 'Vidéo produit 360' : 'Product 360 video'}
-                  </div>
-                </div>
+                <div className="text-[10px] text-white/70">Turbo Pro</div>
               </button>
               <button
                 onClick={() => setProvider('wan')}
                 disabled={isGenerating}
-                className={`px-3 py-2.5 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
                   provider === 'wan'
                     ? 'bg-violet-600 border-violet-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
                 <div className="font-bold">Wan v2.5</div>
-                <div className="text-[10px] text-white/70 mb-2">I2V 1080p</div>
-                <div className="bg-violet-900/60 backdrop-blur-sm rounded-lg px-2 py-1 space-y-0.5">
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
+                <div className="text-[10px] text-white/70">I2V 1080p</div>
+              </button>
+              <button
+                onClick={() => setProvider('runway')}
+                disabled={isGenerating}
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                  provider === 'runway'
+                    ? 'bg-violet-600 border-violet-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                }`}
+              >
+                <div className="font-bold">RunwayML</div>
+                <div className="text-[10px] text-white/70">Gen-3 Alpha Turbo</div>
+              </button>
+            </div>
+            </div>
+
+            {/* Provider Features */}
+            <div className="mb-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+              {provider === 'replicate' && (
+                <>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
                     <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                       <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    {language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}
+                    {language === 'fr' ? 'Vidéo cinématique réaliste' : 'Realistic cinematic video'}
                   </div>
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    {language === 'fr' ? 'Cinématique + audio' : 'Cinematic + audio'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
                     <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                       <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -313,29 +299,71 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     </div>
                     {language === 'fr' ? 'Vidéo produit' : 'Product video'}
                   </div>
-                </div>
-              </button>
-              <button
-                onClick={() => setProvider('runway')}
-                disabled={isGenerating}
-                className={`px-3 py-2.5 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
-                  provider === 'runway'
-                    ? 'bg-violet-600 border-violet-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
-                }`}
-              >
-                <div className="font-bold">RunwayML</div>
-                <div className="text-[10px] text-white/70 mb-2">Gen-3 Alpha Turbo</div>
-                <div className="bg-violet-900/60 backdrop-blur-sm rounded-lg px-2 py-1 space-y-0.5">
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
                     <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                       <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    {language === 'fr' ? 'Vidéo animée' : 'Animated video'}
+                    {language === 'fr' ? 'Produit 360°' : 'Product 360°'}
                   </div>
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
+                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {language === 'fr' ? '3 formats possibles' : '3 formats available'}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
+                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    5s {language === 'fr' ? 'ou' : 'or'} 10s
+                  </div>
+                </>
+              )}
+              {provider === 'wan' && (
+                <>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
+                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {language === 'fr' ? 'Vidéo cinématique réaliste + Audio' : 'Realistic cinematic video + Audio'}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
+                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {language === 'fr' ? 'Vidéo produit incroyable + Audio' : 'Amazing product video + Audio'}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
+                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    5s {language === 'fr' ? 'ou' : 'or'} 10s
+                  </div>
+                </>
+              )}
+              {provider === 'runway' && (
+                <>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
+                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {language === 'fr' ? 'Vidéo style animation' : 'Animation style video'}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-white text-[10px] font-medium">
                     <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                       <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -343,16 +371,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     </div>
                     Format 16:9
                   </div>
-                  <div className="flex items-center gap-1.5 text-white text-[9px] font-medium">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                      <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    Animation
-                  </div>
-                </div>
-              </button>
+                </>
+              )}
             </div>
           </div>
 
