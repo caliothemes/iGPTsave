@@ -28,6 +28,7 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
+import AdminBackup from './pages/AdminBackup';
 import __Layout from './Layout.jsx';
 
 
@@ -62,6 +63,7 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
+    "AdminBackup": AdminBackup,
 }
 
 export const pagesConfig = {
