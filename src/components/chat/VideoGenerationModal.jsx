@@ -11,10 +11,11 @@ import { createPageUrl } from '@/utils';
 
 export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated, user, credits, guestPrompts }) {
   const { language } = useLanguage();
-  const [provider, setProvider] = useState('replicate'); // 'replicate' or 'runway'
+  const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', or 'runway'
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [duration, setDuration] = useState(5);
+  const [audioFile, setAudioFile] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [autoPrompt, setAutoPrompt] = useState(false);
@@ -224,7 +225,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             <label className="text-white/80 text-sm mb-2 block">
               {language === 'fr' ? 'Service de génération' : 'Generation service'}
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => setProvider('replicate')}
                 disabled={isGenerating}
@@ -234,9 +235,24 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
                 }`}
               >
-                <div className="font-bold">Kling-v2.5-turbo-pro</div>
-                <div className="text-xs opacity-70">{language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}</div>
-                <div className="text-[10px] opacity-60 mt-0.5">{language === 'fr' ? 'Vidéos de 5s ou 10s' : 'Videos of 5s or 10s'}</div>
+                <div className="font-bold">Kling v2.5</div>
+                <span className="inline-block mt-1 px-2 py-0.5 bg-white rounded-full text-violet-900 text-[10px] font-semibold">
+                  {language === 'fr' ? 'Vidéo réaliste' : 'Realistic video'}
+                </span>
+              </button>
+              <button
+                onClick={() => setProvider('wan')}
+                disabled={isGenerating}
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                  provider === 'wan'
+                    ? 'bg-violet-600 border-violet-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                }`}
+              >
+                <div className="font-bold">Wan v2.5</div>
+                <span className="inline-block mt-1 px-2 py-0.5 bg-white rounded-full text-violet-900 text-[10px] font-semibold">
+                  {language === 'fr' ? 'Vidéo produit réaliste' : 'Realistic product video'}
+                </span>
               </button>
               <button
                 onClick={() => setProvider('runway')}
@@ -248,8 +264,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}
               >
                 <div className="font-bold">RunwayML</div>
-                <div className="text-xs opacity-70">{language === 'fr' ? 'Animation d\'image' : 'Image animation'}</div>
-                <div className="text-[10px] opacity-60 mt-0.5">{language === 'fr' ? 'Vidéos de 5s ou 10s' : 'Videos of 5s or 10s'}</div>
+                <span className="inline-block mt-1 px-2 py-0.5 bg-white rounded-full text-violet-900 text-[10px] font-semibold">
+                  {language === 'fr' ? 'Animation d\'image' : 'Image animation'}
+                </span>
               </button>
             </div>
           </div>
@@ -283,29 +300,37 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           <div className={`mb-4 p-3 rounded-xl border ${
             provider === 'replicate' 
               ? 'bg-violet-500/10 border-violet-500/20'
+              : provider === 'wan'
+              ? 'bg-blue-500/10 border-blue-500/20'
               : 'bg-amber-500/10 border-amber-500/20'
           }`}>
             <div className="flex items-start gap-2">
               <svg className={`h-4 w-4 flex-shrink-0 mt-0.5 ${
-                provider === 'replicate' ? 'text-violet-400' : 'text-amber-400'
+                provider === 'replicate' ? 'text-violet-400' : provider === 'wan' ? 'text-blue-400' : 'text-amber-400'
               }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
                 <p className={`font-medium text-xs mb-0.5 ${
-                  provider === 'replicate' ? 'text-violet-200' : 'text-amber-200'
+                  provider === 'replicate' ? 'text-violet-200' : provider === 'wan' ? 'text-blue-200' : 'text-amber-200'
                 }`}>
                   {provider === 'replicate' 
-                    ? 'Kling v2.5 Turbo Pro' 
+                    ? 'Kling v2.5 Turbo Pro'
+                    : provider === 'wan'
+                    ? 'Wan-video v2.5 I2V'
                     : 'RunwayML Gen-3 Alpha Turbo'}
                 </p>
                 <p className={`text-xs leading-relaxed ${
-                  provider === 'replicate' ? 'text-violet-300/80' : 'text-amber-200/80'
+                  provider === 'replicate' ? 'text-violet-300/80' : provider === 'wan' ? 'text-blue-300/80' : 'text-amber-200/80'
                 }`}>
                   {provider === 'replicate'
                     ? (language === 'fr' 
                         ? 'Vidéo cinématographique pro. 5s = 15 crédits, 10s = 25 crédits' 
                         : 'Professional cinematic video. 5s = 15 credits, 10s = 25 credits')
+                    : provider === 'wan'
+                    ? (language === 'fr'
+                        ? 'Vidéo produit réaliste en 1080p avec audio optionnel. 5s = 18 crédits, 10s = 28 crédits'
+                        : 'Realistic product video in 1080p with optional audio. 5s = 18 credits, 10s = 28 credits')
                     : (language === 'fr'
                         ? <>Animation fluide HD uniquement en 16:9.<br />5s = 20 crédits, 10s = 30 crédits</>
                         : <>Smooth HD animation 16:9 only.<br />5s = 20 credits, 10s = 30 credits</>)}
@@ -313,6 +338,42 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               </div>
             </div>
           </div>
+
+          {/* Audio Upload - Only show for Wan */}
+          {provider === 'wan' && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Audio (optionnel)' : 'Audio (optional)'}
+              </label>
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) => setAudioFile(e.target.files[0])}
+                disabled={isGenerating}
+                className="hidden"
+                id="audio-upload"
+              />
+              <label
+                htmlFor="audio-upload"
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all cursor-pointer ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                {audioFile 
+                  ? audioFile.name 
+                  : (language === 'fr' ? 'Uploadez votre audio' : 'Upload your audio')}
+              </label>
+              {audioFile && (
+                <button
+                  onClick={() => setAudioFile(null)}
+                  className="mt-2 text-xs text-white/50 hover:text-white/70 transition-colors"
+                >
+                  {language === 'fr' ? '✕ Supprimer l\'audio' : '✕ Remove audio'}
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Examples Button - Only show for Replicate */}
           {provider === 'replicate' && (
