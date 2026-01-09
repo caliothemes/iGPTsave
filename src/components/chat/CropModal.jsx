@@ -81,21 +81,27 @@ export default function CropModal({ isOpen, onClose, visual, onCropComplete }) {
     const containerWidth = container.clientWidth - 40;
     const containerHeight = container.clientHeight - 40;
     const imageAspect = image.width / image.height;
-    const containerAspect = containerWidth / containerHeight;
     
+    // Calculate display size that fits in container while maintaining aspect ratio
     let displayWidth, displayHeight;
-    if (imageAspect > containerAspect) {
+    const maxWidth = Math.min(containerWidth, image.width);
+    const maxHeight = Math.min(containerHeight, image.height);
+    
+    if (imageAspect > maxWidth / maxHeight) {
       // Image is wider - fit to width
-      displayWidth = containerWidth;
-      displayHeight = containerWidth / imageAspect;
+      displayWidth = maxWidth;
+      displayHeight = maxWidth / imageAspect;
     } else {
       // Image is taller - fit to height
-      displayHeight = containerHeight;
-      displayWidth = containerHeight * imageAspect;
+      displayHeight = maxHeight;
+      displayWidth = maxHeight * imageAspect;
     }
     
+    // Set canvas dimensions to maintain aspect ratio exactly
     canvas.width = displayWidth;
     canvas.height = displayHeight;
+    canvas.style.width = displayWidth + 'px';
+    canvas.style.height = displayHeight + 'px';
     
     const displayScale = displayWidth / image.width;
     setScale(displayScale);
