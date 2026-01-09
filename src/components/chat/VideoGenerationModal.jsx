@@ -305,7 +305,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      {language === 'fr' ? 'Produit 360°' : 'Product 360°'}
+                      {language === 'fr' ? 'Vidéo 360°' : '360° video'}
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
                       <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -313,7 +313,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      {language === 'fr' ? '3 formats possibles' : '3 formats available'}
+                      {language === 'fr' ? '3 formats 1:1, 9:16, 16:9' : '3 formats 1:1, 9:16, 16:9'}
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
                       <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -341,7 +341,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      {language === 'fr' ? 'Vidéo produit incroyable' : 'Amazing product video'}
+                      {language === 'fr' ? 'Vidéo produit' : 'Product video'}
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
                       <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -358,6 +358,14 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                         </svg>
                       </div>
                       1080p
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      Format 1:1
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
                       <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
