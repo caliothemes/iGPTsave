@@ -388,6 +388,7 @@ export default function AdminVideoExamples() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="replicate">Kling v2.5 Pro</SelectItem>
+                      <SelectItem value="wan">Wan v2.5 I2V</SelectItem>
                       <SelectItem value="runway">RunwayML Gen-3</SelectItem>
                     </SelectContent>
                   </Select>
