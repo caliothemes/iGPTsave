@@ -37,7 +37,7 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
   };
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto">
+    <div className="relative w-full max-w-2xl mx-auto">
       {/* Scroll Buttons */}
       <button
         onClick={() => scroll('left')}
@@ -53,13 +53,13 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
       </button>
 
       {/* Fade Edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0a0a0f] to-transparent z-[5] pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a0a0f] to-transparent z-[5] pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#0a0a0f] to-transparent z-[5] pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0a0a0f] to-transparent z-[5] pointer-events-none" />
 
       {/* Scrollable Container */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide px-12 py-4"
+        className="flex gap-3 overflow-x-auto scrollbar-hide px-10 py-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {features.map((feature, idx) => {
@@ -89,17 +89,15 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
             >
               <CardComponent
                 onClick={handleClick}
-                className={`w-64 h-56 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-5 flex flex-col transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`w-52 h-48 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-4 flex flex-col items-center justify-center text-center transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-sm">
-                    <Icon className="h-5 w-5 text-white" />
-                  </div>
+                <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-sm mb-3">
+                  <Icon className="h-5 w-5 text-white" />
                 </div>
-                <h3 className="text-white font-bold text-base mb-2 line-clamp-2">
+                <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">
                   {title}
                 </h3>
-                <p className="text-white/80 text-xs leading-relaxed line-clamp-4 flex-1">
+                <p className="text-white/80 text-xs leading-relaxed line-clamp-4">
                   {description}
                 </p>
               </CardComponent>
