@@ -52,10 +52,6 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      {/* Fade Edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#0a0a0f] to-transparent z-[5] pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0a0a0f] to-transparent z-[5] pointer-events-none" />
-
       {/* Scrollable Container */}
       <div
         ref={scrollRef}
