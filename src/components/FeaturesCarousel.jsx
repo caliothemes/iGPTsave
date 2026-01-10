@@ -1,65 +1,30 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Pencil, Video, Upload, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Sparkles, Pencil, Video, Upload, ShoppingBag, ChevronLeft, ChevronRight, Image, Wand2, Palette, Zap } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+
+const ICON_MAP = {
+  Sparkles, Pencil, Video, Upload, ShoppingBag, Image, Wand2, Palette, Zap
+};
 
 export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoExamples }) {
   const { language } = useLanguage();
   const scrollRef = useRef(null);
+  const [features, setFeatures] = useState([]);
 
-  const features = [
-    {
-      id: 'text-to-image',
-      icon: Sparkles,
-      title: language === 'fr' ? 'Text To Image' : 'Text To Image',
-      description: language === 'fr' 
-        ? 'Générez des images incroyables par catégories.'
-        : 'Generate incredible images by categories.',
-      gradient: 'from-violet-600 to-purple-600',
-      onClick: null
-    },
-    {
-      id: 'image-edit',
-      icon: Pencil,
-      title: language === 'fr' ? 'Editez une image avec l\'IA' : 'Edit an image with AI',
-      description: language === 'fr'
-        ? 'Apportez des modifications à une image avec l\'IA en 1 prompt.'
-        : 'Make AI-powered modifications to an image in 1 prompt.',
-      gradient: 'from-orange-600 to-amber-600',
-      onClick: onOpenImageEditExamples
-    },
-    {
-      id: 'image-to-video',
-      icon: Video,
-      title: language === 'fr' ? 'Image To Vidéo' : 'Image To Video',
-      description: language === 'fr'
-        ? 'Créez des vidéos uniques pour vos produits, réseaux etc à partir d\'une image et d\'un prompt.'
-        : 'Create unique videos for your products, social networks, etc. from an image and a prompt.',
-      gradient: 'from-pink-600 to-rose-600',
-      onClick: onOpenVideoExamples
-    },
-    {
-      id: 'upload',
-      icon: Upload,
-      title: 'Upload',
-      description: language === 'fr'
-        ? 'Uploadez votre propre image pour lui apporter des modifications ou la transformer en vidéo.'
-        : 'Upload your own image to modify it or transform it into a video.',
-      gradient: 'from-blue-600 to-cyan-600',
-      onClick: null
-    },
-    {
-      id: 'store',
-      icon: ShoppingBag,
-      title: 'iGPT Store',
-      description: language === 'fr'
-        ? 'Découvrez des visuels prêts à l\'emploi, imaginés et promptés par notre équipe...'
-        : 'Discover ready-to-use visuals, designed and prompted by our team...',
-      gradient: 'from-emerald-600 to-teal-600',
-      onClick: () => window.location.href = createPageUrl('Store')
-    }
-  ];
+  useEffect(() => {
+    const loadFeatures = async () => {
+      try {
+        const data = await base44.entities.FeatureCard.filter({ is_active: true }, 'order');
+        setFeatures(data);
+      } catch (e) {
+        console.error('Failed to load features:', e);
+      }
+    };
+    loadFeatures();
+  }, []);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -98,8 +63,21 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {features.map((feature, idx) => {
-          const Icon = feature.icon;
-          const CardComponent = feature.onClick ? 'button' : 'div';
+          const Icon = ICON_MAP[feature.icon] || Sparkles;
+          const title = language === 'fr' ? feature.title_fr : (feature.title_en || feature.title_fr);
+          const description = language === 'fr' ? feature.description_fr : (feature.description_en || feature.description_fr);
+          
+          const handleClick = () => {
+            if (feature.action_type === 'open_image_edit') {
+              onOpenImageEditExamples?.();
+            } else if (feature.action_type === 'open_video_examples') {
+              onOpenVideoExamples?.();
+            } else if (feature.action_type === 'link_to_store') {
+              window.location.href = createPageUrl('Store');
+            }
+          };
+
+          const CardComponent = feature.action_type !== 'none' ? 'button' : 'div';
           
           return (
             <motion.div
@@ -110,21 +88,19 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
               className="flex-shrink-0"
             >
               <CardComponent
-                onClick={feature.onClick}
-                className={`w-64 h-48 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-6 flex flex-col justify-between transition-all hover:scale-105 hover:shadow-2xl ${feature.onClick ? 'cursor-pointer' : 'cursor-default'}`}
+                onClick={handleClick}
+                className={`w-64 h-56 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-5 flex flex-col transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-white/10 backdrop-blur-sm">
-                      <Icon className="h-6 w-6 text-white" />
-                    </div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-sm">
+                    <Icon className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-white font-bold text-lg mb-2">
-                    {feature.title}
-                  </h3>
                 </div>
-                <p className="text-white/80 text-sm leading-relaxed">
-                  {feature.description}
+                <h3 className="text-white font-bold text-base mb-2 line-clamp-2">
+                  {title}
+                </h3>
+                <p className="text-white/80 text-xs leading-relaxed line-clamp-4 flex-1">
+                  {description}
                 </p>
               </CardComponent>
             </motion.div>
