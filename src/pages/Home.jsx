@@ -38,6 +38,7 @@ import VideoExamplesModal from '@/components/chat/VideoExamplesModal';
 import ImageEditExamplesModal from '@/components/chat/ImageEditExamplesModal';
 import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
+import FeaturesCarousel from '@/components/FeaturesCarousel';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -1444,6 +1445,14 @@ export default function Home() {
               <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
                 {language === 'fr' ? 'NOUVEAU' : 'NEW'}
               </span>
+            </div>
+
+            {/* Features Carousel */}
+            <div className="w-full mb-10">
+              <FeaturesCarousel
+                onOpenImageEditExamples={() => setShowImageEditExamplesModal(true)}
+                onOpenVideoExamples={() => setShowVideoExamplesModal(true)}
+              />
             </div>
 
           </div>
