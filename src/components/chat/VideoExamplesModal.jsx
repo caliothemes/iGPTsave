@@ -192,7 +192,7 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                       <div className="flex flex-col items-center gap-2 mt-3 pt-3 border-t border-white/10 text-xs text-white/60">
                         <span>
                           {t.provider}: <span className="text-violet-400 font-medium">
-                            {currentExample.provider === 'replicate' ? 'Kling v2.5 Pro' : 'RunwayML Gen-3'}
+                            {currentExample.provider === 'replicate' ? 'Kling v2.5 Pro' : currentExample.provider === 'wan' ? 'Wan v2.5 I2V' : 'RunwayML Gen-3'}
                           </span>
                         </span>
                         {currentExample.duration && (
