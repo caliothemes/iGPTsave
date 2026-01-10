@@ -37,7 +37,7 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto">
+    <div className="relative w-full max-w-3xl mx-auto">
       {/* Scroll Buttons */}
       <button
         onClick={() => scroll('left')}
