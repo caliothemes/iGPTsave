@@ -1413,7 +1413,7 @@ export default function Home() {
             </div>
 
             {/* Buttons: Image to Video + Image Edit */}
-            <div className="w-full max-w-xl mb-10 relative">
+            {/* <div className="w-full max-w-xl mb-10 relative">
               <div className="flex flex-col gap-3 items-center justify-center bg-white/5 border border-white/10 rounded-xl p-4">
                 <button
                   onClick={() => setShowVideoExamplesModal(true)}
@@ -1445,7 +1445,7 @@ export default function Home() {
               <span className="absolute -top-3 -right-2 px-1.5 py-[1px] bg-emerald-700 text-white text-[9px] font-bold rounded shadow-md">
                 {language === 'fr' ? 'NOUVEAU' : 'NEW'}
               </span>
-            </div>
+            </div> */}
 
             {/* Features Carousel */}
             <div className="w-full mb-10">
