@@ -33,6 +33,7 @@ const navItems = [
   { id: 'video-prompts', label: 'Gestion Vidéo', icon: Video, page: 'AdminVideoPrompts' },
   { id: 'video-examples', label: 'Exemples Vidéo', icon: Video, page: 'AdminVideoExamples' },
   { id: 'image-edit-examples', label: 'Exemples Édition IA', icon: Pencil, page: 'AdminImageEditExamples' },
+  { id: 'features', label: 'Carousel Accueil', icon: LayoutDashboard, page: 'AdminFeatures' },
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
   { id: 'story-animations', label: 'Story Animations', icon: Wand2, page: 'AdminStoryAnimations' },
   { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
