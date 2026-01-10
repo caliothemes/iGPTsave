@@ -210,7 +210,7 @@ export default function AdminVideoExamples() {
                     </p>
                     <div className="flex items-center gap-3 text-xs text-white/60">
                       <span>
-                        {example.provider === 'replicate' ? 'Kling v2.5 Pro' : 'RunwayML Gen-3'}
+                        {example.provider === 'replicate' ? 'Kling v2.5 Pro' : example.provider === 'wan' ? 'Wan v2.5 I2V' : 'RunwayML Gen-3'}
                       </span>
                       {example.duration && <span>{example.duration}s</span>}
                       <span className={example.is_active ? 'text-green-400' : 'text-red-400'}>
