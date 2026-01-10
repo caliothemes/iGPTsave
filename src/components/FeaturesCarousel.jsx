@@ -37,17 +37,17 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
+    <div className="relative w-full max-w-2xl mx-auto">
       {/* Scroll Buttons */}
       <button
         onClick={() => scroll('left')}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
+        className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={() => scroll('right')}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
+        className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
@@ -55,7 +55,7 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
       {/* Scrollable Container */}
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scrollbar-hide px-10 py-4"
+        className="flex gap-3 overflow-x-auto scrollbar-hide px-2 py-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {features.map((feature, idx) => {
@@ -85,7 +85,7 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
             >
               <CardComponent
                 onClick={handleClick}
-                className={`w-52 h-48 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-4 flex flex-col items-center justify-center text-center transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`w-[200px] h-48 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-4 flex flex-col items-center justify-center text-center transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
               >
                 <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-sm mb-3">
                   <Icon className="h-5 w-5 text-white" />
