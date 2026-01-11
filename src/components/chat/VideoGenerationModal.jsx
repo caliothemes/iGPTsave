@@ -561,7 +561,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     {language === 'fr' ? 'Exemples de prompts :' : 'Prompt examples:'}
                   </p>
                   {promptExamples
-                    .filter(ex => ex.provider === 'both' || ex.provider === provider)
+                    .filter(ex => ex.provider === 'all' || ex.provider === provider || ex.provider === 'both')
                     .map((example, idx) => (
                       <button
                         key={idx}

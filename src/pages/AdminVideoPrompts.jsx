@@ -63,7 +63,7 @@ export default function AdminVideoPrompts() {
       short_desc_fr: '',
       short_desc_en: '',
       icon: '🎬',
-      provider: 'both',
+      provider: 'all',
       is_active: true,
       order: prompts.length
     });
@@ -78,7 +78,7 @@ export default function AdminVideoPrompts() {
       short_desc_fr: prompt.short_desc_fr,
       short_desc_en: prompt.short_desc_en || '',
       icon: prompt.icon || '🎬',
-      provider: prompt.provider || 'both',
+      provider: prompt.provider || 'all',
       is_active: prompt.is_active ?? true,
       order: prompt.order || 0
     });
@@ -169,11 +169,13 @@ export default function AdminVideoPrompts() {
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         prompt.provider === 'replicate' ? 'bg-violet-500/20 text-violet-300' :
+                        prompt.provider === 'wan' ? 'bg-blue-500/20 text-blue-300' :
                         prompt.provider === 'runway' ? 'bg-amber-500/20 text-amber-300' :
-                        'bg-blue-500/20 text-blue-300'
+                        'bg-green-500/20 text-green-300'
                       }`}>
-                        {prompt.provider === 'replicate' ? 'Replicate' : 
-                         prompt.provider === 'runway' ? 'Runway' : 'Les deux'}
+                        {prompt.provider === 'replicate' ? 'Kling' : 
+                         prompt.provider === 'wan' ? 'Wan' :
+                         prompt.provider === 'runway' ? 'Runway' : 'Tous'}
                       </span>
                     </td>
                     <td className="p-4">
@@ -257,9 +259,10 @@ export default function AdminVideoPrompts() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-white/10">
-                      <SelectItem value="both">Les deux</SelectItem>
-                      <SelectItem value="replicate">Replicate Kling</SelectItem>
-                      <SelectItem value="runway">RunwayML</SelectItem>
+                      <SelectItem value="all">Tous les générateurs</SelectItem>
+                      <SelectItem value="replicate">Kling v2.5 (Replicate)</SelectItem>
+                      <SelectItem value="wan">Wan v2.5 I2V</SelectItem>
+                      <SelectItem value="runway">RunwayML Gen-3</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
