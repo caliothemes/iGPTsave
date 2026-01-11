@@ -4531,8 +4531,8 @@ Réponds en JSON avec:
     </div>
     <div className="flex gap-2 items-center">
       <span className="text-white/40 text-xs w-16">{language === 'fr' ? 'Distance:' : 'Distance:'}</span>
-      <Slider value={[currentLayer.reflectionGap || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-200} max={500} step={1} className="flex-1" />
-      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionGap || 2}px</span>
+      <Slider value={[currentLayer.reflectionGap || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-50} max={100} step={1} className="flex-1" />
+      <span className="text-white/40 text-xs w-6">{currentLayer.reflectionGap || 0}px</span>
     </div>
   </div>
 )}
