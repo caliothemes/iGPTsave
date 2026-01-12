@@ -755,24 +755,24 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw image with object-fit: cover (fill zone completely, crop if needed)
+                // Draw image with object-fit: contain (no cropping, preserve aspect ratio)
                 const img = loadedImages[layer.imageUrl];
                 const imgRatio = img.width / img.height;
                 const zoneRatio = layer.width / layer.height;
                 
                 let drawWidth, drawHeight, drawX, drawY;
                 if (imgRatio > zoneRatio) {
-                  // Image wider - fit to height and crop sides
-                  drawHeight = layer.height;
-                  drawWidth = layer.height * imgRatio;
-                  drawX = layer.x - (drawWidth - layer.width) / 2;
-                  drawY = layer.y;
-                } else {
-                  // Image taller - fit to width and crop top/bottom
+                  // Image wider than zone - fit to width
                   drawWidth = layer.width;
                   drawHeight = layer.width / imgRatio;
                   drawX = layer.x;
-                  drawY = layer.y - (drawHeight - layer.height) / 2;
+                  drawY = layer.y + (layer.height - drawHeight) / 2;
+                } else {
+                  // Image taller than zone - fit to height
+                  drawHeight = layer.height;
+                  drawWidth = layer.height * imgRatio;
+                  drawX = layer.x + (layer.width - drawWidth) / 2;
+                  drawY = layer.y;
                 }
                 
                 ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -2419,23 +2419,23 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw image with object-fit: cover (fill zone completely, crop if needed)
+              // Draw image with object-fit: contain (no cropping, preserve aspect ratio)
               const imgRatio = layerImg.width / layerImg.height;
               const zoneRatio = layer.width / layer.height;
               
               let drawWidth, drawHeight, drawX, drawY;
               if (imgRatio > zoneRatio) {
-                // Image wider - fit to height and crop sides
-                drawHeight = layer.height;
-                drawWidth = layer.height * imgRatio;
-                drawX = layer.x - (drawWidth - layer.width) / 2;
-                drawY = layer.y;
-              } else {
-                // Image taller - fit to width and crop top/bottom
+                // Image wider than zone - fit to width
                 drawWidth = layer.width;
                 drawHeight = layer.width / imgRatio;
                 drawX = layer.x;
-                drawY = layer.y - (drawHeight - layer.height) / 2;
+                drawY = layer.y + (layer.height - drawHeight) / 2;
+              } else {
+                // Image taller than zone - fit to height
+                drawHeight = layer.height;
+                drawWidth = layer.height * imgRatio;
+                drawX = layer.x + (layer.width - drawWidth) / 2;
+                drawY = layer.y;
               }
               
               exportCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
