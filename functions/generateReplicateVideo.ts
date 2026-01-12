@@ -78,8 +78,9 @@ Deno.serve(async (req) => {
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       input = {
         prompt: prompt,
-        aspect_ratio: aspect_ratio === '3:4' ? '9:16' : '16:9', // Sora uses different format notation
-        length: duration === 4 ? 'short' : duration === 8 ? 'medium' : 'long'
+        aspect_ratio: aspect_ratio === '3:4' ? '9:16' : '16:9',
+        length: duration === 4 ? 'short' : duration === 8 ? 'medium' : 'long',
+        resolution_quality: 'high'
       };
       if (image_url) {
         input.image_url = image_url;
