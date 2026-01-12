@@ -730,16 +730,18 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills, use a completely clean context
+              // For mockup fills, use a completely isolated rendering
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // Reset all context effects completely
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                ctx.filter = 'none';
+                // Create a temporary canvas for clean rendering
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
                 
-                // Apply clipping mask
+                // Draw the image cleanly on temp canvas
+                tempCtx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                
+                // Apply clipping mask on main context
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
                   if (i === 0) ctx.moveTo(point[0], point[1]);
@@ -748,8 +750,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw clean image
-                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                // Draw the temp canvas onto main canvas
+                ctx.drawImage(tempCanvas, 0, 0);
               } else {
                 // Normal image rendering with effects
                 if (layer.halo) {
@@ -2367,16 +2369,18 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills, use completely clean context
+            // For mockup fills, use completely isolated rendering
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // Reset all effects completely
-              exportCtx.shadowColor = 'transparent';
-              exportCtx.shadowBlur = 0;
-              exportCtx.shadowOffsetX = 0;
-              exportCtx.shadowOffsetY = 0;
-              exportCtx.filter = 'none';
+              // Create a temporary canvas for clean rendering
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = exportCanvas.width;
+              tempCanvas.height = exportCanvas.height;
+              const tempCtx = tempCanvas.getContext('2d');
               
-              // Apply clipping mask
+              // Draw the image cleanly on temp canvas
+              tempCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+              
+              // Apply clipping mask on export context
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
                 if (i === 0) exportCtx.moveTo(point[0], point[1]);
@@ -2385,8 +2389,8 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw clean image
-              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+              // Draw the temp canvas onto export canvas
+              exportCtx.drawImage(tempCanvas, 0, 0);
             } else {
               // Normal image rendering with effects
               if (layer.halo) {
