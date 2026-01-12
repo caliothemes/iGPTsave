@@ -59,8 +59,8 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
                 </h3>
                 <p className="text-white/60 text-xs">
                   {language === 'fr' 
-                    ? 'Découvrez ce que vous pouvez faire avec l\'édition IA' 
-                    : 'See what you can do with AI editing'}
+                    ? 'Générez ou uploadez une image, puis cliquez sur Modifier pour créer des éditions comme celles-ci.' 
+                    : 'Generate or upload an image, then click Edit to create modifications like these.'}
                 </p>
               </div>
             </div>
