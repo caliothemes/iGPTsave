@@ -730,14 +730,14 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - draw directly without temp canvas
+              // For mockup fills - draw image at exact layer dimensions
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // Apply clipping mask directly
                 ctx.save();
                 ctx.globalAlpha = layer.opacity / 100;
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 
+                // Apply clipping mask
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
                   if (i === 0) ctx.moveTo(point[0], point[1]);
@@ -746,25 +746,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw image directly - simple drawImage with layer bounds
-                const img = loadedImages[layer.imageUrl];
-                const imgRatio = img.width / img.height;
-                const zoneRatio = layer.width / layer.height;
-                
-                let drawWidth, drawHeight, drawX, drawY;
-                if (imgRatio > zoneRatio) {
-                  drawWidth = layer.width;
-                  drawHeight = layer.width / imgRatio;
-                  drawX = layer.x;
-                  drawY = layer.y + (layer.height - drawHeight) / 2;
-                } else {
-                  drawHeight = layer.height;
-                  drawWidth = layer.height * imgRatio;
-                  drawX = layer.x + (layer.width - drawWidth) / 2;
-                  drawY = layer.y;
-                }
-                
-                ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+                // Draw image at exact layer dimensions (already calculated correctly on creation)
+                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
                 ctx.restore();
               } else {
                 // Normal image rendering with effects
@@ -2383,14 +2366,14 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - draw directly without temp canvas
+            // For mockup fills - draw image at exact layer dimensions
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // Apply clipping mask directly
               exportCtx.save();
               exportCtx.globalAlpha = layer.opacity / 100;
               exportCtx.imageSmoothingEnabled = true;
               exportCtx.imageSmoothingQuality = 'high';
               
+              // Apply clipping mask
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
                 if (i === 0) exportCtx.moveTo(point[0], point[1]);
@@ -2399,24 +2382,8 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw image directly - simple drawImage with layer bounds
-              const imgRatio = layerImg.width / layerImg.height;
-              const zoneRatio = layer.width / layer.height;
-              
-              let drawWidth, drawHeight, drawX, drawY;
-              if (imgRatio > zoneRatio) {
-                drawWidth = layer.width;
-                drawHeight = layer.width / imgRatio;
-                drawX = layer.x;
-                drawY = layer.y + (layer.height - drawHeight) / 2;
-              } else {
-                drawHeight = layer.height;
-                drawWidth = layer.height * imgRatio;
-                drawX = layer.x + (layer.width - drawWidth) / 2;
-                drawY = layer.y;
-              }
-              
-              exportCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
+              // Draw image at exact layer dimensions (already calculated correctly on creation)
+              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
               exportCtx.restore();
             } else {
               // Normal image rendering with effects
