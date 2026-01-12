@@ -11,10 +11,11 @@ import { createPageUrl } from '@/utils';
 
 export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated, user, credits, guestPrompts }) {
   const { language } = useLanguage();
-  const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', or 'runway'
+  const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', 'runway', or 'sora'
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [duration, setDuration] = useState(5);
+  const [soraAspectRatio, setSoraAspectRatio] = useState('16:9');
   const [audioFile, setAudioFile] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -69,8 +70,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     setProgress(0);
 
     try {
-      if (provider === 'replicate' || provider === 'wan') {
-        // Replicate Kling/Wan generation
+      if (provider === 'replicate' || provider === 'wan' || provider === 'sora') {
+        // Replicate Kling/Wan/Sora generation
         setProgress(10);
         
         // Simulate progressive loading
@@ -85,11 +86,15 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           image_url: visual.image_url,
           prompt: finalPrompt,
           duration: duration,
-          model: provider === 'wan' ? 'wan' : 'kling'
+          model: provider === 'wan' ? 'wan' : provider === 'sora' ? 'sora' : 'kling'
         };
 
         if (provider === 'replicate') {
           payload.aspect_ratio = aspectRatio;
+        }
+
+        if (provider === 'sora') {
+          payload.aspect_ratio = soraAspectRatio;
         }
 
         if (provider === 'wan' && audioFile) {
@@ -110,9 +115,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         setProgress(100);
         setTimeout(() => {
           // Add metadata to prompt for badge display
-          const modelName = provider === 'wan' ? 'Wan v2.5 I2V' : 'Kling v2.5 Pro';
+          const modelName = provider === 'wan' ? 'Wan v2.5 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
           const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
-          onVideoGenerated(response.data.video_url, promptWithMetadata, provider === 'replicate' ? aspectRatio : '16:9');
+          const videoAspectRatio = provider === 'replicate' ? aspectRatio : provider === 'sora' ? soraAspectRatio : '16:9';
+          onVideoGenerated(response.data.video_url, promptWithMetadata, videoAspectRatio);
           onClose();
         }, 500);
 
@@ -238,7 +244,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             <label className="text-white/80 text-sm mb-2 block">
               {language === 'fr' ? 'Service de génération' : 'Generation service'}
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setProvider('replicate')}
                 disabled={isGenerating}
@@ -264,6 +270,18 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 <div className="text-[10px] text-white/70">I2V 1080p</div>
               </button>
               <button
+                onClick={() => setProvider('sora')}
+                disabled={isGenerating}
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                  provider === 'sora'
+                    ? 'bg-violet-600 border-violet-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                }`}
+              >
+                <div className="font-bold">Sora 2 Pro</div>
+                <div className="text-[10px] text-white/70">OpenAI</div>
+              </button>
+              <button
                 onClick={() => setProvider('runway')}
                 disabled={isGenerating}
                 className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
@@ -281,6 +299,42 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             {/* Provider Features */}
             <div className="mb-4">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                {provider === 'sora' && (
+                  <>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Ultra réaliste' : 'Ultra realistic'}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Cohérence parfaite' : 'Perfect coherence'}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? '2 formats 3:4, 16:9' : '2 formats 3:4, 16:9'}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      4s, 8s {language === 'fr' ? 'ou' : 'or'} 12s
+                    </div>
+                  </>
+                )}
                 {provider === 'replicate' && (
                   <>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
@@ -406,26 +460,30 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               ? 'bg-violet-500/10 border-violet-500/20'
               : provider === 'wan'
               ? 'bg-blue-500/10 border-blue-500/20'
+              : provider === 'sora'
+              ? 'bg-pink-500/10 border-pink-500/20'
               : 'bg-amber-500/10 border-amber-500/20'
           }`}>
             <div className="flex items-start gap-2">
               <svg className={`h-4 w-4 flex-shrink-0 mt-0.5 ${
-                provider === 'replicate' ? 'text-violet-400' : provider === 'wan' ? 'text-blue-400' : 'text-amber-400'
+                provider === 'replicate' ? 'text-violet-400' : provider === 'wan' ? 'text-blue-400' : provider === 'sora' ? 'text-pink-400' : 'text-amber-400'
               }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
                 <p className={`font-medium text-xs mb-0.5 ${
-                  provider === 'replicate' ? 'text-violet-200' : provider === 'wan' ? 'text-blue-200' : 'text-amber-200'
+                  provider === 'replicate' ? 'text-violet-200' : provider === 'wan' ? 'text-blue-200' : provider === 'sora' ? 'text-pink-200' : 'text-amber-200'
                 }`}>
                   {provider === 'replicate' 
                     ? 'Kling v2.5 Turbo Pro'
                     : provider === 'wan'
                     ? 'Wan-video v2.5 I2V'
+                    : provider === 'sora'
+                    ? 'Sora 2 Pro by OpenAI'
                     : 'RunwayML Gen-3 Alpha Turbo'}
                 </p>
                 <p className={`text-xs leading-relaxed ${
-                  provider === 'replicate' ? 'text-violet-300/80' : provider === 'wan' ? 'text-blue-300/80' : 'text-amber-200/80'
+                  provider === 'replicate' ? 'text-violet-300/80' : provider === 'wan' ? 'text-blue-300/80' : provider === 'sora' ? 'text-pink-300/80' : 'text-amber-200/80'
                 }`}>
                   {provider === 'replicate'
                     ? (language === 'fr' 
@@ -435,6 +493,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     ? (language === 'fr'
                         ? <>Vidéo produit en 1080p avec audio optionnel.<br />5s = 20 crédits, 10s = 30 crédits</>
                         : <>Product video in 1080p with optional audio.<br />5s = 20 credits, 10s = 30 credits</>)
+                    : provider === 'sora'
+                    ? (language === 'fr'
+                        ? <>Génération ultra-réaliste par OpenAI.<br />4s = 30 crédits, 8s = 50 crédits, 12s = 70 crédits</>
+                        : <>Ultra-realistic generation by OpenAI.<br />4s = 30 credits, 8s = 50 credits, 12s = 70 credits</>)
                     : (language === 'fr'
                         ? <>Animation fluide HD uniquement en 16:9.<br />5s = 20 crédits, 10s = 30 crédits</>
                         : <>Smooth HD animation 16:9 only.<br />5s = 20 credits, 10s = 30 credits</>)}
@@ -462,6 +524,34 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     }`}
                   >
                     {ratio}
+                  </button>
+                  ))}
+                  </div>
+                  </div>
+                  )}
+
+            {/* Aspect Ratio - Only for Sora */}
+            {provider === 'sora' && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Format vidéo' : 'Video format'}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: '3:4', label: language === 'fr' ? 'Portrait (3:4)' : 'Portrait (3:4)' },
+                  { value: '16:9', label: language === 'fr' ? 'Paysage (16:9)' : 'Landscape (16:9)' }
+                ].map(ratio => (
+                  <button
+                    key={ratio.value}
+                    onClick={() => setSoraAspectRatio(ratio.value)}
+                    disabled={isGenerating}
+                    className={`px-3 py-2 rounded-lg border transition-all text-sm disabled:opacity-50 ${
+                      soraAspectRatio === ratio.value
+                        ? 'bg-pink-600 border-pink-500 text-white'
+                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    }`}
+                  >
+                    {ratio.label}
                   </button>
                   ))}
                   </div>
@@ -594,36 +684,84 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             <label className="text-white/80 text-sm mb-2 block">
               {language === 'fr' ? 'Durée' : 'Duration'}
             </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setDuration(5)}
-                disabled={isGenerating}
-                className={`flex-1 px-4 py-2 rounded-lg transition-all ${
-                  duration === 5 
-                    ? 'bg-violet-600 text-white' 
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                } disabled:opacity-50`}
-              >
-                5s
-              </button>
-              <button
-                onClick={() => setDuration(10)}
-                disabled={isGenerating}
-                className={`flex-1 px-4 py-2 rounded-lg transition-all ${
-                  duration === 10 
-                    ? 'bg-violet-600 text-white' 
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                } disabled:opacity-50`}
-              >
-                10s
-              </button>
-            </div>
+            {provider === 'sora' ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDuration(4)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 4 
+                      ? 'bg-pink-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  4s
+                </button>
+                <button
+                  onClick={() => setDuration(8)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 8 
+                      ? 'bg-pink-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  8s
+                </button>
+                <button
+                  onClick={() => setDuration(12)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 12 
+                      ? 'bg-pink-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  12s
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDuration(5)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 5 
+                      ? 'bg-violet-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  5s
+                </button>
+                <button
+                  onClick={() => setDuration(10)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 10 
+                      ? 'bg-violet-600 text-white' 
+                      : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  10s
+                </button>
+              </div>
+            )}
             <div className="flex justify-center mt-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-medium">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium ${
+                provider === 'sora' 
+                  ? 'bg-pink-500/20 border-pink-500/30 text-pink-300' 
+                  : 'bg-violet-500/20 border-violet-500/30 text-violet-300'
+              }`}>
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {provider === 'replicate' 
+                {provider === 'sora'
+                  ? (duration === 4 
+                      ? (language === 'fr' ? '30 crédits' : '30 credits')
+                      : duration === 8
+                      ? (language === 'fr' ? '50 crédits' : '50 credits')
+                      : (language === 'fr' ? '70 crédits' : '70 credits'))
+                  : provider === 'replicate' 
                   ? (duration === 5 
                       ? (language === 'fr' ? '15 crédits' : '15 credits') 
                       : (language === 'fr' ? '25 crédits' : '25 credits'))
@@ -741,6 +879,20 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     </p>
                     <p className="text-white/50 text-[10px]">
                       {language === 'fr' ? 'Vidéo produit 1080p • v2.5 I2V' : 'Product video 1080p • v2.5 I2V'}
+                    </p>
+                  </div>
+                </>
+              ) : provider === 'sora' ? (
+                <>
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-600 to-rose-600 flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/90 text-xs font-medium">
+                      {language === 'fr' ? 'Vidéo générée par OpenAI Sora' : 'Video generated by OpenAI Sora'}
+                    </p>
+                    <p className="text-white/50 text-[10px]">
+                      {language === 'fr' ? 'Ultra-réaliste • Sora 2 Pro' : 'Ultra-realistic • Sora 2 Pro'}
                     </p>
                   </div>
                 </>
