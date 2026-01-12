@@ -673,8 +673,17 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
           // Draw all layers in order (first = bottom, last = top)
           layers.forEach((layer, idx) => {
             ctx.save();
-            ctx.globalCompositeOperation = 'source-over'; // Ensure normal blending
+            
+            // RESET ALL context properties to defaults before each layer
+            ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = layer.opacity / 100;
+            ctx.filter = 'none';
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             
             if (layer.type === 'background') {
               if (layer.bgType === 'solid') {
@@ -730,21 +739,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - completely reset context before drawing
+              // For mockup fills - draw in isolated context
               if (layer.clipMask && layer.clipMask.length > 0) {
-                ctx.save();
-                
-                // RESET ALL possible inherited effects
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.globalAlpha = layer.opacity / 100;
-                ctx.filter = 'none';
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                
                 // Apply clipping mask
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
@@ -756,7 +752,6 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 
                 // Draw image simply at layer dimensions
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-                ctx.restore();
               } else {
                 // Normal image rendering with effects
                 if (layer.halo) {
@@ -2308,7 +2303,17 @@ Réponds en JSON avec:
         // Draw all layers in order (same as rendering)
         for (const layer of layers) {
           exportCtx.save();
+          
+          // RESET ALL context properties to defaults before each layer
+          exportCtx.globalCompositeOperation = 'source-over';
           exportCtx.globalAlpha = layer.opacity / 100;
+          exportCtx.filter = 'none';
+          exportCtx.shadowColor = 'transparent';
+          exportCtx.shadowBlur = 0;
+          exportCtx.shadowOffsetX = 0;
+          exportCtx.shadowOffsetY = 0;
+          exportCtx.imageSmoothingEnabled = true;
+          exportCtx.imageSmoothingQuality = 'high';
           
           if (layer.type === 'background') {
             if (layer.bgType === 'solid') {
@@ -2374,21 +2379,8 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - completely reset context before drawing
+            // For mockup fills - draw in isolated context
             if (layer.clipMask && layer.clipMask.length > 0) {
-              exportCtx.save();
-              
-              // RESET ALL possible inherited effects
-              exportCtx.globalCompositeOperation = 'source-over';
-              exportCtx.globalAlpha = layer.opacity / 100;
-              exportCtx.filter = 'none';
-              exportCtx.shadowColor = 'transparent';
-              exportCtx.shadowBlur = 0;
-              exportCtx.shadowOffsetX = 0;
-              exportCtx.shadowOffsetY = 0;
-              exportCtx.imageSmoothingEnabled = true;
-              exportCtx.imageSmoothingQuality = 'high';
-              
               // Apply clipping mask
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
@@ -2400,7 +2392,6 @@ Réponds en JSON avec:
               
               // Draw image simply at layer dimensions
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
-              exportCtx.restore();
             } else {
               // Normal image rendering with effects
               if (layer.halo) {
