@@ -2428,70 +2428,69 @@ Réponds en JSON avec:
               } else {
                 exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
               }
-            }
-            
-            // Reflection effect for images
-            if (layer.reflection) {
-              exportCtx.save();
               
-              const reflectionGap = layer.reflectionGap || 2;
-              const reflectY = layer.y + layer.height + reflectionGap;
-              const reflectionHeight = layer.height * 0.6;
-              
-              const tempCanvas = document.createElement('canvas');
-              tempCanvas.width = layer.width;
-              tempCanvas.height = reflectionHeight;
-              const tempCtx = tempCanvas.getContext('2d');
-              
-              tempCtx.save();
-              tempCtx.translate(0, reflectionHeight);
-              tempCtx.scale(1, -1);
-              
-              if (layer.tintColor && layer.tintOpacity) {
-                const tintCanvas = document.createElement('canvas');
-                tintCanvas.width = layer.width;
-                tintCanvas.height = layer.height;
-                const tintCtx = tintCanvas.getContext('2d');
-                tintCtx.drawImage(layerImg, 0, 0, layer.width, layer.height);
-                tintCtx.globalCompositeOperation = 'overlay';
-                tintCtx.globalAlpha = layer.tintOpacity / 100;
-                tintCtx.fillStyle = layer.tintColor;
-                tintCtx.fillRect(0, 0, layer.width, layer.height);
-                tempCtx.drawImage(tintCanvas, 0, 0, layer.width, reflectionHeight);
-              } else {
-                tempCtx.drawImage(layerImg, 0, 0, layer.width, reflectionHeight);
+              // Reflection effect for images
+              if (layer.reflection) {
+                exportCtx.save();
+                
+                const reflectionGap = layer.reflectionGap || 2;
+                const reflectY = layer.y + layer.height + reflectionGap;
+                const reflectionHeight = layer.height * 0.6;
+                
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = layer.width;
+                tempCanvas.height = reflectionHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                tempCtx.save();
+                tempCtx.translate(0, reflectionHeight);
+                tempCtx.scale(1, -1);
+                
+                if (layer.tintColor && layer.tintOpacity) {
+                  const tintCanvas = document.createElement('canvas');
+                  tintCanvas.width = layer.width;
+                  tintCanvas.height = layer.height;
+                  const tintCtx = tintCanvas.getContext('2d');
+                  tintCtx.drawImage(layerImg, 0, 0, layer.width, layer.height);
+                  tintCtx.globalCompositeOperation = 'overlay';
+                  tintCtx.globalAlpha = layer.tintOpacity / 100;
+                  tintCtx.fillStyle = layer.tintColor;
+                  tintCtx.fillRect(0, 0, layer.width, layer.height);
+                  tempCtx.drawImage(tintCanvas, 0, 0, layer.width, reflectionHeight);
+                } else {
+                  tempCtx.drawImage(layerImg, 0, 0, layer.width, reflectionHeight);
+                }
+                
+                tempCtx.restore();
+                
+                tempCtx.globalCompositeOperation = 'destination-out';
+                const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
+                fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
+                fadeGradient.addColorStop(0.5, 'rgba(0,0,0,0.5)');
+                fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
+                tempCtx.fillStyle = fadeGradient;
+                tempCtx.fillRect(0, 0, layer.width, reflectionHeight);
+                
+                exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+                exportCtx.drawImage(tempCanvas, layer.x, reflectY);
+                
+                exportCtx.restore();
               }
               
-              tempCtx.restore();
-              
-              tempCtx.globalCompositeOperation = 'destination-out';
-              const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
-              fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
-              fadeGradient.addColorStop(0.5, 'rgba(0,0,0,0.5)');
-              fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
-              tempCtx.fillStyle = fadeGradient;
-              tempCtx.fillRect(0, 0, layer.width, reflectionHeight);
-              
-              exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
-              exportCtx.drawImage(tempCanvas, layer.x, reflectY);
-              
-              exportCtx.restore();
-            }
-            
-            if (layer.stroke) {
-              exportCtx.restore();
-              exportCtx.save();
-              exportCtx.globalAlpha = layer.opacity / 100;
-              exportCtx.strokeStyle = layer.strokeColor || '#000000';
-              exportCtx.lineWidth = layer.strokeWidth || 2;
-              if (layer.borderRadius && layer.borderRadius > 0) {
-                exportCtx.beginPath();
-                exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-                exportCtx.stroke();
-              } else {
-                exportCtx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+              if (layer.stroke) {
+                exportCtx.restore();
+                exportCtx.save();
+                exportCtx.globalAlpha = layer.opacity / 100;
+                exportCtx.strokeStyle = layer.strokeColor || '#000000';
+                exportCtx.lineWidth = layer.strokeWidth || 2;
+                if (layer.borderRadius && layer.borderRadius > 0) {
+                  exportCtx.beginPath();
+                  exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                  exportCtx.stroke();
+                } else {
+                  exportCtx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+                }
               }
-            }
             }
           } else if (layer.type === 'text') {
             const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
