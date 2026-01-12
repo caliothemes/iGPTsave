@@ -739,7 +739,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // MOCKUP FILL - Completely isolated, skip all other processing
+              // MOCKUP FILL - Completely isolated, no effects
               if (layer.clipMask && layer.clipMask.length > 0) {
                 // Apply clipping mask
                 ctx.beginPath();
@@ -750,53 +750,48 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw image ONLY - no effects whatsoever
+                // Draw image ONLY - no effects
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-                
-                // SKIP ALL EFFECTS - go directly to next layer
-                ctx.restore();
-                return; // Exit this layer iteration completely
-              }
-              
-              // Normal image rendering with effects (only for non-mockup images)
-              if (layer.halo) {
-                ctx.shadowColor = layer.haloColor || '#FFD700';
-                ctx.shadowBlur = layer.haloSize || 15;
-              } else if (layer.glow) {
-                ctx.shadowColor = layer.glowColor || '#ffffff';
-                ctx.shadowBlur = layer.glowSize || 10;
-              } else if (layer.shadow) {
-                ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = layer.shadowBlur || 10;
-                ctx.shadowOffsetX = 5;
-                ctx.shadowOffsetY = 5;
-              }
-              
-              // Apply border radius clipping if needed
-              if (layer.borderRadius && layer.borderRadius > 0) {
-                ctx.beginPath();
-                ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-                ctx.clip();
-              }
-              
-              // Draw image with optional tint
-              if (layer.tintColor && layer.tintOpacity) {
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = layer.width;
-                tempCanvas.height = layer.height;
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
-                tempCtx.globalCompositeOperation = 'overlay';
-                tempCtx.globalAlpha = layer.tintOpacity / 100;
-                tempCtx.fillStyle = layer.tintColor;
-                tempCtx.fillRect(0, 0, layer.width, layer.height);
-                ctx.drawImage(tempCanvas, layer.x, layer.y);
               } else {
-                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-              }
+                // Normal image rendering with effects (only for non-mockup images)
+                if (layer.halo) {
+                  ctx.shadowColor = layer.haloColor || '#FFD700';
+                  ctx.shadowBlur = layer.haloSize || 15;
+                } else if (layer.glow) {
+                  ctx.shadowColor = layer.glowColor || '#ffffff';
+                  ctx.shadowBlur = layer.glowSize || 10;
+                } else if (layer.shadow) {
+                  ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+                  ctx.shadowBlur = layer.shadowBlur || 10;
+                  ctx.shadowOffsetX = 5;
+                  ctx.shadowOffsetY = 5;
+                }
+                
+                // Apply border radius clipping if needed
+                if (layer.borderRadius && layer.borderRadius > 0) {
+                  ctx.beginPath();
+                  ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                  ctx.clip();
+                }
+                
+                // Draw image with optional tint
+                if (layer.tintColor && layer.tintOpacity) {
+                  const tempCanvas = document.createElement('canvas');
+                  tempCanvas.width = layer.width;
+                  tempCanvas.height = layer.height;
+                  const tempCtx = tempCanvas.getContext('2d');
+                  tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
+                  tempCtx.globalCompositeOperation = 'overlay';
+                  tempCtx.globalAlpha = layer.tintOpacity / 100;
+                  tempCtx.fillStyle = layer.tintColor;
+                  tempCtx.fillRect(0, 0, layer.width, layer.height);
+                  ctx.drawImage(tempCanvas, layer.x, layer.y);
+                } else {
+                  ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                }
               
-              // Reflection effect for images
-              if (layer.reflection) {
+                // Reflection effect for images
+                if (layer.reflection) {
                 ctx.save();
                 
                 const reflectionGap = layer.reflectionGap || 2;
@@ -846,21 +841,22 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.drawImage(tempCanvas, layer.x, reflectY);
                 
                 ctx.restore();
-              }
-              
-              // Draw border on top
-              if (layer.stroke) {
-                ctx.restore();
-                ctx.save();
-                ctx.globalAlpha = layer.opacity / 100;
-                ctx.strokeStyle = layer.strokeColor || '#000000';
-                ctx.lineWidth = layer.strokeWidth || 2;
-                if (layer.borderRadius && layer.borderRadius > 0) {
-                  ctx.beginPath();
-                  ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-                  ctx.stroke();
-                } else {
-                  ctx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+                }
+                
+                // Draw border on top
+                if (layer.stroke) {
+                  ctx.restore();
+                  ctx.save();
+                  ctx.globalAlpha = layer.opacity / 100;
+                  ctx.strokeStyle = layer.strokeColor || '#000000';
+                  ctx.lineWidth = layer.strokeWidth || 2;
+                  if (layer.borderRadius && layer.borderRadius > 0) {
+                    ctx.beginPath();
+                    ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                    ctx.stroke();
+                  } else {
+                    ctx.strokeRect(layer.x, layer.y, layer.width, layer.height);
+                  }
                 }
               }
             } else if (layer.type === 'text') {
@@ -2383,7 +2379,7 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // MOCKUP FILL - Completely isolated, skip all other processing
+            // MOCKUP FILL - Completely isolated, no effects
             if (layer.clipMask && layer.clipMask.length > 0) {
               // Apply clipping mask
               exportCtx.beginPath();
@@ -2394,15 +2390,9 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw image ONLY - no effects whatsoever
+              // Draw image ONLY - no effects
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
-              
-              // SKIP ALL EFFECTS - go to next layer
-              exportCtx.restore();
-              continue; // Skip to next layer iteration
-            }
-            
-            {
+            } else {
               // Normal image rendering with effects (only for non-mockup images)
               if (layer.halo) {
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
