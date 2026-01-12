@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       input = {
         prompt: prompt,
-        aspect_ratio: aspect_ratio === '3:4' ? '9:16' : '16:9',
+        aspect_ratio: aspect_ratio === '3:4' ? 'portrait' : 'landscape',
         length: duration === 4 ? 'short' : duration === 8 ? 'medium' : 'long',
         resolution_quality: 'high'
       };
