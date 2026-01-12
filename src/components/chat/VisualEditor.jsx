@@ -738,6 +738,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 tempCanvas.height = canvas.height;
                 const tempCtx = tempCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
                 
+                // Enable high-quality image smoothing
+                tempCtx.imageSmoothingEnabled = true;
+                tempCtx.imageSmoothingQuality = 'high';
+                
                 // Draw ONLY the user image on the clean temp canvas with clipping
                 tempCtx.save();
                 tempCtx.beginPath();
@@ -775,6 +779,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.globalAlpha = layer.opacity / 100;
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(tempCanvas, 0, 0);
                 ctx.restore();
               } else {
@@ -2402,6 +2408,10 @@ Réponds en JSON avec:
               tempCanvas.height = canvasSize.height;
               const tempCtx = tempCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
               
+              // Enable highest quality rendering
+              tempCtx.imageSmoothingEnabled = true;
+              tempCtx.imageSmoothingQuality = 'high';
+              
               // Draw ONLY the user image on the clean temp canvas with clipping
               tempCtx.save();
               tempCtx.beginPath();
@@ -2438,6 +2448,8 @@ Réponds en JSON avec:
               exportCtx.save();
               exportCtx.globalCompositeOperation = 'source-over';
               exportCtx.globalAlpha = layer.opacity / 100;
+              exportCtx.imageSmoothingEnabled = true;
+              exportCtx.imageSmoothingQuality = 'high';
               exportCtx.drawImage(tempCanvas, 0, 0);
               exportCtx.restore();
             } else {
