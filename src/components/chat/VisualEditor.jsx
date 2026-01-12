@@ -5565,29 +5565,34 @@ Réponds en JSON avec:
                       
                       const zone = detectedZone;
                       
-                      // Calculate size: width fits zone, height proportional (real size)
-                      const scale = zone.width / uploadedImg.width;
-                      const scaledHeight = uploadedImg.height * scale;
+                      // Use object-fit: cover - fill the zone completely
+                      const imgRatio = uploadedImg.width / uploadedImg.height;
+                      const zoneRatio = zone.width / zone.height;
                       
-                      // Center vertically in the zone
-                      const yOffset = (zone.height - scaledHeight) / 2;
+                      let drawWidth, drawHeight, drawX, drawY;
+                      if (imgRatio > zoneRatio) {
+                        // Image is wider - fit height, crop width
+                        drawHeight = zone.height;
+                        drawWidth = zone.height * imgRatio;
+                        drawX = zone.x - (drawWidth - zone.width) / 2;
+                        drawY = zone.y;
+                      } else {
+                        // Image is taller - fit width, crop height
+                        drawWidth = zone.width;
+                        drawHeight = zone.width / imgRatio;
+                        drawX = zone.x;
+                        drawY = zone.y - (drawHeight - zone.height) / 2;
+                      }
                       
                       const newLayer = {
                         type: 'image',
                         imageUrl: userImageUrl,
-                        x: zone.x,
-                        y: zone.y + yOffset,
-                        width: zone.width,
-                        height: scaledHeight,
+                        x: drawX,
+                        y: drawY,
+                        width: drawWidth,
+                        height: drawHeight,
                         opacity: 100,
-                        clipMask: zone.points,
-                        lockedToMask: true,
-                        // Disable all effects for mockup fills
-                        halo: false,
-                        glow: false,
-                        shadow: false,
-                        tintColor: null,
-                        tintOpacity: 0
+                        clipMask: zone.points
                       };
                       
                       setLayers([...layers, newLayer]);
@@ -5595,8 +5600,8 @@ Réponds en JSON avec:
                       setActiveTab('layers');
                       
                       showHelp(language === 'fr' 
-                        ? '✨ Image insérée ! Elle reste dans la zone blanche.' 
-                        : '✨ Image inserted! It stays within the white area.');
+                        ? '✨ Image insérée ! Elle remplit la zone.' 
+                        : '✨ Image inserted! It fills the area.');
                       setShowMockupModal(false);
                       setMockupImageFile(null);
                       setDetectedZone(null);
