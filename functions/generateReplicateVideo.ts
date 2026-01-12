@@ -76,10 +76,25 @@ Deno.serve(async (req) => {
     if (model === 'sora') {
       // Sora 2 Pro
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
+      
+      // Map duration to Sora's length parameter
+      let lengthValue;
+      if (duration === 4) {
+        lengthValue = 'short';
+      } else if (duration === 8) {
+        lengthValue = 'medium';
+      } else if (duration === 12) {
+        lengthValue = 'long';
+      } else {
+        lengthValue = 'short'; // fallback
+      }
+      
+      console.log(`Sora duration ${duration}s mapped to length: ${lengthValue}`);
+      
       input = {
         prompt: prompt,
         aspect_ratio: aspect_ratio === '3:4' ? 'portrait' : 'landscape',
-        length: duration <= 4 ? 'short' : duration <= 8 ? 'medium' : 'long',
+        length: lengthValue,
         resolution_quality: 'high'
       };
       if (image_url) {
