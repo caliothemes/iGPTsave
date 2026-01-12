@@ -740,18 +740,20 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.clip();
               }
               
-              // Apply effects for images
-              if (layer.halo) {
-                ctx.shadowColor = layer.haloColor || '#FFD700';
-                ctx.shadowBlur = layer.haloSize || 15;
-              } else if (layer.glow) {
-                ctx.shadowColor = layer.glowColor || '#ffffff';
-                ctx.shadowBlur = layer.glowSize || 10;
-              } else if (layer.shadow) {
-                ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = layer.shadowBlur || 10;
-                ctx.shadowOffsetX = 5;
-                ctx.shadowOffsetY = 5;
+              // Apply effects for images (NOT for mockup fills)
+              if (!layer.clipMask) {
+                if (layer.halo) {
+                  ctx.shadowColor = layer.haloColor || '#FFD700';
+                  ctx.shadowBlur = layer.haloSize || 15;
+                } else if (layer.glow) {
+                  ctx.shadowColor = layer.glowColor || '#ffffff';
+                  ctx.shadowBlur = layer.glowSize || 10;
+                } else if (layer.shadow) {
+                  ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+                  ctx.shadowBlur = layer.shadowBlur || 10;
+                  ctx.shadowOffsetX = 5;
+                  ctx.shadowOffsetY = 5;
+                }
               }
               
               // Apply border radius clipping if needed
@@ -761,8 +763,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.clip();
               }
               
-              // Apply color tint using a temporary canvas
-              if (layer.tintColor && layer.tintOpacity) {
+              // Draw image (no tint for mockup fills)
+              if (layer.tintColor && layer.tintOpacity && !layer.clipMask) {
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = layer.width;
                 tempCanvas.height = layer.height;
@@ -2363,17 +2365,20 @@ Réponds en JSON avec:
               exportCtx.clip();
             }
             
-            if (layer.halo) {
-              exportCtx.shadowColor = layer.haloColor || '#FFD700';
-              exportCtx.shadowBlur = layer.haloSize || 15;
-            } else if (layer.glow) {
-              exportCtx.shadowColor = layer.glowColor || '#ffffff';
-              exportCtx.shadowBlur = layer.glowSize || 10;
-            } else if (layer.shadow) {
-              exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
-              exportCtx.shadowBlur = layer.shadowBlur || 10;
-              exportCtx.shadowOffsetX = 5;
-              exportCtx.shadowOffsetY = 5;
+            // Apply effects for images (NOT for mockup fills)
+            if (!layer.clipMask) {
+              if (layer.halo) {
+                exportCtx.shadowColor = layer.haloColor || '#FFD700';
+                exportCtx.shadowBlur = layer.haloSize || 15;
+              } else if (layer.glow) {
+                exportCtx.shadowColor = layer.glowColor || '#ffffff';
+                exportCtx.shadowBlur = layer.glowSize || 10;
+              } else if (layer.shadow) {
+                exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+                exportCtx.shadowBlur = layer.shadowBlur || 10;
+                exportCtx.shadowOffsetX = 5;
+                exportCtx.shadowOffsetY = 5;
+              }
             }
             
             if (layer.borderRadius && layer.borderRadius > 0) {
@@ -2382,7 +2387,8 @@ Réponds en JSON avec:
               exportCtx.clip();
             }
             
-            if (layer.tintColor && layer.tintOpacity) {
+            // Draw image (no tint for mockup fills)
+            if (layer.tintColor && layer.tintOpacity && !layer.clipMask) {
               const tempCanvas = document.createElement('canvas');
               tempCanvas.width = layer.width;
               tempCanvas.height = layer.height;
