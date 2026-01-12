@@ -93,14 +93,20 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           });
         }, 1000);
 
+        // Build payload step by step to ensure duration is included
+        const durationValue = Number(duration);
+        console.log(`[FRONTEND DEBUG] Duration value to send: ${durationValue}, Type: ${typeof durationValue}`);
+        
         const payload = {
           image_url: visual.image_url,
           prompt: finalPrompt,
-          duration: Number(duration),
           model: provider === 'wan' ? 'wan' : provider === 'sora' ? 'sora' : 'kling'
         };
         
-        console.log(`[FRONTEND DEBUG] Payload duration: ${payload.duration}, Type: ${typeof payload.duration}`);
+        // Explicitly add duration
+        payload.duration = durationValue;
+        
+        console.log(`[FRONTEND DEBUG] Payload after adding duration:`, JSON.stringify(payload, null, 2));
 
         if (provider === 'replicate') {
           payload.aspect_ratio = aspectRatio;
