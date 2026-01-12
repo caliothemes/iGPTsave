@@ -732,16 +732,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
               // For mockup fills, use a completely isolated rendering
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // Create a temporary canvas for clean rendering
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const tempCtx = tempCanvas.getContext('2d');
-                
-                // Draw the image cleanly on temp canvas
-                tempCtx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-                
-                // Apply clipping mask on main context
+                // Apply clipping mask
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
                   if (i === 0) ctx.moveTo(point[0], point[1]);
@@ -750,8 +741,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw the temp canvas onto main canvas
-                ctx.drawImage(tempCanvas, 0, 0);
+                // Draw white background first to hide mockup content below
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(layer.x, layer.y, layer.width, layer.height);
+                
+                // Draw the image on top
+                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
               } else {
                 // Normal image rendering with effects
                 if (layer.halo) {
@@ -2371,16 +2366,7 @@ Réponds en JSON avec:
             
             // For mockup fills, use completely isolated rendering
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // Create a temporary canvas for clean rendering
-              const tempCanvas = document.createElement('canvas');
-              tempCanvas.width = exportCanvas.width;
-              tempCanvas.height = exportCanvas.height;
-              const tempCtx = tempCanvas.getContext('2d');
-              
-              // Draw the image cleanly on temp canvas
-              tempCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
-              
-              // Apply clipping mask on export context
+              // Apply clipping mask
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
                 if (i === 0) exportCtx.moveTo(point[0], point[1]);
@@ -2389,8 +2375,12 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw the temp canvas onto export canvas
-              exportCtx.drawImage(tempCanvas, 0, 0);
+              // Draw white background first to hide mockup content below
+              exportCtx.fillStyle = '#ffffff';
+              exportCtx.fillRect(layer.x, layer.y, layer.width, layer.height);
+              
+              // Draw the image on top
+              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
             } else {
               // Normal image rendering with effects
               if (layer.halo) {
