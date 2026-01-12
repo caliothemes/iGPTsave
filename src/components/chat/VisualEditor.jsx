@@ -730,10 +730,18 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - draw image at exact layer dimensions
+              // For mockup fills - completely reset context before drawing
               if (layer.clipMask && layer.clipMask.length > 0) {
                 ctx.save();
+                
+                // RESET ALL possible inherited effects
+                ctx.globalCompositeOperation = 'source-over';
                 ctx.globalAlpha = layer.opacity / 100;
+                ctx.filter = 'none';
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 
@@ -746,7 +754,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw image at exact layer dimensions (already calculated correctly on creation)
+                // Draw image simply at layer dimensions
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
                 ctx.restore();
               } else {
@@ -2366,10 +2374,18 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - draw image at exact layer dimensions
+            // For mockup fills - completely reset context before drawing
             if (layer.clipMask && layer.clipMask.length > 0) {
               exportCtx.save();
+              
+              // RESET ALL possible inherited effects
+              exportCtx.globalCompositeOperation = 'source-over';
               exportCtx.globalAlpha = layer.opacity / 100;
+              exportCtx.filter = 'none';
+              exportCtx.shadowColor = 'transparent';
+              exportCtx.shadowBlur = 0;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
               exportCtx.imageSmoothingEnabled = true;
               exportCtx.imageSmoothingQuality = 'high';
               
@@ -2382,7 +2398,7 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw image at exact layer dimensions (already calculated correctly on creation)
+              // Draw image simply at layer dimensions
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
               exportCtx.restore();
             } else {
