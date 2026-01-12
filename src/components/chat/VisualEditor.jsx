@@ -730,28 +730,52 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - completely reset context and draw clean
+              // For mockup fills - use isolated temporary canvas to avoid ANY effect inheritance
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // Reset ALL context effects completely
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                ctx.filter = 'none';
-                ctx.globalCompositeOperation = 'source-over';
+                // Create a completely fresh temporary canvas
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
                 
-                // Create clipping path
-                ctx.save();
-                ctx.beginPath();
+                // Draw ONLY the user image on the clean temp canvas with clipping
+                tempCtx.save();
+                tempCtx.beginPath();
                 layer.clipMask.forEach((point, i) => {
-                  if (i === 0) ctx.moveTo(point[0], point[1]);
-                  else ctx.lineTo(point[0], point[1]);
+                  if (i === 0) tempCtx.moveTo(point[0], point[1]);
+                  else tempCtx.lineTo(point[0], point[1]);
                 });
-                ctx.closePath();
-                ctx.clip();
+                tempCtx.closePath();
+                tempCtx.clip();
                 
-                // Draw image directly with clean context
-                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                // Draw image with object-fit: contain behavior (preserve aspect ratio)
+                const img = loadedImages[layer.imageUrl];
+                const imgRatio = img.width / img.height;
+                const zoneRatio = layer.width / layer.height;
+                
+                let drawWidth, drawHeight, drawX, drawY;
+                if (imgRatio > zoneRatio) {
+                  // Image wider than zone - fit to width
+                  drawWidth = layer.width;
+                  drawHeight = layer.width / imgRatio;
+                  drawX = layer.x;
+                  drawY = layer.y + (layer.height - drawHeight) / 2;
+                } else {
+                  // Image taller than zone - fit to height
+                  drawHeight = layer.height;
+                  drawWidth = layer.height * imgRatio;
+                  drawX = layer.x + (layer.width - drawWidth) / 2;
+                  drawY = layer.y;
+                }
+                
+                tempCtx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+                tempCtx.restore();
+                
+                // Now draw the clean temp canvas onto main canvas with layer opacity only
+                ctx.save();
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = layer.opacity / 100;
+                ctx.drawImage(tempCanvas, 0, 0);
                 ctx.restore();
               } else {
                 // Normal image rendering with effects
@@ -2370,28 +2394,51 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - completely reset context and draw clean
+            // For mockup fills - use isolated temporary canvas to avoid ANY effect inheritance
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // Reset ALL context effects completely
-              exportCtx.shadowColor = 'transparent';
-              exportCtx.shadowBlur = 0;
-              exportCtx.shadowOffsetX = 0;
-              exportCtx.shadowOffsetY = 0;
-              exportCtx.filter = 'none';
-              exportCtx.globalCompositeOperation = 'source-over';
+              // Create a completely fresh temporary canvas at original scale
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = canvasSize.width;
+              tempCanvas.height = canvasSize.height;
+              const tempCtx = tempCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
               
-              // Create clipping path
-              exportCtx.save();
-              exportCtx.beginPath();
+              // Draw ONLY the user image on the clean temp canvas with clipping
+              tempCtx.save();
+              tempCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
-                if (i === 0) exportCtx.moveTo(point[0], point[1]);
-                else exportCtx.lineTo(point[0], point[1]);
+                if (i === 0) tempCtx.moveTo(point[0], point[1]);
+                else tempCtx.lineTo(point[0], point[1]);
               });
-              exportCtx.closePath();
-              exportCtx.clip();
+              tempCtx.closePath();
+              tempCtx.clip();
               
-              // Draw image directly with clean context
-              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+              // Draw image with object-fit: contain behavior (preserve aspect ratio)
+              const imgRatio = layerImg.width / layerImg.height;
+              const zoneRatio = layer.width / layer.height;
+              
+              let drawWidth, drawHeight, drawX, drawY;
+              if (imgRatio > zoneRatio) {
+                // Image wider than zone - fit to width
+                drawWidth = layer.width;
+                drawHeight = layer.width / imgRatio;
+                drawX = layer.x;
+                drawY = layer.y + (layer.height - drawHeight) / 2;
+              } else {
+                // Image taller than zone - fit to height
+                drawHeight = layer.height;
+                drawWidth = layer.height * imgRatio;
+                drawX = layer.x + (layer.width - drawWidth) / 2;
+                drawY = layer.y;
+              }
+              
+              tempCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
+              tempCtx.restore();
+              
+              // Now draw the clean temp canvas onto export canvas with layer opacity only
+              exportCtx.save();
+              exportCtx.globalCompositeOperation = 'source-over';
+              exportCtx.globalAlpha = layer.opacity / 100;
+              exportCtx.drawImage(tempCanvas, 0, 0);
               exportCtx.restore();
             } else {
               // Normal image rendering with effects
