@@ -78,11 +78,11 @@ Deno.serve(async (req) => {
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       input = {
         prompt: prompt,
-        aspect_ratio: aspect_ratio,
-        num_frames: duration === 4 ? 120 : duration === 8 ? 240 : 360
+        aspect_ratio: aspect_ratio === '3:4' ? '9:16' : '16:9', // Sora uses different format notation
+        length: duration === 4 ? 'short' : duration === 8 ? 'medium' : 'long'
       };
       if (image_url) {
-        input.image = image_url;
+        input.image_url = image_url;
       }
     } else if (model === 'wan') {
       // Wan v2.5 I2V
