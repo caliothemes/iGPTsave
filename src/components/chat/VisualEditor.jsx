@@ -730,58 +730,52 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - use isolated temporary canvas to avoid ANY effect inheritance
+              // For mockup fills - draw directly with clean context, NO temp canvas
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // Create a completely fresh temporary canvas
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const tempCtx = tempCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
+                // Completely reset context before drawing
+                ctx.save();
                 
-                // Enable high-quality image smoothing
-                tempCtx.imageSmoothingEnabled = true;
-                tempCtx.imageSmoothingQuality = 'high';
+                // Reset ALL effects and filters
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.filter = 'none';
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = layer.opacity / 100;
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 
-                // Draw ONLY the user image on the clean temp canvas with clipping
-                tempCtx.save();
-                tempCtx.beginPath();
+                // Apply clipping mask
+                ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
-                  if (i === 0) tempCtx.moveTo(point[0], point[1]);
-                  else tempCtx.lineTo(point[0], point[1]);
+                  if (i === 0) ctx.moveTo(point[0], point[1]);
+                  else ctx.lineTo(point[0], point[1]);
                 });
-                tempCtx.closePath();
-                tempCtx.clip();
+                ctx.closePath();
+                ctx.clip();
                 
-                // Draw image with object-fit: contain behavior (preserve aspect ratio)
+                // Draw image with object-fit: contain (preserve aspect ratio)
                 const img = loadedImages[layer.imageUrl];
                 const imgRatio = img.width / img.height;
                 const zoneRatio = layer.width / layer.height;
                 
                 let drawWidth, drawHeight, drawX, drawY;
                 if (imgRatio > zoneRatio) {
-                  // Image wider than zone - fit to width
+                  // Image wider - fit to width
                   drawWidth = layer.width;
                   drawHeight = layer.width / imgRatio;
                   drawX = layer.x;
                   drawY = layer.y + (layer.height - drawHeight) / 2;
                 } else {
-                  // Image taller than zone - fit to height
+                  // Image taller - fit to height
                   drawHeight = layer.height;
                   drawWidth = layer.height * imgRatio;
                   drawX = layer.x + (layer.width - drawWidth) / 2;
                   drawY = layer.y;
                 }
                 
-                tempCtx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-                tempCtx.restore();
-                
-                // Now draw the clean temp canvas onto main canvas with layer opacity only
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.globalAlpha = layer.opacity / 100;
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(tempCanvas, 0, 0);
+                ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
                 ctx.restore();
               } else {
                 // Normal image rendering with effects
@@ -2400,57 +2394,51 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - use isolated temporary canvas to avoid ANY effect inheritance
+            // For mockup fills - draw directly with clean context, NO temp canvas
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // Create a completely fresh temporary canvas at original scale
-              const tempCanvas = document.createElement('canvas');
-              tempCanvas.width = canvasSize.width;
-              tempCanvas.height = canvasSize.height;
-              const tempCtx = tempCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
+              // Completely reset context before drawing
+              exportCtx.save();
               
-              // Enable highest quality rendering
-              tempCtx.imageSmoothingEnabled = true;
-              tempCtx.imageSmoothingQuality = 'high';
+              // Reset ALL effects and filters
+              exportCtx.shadowColor = 'transparent';
+              exportCtx.shadowBlur = 0;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
+              exportCtx.filter = 'none';
+              exportCtx.globalCompositeOperation = 'source-over';
+              exportCtx.globalAlpha = layer.opacity / 100;
+              exportCtx.imageSmoothingEnabled = true;
+              exportCtx.imageSmoothingQuality = 'high';
               
-              // Draw ONLY the user image on the clean temp canvas with clipping
-              tempCtx.save();
-              tempCtx.beginPath();
+              // Apply clipping mask
+              exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
-                if (i === 0) tempCtx.moveTo(point[0], point[1]);
-                else tempCtx.lineTo(point[0], point[1]);
+                if (i === 0) exportCtx.moveTo(point[0], point[1]);
+                else exportCtx.lineTo(point[0], point[1]);
               });
-              tempCtx.closePath();
-              tempCtx.clip();
+              exportCtx.closePath();
+              exportCtx.clip();
               
-              // Draw image with object-fit: contain behavior (preserve aspect ratio)
+              // Draw image with object-fit: contain (preserve aspect ratio)
               const imgRatio = layerImg.width / layerImg.height;
               const zoneRatio = layer.width / layer.height;
               
               let drawWidth, drawHeight, drawX, drawY;
               if (imgRatio > zoneRatio) {
-                // Image wider than zone - fit to width
+                // Image wider - fit to width
                 drawWidth = layer.width;
                 drawHeight = layer.width / imgRatio;
                 drawX = layer.x;
                 drawY = layer.y + (layer.height - drawHeight) / 2;
               } else {
-                // Image taller than zone - fit to height
+                // Image taller - fit to height
                 drawHeight = layer.height;
                 drawWidth = layer.height * imgRatio;
                 drawX = layer.x + (layer.width - drawWidth) / 2;
                 drawY = layer.y;
               }
               
-              tempCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
-              tempCtx.restore();
-              
-              // Now draw the clean temp canvas onto export canvas with layer opacity only
-              exportCtx.save();
-              exportCtx.globalCompositeOperation = 'source-over';
-              exportCtx.globalAlpha = layer.opacity / 100;
-              exportCtx.imageSmoothingEnabled = true;
-              exportCtx.imageSmoothingQuality = 'high';
-              exportCtx.drawImage(tempCanvas, 0, 0);
+              exportCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
               exportCtx.restore();
             } else {
               // Normal image rendering with effects
