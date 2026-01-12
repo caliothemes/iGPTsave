@@ -9,16 +9,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5 } = await req.json();
+    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5, model = 'kling', audio_url } = await req.json();
     
-    console.log('Video generation request:', { image_url, additional_images, prompt, aspect_ratio, duration });
+    console.log('Video generation request:', { image_url, additional_images, prompt, aspect_ratio, duration, model });
 
     if (!prompt) {
       return Response.json({ error: 'Missing prompt' }, { status: 400 });
     }
 
-    // Calculate credits based on duration
-    const creditsRequired = duration === 10 ? 25 : 15;
+    // Calculate credits based on model and duration
+    let creditsRequired;
+    if (model === 'sora') {
+      creditsRequired = duration === 4 ? 30 : duration === 8 ? 50 : 70;
+    } else if (model === 'wan') {
+      creditsRequired = duration === 10 ? 30 : 20;
+    } else {
+      creditsRequired = duration === 10 ? 25 : 15;
+    }
 
     // Check credits
     const userCredits = await base44.entities.UserCredits.filter({ user_email: user.email });
@@ -60,29 +67,54 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'REPLICATE_API_KEY not configured' }, { status: 500 });
     }
 
-    console.log('Starting Kling v2.5 Turbo Pro prediction...');
+    console.log(`Starting ${model} video generation...`);
 
-    // Prepare input for Kling API
-    const input = {
-      prompt: prompt || 'Cinematic motion, smooth camera movement',
-      duration: duration === 10 ? 10 : 5,
-      aspect_ratio: aspect_ratio
-    };
-
-    // Add images if provided
-    if (image_url) {
-      input.start_image = image_url;
-    }
+    // Prepare input based on model
+    let modelEndpoint;
+    let input;
     
-    // Add end image if additional images provided
-    if (additional_images && additional_images.length > 0) {
-      input.end_image = additional_images[0];
+    if (model === 'sora') {
+      // Sora 2 Pro
+      modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
+      input = {
+        prompt: prompt,
+        aspect_ratio: aspect_ratio,
+        num_frames: duration === 4 ? 120 : duration === 8 ? 240 : 360
+      };
+      if (image_url) {
+        input.image = image_url;
+      }
+    } else if (model === 'wan') {
+      // Wan v2.5 I2V
+      modelEndpoint = 'https://api.replicate.com/v1/models/lucataco/wan-v2.5-i2v/predictions';
+      input = {
+        image: image_url,
+        prompt: prompt,
+        duration: duration
+      };
+      if (audio_url) {
+        input.audio = audio_url;
+      }
+    } else {
+      // Kling v2.5 Turbo Pro
+      modelEndpoint = 'https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions';
+      input = {
+        prompt: prompt || 'Cinematic motion, smooth camera movement',
+        duration: duration === 10 ? 10 : 5,
+        aspect_ratio: aspect_ratio
+      };
+      if (image_url) {
+        input.start_image = image_url;
+      }
+      if (additional_images && additional_images.length > 0) {
+        input.end_image = additional_images[0];
+      }
     }
 
-    console.log('Kling input:', input);
+    console.log('Model input:', input);
 
-    // Use Kling v2.5 Turbo Pro model endpoint
-    const response = await fetch('https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions', {
+    // Call Replicate API
+    const response = await fetch(modelEndpoint, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REPLICATE_API_KEY}`,
