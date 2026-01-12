@@ -739,13 +739,13 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // MOCKUP FILL - Use simple rectangle clip
-              if (layer.clipMask && layer.clipMask.length > 0) {
+              // MOCKUP FILL - Rectangle clip
+              if (layer.clipMask) {
                 ctx.save();
                 
-                // Use simple rectangle clip based on layer bounds (not complex path)
+                // Rectangle clip to the detected zone
                 ctx.beginPath();
-                ctx.rect(layer.clipX || layer.x, layer.clipY || layer.y, layer.clipWidth || layer.width, layer.clipHeight || layer.height);
+                ctx.rect(layer.clipX, layer.clipY, layer.clipWidth, layer.clipHeight);
                 ctx.clip();
                 
                 // Draw image
@@ -2379,13 +2379,13 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // MOCKUP FILL - Use simple rectangle clip
-            if (layer.clipMask && layer.clipMask.length > 0) {
+            // MOCKUP FILL - Rectangle clip
+            if (layer.clipMask) {
               exportCtx.save();
               
-              // Use simple rectangle clip based on layer bounds (not complex path)
+              // Rectangle clip to the detected zone
               exportCtx.beginPath();
-              exportCtx.rect(layer.clipX || layer.x, layer.clipY || layer.y, layer.clipWidth || layer.width, layer.clipHeight || layer.height);
+              exportCtx.rect(layer.clipX, layer.clipY, layer.clipWidth, layer.clipHeight);
               exportCtx.clip();
               
               // Draw image
