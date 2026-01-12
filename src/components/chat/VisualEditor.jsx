@@ -730,29 +730,23 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - use isolated temp canvas to prevent effect inheritance
+              // For mockup fills - draw directly without temp canvas
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // Create isolated temporary canvas
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const tempCtx = tempCanvas.getContext('2d', { alpha: true });
+                // Apply clipping mask directly
+                ctx.save();
+                ctx.globalAlpha = layer.opacity / 100;
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 
-                // Clean temp context with high quality
-                tempCtx.imageSmoothingEnabled = true;
-                tempCtx.imageSmoothingQuality = 'high';
-                
-                // Apply clipping on temp canvas
-                tempCtx.save();
-                tempCtx.beginPath();
+                ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
-                  if (i === 0) tempCtx.moveTo(point[0], point[1]);
-                  else tempCtx.lineTo(point[0], point[1]);
+                  if (i === 0) ctx.moveTo(point[0], point[1]);
+                  else ctx.lineTo(point[0], point[1]);
                 });
-                tempCtx.closePath();
-                tempCtx.clip();
+                ctx.closePath();
+                ctx.clip();
                 
-                // Draw image with object-fit: contain
+                // Draw image directly - simple drawImage with layer bounds
                 const img = loadedImages[layer.imageUrl];
                 const imgRatio = img.width / img.height;
                 const zoneRatio = layer.width / layer.height;
@@ -770,17 +764,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                   drawY = layer.y;
                 }
                 
-                tempCtx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-                tempCtx.restore();
-                
-                // Transfer temp canvas to main with clean state
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.globalAlpha = layer.opacity / 100;
-                ctx.filter = 'none';
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.drawImage(tempCanvas, 0, 0);
+                ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
                 ctx.restore();
               } else {
                 // Normal image rendering with effects
@@ -2399,29 +2383,23 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - use isolated temp canvas
+            // For mockup fills - draw directly without temp canvas
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // Create isolated temporary canvas
-              const tempCanvas = document.createElement('canvas');
-              tempCanvas.width = canvasSize.width;
-              tempCanvas.height = canvasSize.height;
-              const tempCtx = tempCanvas.getContext('2d', { alpha: true });
+              // Apply clipping mask directly
+              exportCtx.save();
+              exportCtx.globalAlpha = layer.opacity / 100;
+              exportCtx.imageSmoothingEnabled = true;
+              exportCtx.imageSmoothingQuality = 'high';
               
-              // Clean temp context with high quality
-              tempCtx.imageSmoothingEnabled = true;
-              tempCtx.imageSmoothingQuality = 'high';
-              
-              // Apply clipping on temp canvas
-              tempCtx.save();
-              tempCtx.beginPath();
+              exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
-                if (i === 0) tempCtx.moveTo(point[0], point[1]);
-                else tempCtx.lineTo(point[0], point[1]);
+                if (i === 0) exportCtx.moveTo(point[0], point[1]);
+                else exportCtx.lineTo(point[0], point[1]);
               });
-              tempCtx.closePath();
-              tempCtx.clip();
+              exportCtx.closePath();
+              exportCtx.clip();
               
-              // Draw image with object-fit: contain
+              // Draw image directly - simple drawImage with layer bounds
               const imgRatio = layerImg.width / layerImg.height;
               const zoneRatio = layer.width / layer.height;
               
@@ -2438,17 +2416,7 @@ Réponds en JSON avec:
                 drawY = layer.y;
               }
               
-              tempCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
-              tempCtx.restore();
-              
-              // Transfer temp canvas to export with clean state
-              exportCtx.save();
-              exportCtx.globalCompositeOperation = 'source-over';
-              exportCtx.globalAlpha = layer.opacity / 100;
-              exportCtx.filter = 'none';
-              exportCtx.shadowColor = 'transparent';
-              exportCtx.shadowBlur = 0;
-              exportCtx.drawImage(tempCanvas, 0, 0);
+              exportCtx.drawImage(layerImg, drawX, drawY, drawWidth, drawHeight);
               exportCtx.restore();
             } else {
               // Normal image rendering with effects
