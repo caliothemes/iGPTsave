@@ -83,6 +83,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         // Replicate Kling/Wan/Sora generation
         setProgress(10);
         
+        console.log(`[FRONTEND DEBUG] Provider: ${provider}, Duration state: ${duration}, Type: ${typeof duration}`);
+        
         // Simulate progressive loading
         const progressInterval = setInterval(() => {
           setProgress(prev => {
@@ -94,9 +96,11 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         const payload = {
           image_url: visual.image_url,
           prompt: finalPrompt,
-          duration: duration,
+          duration: Number(duration),
           model: provider === 'wan' ? 'wan' : provider === 'sora' ? 'sora' : 'kling'
         };
+        
+        console.log(`[FRONTEND DEBUG] Payload duration: ${payload.duration}, Type: ${typeof payload.duration}`);
 
         if (provider === 'replicate') {
           payload.aspect_ratio = aspectRatio;
@@ -104,8 +108,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
         if (provider === 'sora') {
           payload.aspect_ratio = soraAspectRatio;
-          console.log(`Frontend Sora - duration state: ${duration}, type: ${typeof duration}`);
-          console.log(`Frontend Sora - payload before send:`, JSON.stringify(payload, null, 2));
         }
 
         if (provider === 'wan' && audioFile) {
@@ -114,7 +116,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           payload.audio_url = file_url;
         }
 
-        console.log(`Sending payload to backend:`, payload);
+        console.log(`[FRONTEND DEBUG] Final payload being sent:`, JSON.stringify(payload, null, 2));
         const response = await base44.functions.invoke('generateReplicateVideo', payload);
 
         clearInterval(progressInterval);

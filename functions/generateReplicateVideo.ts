@@ -9,9 +9,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5, model = 'kling', audio_url } = await req.json();
+    const body = await req.json();
+    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5, model = 'kling', audio_url } = body;
 
-    console.log('Video generation request:', { image_url, additional_images, prompt, aspect_ratio, duration, model, durationType: typeof duration });
+    console.log('[BACKEND DEBUG] Raw request body:', JSON.stringify(body, null, 2));
+    console.log('[BACKEND DEBUG] Extracted duration:', duration, 'Type:', typeof duration);
 
     if (!prompt) {
       return Response.json({ error: 'Missing prompt' }, { status: 400 });
