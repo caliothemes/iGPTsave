@@ -739,7 +739,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - draw in isolated context
+              // For mockup fills - NO EFFECTS AT ALL
               if (layer.clipMask && layer.clipMask.length > 0) {
                 // Apply clipping mask
                 ctx.beginPath();
@@ -750,10 +750,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw image simply at layer dimensions
+                // Draw image at layer dimensions - NOTHING ELSE
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
               } else {
-                // Normal image rendering with effects
+                // Normal image rendering with effects (only for non-mockup images)
                 if (layer.halo) {
                   ctx.shadowColor = layer.haloColor || '#FFD700';
                   ctx.shadowBlur = layer.haloSize || 15;
@@ -2379,7 +2379,7 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - draw in isolated context
+            // For mockup fills - NO EFFECTS AT ALL
             if (layer.clipMask && layer.clipMask.length > 0) {
               // Apply clipping mask
               exportCtx.beginPath();
@@ -2390,10 +2390,10 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw image simply at layer dimensions
+              // Draw image at layer dimensions - NOTHING ELSE
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
             } else {
-              // Normal image rendering with effects
+              // Normal image rendering with effects (only for non-mockup images)
               if (layer.halo) {
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
                 exportCtx.shadowBlur = layer.haloSize || 15;
