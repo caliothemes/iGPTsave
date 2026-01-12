@@ -673,6 +673,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
           // Draw all layers in order (first = bottom, last = top)
           layers.forEach((layer, idx) => {
             ctx.save();
+            ctx.globalCompositeOperation = 'source-over'; // Ensure normal blending
             ctx.globalAlpha = layer.opacity / 100;
             
             if (layer.type === 'background') {
@@ -1278,6 +1279,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             
             ctx.restore();
           }
+          
+          // Reset composite operation to normal drawing
+          ctx.globalCompositeOperation = 'source-over';
           
           // Draw selection indicators with resize handles
           layers.forEach((layer, idx) => {
@@ -5561,7 +5565,13 @@ Réponds en JSON avec:
                         height: scaledHeight,
                         opacity: 100,
                         clipMask: zone.points,
-                        lockedToMask: true
+                        lockedToMask: true,
+                        // Disable all effects for mockup fills
+                        halo: false,
+                        glow: false,
+                        shadow: false,
+                        tintColor: null,
+                        tintOpacity: 0
                       };
                       
                       setLayers([...layers, newLayer]);
