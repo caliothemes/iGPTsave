@@ -104,6 +104,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
         if (provider === 'sora') {
           payload.aspect_ratio = soraAspectRatio;
+          console.log(`Frontend Sora - duration state: ${duration}, type: ${typeof duration}`);
+          console.log(`Frontend Sora - payload before send:`, JSON.stringify(payload, null, 2));
         }
 
         if (provider === 'wan' && audioFile) {
@@ -112,6 +114,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           payload.audio_url = file_url;
         }
 
+        console.log(`Sending payload to backend:`, payload);
         const response = await base44.functions.invoke('generateReplicateVideo', payload);
 
         clearInterval(progressInterval);
