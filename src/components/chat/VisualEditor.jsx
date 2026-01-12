@@ -730,8 +730,16 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-            // Apply clipping mask if layer has one (for mockup zones)
+              // For mockup fills, use a completely clean context
               if (layer.clipMask && layer.clipMask.length > 0) {
+                // Reset all context effects completely
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.filter = 'none';
+                
+                // Apply clipping mask
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
                   if (i === 0) ctx.moveTo(point[0], point[1]);
@@ -739,10 +747,11 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 });
                 ctx.closePath();
                 ctx.clip();
-              }
-              
-              // Apply effects for images (NOT for mockup fills)
-              if (!layer.clipMask) {
+                
+                // Draw clean image
+                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+              } else {
+                // Normal image rendering with effects
                 if (layer.halo) {
                   ctx.shadowColor = layer.haloColor || '#FFD700';
                   ctx.shadowBlur = layer.haloSize || 15;
@@ -755,29 +764,29 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                   ctx.shadowOffsetX = 5;
                   ctx.shadowOffsetY = 5;
                 }
-              }
-              
-              // Apply border radius clipping if needed
-              if (layer.borderRadius && layer.borderRadius > 0) {
-                ctx.beginPath();
-                ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-                ctx.clip();
-              }
-              
-              // Draw image (no tint for mockup fills)
-              if (layer.tintColor && layer.tintOpacity && !layer.clipMask) {
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = layer.width;
-                tempCanvas.height = layer.height;
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
-                tempCtx.globalCompositeOperation = 'overlay';
-                tempCtx.globalAlpha = layer.tintOpacity / 100;
-                tempCtx.fillStyle = layer.tintColor;
-                tempCtx.fillRect(0, 0, layer.width, layer.height);
-                ctx.drawImage(tempCanvas, layer.x, layer.y);
-              } else {
-                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                
+                // Apply border radius clipping if needed
+                if (layer.borderRadius && layer.borderRadius > 0) {
+                  ctx.beginPath();
+                  ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                  ctx.clip();
+                }
+                
+                // Draw image with optional tint
+                if (layer.tintColor && layer.tintOpacity) {
+                  const tempCanvas = document.createElement('canvas');
+                  tempCanvas.width = layer.width;
+                  tempCanvas.height = layer.height;
+                  const tempCtx = tempCanvas.getContext('2d');
+                  tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
+                  tempCtx.globalCompositeOperation = 'overlay';
+                  tempCtx.globalAlpha = layer.tintOpacity / 100;
+                  tempCtx.fillStyle = layer.tintColor;
+                  tempCtx.fillRect(0, 0, layer.width, layer.height);
+                  ctx.drawImage(tempCanvas, layer.x, layer.y);
+                } else {
+                  ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                }
               }
               
               // Reflection effect for images (mirrored image below with gradient fade)
@@ -2358,8 +2367,16 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // Apply clipping mask if layer has one (for mockup zones)
+            // For mockup fills, use completely clean context
             if (layer.clipMask && layer.clipMask.length > 0) {
+              // Reset all effects completely
+              exportCtx.shadowColor = 'transparent';
+              exportCtx.shadowBlur = 0;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
+              exportCtx.filter = 'none';
+              
+              // Apply clipping mask
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
                 if (i === 0) exportCtx.moveTo(point[0], point[1]);
@@ -2367,10 +2384,11 @@ Réponds en JSON avec:
               });
               exportCtx.closePath();
               exportCtx.clip();
-            }
-            
-            // Apply effects for images (NOT for mockup fills)
-            if (!layer.clipMask) {
+              
+              // Draw clean image
+              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+            } else {
+              // Normal image rendering with effects
               if (layer.halo) {
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
                 exportCtx.shadowBlur = layer.haloSize || 15;
@@ -2383,28 +2401,28 @@ Réponds en JSON avec:
                 exportCtx.shadowOffsetX = 5;
                 exportCtx.shadowOffsetY = 5;
               }
-            }
-            
-            if (layer.borderRadius && layer.borderRadius > 0) {
-              exportCtx.beginPath();
-              exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-              exportCtx.clip();
-            }
-            
-            // Draw image (no tint for mockup fills)
-            if (layer.tintColor && layer.tintOpacity && !layer.clipMask) {
-              const tempCanvas = document.createElement('canvas');
-              tempCanvas.width = layer.width;
-              tempCanvas.height = layer.height;
-              const tempCtx = tempCanvas.getContext('2d');
-              tempCtx.drawImage(layerImg, 0, 0, layer.width, layer.height);
-              tempCtx.globalCompositeOperation = 'overlay';
-              tempCtx.globalAlpha = layer.tintOpacity / 100;
-              tempCtx.fillStyle = layer.tintColor;
-              tempCtx.fillRect(0, 0, layer.width, layer.height);
-              exportCtx.drawImage(tempCanvas, layer.x, layer.y);
-            } else {
-              exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+              
+              if (layer.borderRadius && layer.borderRadius > 0) {
+                exportCtx.beginPath();
+                exportCtx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                exportCtx.clip();
+              }
+              
+              // Draw image with optional tint
+              if (layer.tintColor && layer.tintOpacity) {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = layer.width;
+                tempCanvas.height = layer.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(layerImg, 0, 0, layer.width, layer.height);
+                tempCtx.globalCompositeOperation = 'overlay';
+                tempCtx.globalAlpha = layer.tintOpacity / 100;
+                tempCtx.fillStyle = layer.tintColor;
+                tempCtx.fillRect(0, 0, layer.width, layer.height);
+                exportCtx.drawImage(tempCanvas, layer.x, layer.y);
+              } else {
+                exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+              }
             }
             
             // Reflection effect for images (export version)
