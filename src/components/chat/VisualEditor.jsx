@@ -739,23 +739,19 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // MOCKUP FILL - Completely isolated with extra save/restore
+              // MOCKUP FILL - Use simple rectangle clip
               if (layer.clipMask && layer.clipMask.length > 0) {
-                ctx.save(); // EXTRA save for clip isolation
+                ctx.save();
                 
-                // Apply clipping mask
+                // Use simple rectangle clip based on layer bounds (not complex path)
                 ctx.beginPath();
-                layer.clipMask.forEach((point, i) => {
-                  if (i === 0) ctx.moveTo(point[0], point[1]);
-                  else ctx.lineTo(point[0], point[1]);
-                });
-                ctx.closePath();
+                ctx.rect(layer.clipX || layer.x, layer.clipY || layer.y, layer.clipWidth || layer.width, layer.clipHeight || layer.height);
                 ctx.clip();
                 
-                // Draw image ONLY - no effects, no shadows, nothing
+                // Draw image
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
                 
-                ctx.restore(); // IMMEDIATE restore to clear clip
+                ctx.restore();
               } else {
                 // Normal image rendering with effects (only for non-mockup images)
                 if (layer.halo) {
@@ -2383,23 +2379,19 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // MOCKUP FILL - Completely isolated with extra save/restore
+            // MOCKUP FILL - Use simple rectangle clip
             if (layer.clipMask && layer.clipMask.length > 0) {
-              exportCtx.save(); // EXTRA save for clip isolation
+              exportCtx.save();
               
-              // Apply clipping mask
+              // Use simple rectangle clip based on layer bounds (not complex path)
               exportCtx.beginPath();
-              layer.clipMask.forEach((point, i) => {
-                if (i === 0) exportCtx.moveTo(point[0], point[1]);
-                else exportCtx.lineTo(point[0], point[1]);
-              });
-              exportCtx.closePath();
+              exportCtx.rect(layer.clipX || layer.x, layer.clipY || layer.y, layer.clipWidth || layer.width, layer.clipHeight || layer.height);
               exportCtx.clip();
               
-              // Draw image ONLY - no effects, no shadows, nothing
+              // Draw image
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
               
-              exportCtx.restore(); // IMMEDIATE restore to clear clip
+              exportCtx.restore();
             } else {
               // Normal image rendering with effects (only for non-mockup images)
               if (layer.halo) {
@@ -5607,7 +5599,11 @@ Réponds en JSON avec:
                         width: drawWidth,
                         height: drawHeight,
                         opacity: 100,
-                        clipMask: zone.points
+                        clipMask: true, // Just a flag that clipping is active
+                        clipX: zone.x,
+                        clipY: zone.y,
+                        clipWidth: zone.width,
+                        clipHeight: zone.height
                       };
                       
                       setLayers([...layers, newLayer]);
