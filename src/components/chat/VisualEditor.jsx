@@ -730,27 +730,18 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills, use a completely isolated rendering
+              // For mockup fills - completely reset context and draw clean
               if (layer.clipMask && layer.clipMask.length > 0) {
-                // First, erase the mockup content in the masked area
-                ctx.save();
-                ctx.beginPath();
-                layer.clipMask.forEach((point, i) => {
-                  if (i === 0) ctx.moveTo(point[0], point[1]);
-                  else ctx.lineTo(point[0], point[1]);
-                });
-                ctx.closePath();
-                ctx.clip();
-                
-                // Erase existing content with destination-out
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.fillStyle = 'rgba(0,0,0,1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.restore();
-                
-                // Now draw the user image with clipping
-                ctx.save();
+                // Reset ALL context effects completely
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.filter = 'none';
                 ctx.globalCompositeOperation = 'source-over';
+                
+                // Create clipping path
+                ctx.save();
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
                   if (i === 0) ctx.moveTo(point[0], point[1]);
@@ -759,6 +750,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
+                // Draw image directly with clean context
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
                 ctx.restore();
               } else {
@@ -2378,27 +2370,18 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills, use completely isolated rendering
+            // For mockup fills - completely reset context and draw clean
             if (layer.clipMask && layer.clipMask.length > 0) {
-              // First, erase the mockup content in the masked area
-              exportCtx.save();
-              exportCtx.beginPath();
-              layer.clipMask.forEach((point, i) => {
-                if (i === 0) exportCtx.moveTo(point[0], point[1]);
-                else exportCtx.lineTo(point[0], point[1]);
-              });
-              exportCtx.closePath();
-              exportCtx.clip();
-              
-              // Erase existing content
-              exportCtx.globalCompositeOperation = 'destination-out';
-              exportCtx.fillStyle = 'rgba(0,0,0,1)';
-              exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-              exportCtx.restore();
-              
-              // Now draw the user image with clipping
-              exportCtx.save();
+              // Reset ALL context effects completely
+              exportCtx.shadowColor = 'transparent';
+              exportCtx.shadowBlur = 0;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
+              exportCtx.filter = 'none';
               exportCtx.globalCompositeOperation = 'source-over';
+              
+              // Create clipping path
+              exportCtx.save();
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
                 if (i === 0) exportCtx.moveTo(point[0], point[1]);
@@ -2407,6 +2390,7 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
+              // Draw image directly with clean context
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
               exportCtx.restore();
             } else {
