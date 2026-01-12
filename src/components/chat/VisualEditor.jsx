@@ -739,8 +739,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - NO EFFECTS AT ALL
+              // For mockup fills - COMPLETELY ISOLATED RENDERING
               if (layer.clipMask && layer.clipMask.length > 0) {
+                ctx.save(); // NEW save for mockup
+                
                 // Apply clipping mask
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
@@ -752,6 +754,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 
                 // Draw image at layer dimensions - NOTHING ELSE
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+                
+                ctx.restore(); // Restore immediately after drawing mockup
+                // DO NOT RENDER ANY EFFECTS (reflection, shadow, etc) for mockup fills
               } else {
                 // Normal image rendering with effects (only for non-mockup images)
                 if (layer.halo) {
@@ -791,8 +796,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
               
-              // Reflection effect for images (mirrored image below with gradient fade)
-              if (layer.reflection) {
+              // Reflection effect for images (ONLY for non-mockup images)
+              if (layer.reflection && (!layer.clipMask || layer.clipMask.length === 0)) {
                 ctx.save();
                 
                 const reflectionGap = layer.reflectionGap || 2;
@@ -844,8 +849,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.restore();
               }
               
-              // Draw border on top
-              if (layer.stroke) {
+              // Draw border on top (ONLY for non-mockup images)
+              if (layer.stroke && (!layer.clipMask || layer.clipMask.length === 0)) {
                 ctx.restore();
                 ctx.save();
                 ctx.globalAlpha = layer.opacity / 100;
@@ -2379,8 +2384,10 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - NO EFFECTS AT ALL
+            // For mockup fills - COMPLETELY ISOLATED RENDERING
             if (layer.clipMask && layer.clipMask.length > 0) {
+              exportCtx.save(); // NEW save for mockup
+              
               // Apply clipping mask
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
@@ -2392,6 +2399,9 @@ Réponds en JSON avec:
               
               // Draw image at layer dimensions - NOTHING ELSE
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
+              
+              exportCtx.restore(); // Restore immediately after drawing mockup
+              // DO NOT RENDER ANY EFFECTS (reflection, shadow, etc) for mockup fills
             } else {
               // Normal image rendering with effects (only for non-mockup images)
               if (layer.halo) {
@@ -2430,8 +2440,8 @@ Réponds en JSON avec:
               }
             }
             
-            // Reflection effect for images (export version)
-            if (layer.reflection) {
+            // Reflection effect for images (ONLY for non-mockup images)
+            if (layer.reflection && (!layer.clipMask || layer.clipMask.length === 0)) {
               exportCtx.save();
               
               const reflectionGap = layer.reflectionGap || 2;
@@ -2478,7 +2488,8 @@ Réponds en JSON avec:
               exportCtx.restore();
             }
             
-            if (layer.stroke) {
+            // Border (ONLY for non-mockup images)
+            if (layer.stroke && (!layer.clipMask || layer.clipMask.length === 0)) {
               exportCtx.restore();
               exportCtx.save();
               exportCtx.globalAlpha = layer.opacity / 100;
