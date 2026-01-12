@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       input = {
         prompt: prompt,
         aspect_ratio: aspect_ratio === '3:4' ? 'portrait' : 'landscape',
-        length: duration === 4 ? 'short' : duration === 8 ? 'medium' : 'long',
+        length: duration <= 4 ? 'short' : duration <= 8 ? 'medium' : 'long',
         resolution_quality: 'high'
       };
       if (image_url) {
