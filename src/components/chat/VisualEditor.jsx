@@ -739,10 +739,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 }
               }
             } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
-              // For mockup fills - COMPLETELY ISOLATED RENDERING
+              // MOCKUP FILL - Completely isolated, skip all other processing
               if (layer.clipMask && layer.clipMask.length > 0) {
-                ctx.save(); // NEW save for mockup
-                
                 // Apply clipping mask
                 ctx.beginPath();
                 layer.clipMask.forEach((point, i) => {
@@ -752,52 +750,53 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.closePath();
                 ctx.clip();
                 
-                // Draw image at layer dimensions - NOTHING ELSE
+                // Draw image ONLY - no effects whatsoever
                 ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
                 
-                ctx.restore(); // Restore immediately after drawing mockup
-                // DO NOT RENDER ANY EFFECTS (reflection, shadow, etc) for mockup fills
-              } else {
-                // Normal image rendering with effects (only for non-mockup images)
-                if (layer.halo) {
-                  ctx.shadowColor = layer.haloColor || '#FFD700';
-                  ctx.shadowBlur = layer.haloSize || 15;
-                } else if (layer.glow) {
-                  ctx.shadowColor = layer.glowColor || '#ffffff';
-                  ctx.shadowBlur = layer.glowSize || 10;
-                } else if (layer.shadow) {
-                  ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
-                  ctx.shadowBlur = layer.shadowBlur || 10;
-                  ctx.shadowOffsetX = 5;
-                  ctx.shadowOffsetY = 5;
-                }
-                
-                // Apply border radius clipping if needed
-                if (layer.borderRadius && layer.borderRadius > 0) {
-                  ctx.beginPath();
-                  ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
-                  ctx.clip();
-                }
-                
-                // Draw image with optional tint
-                if (layer.tintColor && layer.tintOpacity) {
-                  const tempCanvas = document.createElement('canvas');
-                  tempCanvas.width = layer.width;
-                  tempCanvas.height = layer.height;
-                  const tempCtx = tempCanvas.getContext('2d');
-                  tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
-                  tempCtx.globalCompositeOperation = 'overlay';
-                  tempCtx.globalAlpha = layer.tintOpacity / 100;
-                  tempCtx.fillStyle = layer.tintColor;
-                  tempCtx.fillRect(0, 0, layer.width, layer.height);
-                  ctx.drawImage(tempCanvas, layer.x, layer.y);
-                } else {
-                  ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
-                }
+                // SKIP ALL EFFECTS - go directly to next layer
+                ctx.restore();
+                return; // Exit this layer iteration completely
               }
               
-              // Reflection effect for images (ONLY for non-mockup images)
-              if (layer.reflection && (!layer.clipMask || layer.clipMask.length === 0)) {
+              // Normal image rendering with effects (only for non-mockup images)
+              if (layer.halo) {
+                ctx.shadowColor = layer.haloColor || '#FFD700';
+                ctx.shadowBlur = layer.haloSize || 15;
+              } else if (layer.glow) {
+                ctx.shadowColor = layer.glowColor || '#ffffff';
+                ctx.shadowBlur = layer.glowSize || 10;
+              } else if (layer.shadow) {
+                ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = layer.shadowBlur || 10;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+              }
+              
+              // Apply border radius clipping if needed
+              if (layer.borderRadius && layer.borderRadius > 0) {
+                ctx.beginPath();
+                ctx.roundRect(layer.x, layer.y, layer.width, layer.height, layer.borderRadius);
+                ctx.clip();
+              }
+              
+              // Draw image with optional tint
+              if (layer.tintColor && layer.tintOpacity) {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = layer.width;
+                tempCanvas.height = layer.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(loadedImages[layer.imageUrl], 0, 0, layer.width, layer.height);
+                tempCtx.globalCompositeOperation = 'overlay';
+                tempCtx.globalAlpha = layer.tintOpacity / 100;
+                tempCtx.fillStyle = layer.tintColor;
+                tempCtx.fillRect(0, 0, layer.width, layer.height);
+                ctx.drawImage(tempCanvas, layer.x, layer.y);
+              } else {
+                ctx.drawImage(loadedImages[layer.imageUrl], layer.x, layer.y, layer.width, layer.height);
+              }
+              
+              // Reflection effect for images
+              if (layer.reflection) {
                 ctx.save();
                 
                 const reflectionGap = layer.reflectionGap || 2;
@@ -849,8 +848,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 ctx.restore();
               }
               
-              // Draw border on top (ONLY for non-mockup images)
-              if (layer.stroke && (!layer.clipMask || layer.clipMask.length === 0)) {
+              // Draw border on top
+              if (layer.stroke) {
                 ctx.restore();
                 ctx.save();
                 ctx.globalAlpha = layer.opacity / 100;
@@ -2384,10 +2383,8 @@ Réponds en JSON avec:
               img.src = layer.imageUrl;
             });
             
-            // For mockup fills - COMPLETELY ISOLATED RENDERING
+            // MOCKUP FILL - Completely isolated, skip all other processing
             if (layer.clipMask && layer.clipMask.length > 0) {
-              exportCtx.save(); // NEW save for mockup
-              
               // Apply clipping mask
               exportCtx.beginPath();
               layer.clipMask.forEach((point, i) => {
@@ -2397,12 +2394,15 @@ Réponds en JSON avec:
               exportCtx.closePath();
               exportCtx.clip();
               
-              // Draw image at layer dimensions - NOTHING ELSE
+              // Draw image ONLY - no effects whatsoever
               exportCtx.drawImage(layerImg, layer.x, layer.y, layer.width, layer.height);
               
-              exportCtx.restore(); // Restore immediately after drawing mockup
-              // DO NOT RENDER ANY EFFECTS (reflection, shadow, etc) for mockup fills
-            } else {
+              // SKIP ALL EFFECTS - go to next layer
+              exportCtx.restore();
+              continue; // Skip to next layer iteration
+            }
+            
+            {
               // Normal image rendering with effects (only for non-mockup images)
               if (layer.halo) {
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
@@ -2440,8 +2440,8 @@ Réponds en JSON avec:
               }
             }
             
-            // Reflection effect for images (ONLY for non-mockup images)
-            if (layer.reflection && (!layer.clipMask || layer.clipMask.length === 0)) {
+            // Reflection effect for images
+            if (layer.reflection) {
               exportCtx.save();
               
               const reflectionGap = layer.reflectionGap || 2;
@@ -2488,8 +2488,7 @@ Réponds en JSON avec:
               exportCtx.restore();
             }
             
-            // Border (ONLY for non-mockup images)
-            if (layer.stroke && (!layer.clipMask || layer.clipMask.length === 0)) {
+            if (layer.stroke) {
               exportCtx.restore();
               exportCtx.save();
               exportCtx.globalAlpha = layer.opacity / 100;
@@ -2502,6 +2501,7 @@ Réponds en JSON avec:
               } else {
                 exportCtx.strokeRect(layer.x, layer.y, layer.width, layer.height);
               }
+            }
             }
           } else if (layer.type === 'text') {
             const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
