@@ -39,6 +39,15 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     }
   }, [isOpen]);
 
+  React.useEffect(() => {
+    // Reset duration when provider changes
+    if (provider === 'sora') {
+      setDuration(4);
+    } else {
+      setDuration(5);
+    }
+  }, [provider]);
+
   const handleGenerate = async () => {
     // Vérification des crédits AVANT la génération
     if (!user) {
