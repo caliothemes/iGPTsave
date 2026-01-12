@@ -59,8 +59,8 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
                 </h3>
                 <p className="text-white/60 text-xs">
                   {language === 'fr' 
-                    ? 'Générez ou uploadez une image, puis cliquez sur Modifier pour créer des éditions comme celles-ci.' 
-                    : 'Generate or upload an image, then click Edit to create modifications like these.'}
+                    ? '✨ Générez ou uploadez une image dans iGPT, cliquez sur l\'icône orange pencil, choisissez vos options (prompt de modification) et cliquez sur générer pour modifier votre image.' 
+                    : '✨ Generate or upload an image in iGPT, click on the orange pencil icon, choose your options (modification prompt) and click generate to edit your image.'}
                 </p>
               </div>
             </div>

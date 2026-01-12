@@ -80,8 +80,8 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
         <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4 mb-4">
           <p className="text-white/90 text-sm leading-relaxed">
             {language === 'fr' 
-              ? 'Générez ou uploadez une image, puis cliquez sur Animer pour créer des vidéos comme celles-ci.'
-              : 'Generate or upload an image, then click Animate to create videos like these.'}
+              ? '✨ Générez ou uploadez une image dans iGPT, cliquez sur l\'icône vidéo rouge, choisissez vos options (prompt, durée, format) et cliquez sur générer pour transformer votre visuel en vidéo animée.'
+              : '✨ Generate or upload an image in iGPT, click on the red video icon, choose your options (prompt, duration, format) and click generate to transform your visual into an animated video.'}
           </p>
         </div>
 
@@ -226,6 +226,7 @@ export default function VideoExamplesModal({ isOpen, onClose }) {
                         autoPlay
                         loop
                         muted
+                        controlsList="nodownload"
                         className="w-full h-full object-cover"
                       />
                     </div>
