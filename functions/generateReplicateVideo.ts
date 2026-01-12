@@ -10,17 +10,19 @@ Deno.serve(async (req) => {
     }
 
     const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5, model = 'kling', audio_url } = await req.json();
-    
-    console.log('Video generation request:', { image_url, additional_images, prompt, aspect_ratio, duration, model });
+
+    console.log('Video generation request:', { image_url, additional_images, prompt, aspect_ratio, duration, model, durationType: typeof duration });
 
     if (!prompt) {
       return Response.json({ error: 'Missing prompt' }, { status: 400 });
     }
 
     // Calculate credits based on model and duration
+    const durationNum = Number(duration);
     let creditsRequired;
     if (model === 'sora') {
-      creditsRequired = duration === 4 ? 30 : duration === 8 ? 50 : 70;
+      creditsRequired = durationNum == 4 ? 30 : durationNum == 8 ? 50 : 70;
+      console.log(`Sora credits calculation: duration=${durationNum} → credits=${creditsRequired}`);
     } else if (model === 'wan') {
       creditsRequired = duration === 10 ? 30 : 20;
     } else {
@@ -128,7 +130,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('Model input:', input);
+    console.log('Model endpoint:', modelEndpoint);
+    console.log('Model input:', JSON.stringify(input, null, 2));
 
     // Call Replicate API
     const response = await fetch(modelEndpoint, {
