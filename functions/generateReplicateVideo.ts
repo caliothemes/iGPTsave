@@ -79,20 +79,26 @@ Deno.serve(async (req) => {
       // Sora 2 Pro
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       
-      // Map duration to Sora's length parameter (using non-strict comparison to handle string/number types)
+      // Map duration to Sora's length parameter
+      // Sora expects: short=4s, medium=8s, long=12s
       const durationNum = Number(duration);
       let lengthValue;
-      if (durationNum == 4) {
+      
+      console.log(`Sora BEFORE mapping - duration: ${duration}, type: ${typeof duration}, durationNum: ${durationNum}`);
+      console.log(`Comparisons: ${durationNum} == 4? ${durationNum == 4}, == 8? ${durationNum == 8}, == 12? ${durationNum == 12}`);
+      
+      if (durationNum === 4) {
         lengthValue = 'short';
-      } else if (durationNum == 8) {
+      } else if (durationNum === 8) {
         lengthValue = 'medium';
-      } else if (durationNum == 12) {
+      } else if (durationNum === 12) {
         lengthValue = 'long';
       } else {
-        lengthValue = 'short'; // fallback
+        console.warn(`Unexpected duration ${durationNum}, defaulting to short`);
+        lengthValue = 'short';
       }
       
-      console.log(`Sora duration ${duration} (type: ${typeof duration}) → ${durationNum}s mapped to length: ${lengthValue}`);
+      console.log(`Sora AFTER mapping - lengthValue: ${lengthValue}`);
       
       input = {
         prompt: prompt,
@@ -103,6 +109,8 @@ Deno.serve(async (req) => {
       if (image_url) {
         input.input_reference = image_url;
       }
+      
+      console.log('Sora final input object:', JSON.stringify(input, null, 2));
     } else if (model === 'wan') {
       // Wan v2.5 I2V
       modelEndpoint = 'https://api.replicate.com/v1/models/lucataco/wan-v2.5-i2v/predictions';
