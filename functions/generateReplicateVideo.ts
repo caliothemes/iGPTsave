@@ -77,19 +77,20 @@ Deno.serve(async (req) => {
       // Sora 2 Pro
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       
-      // Map duration to Sora's length parameter
+      // Map duration to Sora's length parameter (using non-strict comparison to handle string/number types)
+      const durationNum = Number(duration);
       let lengthValue;
-      if (duration === 4) {
+      if (durationNum == 4) {
         lengthValue = 'short';
-      } else if (duration === 8) {
+      } else if (durationNum == 8) {
         lengthValue = 'medium';
-      } else if (duration === 12) {
+      } else if (durationNum == 12) {
         lengthValue = 'long';
       } else {
         lengthValue = 'short'; // fallback
       }
       
-      console.log(`Sora duration ${duration}s mapped to length: ${lengthValue}`);
+      console.log(`Sora duration ${duration} (type: ${typeof duration}) → ${durationNum}s mapped to length: ${lengthValue}`);
       
       input = {
         prompt: prompt,
