@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
         resolution_quality: 'high'
       };
       if (image_url) {
-        input.image_url = image_url;
+        input.input_reference = image_url;
       }
     } else if (model === 'wan') {
       // Wan v2.5 I2V
