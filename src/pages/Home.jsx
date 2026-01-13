@@ -531,7 +531,7 @@ export default function Home() {
         localStorage.setItem('igpt_guest_prompts', newCount.toString());
       }
 
-      // Détecter URL dans le prompt
+      // Détecter URL et analyser branding
       const urlRegex = /(https?:\/\/[^\s]+)/gi;
       const urls = userMessage.match(urlRegex);
       let brandingInfo = null;
@@ -540,16 +540,38 @@ export default function Home() {
         try {
           setMessages(prev => [
             ...prev.slice(0, -1),
-            { role: 'assistant', content: language === 'fr' ? '🔍 Analyse du site web en cours...' : '🔍 Analyzing website...', isStreaming: true }
+            { role: 'assistant', content: language === 'fr' ? '🔍 Analyse du branding...' : '🔍 Analyzing branding...', isStreaming: true }
           ]);
           
-          const brandingResult = await base44.functions.invoke('analyzeWebsiteBranding', { url: urls[0] });
-          if (brandingResult.data?.branding) {
-            brandingInfo = brandingResult.data.branding;
-            console.log('✅ Branding détecté:', brandingInfo);
-          }
+          brandingInfo = await base44.integrations.Core.InvokeLLM({
+            prompt: `Visit this website: ${urls[0]}
+
+Analyze the brand identity and extract:
+1. Primary colors (2-3 HEX codes from logo and main elements)
+2. Logo characteristics (shapes, icons, symbols)
+3. Visual style (modern/elegant/minimal/bold/playful/professional)
+4. Typography feel (sans-serif/serif/geometric/humanist)
+5. Brand mood/personality
+6. Distinctive visual elements
+
+Return JSON with EXACT HEX codes visible on the site:`,
+            add_context_from_internet: true,
+            response_json_schema: {
+              type: "object",
+              properties: {
+                colors: { type: "array", items: { type: "string" } },
+                logo_style: { type: "string" },
+                visual_style: { type: "string" },
+                typography: { type: "string" },
+                mood: { type: "string" },
+                keywords: { type: "array", items: { type: "string" } }
+              }
+            }
+          });
+          
+          console.log('✅ Branding:', brandingInfo);
         } catch (e) {
-          console.error('Échec analyse branding:', e);
+          console.error('❌ Analyse échouée:', e);
         }
       }
 
@@ -609,41 +631,36 @@ export default function Home() {
           console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
         }
 
-        // Enrichir avec les infos de branding si disponibles
+        // Enrichir avec branding si extrait
         if (brandingInfo) {
-          // Construire un prompt enrichi avec le branding extrait
-          let brandContext = '';
+          let brandPrompt = '';
           
-          if (brandingInfo.logo_description) {
-            brandContext += `incorporating brand logo: ${brandingInfo.logo_description}, `;
+          if (brandingInfo.colors?.length > 0) {
+            brandPrompt += `, EXACT brand colors: ${brandingInfo.colors.join(' and ')}`;
           }
           
-          if (brandingInfo.colors && brandingInfo.colors.length > 0) {
-            brandContext += `using exact brand colors ${brandingInfo.colors.join(', ')}, `;
+          if (brandingInfo.logo_style) {
+            brandPrompt += `, logo inspired by: ${brandingInfo.logo_style}`;
           }
           
-          if (brandingInfo.style) {
-            brandContext += `${brandingInfo.style} visual style matching brand identity, `;
-          }
-          
-          if (brandingInfo.mood) {
-            brandContext += `${brandingInfo.mood} brand personality and tone, `;
+          if (brandingInfo.visual_style) {
+            brandPrompt += `, ${brandingInfo.visual_style} brand aesthetic`;
           }
           
           if (brandingInfo.typography) {
-            brandContext += `${brandingInfo.typography} typography matching brand, `;
+            brandPrompt += `, ${brandingInfo.typography} typeface style`;
           }
           
-          if (brandingInfo.keywords && brandingInfo.keywords.length > 0) {
-            brandContext += `including brand visual elements: ${brandingInfo.keywords.join(', ')}, `;
+          if (brandingInfo.mood) {
+            brandPrompt += `, ${brandingInfo.mood} brand personality`;
           }
           
-          if (brandingInfo.design_description) {
-            brandContext += `brand aesthetic: ${brandingInfo.design_description}`;
+          if (brandingInfo.keywords?.length > 0) {
+            brandPrompt += `, incorporating: ${brandingInfo.keywords.slice(0, 3).join(', ')}`;
           }
           
-          enhancedPrompt += `, ${brandContext.trim()}`;
-          console.log('🎨 Prompt enrichi avec branding complet:', brandingInfo);
+          enhancedPrompt += brandPrompt;
+          console.log('🎨 Branding appliqué au prompt');
         }
 
         if (selectedStyle) {
