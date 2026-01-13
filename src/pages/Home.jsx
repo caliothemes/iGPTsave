@@ -612,18 +612,24 @@ export default function Home() {
         // Enrichir avec les infos de branding si disponibles
         if (brandingInfo) {
           if (brandingInfo.colors && brandingInfo.colors.length > 0) {
-            enhancedPrompt += `, brand colors: ${brandingInfo.colors.join(', ')}`;
+            enhancedPrompt += `, brand identity colors: ${brandingInfo.colors.join(', ')}`;
           }
           if (brandingInfo.style) {
-            enhancedPrompt += `, ${brandingInfo.style} style`;
+            enhancedPrompt += `, ${brandingInfo.style} brand aesthetic`;
           }
           if (brandingInfo.mood) {
-            enhancedPrompt += `, ${brandingInfo.mood} mood`;
+            enhancedPrompt += `, ${brandingInfo.mood} brand personality`;
+          }
+          if (brandingInfo.typography) {
+            enhancedPrompt += `, ${brandingInfo.typography} typography style`;
           }
           if (brandingInfo.keywords && brandingInfo.keywords.length > 0) {
-            enhancedPrompt += `, thematic elements: ${brandingInfo.keywords.join(', ')}`;
+            enhancedPrompt += `, brand elements: ${brandingInfo.keywords.join(', ')}`;
           }
-          console.log('🎨 Prompt enrichi avec branding:', brandingInfo);
+          if (brandingInfo.design_description) {
+            enhancedPrompt += `, brand context: ${brandingInfo.design_description}`;
+          }
+          console.log('🎨 Prompt enrichi avec analyse visuelle du branding:', brandingInfo);
         }
 
         if (selectedStyle) {
