@@ -694,9 +694,105 @@ export default function Home() {
         const promptToUse = isModification ? finalPrompt : enhancedPrompt;
         console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
-        const result = await base44.integrations.Core.GenerateImage({
-        prompt: promptToUse
-        });
+        // CAS AVEC IMAGES ATTACHÉES: Composition avec PrunaAI
+        if (attachedImages.length > 0) {
+          // 1. Générer image de base
+          const baseResult = await base44.integrations.Core.GenerateImage({
+            prompt: promptToUse
+          });
+
+          if (!baseResult.url) throw new Error('Base generation failed');
+
+          // 2. Composer avec les images via PrunaAI
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            { role: 'assistant', content: language === 'fr' ? '🎨 Composition avec vos images...' : '🎨 Composing with your images...', isStreaming: true }
+          ]);
+
+          const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
+            image_url: baseResult.url,
+            prompt: userMessage,
+            additional_images: attachedImages
+          });
+
+          if (!compositionResult.data?.url) throw new Error('Composition failed');
+
+          // Extraction couleurs
+          let extractedColors = selectedPalette?.colors;
+          if (!extractedColors) {
+            try {
+              const colorResult = await base44.integrations.Core.InvokeLLM({
+                prompt: 'Extract the 5 most dominant colors from this image as HEX codes. Return only an array of hex codes.',
+                response_json_schema: {
+                  type: "object",
+                  properties: {
+                    colors: { type: "array", items: { type: "string" } }
+                  }
+                },
+                file_urls: [compositionResult.data.url]
+              });
+              extractedColors = colorResult.colors;
+            } catch (e) {
+              console.error('Color extraction failed:', e);
+            }
+          }
+
+          const visualData = {
+            user_email: user?.email || 'anonymous',
+            conversation_id: activeConversation?.id,
+            image_url: compositionResult.data.url,
+            original_image_url: compositionResult.data.url,
+            title: userMessage.slice(0, 50),
+            original_prompt: userMessage,
+            image_prompt: promptToUse,
+            dimensions: dimensions,
+            visual_type: activeCategory?.id,
+            format_name: selectedFormat?.name || null,
+            category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
+            style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
+            color_palette: extractedColors
+          };
+
+          let savedVisual = visualData;
+          if (user) {
+            savedVisual = await base44.entities.Visual.create(visualData);
+            setSessionVisuals(prev => [savedVisual, ...prev]);
+          }
+
+          setCurrentVisual(savedVisual);
+          setVisualsHistory(prev => [...prev, savedVisual]);
+          setAttachedImages([]);
+
+          const successMessage = `✨ ${language === 'fr' ? 'Composition créée !' : 'Composition created!'}`;
+          
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            { role: 'assistant', content: successMessage },
+            { role: 'assistant', content: '', visual: savedVisual }
+          ]);
+
+          if (activeConversation && user) {
+            try {
+              const updatedMessages = [
+                ...(activeConversation.messages || []),
+                { role: 'user', content: userMessage },
+                { role: 'assistant', content: successMessage }
+              ];
+              await base44.entities.Conversation.update(activeConversation.id, {
+                messages: updatedMessages,
+                title: activeConversation.title || userMessage.slice(0, 50),
+                visual_id: savedVisual.id
+              });
+              setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
+            } catch (e) {
+              console.error('Failed to update conversation:', e);
+            }
+          }
+        } else {
+          // CAS NORMAL: Génération simple
+          const result = await base44.integrations.Core.GenerateImage({
+            prompt: promptToUse
+          });
 
       if (result.url) {
         // Extract color palette from generated image
@@ -1002,11 +1098,12 @@ export default function Home() {
           } catch (e) {
             console.error('Failed to update conversation:', e);
           }
-        }
-        }
-        }
-        } catch (error) {
-        console.error(error);
+          }
+          }
+          }
+          }
+          } catch (error) {
+          console.error(error);
         const errorMsg = t('error');
         setMessages(prev => {
         const newMsgs = [...prev];
@@ -1154,6 +1251,7 @@ export default function Home() {
     setSelectedStyle(null);
     setSelectedPalette(null);
     setMessages([]);
+    setAttachedImages([]);
   };
   
   const handleSelectConversation = async (conv) => {
