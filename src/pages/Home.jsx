@@ -763,31 +763,31 @@ export default function Home() {
           setAttachedImages([]);
 
           const successMessage = `✨ ${language === 'fr' ? 'Composition créée !' : 'Composition created!'}`;
-          
+
           setMessages(prev => [
             ...prev.slice(0, -1),
             { role: 'assistant', content: successMessage },
             { role: 'assistant', content: '', visual: savedVisual }
           ]);
 
-        if (activeConversation && user) {
-          try {
-            const updatedMessages = [
-              ...(activeConversation.messages || []),
-              { role: 'user', content: userMessage },
-              { role: 'assistant', content: successMessage }
-            ];
-            await base44.entities.Conversation.update(activeConversation.id, {
-              messages: updatedMessages,
-              title: activeConversation.title || userMessage.slice(0, 50),
-              visual_id: savedVisual.id
-            });
-            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
-          } catch (e) {
-            console.error('Failed to update conversation:', e);
+          if (activeConversation && user) {
+            try {
+              const updatedMessages = [
+                ...(activeConversation.messages || []),
+                { role: 'user', content: userMessage },
+                { role: 'assistant', content: successMessage }
+              ];
+              await base44.entities.Conversation.update(activeConversation.id, {
+                messages: updatedMessages,
+                title: activeConversation.title || userMessage.slice(0, 50),
+                visual_id: savedVisual.id
+              });
+              setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
+            } catch (e) {
+              console.error('Failed to update conversation:', e);
+            }
           }
-        }
-      } else {
+        } else {
         // CAS NORMAL: Génération simple
         const result = await base44.integrations.Core.GenerateImage({
           prompt: promptToUse
