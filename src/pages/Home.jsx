@@ -140,7 +140,11 @@ export default function Home() {
           settingsMap[s.key] = s.value;
         });
         setSettings(settingsMap);
-        
+      } catch (e) {
+        console.error('Failed to load settings:', e);
+      }
+      
+      try {
         const isAuth = await base44.auth.isAuthenticated();
         if (isAuth) {
           const currentUser = await base44.auth.me();
@@ -150,7 +154,6 @@ export default function Home() {
           if (userCredits.length > 0) {
             setCredits(userCredits[0]);
           } else {
-            // Nouvel utilisateur - créer le plan gratuit avec 15 crédits mensuels
             const newCredits = await base44.entities.UserCredits.create({
               user_email: currentUser.email,
               free_downloads: 15,
@@ -167,52 +170,48 @@ export default function Home() {
           const visuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10);
           setSessionVisuals(visuals);
 
-          // Get total count of all visuals
           const allVisuals = await base44.entities.Visual.filter({ user_email: currentUser.email });
           setTotalVisualsCount(allVisuals.length);
 
-          // Check if there's an editVisual parameter
           const urlParams = new URLSearchParams(window.location.search);
           const editVisualId = urlParams.get('editVisual');
           if (editVisualId) {
-          try {
-            const visualToEditArray = await base44.entities.Visual.filter({ id: editVisualId });
-            if (visualToEditArray.length > 0) {
-              const visualToEdit = visualToEditArray[0];
-              setCurrentVisual(visualToEdit);
-              setVisualsHistory([visualToEdit]);
-              setMessages([{ 
-                role: 'assistant', 
-                content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.'),
-                visual: visualToEdit
-              }]);
-              // Set category based on visual type to enable prompt
-              if (visualToEdit.visual_type) {
-                setSelectedCategory({ id: visualToEdit.visual_type });
+            try {
+              const visualToEditArray = await base44.entities.Visual.filter({ id: editVisualId });
+              if (visualToEditArray.length > 0) {
+                const visualToEdit = visualToEditArray[0];
+                setCurrentVisual(visualToEdit);
+                setVisualsHistory([visualToEdit]);
+                setMessages([{ 
+                  role: 'assistant', 
+                  content: '✨ ' + (language === 'fr' ? 'Voici votre visuel. Vous pouvez me demander de le modifier ou de créer des variations.' : 'Here is your visual. You can ask me to modify it or create variations.'),
+                  visual: visualToEdit
+                }]);
+                if (visualToEdit.visual_type) {
+                  setSelectedCategory({ id: visualToEdit.visual_type });
+                }
               }
+            } catch (e) {
+              console.error('Failed to load visual:', e);
             }
-          } catch (e) {
-            console.error('Failed to load visual:', e);
           }
         }
+      } catch (e) {
+        console.error('Auth error:', e);
       }
-    } catch (e) {
-      console.error(e);
-    }
 
-    // Load prompt templates and examples (for all users, including guests)
-    try {
-      const [templates, examples] = await Promise.all([
-        base44.entities.PromptTemplate.filter({ is_active: true }),
-        base44.entities.PromptExample.filter({ is_active: true }, 'order')
-      ]);
-      setPromptTemplates(templates);
-      setPromptExamples(examples);
-    } catch (e) {
-      console.error('Failed to load prompt templates/examples:', e);
-    }
+      try {
+        const [templates, examples] = await Promise.all([
+          base44.entities.PromptTemplate.filter({ is_active: true }),
+          base44.entities.PromptExample.filter({ is_active: true }, 'order')
+        ]);
+        setPromptTemplates(templates);
+        setPromptExamples(examples);
+      } catch (e) {
+        console.error('Failed to load prompt templates/examples:', e);
+      }
 
-    setIsLoading(false);
+      setIsLoading(false);
     };
     init();
   }, []);
