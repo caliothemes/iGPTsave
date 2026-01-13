@@ -15,88 +15,94 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    console.log('🔍 Starting website analysis for:', url);
+    console.log('📸 Taking screenshot of:', url);
 
-    // Use Core.InvokeLLM with web search to analyze the website
+    // Take screenshot using ScreenshotOne API
+    let screenshotUrl = null;
+    try {
+      const screenshotResponse = await fetch(
+        `https://api.screenshotone.com/take?` +
+        `access_key=VykdDVsgzXivig&` +
+        `url=${encodeURIComponent(url)}&` +
+        `viewport_width=1920&` +
+        `viewport_height=1080&` +
+        `device_scale_factor=1&` +
+        `format=jpg&` +
+        `full_page=false&` +
+        `block_ads=true&` +
+        `block_cookie_banners=true&` +
+        `block_trackers=true&` +
+        `cache=false`
+      );
+
+      if (screenshotResponse.ok) {
+        const screenshotBlob = await screenshotResponse.arrayBuffer();
+        const screenshotFile = new File([screenshotBlob], 'screenshot.jpg', { type: 'image/jpeg' });
+        const uploadResult = await base44.integrations.Core.UploadFile({ file: screenshotFile });
+        screenshotUrl = uploadResult.file_url;
+        console.log('✅ Screenshot captured:', screenshotUrl);
+      } else {
+        console.error('❌ Screenshot failed:', await screenshotResponse.text());
+        throw new Error('Screenshot capture failed');
+      }
+    } catch (e) {
+      console.error('❌ Screenshot error:', e);
+      return Response.json({ error: 'Failed to capture screenshot' }, { status: 500 });
+    }
+
+    console.log('🔍 Analyzing screenshot with AI...');
+
+    // Analyze screenshot with InvokeLLM
     const analysisResult = await base44.integrations.Core.InvokeLLM({
-      prompt: `Analyze this website URL and extract ALL visual branding elements:
-${url}
+      prompt: `Analyze this website screenshot and extract ALL visual branding elements.
 
-You MUST browse the actual website and extract:
-1. PRIMARY BRAND COLORS: Extract the exact HEX color codes used in the website (logo, buttons, headers, backgrounds, accent colors)
-2. LOGO DESCRIPTION: Describe the logo design in detail (shapes, colors, style, elements)
-3. TYPOGRAPHY: Identify the font styles used (modern sans-serif, elegant serif, bold display, etc.)
-4. VISUAL STYLE: Describe the overall design style (modern, minimalist, classic, bold, elegant, playful, corporate, luxury, etc.)
-5. BRAND MOOD: Define the brand personality (professional, friendly, luxurious, casual, dynamic, serious, warm, cold, etc.)
-6. KEY VISUAL ELEMENTS: List patterns, shapes, icons, design motifs used throughout the site
-7. DESIGN DESCRIPTION: Provide a comprehensive 2-3 sentence description of the complete visual identity and brand aesthetic
+IMPORTANT INSTRUCTIONS:
+- Look at the ACTUAL screenshot image provided
+- Extract REAL colors you see in the image (HEX codes from logo, buttons, backgrounds)
+- Describe the ACTUAL logo you see in the screenshot
+- Identify the typography style visible in the image
+- Define the visual style and brand mood based on what you SEE
 
-IMPORTANT: Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON:
 {
-  "colors": ["#hex1", "#hex2", "#hex3"],
-  "logo_description": "detailed description of the logo design and elements",
-  "typography": "description of font styles and text hierarchy",
-  "style": "overall design style",
-  "mood": "brand personality and tone",
-  "keywords": ["element1", "element2", "element3"],
-  "design_description": "comprehensive description of the brand's complete visual identity"
+  "colors": ["#hex1", "#hex2", "#hex3", "#hex4"],
+  "logo_description": "detailed description of the logo visible in the screenshot",
+  "typography": "font style description based on text visible",
+  "style": "visual design style you observe",
+  "mood": "brand personality based on visual elements",
+  "keywords": ["design element 1", "element 2", "element 3"],
+  "design_description": "comprehensive 2-3 sentence description of the brand's visual identity"
 }`,
-      add_context_from_internet: true,
+      file_urls: [screenshotUrl],
       response_json_schema: {
         type: "object",
         properties: {
-          colors: { 
-            type: "array", 
-            items: { type: "string" },
-            description: "Array of HEX color codes from the website"
-          },
-          logo_description: { 
-            type: "string",
-            description: "Detailed description of the logo"
-          },
-          typography: { 
-            type: "string",
-            description: "Description of typography used"
-          },
-          style: { 
-            type: "string",
-            description: "Overall visual style"
-          },
-          mood: { 
-            type: "string",
-            description: "Brand mood and personality"
-          },
-          keywords: { 
-            type: "array", 
-            items: { type: "string" },
-            description: "Key visual elements and design motifs"
-          },
-          design_description: { 
-            type: "string",
-            description: "Complete visual identity description"
-          }
+          colors: { type: "array", items: { type: "string" } },
+          logo_description: { type: "string" },
+          typography: { type: "string" },
+          style: { type: "string" },
+          mood: { type: "string" },
+          keywords: { type: "array", items: { type: "string" } },
+          design_description: { type: "string" }
         },
         required: ["colors", "style", "mood"]
       }
     });
 
-    console.log('✅ Website analysis completed:', JSON.stringify(analysisResult, null, 2));
+    console.log('✅ Analysis completed:', JSON.stringify(analysisResult, null, 2));
 
     if (!analysisResult || typeof analysisResult !== 'object') {
-      console.error('❌ Invalid analysis result:', analysisResult);
-      return Response.json({ error: 'Failed to analyze website - invalid response' }, { status: 500 });
+      console.error('❌ Invalid analysis result');
+      return Response.json({ error: 'Failed to analyze screenshot' }, { status: 500 });
     }
 
-    // Ensure we have at least minimal data
-    if (!analysisResult.colors || analysisResult.colors.length === 0) {
-      console.warn('⚠️ No colors extracted, using defaults');
-      analysisResult.colors = ['#000000', '#ffffff'];
-    }
+    // Add screenshot URL to result
+    analysisResult.screenshot_url = screenshotUrl;
 
     return Response.json({ branding: analysisResult });
 
   } catch (error) {
-    console.error('❌ Error analyzing website:', error);
-    return Response.json({ error: error.message || 'Failed to analyze website' }, { status: 500 });
+    console.error('❌ Error:', error);
+    return Response.json({ error: error.message || 'Analysis failed' }, { status: 500 });
   }
 });
