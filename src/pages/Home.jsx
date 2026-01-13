@@ -1108,8 +1108,8 @@ export default function Home() {
         return newMsgs;
         });
 
-        // Update conversation with error
-        if (activeConversation && user) {
+      // Update conversation with error
+      if (activeConversation && user) {
         try {
           await base44.entities.Conversation.update(activeConversation.id, {
             messages: [
@@ -1121,11 +1121,11 @@ export default function Home() {
         } catch (e) {
           console.error('Failed to update conversation:', e);
         }
-        }
-        }
+      }
+    }
 
-        setIsGenerating(false);
-        };
+    setIsGenerating(false);
+  };
 
   const handleRegenerate = async (visual) => {
     // Vérification des crédits AVANT régénération
