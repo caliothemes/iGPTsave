@@ -41,8 +41,17 @@ Deno.serve(async (req) => {
     const statusData = await response.json();
     console.log('=== REPLICATE STATUS ===');
     console.log('Status:', statusData.status);
-    console.log('Output type:', typeof statusData.output);
+    console.log('Error:', statusData.error);
     console.log('Output:', statusData.output);
+
+    // Check for Replicate service errors
+    if (statusData.error && statusData.error.includes('temporarily unavailable')) {
+      console.error('Replicate service unavailable');
+      return Response.json({ 
+        status: 'failed',
+        error: 'Service temporarily unavailable. Sora is overloaded, please retry in a few minutes.'
+      });
+    }
 
     if (statusData.status === 'succeeded') {
       const videoUrl = statusData.output;
@@ -57,7 +66,6 @@ Deno.serve(async (req) => {
       
       console.log('Video URL:', videoUrl);
       
-      // Return URL directly without downloading (faster)
       return Response.json({ 
         status: 'succeeded',
         video_url: videoUrl
