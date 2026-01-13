@@ -1099,12 +1099,9 @@ export default function Home() {
             console.error('Failed to update conversation:', e);
           }
           }
-          }
-          }
-          }
           } catch (error) {
           console.error(error);
-        const errorMsg = t('error');
+          const errorMsg = t('error');
         setMessages(prev => {
         const newMsgs = [...prev];
         newMsgs[newMsgs.length - 1] = { role: 'assistant', content: errorMsg };
