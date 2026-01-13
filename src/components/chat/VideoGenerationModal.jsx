@@ -408,8 +408,24 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                       </div>
                       4s, 8s {language === 'fr' ? 'ou' : 'or'} 12s
                     </div>
-                  </>
-                )}
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      Audio
+                    </div>
+                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
+                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      {language === 'fr' ? 'Animations de textes' : 'Text animations'}
+                    </div>
+                    </>
+                    )}
                 {provider === 'replicate' && (
                   <>
                     <div className="flex items-center gap-1.5 text-white text-xs font-medium">
