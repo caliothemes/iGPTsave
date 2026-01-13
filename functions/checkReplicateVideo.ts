@@ -39,52 +39,38 @@ Deno.serve(async (req) => {
     }
 
     const statusData = await response.json();
-    console.log('Status check:', statusData.status, 'Logs:', statusData.logs?.slice(-200) || 'none');
+    console.log('=== REPLICATE STATUS ===');
+    console.log('Status:', statusData.status);
+    console.log('Output type:', typeof statusData.output);
+    console.log('Output:', statusData.output);
 
     if (statusData.status === 'succeeded') {
       const videoUrl = statusData.output;
       
-      // Download and store video permanently
-      console.log('Downloading video from Replicate...');
-      try {
-        const videoResponse = await fetch(videoUrl);
-        if (!videoResponse.ok) {
-          throw new Error('Failed to download video');
-        }
-        
-        const videoBlob = await videoResponse.blob();
-        const videoFile = new File([videoBlob], `video_${Date.now()}.mp4`, { type: 'video/mp4' });
-        
-        console.log('Uploading video to permanent storage...');
-        const { file_url: permanentUrl } = await base44.asServiceRole.integrations.Core.UploadFile({ 
-          file: videoFile 
-        });
-        
-        console.log('Video stored permanently:', permanentUrl);
-        
+      if (!videoUrl) {
+        console.error('No video URL in output!');
         return Response.json({ 
-          status: 'succeeded',
-          video_url: permanentUrl
-        });
-      } catch (uploadError) {
-        console.error('Failed to store video permanently:', uploadError);
-        // Fallback to temporary URL
-        return Response.json({ 
-          status: 'succeeded',
-          video_url: videoUrl,
-          warning: 'Video stored with temporary URL'
+          status: 'failed',
+          error: 'No video URL returned from Replicate'
         });
       }
-    } else if (statusData.status === 'failed') {
+      
+      console.log('Video URL:', videoUrl);
+      
+      // Return URL directly without downloading (faster)
+      return Response.json({ 
+        status: 'succeeded',
+        video_url: videoUrl
+      });
+    } else if (statusData.status === 'failed' || statusData.status === 'canceled') {
       return Response.json({ 
         status: 'failed',
-        error: statusData.error || 'Video generation failed'
+        error: statusData.error || `Generation ${statusData.status}`
       });
     } else {
       // Still processing
       return Response.json({ 
-        status: statusData.status || 'processing',
-        progress: statusData.progress || 0
+        status: statusData.status || 'processing'
       });
     }
 
