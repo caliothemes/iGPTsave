@@ -611,25 +611,39 @@ export default function Home() {
 
         // Enrichir avec les infos de branding si disponibles
         if (brandingInfo) {
+          // Construire un prompt enrichi avec le branding extrait
+          let brandContext = '';
+          
+          if (brandingInfo.logo_description) {
+            brandContext += `incorporating brand logo: ${brandingInfo.logo_description}, `;
+          }
+          
           if (brandingInfo.colors && brandingInfo.colors.length > 0) {
-            enhancedPrompt += `, brand identity colors: ${brandingInfo.colors.join(', ')}`;
+            brandContext += `using exact brand colors ${brandingInfo.colors.join(', ')}, `;
           }
+          
           if (brandingInfo.style) {
-            enhancedPrompt += `, ${brandingInfo.style} brand aesthetic`;
+            brandContext += `${brandingInfo.style} visual style matching brand identity, `;
           }
+          
           if (brandingInfo.mood) {
-            enhancedPrompt += `, ${brandingInfo.mood} brand personality`;
+            brandContext += `${brandingInfo.mood} brand personality and tone, `;
           }
+          
           if (brandingInfo.typography) {
-            enhancedPrompt += `, ${brandingInfo.typography} typography style`;
+            brandContext += `${brandingInfo.typography} typography matching brand, `;
           }
+          
           if (brandingInfo.keywords && brandingInfo.keywords.length > 0) {
-            enhancedPrompt += `, brand elements: ${brandingInfo.keywords.join(', ')}`;
+            brandContext += `including brand visual elements: ${brandingInfo.keywords.join(', ')}, `;
           }
+          
           if (brandingInfo.design_description) {
-            enhancedPrompt += `, brand context: ${brandingInfo.design_description}`;
+            brandContext += `brand aesthetic: ${brandingInfo.design_description}`;
           }
-          console.log('🎨 Prompt enrichi avec analyse visuelle du branding:', brandingInfo);
+          
+          enhancedPrompt += `, ${brandContext.trim()}`;
+          console.log('🎨 Prompt enrichi avec branding complet:', brandingInfo);
         }
 
         if (selectedStyle) {

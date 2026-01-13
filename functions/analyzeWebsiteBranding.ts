@@ -103,72 +103,11 @@ Provide ONLY a JSON response (no other text):
       })
     });
 
-    if (!llamaResponse.ok) {
-      const error = await llamaResponse.text();
-      console.error('LLaMA API error:', error);
+    if (!analysisResult || typeof analysisResult !== 'object') {
       return Response.json({ error: 'Failed to analyze website' }, { status: 500 });
     }
 
-    const prediction = await llamaResponse.json();
-    const predictionId = prediction.id;
-
-    // Poll for result
-    let result = null;
-    for (let i = 0; i < 30; i++) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-        headers: {
-          'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const status = await statusResponse.json();
-      
-      if (status.status === 'succeeded') {
-        const output = status.output.join('');
-        
-        // Try to parse JSON from output
-        try {
-          const jsonMatch = output.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            result = JSON.parse(jsonMatch[0]);
-          } else {
-            // Fallback: extract basic info
-            result = {
-              colors: [],
-              style: 'modern',
-              mood: 'professional',
-              keywords: [],
-              design_description: output.substring(0, 200)
-            };
-          }
-        } catch (e) {
-          console.error('Failed to parse LLaMA output:', e);
-          result = {
-            colors: [],
-            style: 'modern',
-            mood: 'professional',
-            keywords: [],
-            design_description: output.substring(0, 200)
-          };
-        }
-        break;
-      } else if (status.status === 'failed') {
-        throw new Error('LLaMA analysis failed');
-      }
-    }
-
-    if (!result) {
-      return Response.json({ error: 'Analysis timeout' }, { status: 408 });
-    }
-
-    // Add logo URL to result
-    result.logo_url = logoUrl;
-    result.screenshot_url = screenshotUrl;
-
-    return Response.json({ branding: result });
+    return Response.json({ branding: analysisResult });
 
   } catch (error) {
     console.error('Error:', error);
