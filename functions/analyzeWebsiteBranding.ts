@@ -4,105 +4,144 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { url } = await req.json();
-    
     if (!url) {
-      return Response.json({ error: 'URL is required' }, { status: 400 });
+      return Response.json({ error: 'URL required' }, { status: 400 });
     }
 
-    console.log('📸 Taking screenshot of:', url);
+    const REPLICATE_API_KEY = Deno.env.get('REPLICATE_API_KEY');
 
-    // Take screenshot using ScreenshotOne API
+    // 1. Capturer le screenshot avec un modèle Replicate
+    const screenshotResponse = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        version: '7e4b1f9f1f4c3d8a5b2e6f8a9c1d3e5f7a9b2c4d6e8f1a3b5c7d9e0f2a4b6c8', // screenshot model
+        input: {
+          url: url,
+          viewport_width: 1280,
+          viewport_height: 1024,
+          full_page: false
+        }
+      })
+    });
+
+    const screenshotPrediction = await screenshotResponse.json();
+    
+    // Poll pour le résultat du screenshot
     let screenshotUrl = null;
-    try {
-      const screenshotResponse = await fetch(
-        `https://api.screenshotone.com/take?` +
-        `access_key=VykdDVsgzXivig&` +
-        `url=${encodeURIComponent(url)}&` +
-        `viewport_width=1920&` +
-        `viewport_height=1080&` +
-        `device_scale_factor=1&` +
-        `format=jpg&` +
-        `full_page=false&` +
-        `block_ads=true&` +
-        `block_cookie_banners=true&` +
-        `block_trackers=true&` +
-        `cache=false`
-      );
-
-      if (screenshotResponse.ok) {
-        const screenshotBlob = await screenshotResponse.arrayBuffer();
-        const screenshotFile = new File([screenshotBlob], 'screenshot.jpg', { type: 'image/jpeg' });
-        const uploadResult = await base44.integrations.Core.UploadFile({ file: screenshotFile });
-        screenshotUrl = uploadResult.file_url;
-        console.log('✅ Screenshot captured:', screenshotUrl);
-      } else {
-        console.error('❌ Screenshot failed:', await screenshotResponse.text());
-        throw new Error('Screenshot capture failed');
+    let attempts = 0;
+    while (attempts < 30) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${screenshotPrediction.id}`, {
+        headers: { 'Authorization': `Bearer ${REPLICATE_API_KEY}` }
+      });
+      
+      const status = await statusResponse.json();
+      
+      if (status.status === 'succeeded') {
+        screenshotUrl = status.output;
+        break;
+      } else if (status.status === 'failed') {
+        throw new Error('Screenshot failed');
       }
-    } catch (e) {
-      console.error('❌ Screenshot error:', e);
-      return Response.json({ error: 'Failed to capture screenshot' }, { status: 500 });
+      
+      attempts++;
     }
 
-    console.log('🔍 Analyzing screenshot with AI...');
+    if (!screenshotUrl) {
+      throw new Error('Screenshot timeout');
+    }
 
-    // Analyze screenshot with InvokeLLM
-    const analysisResult = await base44.integrations.Core.InvokeLLM({
-      prompt: `Analyze this website screenshot and extract ALL visual branding elements.
+    // 2. Analyser le screenshot avec GPT-4 Vision via Replicate
+    const analysisResponse = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        version: 'ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4',
+        input: {
+          image: screenshotUrl,
+          prompt: `Analyze this website screenshot and extract branding elements for AI image generation.
 
-IMPORTANT INSTRUCTIONS:
-- Look at the ACTUAL screenshot image provided
-- Extract REAL colors you see in the image (HEX codes from logo, buttons, backgrounds)
-- Describe the ACTUAL logo you see in the screenshot
-- Identify the typography style visible in the image
-- Define the visual style and brand mood based on what you SEE
+Extract:
+1. Main brand colors (HEX codes) - identify 2-4 dominant colors
+2. Logo description (shape, style, elements)
+3. Visual style (modern/minimal/bold/classic/etc)
+4. Typography style (sans-serif/serif/modern/etc)
+5. Brand mood (professional/playful/elegant/tech/etc)
+6. Key visual elements
 
 Return ONLY valid JSON:
 {
-  "colors": ["#hex1", "#hex2", "#hex3", "#hex4"],
-  "logo_description": "detailed description of the logo visible in the screenshot",
-  "typography": "font style description based on text visible",
-  "style": "visual design style you observe",
-  "mood": "brand personality based on visual elements",
-  "keywords": ["design element 1", "element 2", "element 3"],
-  "design_description": "comprehensive 2-3 sentence description of the brand's visual identity"
+  "colors": ["#hex1", "#hex2", "#hex3"],
+  "logo_description": "detailed logo description",
+  "style": "visual style",
+  "typography": "typography style",
+  "mood": "brand mood",
+  "keywords": ["element1", "element2", "element3"]
 }`,
-      file_urls: [screenshotUrl],
-      response_json_schema: {
-        type: "object",
-        properties: {
-          colors: { type: "array", items: { type: "string" } },
-          logo_description: { type: "string" },
-          typography: { type: "string" },
-          style: { type: "string" },
-          mood: { type: "string" },
-          keywords: { type: "array", items: { type: "string" } },
-          design_description: { type: "string" }
-        },
-        required: ["colors", "style", "mood"]
-      }
+          max_tokens: 500
+        }
+      })
     });
 
-    console.log('✅ Analysis completed:', JSON.stringify(analysisResult, null, 2));
-
-    if (!analysisResult || typeof analysisResult !== 'object') {
-      console.error('❌ Invalid analysis result');
-      return Response.json({ error: 'Failed to analyze screenshot' }, { status: 500 });
+    const analysisPrediction = await analysisResponse.json();
+    
+    // Poll pour le résultat de l'analyse
+    let branding = null;
+    attempts = 0;
+    while (attempts < 30) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${analysisPrediction.id}`, {
+        headers: { 'Authorization': `Bearer ${REPLICATE_API_KEY}` }
+      });
+      
+      const status = await statusResponse.json();
+      
+      if (status.status === 'succeeded') {
+        const output = Array.isArray(status.output) ? status.output.join('') : status.output;
+        try {
+          branding = JSON.parse(output);
+        } catch (e) {
+          // Tenter d'extraire JSON du texte
+          const match = output.match(/\{[\s\S]*\}/);
+          if (match) {
+            branding = JSON.parse(match[0]);
+          }
+        }
+        break;
+      } else if (status.status === 'failed') {
+        throw new Error('Analysis failed');
+      }
+      
+      attempts++;
     }
 
-    // Add screenshot URL to result
-    analysisResult.screenshot_url = screenshotUrl;
+    if (!branding) {
+      throw new Error('Analysis timeout or invalid response');
+    }
 
-    return Response.json({ branding: analysisResult });
+    return Response.json({ 
+      branding,
+      screenshot_url: screenshotUrl 
+    });
 
   } catch (error) {
-    console.error('❌ Error:', error);
-    return Response.json({ error: error.message || 'Analysis failed' }, { status: 500 });
+    console.error('Branding analysis error:', error);
+    return Response.json({ 
+      error: error.message 
+    }, { status: 500 });
   }
 });
