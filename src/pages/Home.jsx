@@ -787,13 +787,13 @@ export default function Home() {
               console.error('Failed to update conversation:', e);
             }
           }
-        } else {
-        // CAS NORMAL: Génération simple
-        const result = await base44.integrations.Core.GenerateImage({
-          prompt: promptToUse
-        });
+          } else {
+          // CAS NORMAL: Génération simple
+          const result = await base44.integrations.Core.GenerateImage({
+            prompt: promptToUse
+          });
 
-        if (result.url) {
+          if (result.url) {
         // Extract color palette from generated image
         let extractedColors = selectedPalette?.colors;
         if (!extractedColors) {
