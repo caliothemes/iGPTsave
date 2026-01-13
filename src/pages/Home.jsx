@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
@@ -195,24 +194,24 @@ export default function Home() {
           } catch (e) {
             console.error('Failed to load visual:', e);
           }
-          }
-          } catch (e) {
-          console.error(e);
-          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
 
-          // Load prompt templates and examples (for all users, including guests)
-          try {
-          const [templates, examples] = await Promise.all([
+      // Load prompt templates and examples (for all users, including guests)
+      try {
+        const [templates, examples] = await Promise.all([
           base44.entities.PromptTemplate.filter({ is_active: true }),
           base44.entities.PromptExample.filter({ is_active: true }, 'order')
-          ]);
-          setPromptTemplates(templates);
-          setPromptExamples(examples);
-          } catch (e) {
-          console.error('Failed to load prompt templates/examples:', e);
-          }
+        ]);
+        setPromptTemplates(templates);
+        setPromptExamples(examples);
+      } catch (e) {
+        console.error('Failed to load prompt templates/examples:', e);
+      }
 
-          setIsLoading(false);
+      setIsLoading(false);
     };
     init();
   }, []);
@@ -1098,15 +1097,16 @@ export default function Home() {
           } catch (e) {
             console.error('Failed to update conversation:', e);
           }
-          }
-          } catch (error) {
-          console.error(error);
-          const errorMsg = t('error');
-        setMessages(prev => {
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMsg = t('error');
+      setMessages(prev => {
         const newMsgs = [...prev];
         newMsgs[newMsgs.length - 1] = { role: 'assistant', content: errorMsg };
         return newMsgs;
-        });
+      });
 
       // Update conversation with error
       if (activeConversation && user) {
