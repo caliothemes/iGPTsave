@@ -63,7 +63,7 @@ export default function Store() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [popularKeywords, setPopularKeywords] = useState([]);
-  const [selectedKeyword, setSelectedKeyword] = useState(null);
+  const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [placeholderText, setPlaceholderText] = useState('');
   const [currentKeywordIndex, setCurrentKeywordIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
@@ -200,9 +200,9 @@ export default function Store() {
     ).length;
   };
 
-  // Reset keyword when category changes
+  // Reset keywords when category changes
   useEffect(() => {
-    setSelectedKeyword(null);
+    setSelectedKeywords([]);
   }, [selectedCategory]);
 
   useEffect(() => {
@@ -229,15 +229,22 @@ export default function Store() {
       });
     }
 
-    // Filter by selected keyword
-    if (selectedKeyword) {
-      items = items.filter(item => 
-        item.keywords && item.keywords.includes(selectedKeyword)
-      );
+    // Filter by selected keywords - all must match
+    if (selectedKeywords.length > 0) {
+      items = items.filter(item => {
+        return selectedKeywords.every(keyword => {
+          const titleMatch = (item.title || '').toLowerCase().includes(keyword.toLowerCase());
+          const descMatch = (item.description || '').toLowerCase().includes(keyword.toLowerCase());
+          const keywordsMatch = Array.isArray(item.keywords) && item.keywords.some(k => 
+            (k || '').toLowerCase().includes(keyword.toLowerCase())
+          );
+          return titleMatch || descMatch || keywordsMatch;
+        });
+      });
     }
 
     setFilteredItems(items);
-  }, [selectedCategory, storeItems, searchQuery, selectedKeyword]);
+  }, [selectedCategory, storeItems, searchQuery, selectedKeywords]);
 
   // Extract unique keywords for current category
   const categoryKeywords = React.useMemo(() => {
@@ -496,25 +503,36 @@ export default function Store() {
                   </span>
                 )}
                 
-                {selectedKeyword && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600/30 border border-blue-500/50 text-blue-200 text-xs rounded-full">
-                    {selectedKeyword}
+                {/* Selected Keywords Tags */}
+                {selectedKeywords.map((keyword, idx) => (
+                  <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600/30 border border-blue-500/50 text-blue-200 text-xs rounded-full">
+                    {keyword}
                     <button
-                      onClick={() => setSelectedKeyword(null)}
+                      onClick={() => setSelectedKeywords(prev => prev.filter((_, i) => i !== idx))}
                       className="hover:text-white"
                     >
                       <X className="h-3 w-3" />
                     </button>
                   </span>
-                )}
+                ))}
                 
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setSelectedKeyword(null);
                     setUserTyping(e.target.value.length > 0);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchQuery.trim()) {
+                      e.preventDefault();
+                      const newKeyword = searchQuery.trim();
+                      if (!selectedKeywords.includes(newKeyword)) {
+                        setSelectedKeywords(prev => [...prev, newKeyword]);
+                      }
+                      setSearchQuery('');
+                      setUserTyping(false);
+                    }
                   }}
                   onFocus={() => {
                     setSearchFocused(true);
@@ -527,9 +545,12 @@ export default function Store() {
                   placeholder={placeholderText || (language === 'fr' ? 'Rechercher un visuel...' : 'Search for a visual...')}
                   className="flex-1 min-w-[200px] bg-transparent text-white placeholder:text-white/30 outline-none"
                 />
-                {searchQuery && (
+                {(searchQuery || selectedKeywords.length > 0) && (
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedKeywords([]);
+                    }}
                     className="p-1 hover:bg-white/10 rounded-full transition-colors flex-shrink-0"
                   >
                     <X className="h-4 w-4 text-white/40" />
@@ -556,7 +577,10 @@ export default function Store() {
                         key={idx}
                         onMouseDown={(e) => {
                           e.preventDefault();
-                          setSearchQuery(keyword);
+                          if (!selectedKeywords.includes(keyword)) {
+                            setSelectedKeywords(prev => [...prev, keyword]);
+                          }
+                          setSearchQuery('');
                         }}
                         className="px-3 py-1.5 bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-300 text-xs rounded-full transition-colors"
                       >
