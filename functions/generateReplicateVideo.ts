@@ -150,89 +150,12 @@ Deno.serve(async (req) => {
     const prediction = JSON.parse(responseText);
     console.log('Replicate prediction:', prediction);
 
-    // Poll status until completed
-    let videoUrl = null;
-    let status = prediction.status;
-    let pollCount = 0;
-    const maxPolls = 180; // 6 minutes max
-
-    while (status !== 'succeeded' && status !== 'failed' && pollCount < maxPolls) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
-        headers: {
-          'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!statusResponse.ok) {
-        const errorText = await statusResponse.text();
-        console.error('Poll error:', errorText);
-        return Response.json({ 
-          error: 'Failed to check video status', 
-          details: errorText 
-        }, { status: 500 });
-      }
-
-      const statusData = await statusResponse.json();
-      status = statusData.status;
-      console.log('Status:', status, 'Poll:', pollCount);
-
-      if (status === 'succeeded') {
-        videoUrl = statusData.output;
-        break;
-      } else if (status === 'failed') {
-        console.error('Generation failed:', statusData.error);
-        return Response.json({ 
-          error: 'Video generation failed', 
-          details: statusData.error || 'Unknown error'
-        }, { status: 500 });
-      }
-
-      pollCount++;
-    }
-
-    if (!videoUrl) {
-      return Response.json({ 
-        error: 'Video generation timeout',
-        details: `Timeout after ${pollCount} polls`
-      }, { status: 500 });
-    }
-
-    // Download and store video permanently
-    console.log('Downloading video from Replicate...');
-    try {
-      const videoResponse = await fetch(videoUrl);
-      if (!videoResponse.ok) {
-        throw new Error('Failed to download video');
-      }
-      
-      const videoBlob = await videoResponse.blob();
-      const videoFile = new File([videoBlob], `video_${Date.now()}.mp4`, { type: 'video/mp4' });
-      
-      console.log('Uploading video to permanent storage...');
-      const { file_url: permanentUrl } = await base44.asServiceRole.integrations.Core.UploadFile({ 
-        file: videoFile 
-      });
-      
-      console.log('Video stored permanently:', permanentUrl);
-      
-      return Response.json({ 
-        video_url: permanentUrl,
-        status: 'success',
-        credits_used: creditsRequired
-      });
-    } catch (uploadError) {
-      console.error('Failed to store video permanently:', uploadError);
-      // Fallback to temporary URL if upload fails
-      return Response.json({ 
-        video_url: videoUrl,
-        status: 'success',
-        credits_used: creditsRequired,
-        warning: 'Video stored with temporary URL'
-      });
-    }
+    // Return prediction ID immediately for frontend polling
+    return Response.json({ 
+      prediction_id: prediction.id,
+      status: 'processing',
+      credits_used: creditsRequired
+    });
 
   } catch (error) {
     console.error('Error:', error);
