@@ -137,15 +137,26 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         console.log('Prediction ID:', predictionId);
 
         const pollForCompletion = async () => {
+          const maxWaitTime = provider === 'sora' ? 600000 : 360000; // 10min for Sora, 6min for others
+          const startTime = Date.now();
+          
           while (true) {
-            await new Promise(resolve => setTimeout(resolve, 3000)); // Poll every 3s
+            // Check timeout
+            if (Date.now() - startTime > maxWaitTime) {
+              clearInterval(progressInterval);
+              throw new Error(language === 'fr' 
+                ? 'Timeout: génération trop longue (>10min). Réessayez.' 
+                : 'Timeout: generation too long (>10min). Retry.');
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 3000));
             
             try {
               const statusResponse = await base44.functions.invoke('checkReplicateVideo', { 
                 prediction_id: predictionId 
               });
 
-              console.log('Status response:', statusResponse.data);
+              console.log('Status:', statusResponse.data.status, 'Time:', Math.round((Date.now() - startTime) / 1000) + 's');
 
               if (statusResponse.data.status === 'succeeded') {
                 clearInterval(progressInterval);
@@ -159,11 +170,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                   onClose();
                 }, 500);
                 break;
-              } else if (statusResponse.data.status === 'failed') {
+              } else if (statusResponse.data.status === 'failed' || statusResponse.data.status === 'canceled') {
                 clearInterval(progressInterval);
-                throw new Error(statusResponse.data.error || 'Video generation failed');
+                throw new Error(statusResponse.data.error || `Generation ${statusResponse.data.status}`);
               }
-              // Continue polling if still processing
             } catch (pollError) {
               console.error('Polling error:', pollError);
               clearInterval(progressInterval);
