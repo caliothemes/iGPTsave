@@ -531,6 +531,28 @@ export default function Home() {
         localStorage.setItem('igpt_guest_prompts', newCount.toString());
       }
 
+      // Détecter URL dans le prompt
+      const urlRegex = /(https?:\/\/[^\s]+)/gi;
+      const urls = userMessage.match(urlRegex);
+      let brandingInfo = null;
+
+      if (urls && urls.length > 0) {
+        try {
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            { role: 'assistant', content: language === 'fr' ? '🔍 Analyse du site web en cours...' : '🔍 Analyzing website...', isStreaming: true }
+          ]);
+          
+          const brandingResult = await base44.functions.invoke('analyzeWebsiteBranding', { url: urls[0] });
+          if (brandingResult.data?.branding) {
+            brandingInfo = brandingResult.data.branding;
+            console.log('✅ Branding détecté:', brandingInfo);
+          }
+        } catch (e) {
+          console.error('Échec analyse branding:', e);
+        }
+      }
+
       let enhancedPrompt = '';
       const dimensions = activeCategory?.selectedSubmenu?.dimensions || selectedFormat?.dimensions || '1080x1080';
       const isExpertMode = activeCategory?.expertMode || activeCategory?.id === 'free_prompt';
@@ -585,6 +607,23 @@ export default function Home() {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
           console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
+        }
+
+        // Enrichir avec les infos de branding si disponibles
+        if (brandingInfo) {
+          if (brandingInfo.colors && brandingInfo.colors.length > 0) {
+            enhancedPrompt += `, brand colors: ${brandingInfo.colors.join(', ')}`;
+          }
+          if (brandingInfo.style) {
+            enhancedPrompt += `, ${brandingInfo.style} style`;
+          }
+          if (brandingInfo.mood) {
+            enhancedPrompt += `, ${brandingInfo.mood} mood`;
+          }
+          if (brandingInfo.keywords && brandingInfo.keywords.length > 0) {
+            enhancedPrompt += `, thematic elements: ${brandingInfo.keywords.join(', ')}`;
+          }
+          console.log('🎨 Prompt enrichi avec branding:', brandingInfo);
         }
 
         if (selectedStyle) {
