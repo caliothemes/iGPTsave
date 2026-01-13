@@ -78,41 +78,23 @@ Deno.serve(async (req) => {
     let input;
     
     if (model === 'sora') {
-      // Sora 2 Pro
+      // Sora 2 Pro - uses "seconds" parameter directly, NOT "length"
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       
-      // Map duration to Sora's length parameter
-      // Sora expects: short=4s, medium=8s, long=12s
       const durationNum = Number(duration);
-      let lengthValue;
-      
-      console.log(`Sora BEFORE mapping - duration: ${duration}, type: ${typeof duration}, durationNum: ${durationNum}`);
-      console.log(`Comparisons: ${durationNum} == 4? ${durationNum == 4}, == 8? ${durationNum == 8}, == 12? ${durationNum == 12}`);
-      
-      if (durationNum == 4) {
-        lengthValue = 'short';
-      } else if (durationNum == 8) {
-        lengthValue = 'medium';
-      } else if (durationNum == 12) {
-        lengthValue = 'long';
-      } else {
-        console.warn(`Unexpected duration ${durationNum}, defaulting to short`);
-        lengthValue = 'short';
-      }
-      
-      console.log(`Sora AFTER mapping - lengthValue: ${lengthValue}`);
+      console.log(`Sora 2 Pro - duration: ${durationNum} seconds`);
       
       input = {
         prompt: prompt,
+        seconds: durationNum,
         aspect_ratio: aspect_ratio === '3:4' ? 'portrait' : 'landscape',
-        length: lengthValue,
-        resolution_quality: 'high'
+        resolution: 'high'
       };
       if (image_url) {
         input.input_reference = image_url;
       }
       
-      console.log('Sora final input object:', JSON.stringify(input, null, 2));
+      console.log('Sora 2 Pro final input:', JSON.stringify(input, null, 2));
     } else if (model === 'wan') {
       // Wan v2.5 I2V
       modelEndpoint = 'https://api.replicate.com/v1/models/lucataco/wan-v2.5-i2v/predictions';
