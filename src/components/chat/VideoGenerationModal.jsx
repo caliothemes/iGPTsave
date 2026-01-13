@@ -137,7 +137,13 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         console.log('Prediction ID:', predictionId);
 
         const pollForCompletion = async () => {
-          const maxWaitTime = 400000; // 400s max comme demandé
+          // Timeout adapté selon le modèle et la durée
+          let maxWaitTime = 400000; // 400s par défaut
+          if (provider === 'sora') {
+            if (durationValue === 4) maxWaitTime = 400000; // 6m40s
+            else if (durationValue === 8) maxWaitTime = 600000; // 10min
+            else if (durationValue === 12) maxWaitTime = 900000; // 15min
+          }
           const startTime = Date.now();
           
           while (true) {
