@@ -1099,6 +1099,7 @@ export default function Home() {
           }
         }
       }
+      }
     } catch (error) {
       console.error(error);
       const errorMsg = t('error');
