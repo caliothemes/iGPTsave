@@ -221,9 +221,9 @@ export default function Store() {
       items = items.filter(item => {
         // All search words must be found somewhere in the item
         return searchWords.every(word => {
-          const titleMatch = item.title?.toLowerCase().includes(word);
-          const descMatch = item.description?.toLowerCase().includes(word);
-          const keywordsMatch = item.keywords?.some(k => k.toLowerCase().includes(word));
+          const titleMatch = (item.title || '').toLowerCase().includes(word);
+          const descMatch = (item.description || '').toLowerCase().includes(word);
+          const keywordsMatch = Array.isArray(item.keywords) && item.keywords.some(k => (k || '').toLowerCase().includes(word));
           return titleMatch || descMatch || keywordsMatch;
         });
       });
@@ -727,48 +727,7 @@ export default function Store() {
           `}</style>
         </div>
 
-        {/* Category Keywords Tags */}
-        {categoryKeywords.length > 0 && (
-          <div className="w-full mb-8 bg-white/[0.02] border-y border-white/5 py-4">
-            <div className="px-6 overflow-x-auto scrollbar-hide">
-              <div className="flex gap-2 justify-center min-w-max mx-auto">
-                {/* Tous button */}
-                <button
-                  onClick={() => {
-                    setSelectedKeyword(null);
-                    setSearchQuery('');
-                  }}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap",
-                    !selectedKeyword
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30"
-                      : "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border border-blue-500/30"
-                  )}
-                >
-                  {language === 'fr' ? 'Tous' : 'All'}
-                </button>
-                
-                {categoryKeywords.map((keyword) => (
-                  <button
-                    key={keyword}
-                    onClick={() => {
-                      setSelectedKeyword(selectedKeyword === keyword ? null : keyword);
-                      setSearchQuery('');
-                    }}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap",
-                      selectedKeyword === keyword
-                        ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10 hover:border-violet-500/30"
-                    )}
-                  >
-                    {keyword}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Masonry Grid */}
         <div className="px-2 pb-32 flex-1 w-full">
