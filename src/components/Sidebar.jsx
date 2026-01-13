@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { base44 } from '@/api/base44Client';
 
 export default function Sidebar({ 
   isOpen, 
@@ -40,6 +41,21 @@ export default function Sidebar({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingConv, setEditingConv] = useState(null);
   const [editTitle, setEditTitle] = useState('');
+  const [appVersion, setAppVersion] = useState('iGPT 1.0.1 beta');
+
+  useEffect(() => {
+    const loadAppVersion = async () => {
+      try {
+        const settings = await base44.entities.AppSettings.list();
+        if (settings.length > 0 && settings[0].app_version) {
+          setAppVersion(settings[0].app_version);
+        }
+      } catch (e) {
+        console.error('Failed to load app version:', e);
+      }
+    };
+    loadAppVersion();
+  }, []);
 
   const getTotalCredits = () => {
     if (!credits) return 0;
@@ -92,7 +108,7 @@ export default function Sidebar({
       )}>
         {/* Header */}
         <div className="p-3 pt-4 flex flex-col border-b border-white/10">
-          <p className="text-white/50 text-xs font-medium mb-3 ml-1">{sidebarTitle || 'iGPT 1.0.1 beta'}</p>
+          <p className="text-white/50 text-xs font-medium mb-3 ml-1">{sidebarTitle || appVersion}</p>
           <div className="flex items-center gap-2 mb-3">
                             <button onClick={onNewChat} className="flex-1 flex items-center justify-center p-2.5 rounded-lg bg-gradient-to-r from-violet-800/80 to-blue-800/80 hover:from-violet-900 hover:to-blue-900 text-white transition-colors" title={t('newCreation')}>
                               <Plus className="h-4 w-4" />
