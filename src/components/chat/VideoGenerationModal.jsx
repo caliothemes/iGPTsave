@@ -125,22 +125,54 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         console.log(`[FRONTEND DEBUG] Final payload being sent:`, JSON.stringify(payload, null, 2));
         const response = await base44.functions.invoke('generateReplicateVideo', payload);
 
-        clearInterval(progressInterval);
         console.log('Replicate response:', response);
 
         if (response.data.error) {
+          clearInterval(progressInterval);
           throw new Error(response.data.error);
         }
 
-        setProgress(100);
-        setTimeout(() => {
-          // Add metadata to prompt for badge display
-          const modelName = provider === 'wan' ? 'Wan v2.5 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
-          const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
-          const videoAspectRatio = provider === 'replicate' ? aspectRatio : provider === 'sora' ? soraAspectRatio : '16:9';
-          onVideoGenerated(response.data.video_url, promptWithMetadata, videoAspectRatio);
-          onClose();
-        }, 500);
+        // Start polling for completion
+        const predictionId = response.data.prediction_id;
+        console.log('Prediction ID:', predictionId);
+
+        const pollForCompletion = async () => {
+          while (true) {
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Poll every 3s
+            
+            try {
+              const statusResponse = await base44.functions.invoke('checkReplicateVideo', { 
+                prediction_id: predictionId 
+              });
+
+              console.log('Status response:', statusResponse.data);
+
+              if (statusResponse.data.status === 'succeeded') {
+                clearInterval(progressInterval);
+                setProgress(100);
+                
+                setTimeout(() => {
+                  const modelName = provider === 'wan' ? 'Wan v2.5 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
+                  const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
+                  const videoAspectRatio = provider === 'replicate' ? aspectRatio : provider === 'sora' ? soraAspectRatio : '16:9';
+                  onVideoGenerated(statusResponse.data.video_url, promptWithMetadata, videoAspectRatio);
+                  onClose();
+                }, 500);
+                break;
+              } else if (statusResponse.data.status === 'failed') {
+                clearInterval(progressInterval);
+                throw new Error(statusResponse.data.error || 'Video generation failed');
+              }
+              // Continue polling if still processing
+            } catch (pollError) {
+              console.error('Polling error:', pollError);
+              clearInterval(progressInterval);
+              throw pollError;
+            }
+          }
+        };
+
+        pollForCompletion();
 
       } else {
         // Runway generation (existing code)
