@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     }
 
     const statusData = await response.json();
-    console.log('Status check:', statusData.status);
+    console.log('Status check:', statusData.status, 'Logs:', statusData.logs?.slice(-200) || 'none');
 
     if (statusData.status === 'succeeded') {
       const videoUrl = statusData.output;
