@@ -793,7 +793,7 @@ export default function Home() {
           prompt: promptToUse
         });
 
-      if (result.url) {
+        if (result.url) {
         // Extract color palette from generated image
         let extractedColors = selectedPalette?.colors;
         if (!extractedColors) {
