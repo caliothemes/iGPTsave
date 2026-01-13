@@ -122,10 +122,12 @@ export default function Home() {
   const [showVideoInfoModal, setShowVideoInfoModal] = useState(false);
   const [showRecentVisualsModal, setShowRecentVisualsModal] = useState(false);
   const [recentVisuals, setRecentVisuals] = useState([]);
+  const [attachedImages, setAttachedImages] = useState([]);
 
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
 
@@ -363,6 +365,34 @@ export default function Home() {
       // Reset file input
       e.target.value = '';
     }
+  };
+
+  const handleAttachImages = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    // Limit to 4 images
+    if (attachedImages.length + files.length > 4) {
+      alert(language === 'fr' ? 'Maximum 4 images' : 'Maximum 4 images');
+      return;
+    }
+
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) continue;
+
+      try {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        setAttachedImages(prev => [...prev, file_url]);
+      } catch (error) {
+        console.error('Upload failed:', error);
+      }
+    }
+
+    e.target.value = '';
+  };
+
+  const removeAttachedImage = (index) => {
+    setAttachedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleVoiceInput = () => {
@@ -974,6 +1004,7 @@ export default function Home() {
           }
         }
         }
+        }
         } catch (error) {
         console.error(error);
         const errorMsg = t('error');
@@ -1406,6 +1437,14 @@ export default function Home() {
         ref={fileInputRef}
         onChange={handleFileUpload}
         accept="image/*"
+        className="hidden"
+      />
+      <input
+        type="file"
+        ref={imageInputRef}
+        onChange={handleAttachImages}
+        accept="image/*"
+        multiple
         className="hidden"
       />
 
@@ -1866,6 +1905,26 @@ export default function Home() {
 
             {/* Input Bar */}
             <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+              {/* Attached Images Thumbnails */}
+              {attachedImages.length > 0 && (
+                <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-white/5">
+                  {attachedImages.map((img, idx) => (
+                    <div key={idx} className="relative group">
+                      <img src={img} alt="" className="w-16 h-16 object-cover rounded-lg border border-white/20" />
+                      <button
+                        onClick={() => removeAttachedImage(idx)}
+                        className="absolute -top-1 -right-1 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                  <span className="text-white/40 text-xs ml-2">
+                    {attachedImages.length}/4
+                  </span>
+                </div>
+              )}
+
               {/* Ligne principale - Textarea + boutons */}
               <div className="flex items-center gap-2 px-4 py-3">
                 {/* Plus Menu */}
@@ -2015,6 +2074,23 @@ export default function Home() {
                   disabled={isGenerating}
                   style={{ height: '24px' }}
                 />
+
+                <button 
+                  onClick={() => imageInputRef.current?.click()}
+                  className="p-2 text-white/40 hover:text-white/60 transition-colors"
+                  disabled={attachedImages.length >= 4}
+                >
+                  <div className="relative">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                      <path d="M21 15l-5-5L5 21" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    <svg className="h-2.5 w-2.5 absolute -bottom-0.5 -right-0.5 bg-[#0a0a0f] rounded-full" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                </button>
 
                 <button 
                   onClick={handleVoiceInput}
