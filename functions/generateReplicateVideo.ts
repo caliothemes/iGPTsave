@@ -89,11 +89,11 @@ Deno.serve(async (req) => {
       console.log(`Sora BEFORE mapping - duration: ${duration}, type: ${typeof duration}, durationNum: ${durationNum}`);
       console.log(`Comparisons: ${durationNum} == 4? ${durationNum == 4}, == 8? ${durationNum == 8}, == 12? ${durationNum == 12}`);
       
-      if (durationNum === 4) {
+      if (durationNum == 4) {
         lengthValue = 'short';
-      } else if (durationNum === 8) {
+      } else if (durationNum == 8) {
         lengthValue = 'medium';
-      } else if (durationNum === 12) {
+      } else if (durationNum == 12) {
         lengthValue = 'long';
       } else {
         console.warn(`Unexpected duration ${durationNum}, defaulting to short`);
