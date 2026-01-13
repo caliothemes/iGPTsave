@@ -531,7 +531,7 @@ export default function Home() {
         localStorage.setItem('igpt_guest_prompts', newCount.toString());
       }
 
-      // Détecter URL et analyser branding
+      // Détecter URL et analyser branding avec LLaMA 3.1
       const urlRegex = /(https?:\/\/[^\s]+)/gi;
       const urls = userMessage.match(urlRegex);
       let brandingInfo = null;
@@ -540,38 +540,20 @@ export default function Home() {
         try {
           setMessages(prev => [
             ...prev.slice(0, -1),
-            { role: 'assistant', content: language === 'fr' ? '🔍 Analyse du branding...' : '🔍 Analyzing branding...', isStreaming: true }
+            { role: 'assistant', content: language === 'fr' ? '🔍 Lecture du site web...' : '🔍 Reading website...', isStreaming: true }
           ]);
           
-          brandingInfo = await base44.integrations.Core.InvokeLLM({
-            prompt: `Visit this website: ${urls[0]}
-
-Analyze the brand identity and extract:
-1. Primary colors (2-3 HEX codes from logo and main elements)
-2. Logo characteristics (shapes, icons, symbols)
-3. Visual style (modern/elegant/minimal/bold/playful/professional)
-4. Typography feel (sans-serif/serif/geometric/humanist)
-5. Brand mood/personality
-6. Distinctive visual elements
-
-Return JSON with EXACT HEX codes visible on the site:`,
-            add_context_from_internet: true,
-            response_json_schema: {
-              type: "object",
-              properties: {
-                colors: { type: "array", items: { type: "string" } },
-                logo_style: { type: "string" },
-                visual_style: { type: "string" },
-                typography: { type: "string" },
-                mood: { type: "string" },
-                keywords: { type: "array", items: { type: "string" } }
-              }
-            }
+          const result = await base44.functions.invoke('analyzeBrandingFromURL', { 
+            url: urls[0],
+            userPrompt: userMessage.replace(urls[0], '').trim()
           });
           
-          console.log('✅ Branding:', brandingInfo);
+          if (result.data?.branding) {
+            brandingInfo = result.data.branding;
+            console.log('✅ Branding extrait:', brandingInfo);
+          }
         } catch (e) {
-          console.error('❌ Analyse échouée:', e);
+          console.error('❌ Échec analyse:', e);
         }
       }
 
@@ -631,36 +613,40 @@ Return JSON with EXACT HEX codes visible on the site:`,
           console.log('🤖 MODE ASSISTÉ - Prompt par défaut appliqué');
         }
 
-        // Enrichir avec branding si extrait
+        // Enrichir avec branding détaillé
         if (brandingInfo) {
           let brandPrompt = '';
           
-          if (brandingInfo.colors?.length > 0) {
-            brandPrompt += `, EXACT brand colors: ${brandingInfo.colors.join(' and ')}`;
+          if (brandingInfo.brand_name) {
+            brandPrompt += ` for ${brandingInfo.brand_name}`;
           }
           
-          if (brandingInfo.logo_style) {
-            brandPrompt += `, logo inspired by: ${brandingInfo.logo_style}`;
+          if (brandingInfo.colors?.length > 0) {
+            brandPrompt += `, using brand colors ${brandingInfo.colors.join(', ')}`;
+          }
+          
+          if (brandingInfo.logo_description) {
+            brandPrompt += `, logo style: ${brandingInfo.logo_description}`;
           }
           
           if (brandingInfo.visual_style) {
-            brandPrompt += `, ${brandingInfo.visual_style} brand aesthetic`;
-          }
-          
-          if (brandingInfo.typography) {
-            brandPrompt += `, ${brandingInfo.typography} typeface style`;
+            brandPrompt += `, ${brandingInfo.visual_style} aesthetic`;
           }
           
           if (brandingInfo.mood) {
-            brandPrompt += `, ${brandingInfo.mood} brand personality`;
+            brandPrompt += `, ${brandingInfo.mood} tone`;
           }
           
-          if (brandingInfo.keywords?.length > 0) {
-            brandPrompt += `, incorporating: ${brandingInfo.keywords.slice(0, 3).join(', ')}`;
+          if (brandingInfo.typography) {
+            brandPrompt += `, ${brandingInfo.typography} typography`;
+          }
+          
+          if (brandingInfo.prompt_suggestions) {
+            brandPrompt += `, ${brandingInfo.prompt_suggestions}`;
           }
           
           enhancedPrompt += brandPrompt;
-          console.log('🎨 Branding appliqué au prompt');
+          console.log('🎨 Branding complet appliqué');
         }
 
         if (selectedStyle) {
