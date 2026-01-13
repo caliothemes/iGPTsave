@@ -695,22 +695,6 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </button>
           </div>
 
-          {/* Sora Duration Warning */}
-          {provider === 'sora' && duration > 4 && (
-            <div className="mb-4 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <div className="flex items-start gap-2">
-                <svg className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <p className="text-amber-200 text-xs leading-relaxed">
-                  {language === 'fr'
-                    ? `⏱️ ${duration}s = ${duration === 8 ? '~10min' : '~15min'} de génération. Restez sur cette fenêtre.`
-                    : `⏱️ ${duration}s = ${duration === 8 ? '~10min' : '~15min'} generation. Stay on this window.`}
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* Prompt Input - Only show if auto prompt is disabled */}
           {!autoPrompt && (
             <div className="mb-4">
@@ -771,10 +755,26 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                       )}
 
                       {/* Duration Selector */}
-          <div className="mb-6">
-            <label className="text-white/80 text-sm mb-2 block">
-              {language === 'fr' ? 'Durée' : 'Duration'}
-            </label>
+                      <div className="mb-6">
+                      <label className="text-white/80 text-sm mb-2 block">
+                      {language === 'fr' ? 'Durée' : 'Duration'}
+                      </label>
+
+                      {/* Sora Duration Warning */}
+                      {provider === 'sora' && duration > 4 && (
+                      <div className="mb-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <div className="flex items-start gap-2">
+                      <svg className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <p className="text-amber-200 text-xs leading-relaxed">
+                      {language === 'fr'
+                      ? `⏱️ Cela peut aller de 3 à 10 min. Restez sur cette fenêtre.`
+                      : `⏱️ This can take 3 to 10 min. Stay on this window.`}
+                      </p>
+                      </div>
+                      </div>
+                      )}
             {provider === 'sora' ? (
               <div className="flex gap-2">
                 <button
