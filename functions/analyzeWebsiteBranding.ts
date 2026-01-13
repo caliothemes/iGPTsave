@@ -20,88 +20,46 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'REPLICATE_API_KEY not configured' }, { status: 500 });
     }
 
-    // Fetch website HTML for logo extraction
-    let html = '';
-    let logoUrl = null;
-    try {
-      const siteResponse = await fetch(url);
-      html = await siteResponse.text();
-      
-      // Extract logo from common meta tags
-      const ogImageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
-      const faviconMatch = html.match(/<link\s+rel=["'](?:icon|shortcut icon|apple-touch-icon)["']\s+href=["']([^"']+)["']/i);
-      
-      if (ogImageMatch) {
-        logoUrl = ogImageMatch[1];
-      } else if (faviconMatch) {
-        logoUrl = faviconMatch[1];
-      }
-      
-      // Make logo URL absolute
-      if (logoUrl && !logoUrl.startsWith('http')) {
-        const baseUrl = new URL(url);
-        logoUrl = new URL(logoUrl, baseUrl.origin).href;
-      }
-      
-      console.log('Logo extracted:', logoUrl);
-    } catch (e) {
-      console.error('Failed to fetch website:', e);
-    }
+    // Use Core.InvokeLLM with web context to analyze the site
+    const analysisResult = await base44.integrations.Core.InvokeLLM({
+      prompt: `Analyze this website URL and extract ALL visual branding elements:
+${url}
 
-    // Take screenshot of website using ScreenshotOne or similar
-    let screenshotUrl = null;
-    try {
-      // Use a screenshot API to capture the website visually
-      const screenshotResponse = await fetch(`https://api.screenshotone.com/take?url=${encodeURIComponent(url)}&viewport_width=1920&viewport_height=1080&device_scale_factor=1&format=jpg&block_ads=true&block_cookie_banners=true&access_key=demo`);
-      
-      if (screenshotResponse.ok) {
-        const screenshotBlob = await screenshotResponse.blob();
-        const screenshotFile = new File([screenshotBlob], 'screenshot.jpg', { type: 'image/jpeg' });
-        const uploadResult = await base44.integrations.Core.UploadFile({ file: screenshotFile });
-        screenshotUrl = uploadResult.file_url;
-        console.log('Screenshot captured:', screenshotUrl);
-      }
-    } catch (e) {
-      console.error('Screenshot failed:', e);
-    }
+You MUST browse the website and extract:
+1. PRIMARY COLORS: Extract the exact HEX color codes used (logo, buttons, headers, backgrounds)
+2. LOGO: Find and describe the logo design (shapes, colors, style)
+3. TYPOGRAPHY: Identify the font families used (serif/sans-serif/monospace/script)
+4. VISUAL STYLE: modern/minimalist/classic/bold/elegant/playful/corporate
+5. BRAND MOOD: professional/friendly/luxurious/casual/dynamic/serious
+6. KEY VISUAL ELEMENTS: patterns, shapes, icons used
+7. DESIGN DESCRIPTION: Describe the overall visual identity in 2 sentences
 
-    // Call LLaMA with visual analysis
-    const fileUrls = [];
-    if (screenshotUrl) fileUrls.push(screenshotUrl);
-    if (logoUrl) fileUrls.push(logoUrl);
-
-    const llamaResponse = await fetch('https://api.replicate.com/v1/predictions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        version: 'fbfb20b472b2f3bdd101412a9f70a0ed4fc0ced78a77ff00970ee7a2383c575d',
-        input: {
-          prompt: `Analyze this website's visual branding and identity:
-
-Website URL: ${url}
-${screenshotUrl ? 'Screenshot and logo provided as images.' : ''}
-
-Extract branding elements for generating visuals that match this brand:
-
-Provide ONLY a JSON response (no other text):
+Return ONLY valid JSON:
 {
   "colors": ["#hex1", "#hex2", "#hex3"],
-  "style": "modern/minimalist/classic/bold/elegant/playful",
-  "mood": "professional/dynamic/friendly/luxurious/casual",
-  "typography": "sans-serif/serif/geometric/rounded",
-  "keywords": ["keyword1", "keyword2", "keyword3"],
-  "design_description": "2-sentence description of the visual identity and brand aesthetic"
+  "logo_description": "detailed description of logo",
+  "typography": "font style description",
+  "style": "visual style",
+  "mood": "brand mood",
+  "keywords": ["element1", "element2", "element3"],
+  "design_description": "2-sentence brand identity description"
 }`,
-          image: fileUrls.length > 0 ? fileUrls : undefined,
-          max_new_tokens: 512,
-          temperature: 0.2,
-          top_p: 0.9
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          colors: { type: "array", items: { type: "string" } },
+          logo_description: { type: "string" },
+          typography: { type: "string" },
+          style: { type: "string" },
+          mood: { type: "string" },
+          keywords: { type: "array", items: { type: "string" } },
+          design_description: { type: "string" }
         }
-      })
+      }
     });
+
+    console.log('✅ Branding analysis result:', analysisResult);
 
     if (!analysisResult || typeof analysisResult !== 'object') {
       return Response.json({ error: 'Failed to analyze website' }, { status: 500 });
