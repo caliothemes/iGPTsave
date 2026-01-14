@@ -712,10 +712,16 @@ export default function Home() {
             const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
               image_url: baseResult.url,
               prompt: userMessage,
-              additional_images: attachedImages
+              additional_images: attachedImages,
+              aspect_ratio: '1:1'
             });
 
-            if (!compositionResult.data?.url) throw new Error('Composition failed');
+            console.log('Composition result:', compositionResult);
+
+            if (!compositionResult.data?.url) {
+              console.error('Composition failed - no URL returned:', compositionResult.data);
+              throw new Error('Composition failed');
+            }
 
           // Extraction couleurs
           let extractedColors = selectedPalette?.colors;
@@ -737,61 +743,62 @@ export default function Home() {
             }
           }
 
-          const visualData = {
-            user_email: user?.email || 'anonymous',
-            conversation_id: activeConversation?.id,
-            image_url: compositionResult.data.url,
-            original_image_url: compositionResult.data.url,
-            title: userMessage.slice(0, 50),
-            original_prompt: userMessage,
-            image_prompt: promptToUse,
-            dimensions: dimensions,
-            visual_type: activeCategory?.id,
-            format_name: selectedFormat?.name || null,
-            category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
-            style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
-            color_palette: extractedColors
-          };
+            const visualData = {
+              user_email: user?.email || 'anonymous',
+              conversation_id: activeConversation?.id,
+              image_url: compositionResult.data.url,
+              original_image_url: compositionResult.data.url,
+              title: userMessage.slice(0, 50),
+              original_prompt: userMessage,
+              image_prompt: promptToUse,
+              dimensions: dimensions,
+              visual_type: activeCategory?.id,
+              format_name: selectedFormat?.name || null,
+              category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
+              style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
+              color_palette: extractedColors
+            };
 
-          let savedVisual = visualData;
-          if (user) {
-            savedVisual = await base44.entities.Visual.create(visualData);
-            setSessionVisuals(prev => [savedVisual, ...prev]);
-          }
-
-          setCurrentVisual(savedVisual);
-          setVisualsHistory(prev => [...prev, savedVisual]);
-          setAttachedImages([]);
-
-          const successMessage = `✨ ${language === 'fr' ? 'Composition créée !' : 'Composition created!'}`;
-
-          setMessages(prev => [
-            ...prev.slice(0, -1),
-            { role: 'assistant', content: successMessage },
-            { role: 'assistant', content: '', visual: savedVisual }
-          ]);
-
-          if (activeConversation && user) {
-            try {
-              const updatedMessages = [
-                ...(activeConversation.messages || []),
-                { role: 'user', content: userMessage },
-                { role: 'assistant', content: successMessage }
-              ];
-              await base44.entities.Conversation.update(activeConversation.id, {
-                messages: updatedMessages,
-                title: activeConversation.title || userMessage.slice(0, 50),
-                visual_id: savedVisual.id
-              });
-              setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
-            } catch (e) {
-              console.error('Failed to update conversation:', e);
+            let savedVisual = visualData;
+            if (user) {
+              savedVisual = await base44.entities.Visual.create(visualData);
+              setSessionVisuals(prev => [savedVisual, ...prev]);
             }
+
+            setCurrentVisual(savedVisual);
+            setVisualsHistory(prev => [...prev, savedVisual]);
+            setAttachedImages([]);
+
+            const successMessage = `✨ ${language === 'fr' ? 'Composition créée !' : 'Composition created!'}`;
+
+            setMessages(prev => [
+              ...prev.slice(0, -1),
+              { role: 'assistant', content: successMessage },
+              { role: 'assistant', content: '', visual: savedVisual }
+            ]);
+
+            if (activeConversation && user) {
+              try {
+                const updatedMessages = [
+                  ...(activeConversation.messages || []),
+                  { role: 'user', content: userMessage },
+                  { role: 'assistant', content: successMessage }
+                ];
+                await base44.entities.Conversation.update(activeConversation.id, {
+                  messages: updatedMessages,
+                  title: activeConversation.title || userMessage.slice(0, 50),
+                  visual_id: savedVisual.id
+                });
+                setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
+              } catch (e) {
+                console.error('Failed to update conversation:', e);
+              }
+            }
+          } catch (compError) {
+            console.error('Composition error:', compError);
+            setAttachedImages([]);
+            throw compError;
           }
-        } catch (compError) {
-          console.error('Composition error:', compError);
-          throw compError;
-        }
       } else {
         // CAS NORMAL: Génération simple
         const result = await base44.integrations.Core.GenerateImage({
