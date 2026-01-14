@@ -2213,7 +2213,7 @@ export default function Home() {
                       <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
                       <path d="M21 15l-5-5L5 21" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
-                    <svg className="h-2.5 w-2.5 absolute -bottom-0.5 -right-0.5 bg-[#0a0a0f] rounded-full text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                    <svg className="h-2.5 w-2.5 absolute -bottom-0.5 -right-0.5 bg-blue-500 rounded-full text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
