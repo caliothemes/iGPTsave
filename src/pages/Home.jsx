@@ -510,7 +510,11 @@ export default function Home() {
       inputRef.current.style.height = 'auto';
       inputRef.current.style.height = '24px';
     }
-    setMessages(prev => [...prev, { role: 'user', content: displayMessage }]);
+    setMessages(prev => [...prev, { 
+      role: 'user', 
+      content: displayMessage,
+      attachedImages: attachedImages.length > 0 ? [...attachedImages] : undefined
+    }]);
     setIsGenerating(true);
     
     // Reset currentVisual seulement si c'est un nouveau prompt
@@ -711,7 +715,7 @@ export default function Home() {
 
             const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
               image_url: baseResult.url,
-              prompt: userMessage,
+              prompt: promptToUse,
               additional_images: attachedImages,
               aspect_ratio: '1:1'
             });
