@@ -62,11 +62,17 @@ export default function ImageEditModal({ visual, isOpen, onClose, onEditComplete
         throw new Error(response.data.error);
       }
 
+      // Vérifier que l'URL existe
+      const editedImageUrl = response.data?.url;
+      if (!editedImageUrl) {
+        throw new Error('No URL returned from image edit');
+      }
+
       setProgress(100);
       
       // Callback avec la nouvelle URL
       setTimeout(() => {
-        onEditComplete(response.data.output_url, prompt);
+        onEditComplete(editedImageUrl, prompt);
         onClose();
       }, 500);
 
