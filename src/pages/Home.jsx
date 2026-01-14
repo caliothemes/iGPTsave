@@ -1412,10 +1412,18 @@ export default function Home() {
   };
 
   const handleImageEditComplete = async (newImageUrl, editPrompt) => {
-    // Create new visual with edited image
+    // Valider que newImageUrl existe
+    if (!newImageUrl || typeof newImageUrl !== 'string') {
+      console.error('❌ Invalid URL in handleImageEditComplete:', newImageUrl);
+      alert(language === 'fr' ? 'Erreur: URL invalide' : 'Error: Invalid URL');
+      return;
+    }
+
+    console.log('✅ Valid URL received:', newImageUrl);
+
     const editedVisualData = {
       user_email: user?.email || 'anonymous',
-      conversation_id: currentConversation?.id,
+      conversation_id: activeConversation?.id,
       image_url: newImageUrl,
       original_image_url: newImageUrl,
       title: currentVisual.title + ' (Modifié)',
@@ -1426,10 +1434,19 @@ export default function Home() {
       version: (currentVisual.version || 1) + 1
     };
 
+    console.log('📝 Creating visual:', editedVisualData);
+
     let newVisual = editedVisualData;
     if (user) {
-      newVisual = await base44.entities.Visual.create(editedVisualData);
-      setSessionVisuals(prev => [newVisual, ...prev]);
+      try {
+        newVisual = await base44.entities.Visual.create(editedVisualData);
+        console.log('✅ Visual created:', newVisual.id);
+        setSessionVisuals(prev => [newVisual, ...prev]);
+      } catch (error) {
+        console.error('❌ Create failed:', error);
+        alert(language === 'fr' ? `Erreur: ${error.message}` : `Error: ${error.message}`);
+        return;
+      }
     }
 
     setCurrentVisual(newVisual);
