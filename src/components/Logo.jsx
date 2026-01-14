@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/f227f1937_iGPT.png";
+const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/f5d18ecd5_2.png";
 
 export default function Logo({ size = 'default', showText = true, animate = false, onClick }) {
   const sizes = {
