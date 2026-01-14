@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { 
   Save, Loader2, Plus, Trash2, Monitor, Printer, 
-  Sparkles, Wand2, FileText, Eye 
+  Sparkles, Wand2, FileText, Eye, Pencil, Video
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/components/LanguageContext';
@@ -24,7 +24,7 @@ const SECTIONS = [
   { id: 'footer', label: 'Pied de page', icon: FileText },
 ];
 
-const ICONS = ['Monitor', 'Printer', 'Sparkles', 'Wand2', 'Image', 'Layout', 'FileText', 'CreditCard', 'Layers', 'Type', 'Square', 'Palette'];
+const ICONS = ['Monitor', 'Printer', 'Sparkles', 'Wand2', 'Image', 'Layout', 'FileText', 'CreditCard', 'Layers', 'Type', 'Square', 'Palette', 'Pencil', 'Video'];
 
 export default function AdminPresentation() {
   const { language } = useLanguage();
