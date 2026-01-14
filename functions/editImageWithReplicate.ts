@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
     }
 
     return Response.json({ 
-      output_url: outputUrl,
+      url: outputUrl,
       status: result.status
     });
 

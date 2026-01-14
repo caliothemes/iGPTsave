@@ -695,26 +695,27 @@ export default function Home() {
 
         // CAS AVEC IMAGES ATTACHÉES: Composition avec PrunaAI
         if (attachedImages.length > 0) {
-          // 1. Générer image de base
-          const baseResult = await base44.integrations.Core.GenerateImage({
-            prompt: promptToUse
-          });
+          try {
+            // 1. Générer image de base
+            const baseResult = await base44.integrations.Core.GenerateImage({
+              prompt: promptToUse
+            });
 
-          if (!baseResult.url) throw new Error('Base generation failed');
+            if (!baseResult.url) throw new Error('Base generation failed');
 
-          // 2. Composer avec les images via PrunaAI
-          setMessages(prev => [
-            ...prev.slice(0, -1),
-            { role: 'assistant', content: language === 'fr' ? '🎨 Composition avec vos images...' : '🎨 Composing with your images...', isStreaming: true }
-          ]);
+            // 2. Composer avec les images via PrunaAI
+            setMessages(prev => [
+              ...prev.slice(0, -1),
+              { role: 'assistant', content: language === 'fr' ? '🎨 Composition avec vos images...' : '🎨 Composing with your images...', isStreaming: true }
+            ]);
 
-          const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
-            image_url: baseResult.url,
-            prompt: userMessage,
-            additional_images: attachedImages
-          });
+            const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
+              image_url: baseResult.url,
+              prompt: userMessage,
+              additional_images: attachedImages
+            });
 
-          if (!compositionResult.data?.url) throw new Error('Composition failed');
+            if (!compositionResult.data?.url) throw new Error('Composition failed');
 
           // Extraction couleurs
           let extractedColors = selectedPalette?.colors;
@@ -770,22 +771,26 @@ export default function Home() {
             { role: 'assistant', content: '', visual: savedVisual }
           ]);
 
-        if (activeConversation && user) {
-          try {
-            const updatedMessages = [
-              ...(activeConversation.messages || []),
-              { role: 'user', content: userMessage },
-              { role: 'assistant', content: successMessage }
-            ];
-            await base44.entities.Conversation.update(activeConversation.id, {
-              messages: updatedMessages,
-              title: activeConversation.title || userMessage.slice(0, 50),
-              visual_id: savedVisual.id
-            });
-            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
-          } catch (e) {
-            console.error('Failed to update conversation:', e);
+          if (activeConversation && user) {
+            try {
+              const updatedMessages = [
+                ...(activeConversation.messages || []),
+                { role: 'user', content: userMessage },
+                { role: 'assistant', content: successMessage }
+              ];
+              await base44.entities.Conversation.update(activeConversation.id, {
+                messages: updatedMessages,
+                title: activeConversation.title || userMessage.slice(0, 50),
+                visual_id: savedVisual.id
+              });
+              setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
+            } catch (e) {
+              console.error('Failed to update conversation:', e);
+            }
           }
+        } catch (compError) {
+          console.error('Composition error:', compError);
+          throw compError;
         }
       } else {
         // CAS NORMAL: Génération simple
