@@ -515,6 +515,10 @@ export default function Home() {
       content: displayMessage,
       attachedImages: attachedImages.length > 0 ? [...attachedImages] : undefined
     }]);
+    
+    // Clear attached images immediately after sending
+    setAttachedImages([]);
+    
     setIsGenerating(true);
     
     // Reset currentVisual seulement si c'est un nouveau prompt
@@ -769,7 +773,6 @@ export default function Home() {
 
             setCurrentVisual(savedVisual);
             setVisualsHistory(prev => [...prev, savedVisual]);
-            setAttachedImages([]);
 
             const successMessage = `✨ ${language === 'fr' ? 'Visuel créé avec vos images !' : 'Visual created with your images!'}`;
 
@@ -798,7 +801,6 @@ export default function Home() {
             }
           } catch (compError) {
             console.error('❌ Composition error:', compError);
-            setAttachedImages([]);
             throw compError;
           }
         } else {
@@ -1828,8 +1830,8 @@ export default function Home() {
                       </p>
                       <p className="text-orange-300/90 text-xs leading-relaxed">
                         {language === 'fr' 
-                          ? 'Vous n\'avez pas sélectionné de catégorie dans le menu "Catégories" du prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez une catégorie adaptée à votre besoin (Logo, Print, Posts/Story, etc.).'
-                          : 'You haven\'t selected a category in the "Categories" menu in the prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable category (Logo, Print, Social, etc.).'
+                          ? 'Vous n\'avez pas sélectionné de catégorie dans le menu "Catégories" du prompt. Votre prompt sera envoyé brut à l\'IA, sans assistance ni optimisation automatique d\'iGPT. Pour de meilleurs résultats, choisissez une catégorie adaptée à votre besoin (Logo, Print, Posts/Story, etc.). Vous pouvez également uploader votre image pour la modifier ou la transformer en vidéo avec l\'IA.'
+                          : 'You haven\'t selected a category in the "Categories" menu in the prompt. Your prompt will be sent raw to the AI, without assistance or automatic optimization from iGPT. For better results, choose a suitable category (Logo, Print, Social, etc.). You can also upload your image to edit it or turn it into a video with AI.'
                         }
                       </p>
                     </div>
