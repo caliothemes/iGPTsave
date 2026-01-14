@@ -416,7 +416,7 @@ export default function AdminSettings() {
               <Input
                 value={settings.company_logo}
                 onChange={(e) => setSettings(prev => ({ ...prev, company_logo: e.target.value }))}
-                placeholder="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/69a6c0eb9_2.png"
+                placeholder="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/f2482600e_2.png"
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
               />
               {settings.company_logo && (
