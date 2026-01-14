@@ -1423,7 +1423,7 @@ export default function Home() {
 
     const editedVisualData = {
       user_email: user?.email || 'anonymous',
-      conversation_id: activeConversation?.id,
+      conversation_id: currentConversation?.id,
       image_url: newImageUrl,
       original_image_url: newImageUrl,
       title: currentVisual.title + ' (Modifié)',
