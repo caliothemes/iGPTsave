@@ -718,13 +718,16 @@ export default function Home() {
 
             console.log('Composition result:', compositionResult);
 
-            // Vérifier que l'URL existe et est valide
+            // Vérifier strictement que l'URL existe et est valide
             const composedImageUrl = compositionResult?.data?.url;
-            if (!composedImageUrl) {
-              console.error('Composition failed - no URL returned:', compositionResult?.data);
-              // Fallback to base image if composition fails
-              throw new Error(language === 'fr' ? 'La composition a échoué' : 'Composition failed');
+            if (!composedImageUrl || typeof composedImageUrl !== 'string') {
+              console.error('Composition failed - invalid URL:', composedImageUrl);
+              console.error('Full response data:', compositionResult?.data);
+              setAttachedImages([]);
+              throw new Error(language === 'fr' ? 'La composition avec les images a échoué. Réessayez sans images attachées.' : 'Composition with images failed. Try again without attached images.');
             }
+
+            console.log('✅ Valid composed image URL:', composedImageUrl);
 
             // Extraction couleurs
             let extractedColors = selectedPalette?.colors;
