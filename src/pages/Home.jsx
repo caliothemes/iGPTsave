@@ -1628,7 +1628,7 @@ export default function Home() {
                 <div className="flex-shrink-0 w-12 h-12 rounded-full p-[2px] bg-gradient-conic-animated shadow-lg shadow-violet-500/20">
                   <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0f] p-1">
                     <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/7b5e0f746_icon.png" 
                       alt="iGPT" 
                       className="w-full h-full object-cover rounded-full"
                     />
