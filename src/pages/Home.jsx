@@ -713,10 +713,12 @@ export default function Home() {
               { role: 'assistant', content: language === 'fr' ? '🎨 Composition avec vos images...' : '🎨 Composing with your images...', isStreaming: true }
             ]);
 
-            const compositionPrompt = `Integrate and blend the additional reference images into this composition: ${userMessage}. The additional images must be visible and incorporated into the final result.`;
+            // Prompt spécifique pour forcer l'intégration des images additionnelles
+            const compositionPrompt = `Blend and composite all provided reference images together. ${userMessage}. Important: all additional images must be seamlessly integrated and visible in the final composition.`;
             
-            console.log('🎨 Composition with images:', {
+            console.log('🎨 Starting composition with:', {
               baseImage: baseResult.url,
+              additionalImagesCount: attachedImages.length,
               additionalImages: attachedImages,
               prompt: compositionPrompt
             });
