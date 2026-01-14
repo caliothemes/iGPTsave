@@ -700,27 +700,28 @@ export default function Home() {
         // CAS AVEC IMAGES ATTACHÉES: Composition avec PrunaAI
         if (attachedImages.length > 0) {
           try {
-            // 1. Générer image de base
+            // 1. Générer image de base SANS mentionner les images additionnelles
             const baseResult = await base44.integrations.Core.GenerateImage({
               prompt: promptToUse
             });
 
             if (!baseResult.url) throw new Error('Base generation failed');
+            console.log('✅ Base image generated:', baseResult.url);
 
-            // 2. Composer avec les images via PrunaAI
+            // 2. Composer avec les images via PrunaAI avec un prompt spécifique
             setMessages(prev => [
               ...prev.slice(0, -1),
-              { role: 'assistant', content: language === 'fr' ? '🎨 Composition avec vos images...' : '🎨 Composing with your images...', isStreaming: true }
+              { role: 'assistant', content: language === 'fr' ? '🎨 Intégration de vos images...' : '🎨 Integrating your images...', isStreaming: true }
             ]);
 
-            // Prompt spécifique pour forcer l'intégration des images additionnelles
-            const compositionPrompt = `Blend and composite all provided reference images together. ${userMessage}. Important: all additional images must be seamlessly integrated and visible in the final composition.`;
-            
-            console.log('🎨 Starting composition with:', {
+            // Prompt de composition uniquement pour intégrer les images additionnelles
+            const compositionPrompt = `Seamlessly blend and integrate all the additional reference images into this background. Merge them naturally into the composition maintaining the style and atmosphere. All images must be visible and well-integrated.`;
+
+            console.log('🎨 Composing with PrunaAI:', {
               baseImage: baseResult.url,
               additionalImagesCount: attachedImages.length,
               additionalImages: attachedImages,
-              prompt: compositionPrompt
+              compositionPrompt: compositionPrompt
             });
 
             const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
@@ -730,20 +731,16 @@ export default function Home() {
               aspect_ratio: '1:1'
             });
 
-            console.log('Composition result:', compositionResult);
-            console.log('Used prompt:', compositionPrompt);
-            console.log('Additional images:', attachedImages);
-
             // Vérifier strictement que l'URL existe et est valide
             const composedImageUrl = compositionResult?.data?.url;
             if (!composedImageUrl || typeof composedImageUrl !== 'string') {
-              console.error('Composition failed - invalid URL:', composedImageUrl);
-              console.error('Full response data:', compositionResult?.data);
+              console.error('❌ Composition failed - invalid URL:', composedImageUrl);
+              console.error('Full response:', compositionResult?.data);
               setAttachedImages([]);
-              throw new Error(language === 'fr' ? 'La composition avec les images a échoué. Réessayez sans images attachées.' : 'Composition with images failed. Try again without attached images.');
+              throw new Error(language === 'fr' ? 'Erreur lors de la composition. Réessayez.' : 'Composition error. Try again.');
             }
 
-            console.log('✅ Valid composed image URL:', composedImageUrl);
+            console.log('✅ Composition successful:', composedImageUrl);
 
             // Extraction couleurs
             let extractedColors = selectedPalette?.colors;
@@ -791,7 +788,7 @@ export default function Home() {
             setVisualsHistory(prev => [...prev, savedVisual]);
             setAttachedImages([]);
 
-            const successMessage = `✨ ${language === 'fr' ? 'Composition créée !' : 'Composition created!'}`;
+            const successMessage = `✨ ${language === 'fr' ? 'Composition créée avec vos images !' : 'Composition created with your images!'}`;
 
             setMessages(prev => [
               ...prev.slice(0, -1),
@@ -817,11 +814,11 @@ export default function Home() {
               }
             }
           } catch (compError) {
-            console.error('Composition error:', compError);
+            console.error('❌ Composition error:', compError);
             setAttachedImages([]);
             throw compError;
           }
-      } else {
+        } else {
         // CAS NORMAL: Génération simple
         const result = await base44.integrations.Core.GenerateImage({
           prompt: promptToUse
