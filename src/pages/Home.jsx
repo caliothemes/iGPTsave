@@ -713,14 +713,18 @@ export default function Home() {
               { role: 'assistant', content: language === 'fr' ? '🎨 Composition avec vos images...' : '🎨 Composing with your images...', isStreaming: true }
             ]);
 
+            const compositionPrompt = `${userMessage}. IMPORTANT: Use and integrate the provided additional images into the composition.`;
+            
             const compositionResult = await base44.functions.invoke('editImageWithReplicate', {
               image_url: baseResult.url,
-              prompt: promptToUse,
+              prompt: compositionPrompt,
               additional_images: attachedImages,
               aspect_ratio: '1:1'
             });
 
             console.log('Composition result:', compositionResult);
+            console.log('Used prompt:', compositionPrompt);
+            console.log('Additional images:', attachedImages);
 
             // Vérifier strictement que l'URL existe et est valide
             const composedImageUrl = compositionResult?.data?.url;

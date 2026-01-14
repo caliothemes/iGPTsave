@@ -66,7 +66,7 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
       )}
 
       {/* Message Content */}
-      <div className={cn("max-w-[85%]", isUser && "flex flex-col items-end gap-2")}>
+      <div className={cn("max-w-[85%]", isUser && "text-right")}>
         <div className={cn(
           "inline-block rounded-2xl px-4 py-3",
           isUser 
@@ -78,64 +78,66 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
           {isStreaming ? (
             <TypingIndicator />
           ) : (
-            <ReactMarkdown 
-              className="prose prose-invert prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
-              components={{
-                img: ({ src, alt, ...props }) => (
-                  <div 
-                    className="relative group cursor-pointer my-2 rounded-lg overflow-hidden inline-block max-w-full"
-                    onClick={() => setShowImageModal(src)}
-                  >
-                    <img 
-                      src={src} 
-                      alt={alt}
-                      className="rounded-lg max-w-full transition-all group-hover:brightness-75"
-                      {...props}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                      <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/40 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <>
+              <ReactMarkdown 
+                className="prose prose-invert prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                components={{
+                  img: ({ src, alt, ...props }) => (
+                    <div 
+                      className="relative group cursor-pointer my-2 rounded-lg overflow-hidden inline-block max-w-full"
+                      onClick={() => setShowImageModal(src)}
+                    >
+                      <img 
+                        src={src} 
+                        alt={alt}
+                        className="rounded-lg max-w-full transition-all group-hover:brightness-75"
+                        {...props}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/40 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ),
+                  p: ({ children }) => <p className="my-1 leading-relaxed text-sm">{children}</p>,
+                  ul: ({ children }) => <ul className="my-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>,
+                  ol: ({ children }) => <ol className="my-2 ml-4 list-decimal space-y-1 text-sm">{children}</ol>,
+                  li: ({ children }) => <li className="my-0.5">{children}</li>,
+                  strong: ({ children }) => <strong className="font-semibold text-violet-300">{children}</strong>,
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+
+              {/* Attached Images - dans la bulle pour user */}
+              {isUser && message.attachedImages && message.attachedImages.length > 0 && (
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/10">
+                  {message.attachedImages.map((img, idx) => (
+                    <div 
+                      key={idx} 
+                      className="relative group cursor-pointer"
+                      onClick={() => setShowImageModal(img)}
+                    >
+                      <img 
+                        src={img} 
+                        alt="" 
+                        className="w-20 h-20 object-cover rounded-lg border border-white/20 hover:border-white/40 transition-all hover:scale-105" 
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-lg">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                         </svg>
                       </div>
                     </div>
-                  </div>
-                ),
-                p: ({ children }) => <p className="my-1 leading-relaxed text-sm">{children}</p>,
-                ul: ({ children }) => <ul className="my-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>,
-                ol: ({ children }) => <ol className="my-2 ml-4 list-decimal space-y-1 text-sm">{children}</ol>,
-                li: ({ children }) => <li className="my-0.5">{children}</li>,
-                strong: ({ children }) => <strong className="font-semibold text-violet-300">{children}</strong>,
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
-
-        {/* Attached Images - sous la bulle pour user */}
-        {isUser && message.attachedImages && message.attachedImages.length > 0 && (
-          <div className="flex items-center gap-2 mt-1">
-            {message.attachedImages.map((img, idx) => (
-              <div 
-                key={idx} 
-                className="relative group cursor-pointer"
-                onClick={() => setShowImageModal(img)}
-              >
-                <img 
-                  src={img} 
-                  alt="" 
-                  className="w-16 h-16 object-cover rounded-lg border border-white/20 hover:border-white/40 transition-all hover:scale-105 shadow-lg" 
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-lg">
-                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                  </svg>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Image Modal */}
