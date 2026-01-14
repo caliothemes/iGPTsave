@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Monitor, Printer, Sparkles, Wand2, X,
   Image, Layout, FileText, CreditCard, 
-  Layers, Type, Square, Palette
+  Layers, Type, Square, Palette, Pencil, Video
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from './LanguageContext';
@@ -13,7 +13,7 @@ import Logo from './Logo';
 
 const ICON_MAP = {
   Monitor, Printer, Sparkles, Wand2, Image, Layout, 
-  FileText, CreditCard, Layers, Type, Square, Palette
+  FileText, CreditCard, Layers, Type, Square, Palette, Pencil, Video
 };
 
 // Default content if no admin data
@@ -34,14 +34,14 @@ const DEFAULT_CONTENT = {
   print: {
     title_fr: "Supports Print",
     title_en: "Print Materials",
-    icon: "Printer",
+    icon: "Pencil",
     items_fr: ["Cartes de visite", "Flyers", "Affiches", "Invitations", "Stickers", "Cartes cadeaux"],
     items_en: ["Business Cards", "Flyers", "Posters", "Invitations", "Stickers", "Gift Cards"]
   },
   ai_images: {
     title_fr: "Images IA",
     title_en: "AI Images",
-    icon: "Sparkles",
+    icon: "Video",
     items_fr: ["Illustrations uniques", "Arrière-plans créatifs", "Textures sur mesure", "Art conceptuel", "Portraits stylisés", "Scènes imaginaires"],
     items_en: ["Unique Illustrations", "Creative Backgrounds", "Custom Textures", "Concept Art", "Stylized Portraits", "Imaginary Scenes"]
   },
@@ -154,7 +154,7 @@ export default function PresentationModal({ isOpen, onClose }) {
                 icon={getIcon('print')}
                 title={t('print', 'title')}
                 items={getItems('print')}
-                gradient="from-blue-500 to-cyan-500"
+                gradient="from-orange-500 to-amber-500"
               />
               
               {/* AI Images Column */}
