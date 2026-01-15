@@ -2201,12 +2201,6 @@ export default function Home() {
                       setShowModeSelector(true);
                     }
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
                   placeholder={language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...'}
                   className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px]"
                   rows={1}
