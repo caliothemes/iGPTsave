@@ -371,9 +371,9 @@ export default function Home() {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
-    // Limit to 4 images
-    if (attachedImages.length + files.length > 4) {
-      alert(language === 'fr' ? 'Maximum 4 images' : 'Maximum 4 images');
+    // Limit to 6 images
+    if (attachedImages.length + files.length > 6) {
+      alert(language === 'fr' ? 'Maximum 6 images' : 'Maximum 6 images');
       return;
     }
 
@@ -2059,7 +2059,7 @@ export default function Home() {
                     </div>
                   )}
                   <span className="text-white/40 text-xs ml-2">
-                    {attachedImages.length}/4
+                    {attachedImages.length}/6
                   </span>
                 </div>
               )}
@@ -2217,7 +2217,7 @@ export default function Home() {
                 <button 
                   onClick={() => imageInputRef.current?.click()}
                   className="p-2 text-white/40 hover:text-white/60 transition-colors"
-                  disabled={attachedImages.length >= 4}
+                  disabled={attachedImages.length >= 6}
                 >
                   <div className="relative">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
