@@ -2033,7 +2033,7 @@ export default function Home() {
 
 
             {/* Input Bar */}
-            <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+            <div className="relative bg-gray-900 border border-white/10 rounded-2xl overflow-hidden">
               {/* Attached Images Thumbnails */}
               {attachedImages.length > 0 && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-white/5">
