@@ -2346,26 +2346,7 @@ export default function Home() {
                   {language === 'fr' ? 'Upload' : 'Upload'}
                 </button>
 
-                {/* Tag iGPT Store */}
-                <Link
-                  to={createPageUrl('Store')}
-                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-md"
-                >
-                  {language === 'fr' ? 'iGPT Store' : 'iGPT Store'}
-                </Link>
 
-                {/* Tag Mes visuels */}
-                <Link
-                  to={createPageUrl('MyVisuals')}
-                  className="px-2 py-1 rounded-full text-[11px] font-medium transition-all bg-blue-900/90 hover:bg-blue-900 border border-white/10 hover:border-white/20 text-white shadow-md flex items-center gap-1"
-                >
-                  {language === 'fr' ? 'Mes visuels' : 'My visuals'}
-                  {totalVisualsCount > 0 && (
-                    <span className="px-1 py-0.5 bg-white/20 rounded-full text-[9px]">
-                      {totalVisualsCount}
-                    </span>
-                  )}
-                </Link>
                 </div>
 
                 {/* Toggle button - visible en mobile uniquement */}
