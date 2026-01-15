@@ -123,6 +123,7 @@ export default function Home() {
   const [showRecentVisualsModal, setShowRecentVisualsModal] = useState(false);
   const [recentVisuals, setRecentVisuals] = useState([]);
   const [attachedImages, setAttachedImages] = useState([]);
+  const [uploadingImages, setUploadingImages] = useState(0);
 
 
   const messagesEndRef = useRef(null);
@@ -376,6 +377,8 @@ export default function Home() {
       return;
     }
 
+    setUploadingImages(files.length);
+
     for (const file of files) {
       if (!file.type.startsWith('image/')) continue;
 
@@ -384,6 +387,8 @@ export default function Home() {
         setAttachedImages(prev => [...prev, file_url]);
       } catch (error) {
         console.error('Upload failed:', error);
+      } finally {
+        setUploadingImages(prev => prev - 1);
       }
     }
 
@@ -2035,7 +2040,7 @@ export default function Home() {
             {/* Input Bar */}
             <div className="relative bg-gray-900 border border-white/10 rounded-2xl overflow-hidden">
               {/* Attached Images Thumbnails */}
-              {attachedImages.length > 0 && (
+              {(attachedImages.length > 0 || uploadingImages > 0) && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-white/5">
                   {attachedImages.map((img, idx) => (
                     <div key={idx} className="relative group">
@@ -2048,6 +2053,11 @@ export default function Home() {
                       </button>
                     </div>
                   ))}
+                  {uploadingImages > 0 && (
+                    <div className="w-16 h-16 rounded-lg border border-white/20 bg-white/5 flex items-center justify-center">
+                      <Loader2 className="h-6 w-6 text-violet-400 animate-spin" />
+                    </div>
+                  )}
                   <span className="text-white/40 text-xs ml-2">
                     {attachedImages.length}/4
                   </span>
