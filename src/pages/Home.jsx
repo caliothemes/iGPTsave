@@ -1891,9 +1891,9 @@ export default function Home() {
     <p className="text-violet-300 text-[11px] font-medium mb-1.5">
       {language === 'fr' ? '💡 Exemples :' : '💡 Examples:'}
     </p>
-    {/* Desktop: Afficher 2 exemples complets */}
+    {/* Desktop: Afficher 1 exemple complet */}
     <div className="hidden md:block space-y-2">
-      {currentPromptExamples.slice(0, 2).map((example, idx) => (
+      {currentPromptExamples.slice(0, 1).map((example, idx) => (
         <button
           key={idx}
           onClick={() => {
@@ -1936,8 +1936,8 @@ export default function Home() {
       </svg>
       {language === 'fr' ? 'Voir les exemples de prompt' : 'See prompt examples'}
     </button>
-    {/* Desktop: Bouton voir plus si > 2 exemples */}
-    {currentPromptExamples.length > 2 && (
+    {/* Desktop: Bouton voir plus si > 1 exemple */}
+    {currentPromptExamples.length > 1 && (
       <button
         onClick={() => setShowExamplesModal(true)}
         className="hidden md:flex w-full mt-2 px-3 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 rounded-lg text-violet-200 text-xs font-medium transition-all items-center justify-center gap-2"
