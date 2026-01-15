@@ -578,8 +578,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}>
                   {provider === 'replicate'
                     ? (language === 'fr' 
-                        ? <>Vidéo cinématographique pro.<br />5s = 15 crédits, 10s = 25 crédits</> 
-                        : <>Professional cinematic video.<br />5s = 15 credits, 10s = 25 credits</>)
+                        ? <>Vidéo cinématographique pro.<br />5s = 20 crédits, 10s = 30 crédits</> 
+                        : <>Professional cinematic video.<br />5s = 20 credits, 10s = 30 credits</>)
                     : provider === 'wan'
                     ? (language === 'fr'
                         ? <>Vidéo produit en 1080p avec audio optionnel.<br />5s = 20 crédits, 10s = 30 crédits</>
@@ -870,8 +870,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                       : (language === 'fr' ? '70 crédits' : '70 credits'))
                   : provider === 'replicate' 
                   ? (duration === 5 
-                      ? (language === 'fr' ? '15 crédits' : '15 credits') 
-                      : (language === 'fr' ? '25 crédits' : '25 credits'))
+                      ? (language === 'fr' ? '20 crédits' : '20 credits') 
+                      : (language === 'fr' ? '30 crédits' : '30 credits'))
                   : (duration === 5 
                       ? (language === 'fr' ? '20 crédits' : '20 credits') 
                       : (language === 'fr' ? '30 crédits' : '30 credits'))}
