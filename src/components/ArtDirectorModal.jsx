@@ -10,6 +10,7 @@ import { useLanguage } from './LanguageContext';
 export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = null }) {
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [settings, setSettings] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     logo_url: '',
@@ -20,6 +21,22 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
     style_keywords: ''
   });
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  React.useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const allSettings = await base44.entities.AppSettings.list();
+        const settingsMap = {};
+        allSettings.forEach(s => {
+          settingsMap[s.key] = s.value;
+        });
+        setSettings(settingsMap);
+      } catch (e) {
+        console.error('Failed to load settings:', e);
+      }
+    };
+    loadSettings();
+  }, []);
 
   React.useEffect(() => {
     if (editingDA) {
@@ -80,11 +97,20 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
             {editingDA ? (language === 'fr' ? 'Modifier le DA' : 'Edit AD') : (language === 'fr' ? 'Créer un Directeur Artistique' : 'Create Art Director')}
           </DialogTitle>
-          <p className="text-white/60 text-sm mt-2">
-            {language === 'fr' 
-              ? "Le Directeur Artistique (DA) permet d'appliquer automatiquement l'identité visuelle de votre marque à toutes vos créations. Définissez votre logo, vos couleurs, votre style et votre secteur d'activité pour que iGPT génère des visuels alignés avec votre charte graphique."
-              : "The Art Director (AD) allows you to automatically apply your brand's visual identity to all your creations. Define your logo, colors, style, and business sector so iGPT generates visuals aligned with your brand guidelines."}
-          </p>
+          {(settings.da_intro_fr || settings.da_intro_en) && (
+            <p className="text-white/60 text-sm mt-2">
+              {language === 'fr' 
+                ? (settings.da_intro_fr || "Le Directeur Artistique (DA) permet d'appliquer automatiquement l'identité visuelle de votre marque à toutes vos créations. Définissez votre logo, vos couleurs, votre style et votre secteur d'activité pour que iGPT génère des visuels alignés avec votre charte graphique.")
+                : (settings.da_intro_en || "The Art Director (AD) allows you to automatically apply your brand's visual identity to all your creations. Define your logo, colors, style, and business sector so iGPT generates visuals aligned with your brand guidelines.")}
+            </p>
+          )}
+          {!settings.da_intro_fr && !settings.da_intro_en && (
+            <p className="text-white/60 text-sm mt-2">
+              {language === 'fr' 
+                ? "Le Directeur Artistique (DA) permet d'appliquer automatiquement l'identité visuelle de votre marque à toutes vos créations. Définissez votre logo, vos couleurs, votre style et votre secteur d'activité pour que iGPT génère des visuels alignés avec votre charte graphique."
+                : "The Art Director (AD) allows you to automatically apply your brand's visual identity to all your creations. Define your logo, colors, style, and business sector so iGPT generates visuals aligned with your brand guidelines."}
+            </p>
+          )}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">

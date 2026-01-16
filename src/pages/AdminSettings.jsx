@@ -38,7 +38,9 @@ export default function AdminSettings() {
     company_vat: '',
     company_email: '',
     company_phone: '',
-    company_logo: ''
+    company_logo: '',
+    da_intro_fr: '',
+    da_intro_en: ''
   });
 
   useEffect(() => {
@@ -307,6 +309,40 @@ export default function AdminSettings() {
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Art Director Settings */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-purple-600/20">
+              <MessageSquare className="h-5 w-5 text-purple-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Directeur Artistique</h2>
+              <p className="text-sm text-white/50">Texte d'introduction de la modal DA</p>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-white/60 mb-2">Texte d'intro (Français)</label>
+              <Textarea
+                value={settings.da_intro_fr}
+                onChange={(e) => setSettings(prev => ({ ...prev, da_intro_fr: e.target.value }))}
+                placeholder="Le Directeur Artistique (DA) permet d'appliquer automatiquement l'identité visuelle..."
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-white/60 mb-2">Intro text (English)</label>
+              <Textarea
+                value={settings.da_intro_en}
+                onChange={(e) => setSettings(prev => ({ ...prev, da_intro_en: e.target.value }))}
+                placeholder="The Art Director (AD) allows you to automatically apply your brand's visual identity..."
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
+              />
             </div>
           </div>
         </div>
