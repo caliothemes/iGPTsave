@@ -531,7 +531,8 @@ export default function Home() {
     setMessages(prev => [...prev, { 
       role: 'user', 
       content: displayMessage,
-      attachedImages: attachedImages.length > 0 ? [...attachedImages] : undefined
+      attachedImages: attachedImages.length > 0 ? [...attachedImages] : undefined,
+      artDirector: selectedDA ? selectedDA.name : null
     }]);
     
     // Clear attached images immediately after sending
@@ -1096,7 +1097,8 @@ export default function Home() {
           category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
           style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
           color_palette: extractedColors,
-          editor_layers: editorLayers.length > 0 ? editorLayers : undefined
+          editor_layers: editorLayers.length > 0 ? editorLayers : undefined,
+          art_director_name: selectedDA ? selectedDA.name : null
         };
 
         let savedVisual = visualData;
