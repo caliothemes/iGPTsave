@@ -38,6 +38,7 @@ import VideoExamplesModal from '@/components/chat/VideoExamplesModal';
 import ImageEditExamplesModal from '@/components/chat/ImageEditExamplesModal';
 import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
+import ArtDirectorModal from '@/components/ArtDirectorModal';
 import FeaturesCarousel from '@/components/FeaturesCarousel';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -124,6 +125,10 @@ export default function Home() {
   const [recentVisuals, setRecentVisuals] = useState([]);
   const [attachedImages, setAttachedImages] = useState([]);
   const [uploadingImages, setUploadingImages] = useState(0);
+  const [artDirectors, setArtDirectors] = useState([]);
+  const [selectedDA, setSelectedDA] = useState(null);
+  const [showDAModal, setShowDAModal] = useState(false);
+  const [editingDA, setEditingDA] = useState(null);
 
 
   const messagesEndRef = useRef(null);
@@ -143,6 +148,14 @@ export default function Home() {
         setSettings(settingsMap);
       } catch (e) {
         console.error('Failed to load settings:', e);
+      }
+
+      // Load Art Directors
+      try {
+        const das = await base44.entities.ArtDirector.filter({ is_active: true }, '-created_date');
+        setArtDirectors(das);
+      } catch (e) {
+        console.error('Failed to load art directors:', e);
       }
       
       try {
@@ -555,6 +568,13 @@ export default function Home() {
 
     try {
 
+
+      // Enrichir avec le DA si sélectionné
+      if (selectedDA) {
+        const daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
+        enhancedPrompt = `${daPrompt} ${enhancedPrompt}`;
+        console.log('🎨 DA appliqué:', selectedDA.name);
+      }
 
       // CAS NORMAL: Génération d'image
       // Déduire 1 crédit AVANT la génération
@@ -2341,6 +2361,65 @@ export default function Home() {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
+                {/* Tag DA (Directeur Artistique) */}
+                {user && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className={cn(
+                        "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
+                        selectedDA
+                          ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
+                          : "bg-blue-600/10 border-blue-500/20 text-blue-300 hover:bg-blue-600/20"
+                      )}>
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {selectedDA ? selectedDA.name : 'DA'}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 max-h-96 overflow-y-auto">
+                      {artDirectors.filter(da => da.user_email === user.email).map(da => (
+                        <DropdownMenuItem 
+                          key={da.id}
+                          onClick={() => setSelectedDA(da)}
+                          className="text-white flex items-center gap-2"
+                        >
+                          {da.logo_url && (
+                            <img src={da.logo_url} alt="" className="w-5 h-5 rounded object-cover" />
+                          )}
+                          <span>{da.name}</span>
+                        </DropdownMenuItem>
+                      ))}
+                      {artDirectors.filter(da => da.user_email === user.email).length > 0 && (
+                        <div className="h-px bg-white/10 my-1" />
+                      )}
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setEditingDA(null);
+                          setShowDAModal(true);
+                        }}
+                        className="text-blue-300 bg-blue-600/10 hover:bg-blue-600/20"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        {language === 'fr' ? 'Créer un DA' : 'Create AD'}
+                      </DropdownMenuItem>
+                      {selectedDA && (
+                        <>
+                          <div className="h-px bg-white/10 my-1" />
+                          <DropdownMenuItem
+                            onClick={() => setSelectedDA(null)}
+                            className="text-white/60"
+                          >
+                            {language === 'fr' ? 'Désélectionner' : 'Deselect'}
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+
                 {/* Tag Upload */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -2393,6 +2472,28 @@ export default function Home() {
           100% { background-position: 300% 50%; }
         }
       `}</style>
+
+      {/* Art Director Modal */}
+      <ArtDirectorModal
+        isOpen={showDAModal}
+        onClose={() => {
+          setShowDAModal(false);
+          setEditingDA(null);
+        }}
+        editingDA={editingDA}
+        onSave={async (daData) => {
+          if (editingDA) {
+            await base44.entities.ArtDirector.update(editingDA.id, daData);
+            setArtDirectors(prev => prev.map(da => da.id === editingDA.id ? { ...da, ...daData } : da));
+          } else {
+            const newDA = await base44.entities.ArtDirector.create({
+              ...daData,
+              user_email: user.email
+            });
+            setArtDirectors(prev => [newDA, ...prev]);
+          }
+        }}
+      />
 
       {/* Login Modal for Guests */}
       <LoginRequiredModal
