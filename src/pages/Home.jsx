@@ -2391,78 +2391,90 @@ export default function Home() {
                 </DropdownMenu>
 
                 {/* Tag DA (Directeur Artistique) */}
-                {user && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className={cn(
-                        "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
-                        selectedDA
-                          ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
-                          : "bg-blue-600/10 border-blue-500/20 text-blue-300 hover:bg-blue-600/20"
-                      )}>
-                        <Users className="w-3 h-3" />
-                        {selectedDA ? selectedDA.name : 'DA'}
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 max-h-96 overflow-y-auto">
-                      {artDirectors.filter(da => da.user_email === user.email).map(da => (
-                        <DropdownMenuItem 
-                          key={da.id}
-                          onSelect={(e) => e.preventDefault()}
-                          className="text-white flex items-center gap-2 justify-between group"
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={cn(
+                      "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
+                      selectedDA
+                        ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
+                        : "bg-blue-600/10 border-blue-500/20 text-blue-300 hover:bg-blue-600/20"
+                    )}>
+                      <Users className="w-3 h-3" />
+                      {selectedDA ? selectedDA.name : 'DA'}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 max-h-96 overflow-y-auto">
+                    {user ? (
+                      <>
+                        {artDirectors.filter(da => da.user_email === user.email).map(da => (
+                          <DropdownMenuItem 
+                            key={da.id}
+                            onSelect={(e) => e.preventDefault()}
+                            className="text-white flex items-center gap-2 justify-between group"
+                          >
+                            <button
+                              onClick={() => setSelectedDA(da)}
+                              className="flex items-center gap-2 flex-1"
+                            >
+                              {da.logo_url && (
+                                <img src={da.logo_url} alt="" className="w-5 h-5 rounded object-cover" />
+                              )}
+                              <span>{da.name}</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingDA(da);
+                                setShowDAModal(true);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                          </DropdownMenuItem>
+                        ))}
+                        {artDirectors.filter(da => da.user_email === user.email).length > 0 && (
+                          <div className="h-px bg-white/10 my-1" />
+                        )}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditingDA(null);
+                            setShowDAModal(true);
+                          }}
+                          className="text-blue-300 bg-blue-600/10 hover:bg-blue-600/20"
                         >
-                          <button
-                            onClick={() => setSelectedDA(da)}
-                            className="flex items-center gap-2 flex-1"
-                          >
-                            {da.logo_url && (
-                              <img src={da.logo_url} alt="" className="w-5 h-5 rounded object-cover" />
-                            )}
-                            <span>{da.name}</span>
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingDA(da);
-                              setShowDAModal(true);
-                            }}
-                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
+                          <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          {language === 'fr' ? 'Créer un DA' : 'Create AD'}
                         </DropdownMenuItem>
-                      ))}
-                      {artDirectors.filter(da => da.user_email === user.email).length > 0 && (
-                        <div className="h-px bg-white/10 my-1" />
-                      )}
+                        {selectedDA && (
+                          <>
+                            <div className="h-px bg-white/10 my-1" />
+                            <DropdownMenuItem
+                              onClick={() => setSelectedDA(null)}
+                              className="text-white/60"
+                            >
+                              {language === 'fr' ? 'Désélectionner' : 'Deselect'}
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </>
+                    ) : (
                       <DropdownMenuItem
-                        onClick={() => {
-                          setEditingDA(null);
-                          setShowDAModal(true);
-                        }}
+                        onClick={handleLogin}
                         className="text-blue-300 bg-blue-600/10 hover:bg-blue-600/20"
                       >
                         <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                         </svg>
-                        {language === 'fr' ? 'Créer un DA' : 'Create AD'}
+                        {language === 'fr' ? 'Se connecter pour créer un DA' : 'Login to create an AD'}
                       </DropdownMenuItem>
-                      {selectedDA && (
-                        <>
-                          <div className="h-px bg-white/10 my-1" />
-                          <DropdownMenuItem
-                            onClick={() => setSelectedDA(null)}
-                            className="text-white/60"
-                          >
-                            {language === 'fr' ? 'Désélectionner' : 'Deselect'}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
                 {/* Tag Upload */}
                 <button
