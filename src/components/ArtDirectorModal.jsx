@@ -148,6 +148,23 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
             />
           </div>
 
+          {/* Site web */}
+          <div>
+            <label className="text-white/80 text-sm mb-2 block">
+              {language === 'fr' ? 'Site web' : 'Website'}
+            </label>
+            <Input
+              value={formData.website}
+              onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+              placeholder="https://example.com"
+              type="url"
+              className="bg-white/10 border-white/20 text-white"
+            />
+            <p className="text-white/40 text-xs mt-1">
+              {language === 'fr' ? "iGPT analysera automatiquement le site pour enrichir la direction artistique" : "iGPT will automatically analyze the site to enrich the art direction"}
+            </p>
+          </div>
+
           {/* Description */}
           <div>
             <label className="text-white/80 text-sm mb-2 block">
