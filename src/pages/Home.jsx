@@ -718,7 +718,34 @@ export default function Home() {
 
         // Enrichir avec le DA si sélectionné
         if (selectedDA) {
-          const daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
+          let daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
+
+          // Analyser le site web si présent
+          if (selectedDA.website) {
+            try {
+              setMessages(prev => [
+                ...prev.slice(0, -1),
+                { role: 'assistant', content: language === 'fr' ? '🔍 Analyse du site web du DA...' : '🔍 Analyzing DA website...', isStreaming: true }
+              ]);
+
+              const brandingResult = await base44.functions.invoke('analyzeBrandingFromURL', { 
+                url: selectedDA.website,
+                userPrompt: userMessage
+              });
+
+              if (brandingResult.data?.branding) {
+                const webBranding = brandingResult.data.branding;
+                if (webBranding.visual_style) daPrompt += ` Visual style: ${webBranding.visual_style}.`;
+                if (webBranding.mood) daPrompt += ` Mood: ${webBranding.mood}.`;
+                if (webBranding.typography) daPrompt += ` Typography: ${webBranding.typography}.`;
+                if (webBranding.prompt_suggestions) daPrompt += ` ${webBranding.prompt_suggestions}`;
+                console.log('🌐 Branding du site DA analysé');
+              }
+            } catch (e) {
+              console.error('❌ Échec analyse site DA:', e);
+            }
+          }
+
           enhancedPrompt = `${daPrompt} ${enhancedPrompt}`;
           console.log('🎨 DA appliqué:', selectedDA.name);
         }

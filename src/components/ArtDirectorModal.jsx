@@ -15,6 +15,7 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
     logo_url: '',
     description: '',
     activity: '',
+    website: '',
     color_palette: ['#000000', '#000000', '#000000'],
     style_keywords: ''
   });
@@ -27,6 +28,7 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
         logo_url: editingDA.logo_url || '',
         description: editingDA.description || '',
         activity: editingDA.activity || '',
+        website: editingDA.website || '',
         color_palette: editingDA.color_palette || ['#000000', '#000000', '#000000'],
         style_keywords: editingDA.style_keywords || ''
       });
@@ -36,6 +38,7 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
         logo_url: '',
         description: '',
         activity: '',
+        website: '',
         color_palette: ['#000000', '#000000', '#000000'],
         style_keywords: ''
       });
