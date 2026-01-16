@@ -10,7 +10,7 @@ import { useLanguage } from './LanguageContext';
 export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = null }) {
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState(editingDA || {
+  const [formData, setFormData] = useState({
     name: '',
     logo_url: '',
     description: '',
@@ -19,6 +19,28 @@ export default function ArtDirectorModal({ isOpen, onClose, onSave, editingDA = 
     style_keywords: ''
   });
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  React.useEffect(() => {
+    if (editingDA) {
+      setFormData({
+        name: editingDA.name || '',
+        logo_url: editingDA.logo_url || '',
+        description: editingDA.description || '',
+        activity: editingDA.activity || '',
+        color_palette: editingDA.color_palette || ['#000000', '#000000', '#000000'],
+        style_keywords: editingDA.style_keywords || ''
+      });
+    } else {
+      setFormData({
+        name: '',
+        logo_url: '',
+        description: '',
+        activity: '',
+        color_palette: ['#000000', '#000000', '#000000'],
+        style_keywords: ''
+      });
+    }
+  }, [editingDA, isOpen]);
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
