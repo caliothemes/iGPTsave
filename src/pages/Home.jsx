@@ -569,13 +569,6 @@ export default function Home() {
     try {
 
 
-      // Enrichir avec le DA si sélectionné
-      if (selectedDA) {
-        const daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
-        enhancedPrompt = `${daPrompt} ${enhancedPrompt}`;
-        console.log('🎨 DA appliqué:', selectedDA.name);
-      }
-
       // CAS NORMAL: Génération d'image
       // Déduire 1 crédit AVANT la génération
       if (user && credits) {
@@ -720,6 +713,13 @@ export default function Home() {
 
         enhancedPrompt += ', professional quality, 4K resolution';
         console.log('📝 Prompt final enrichi:', enhancedPrompt);
+        }
+
+        // Enrichir avec le DA si sélectionné
+        if (selectedDA) {
+          const daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
+          enhancedPrompt = `${daPrompt} ${enhancedPrompt}`;
+          console.log('🎨 DA appliqué:', selectedDA.name);
         }
 
         // Si c'est une modification, utiliser le prompt enrichi directement
