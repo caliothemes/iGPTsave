@@ -26,6 +26,8 @@ export default function MyVisuals() {
   });
   const [typeFilter, setTypeFilter] = useState('all');
   const [formatFilter, setFormatFilter] = useState('all');
+  const [daFilter, setDaFilter] = useState('all');
+  const [artDirectors, setArtDirectors] = useState([]);
   const [gridSize, setGridSize] = useState('medium');
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -89,6 +91,10 @@ export default function MyVisuals() {
         
         setVisuals(visualsWithPurchaseFlag);
         setHasMore(false);
+
+        // Load Art Directors
+        const das = await base44.entities.ArtDirector.filter({ user_email: user.email, is_active: true }, '-created_date');
+        setArtDirectors(das);
       } catch (e) {
         console.error(e);
       } finally {
@@ -334,8 +340,11 @@ export default function MyVisuals() {
     // Format filter
     const aspectRatio = getAspectRatio(v.dimensions);
     const matchesFormat = formatFilter === 'all' || aspectRatio === formatFilter;
+
+    // DA filter
+    const matchesDA = daFilter === 'all' || v.art_director_name === daFilter;
     
-    return matchesSearch && matchesFilter && matchesType && matchesFormat;
+    return matchesSearch && matchesFilter && matchesType && matchesFormat && matchesDA;
   });
 
   // Pagination
@@ -347,7 +356,7 @@ export default function MyVisuals() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, filter, typeFilter, formatFilter]);
+  }, [search, filter, typeFilter, formatFilter, daFilter]);
 
   // Editor view
   if (showEditor && editingVisual) {
@@ -391,6 +400,21 @@ export default function MyVisuals() {
                   <SelectItem value="16:9">Paysage 16:9</SelectItem>
                 </SelectContent>
               </Select>
+              {artDirectors.length > 0 && (
+                <Select value={daFilter} onValueChange={setDaFilter}>
+                  <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
+                    <SelectValue placeholder="DA" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{language === 'fr' ? 'Tous les DA' : 'All AD'}</SelectItem>
+                    {artDirectors.map(da => (
+                      <SelectItem key={da.id} value={da.name}>
+                        {da.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <div className="flex gap-2">
                 <Button variant={filter === 'all' ? 'default' : 'ghost'} onClick={() => setFilter('all')} className={cn(filter === 'all' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}>{t.all}</Button>
                 <Button variant={filter === 'favorites' ? 'default' : 'ghost'} onClick={() => setFilter('favorites')} className={cn(filter === 'favorites' ? 'bg-violet-600' : 'text-white/60 hover:text-white')}><Heart className="h-4 w-4 mr-1" />{t.favorites}</Button>
