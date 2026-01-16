@@ -3,10 +3,11 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Camera, User, Mail, Crown, Zap, Save, Receipt, Download, FileText, Image } from 'lucide-react';
+import { Loader2, Camera, User, Mail, Crown, Zap, Save, Receipt, Download, FileText, Image, Briefcase, Edit, Trash2 } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import { useLanguage } from '@/components/LanguageContext';
 import moment from 'moment';
+import ArtDirectorModal from '@/components/ArtDirectorModal';
 
 export default function Account() {
   const { language } = useLanguage();
@@ -17,6 +18,10 @@ export default function Account() {
   const [loadingTransactions, setLoadingTransactions] = useState(true);
   const [companySettings, setCompanySettings] = useState({});
   const [userVisuals, setUserVisuals] = useState([]);
+  const [artDirectors, setArtDirectors] = useState([]);
+  const [showDAModal, setShowDAModal] = useState(false);
+  const [editingDA, setEditingDA] = useState(null);
+  const [loadingDAs, setLoadingDAs] = useState(true);
 
   const t = {
     fr: {
@@ -85,19 +90,22 @@ export default function Account() {
 
   const loadTransactions = async (userEmail) => {
     setLoadingTransactions(true);
-    const [userTransactions, appSettings, visuals] = await Promise.all([
+    const [userTransactions, appSettings, visuals, das] = await Promise.all([
       base44.entities.Transaction.filter({ user_email: userEmail }, '-created_date', 50),
       base44.entities.AppSettings.list(),
-      base44.entities.Visual.filter({ user_email: userEmail }, '-created_date', 10)
+      base44.entities.Visual.filter({ user_email: userEmail }, '-created_date', 10),
+      base44.entities.ArtDirector.filter({ user_email: userEmail, is_active: true }, '-created_date')
     ]);
     setTransactions(userTransactions);
     setUserVisuals(visuals);
+    setArtDirectors(das);
     
     const settingsMap = {};
     appSettings.forEach(s => { settingsMap[s.key] = s.value; });
     setCompanySettings(settingsMap);
     
     setLoadingTransactions(false);
+    setLoadingDAs(false);
   };
 
   const getTransactionTypeName = (type) => {
@@ -446,6 +454,87 @@ export default function Account() {
               </div>
             </div>
 
+            {/* Art Directors Card */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Briefcase className="h-5 w-5 text-violet-400" />
+                  {language === 'fr' ? 'Mes Directeurs Artistiques' : 'My Art Directors'}
+                </h2>
+                <Button
+                  onClick={() => {
+                    setEditingDA(null);
+                    setShowDAModal(true);
+                  }}
+                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-sm"
+                >
+                  {language === 'fr' ? 'Créer un DA' : 'Create AD'}
+                </Button>
+              </div>
+              
+              {loadingDAs ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 text-violet-400 animate-spin" />
+                </div>
+              ) : artDirectors.length === 0 ? (
+                <div className="text-center py-8 text-white/40">
+                  {language === 'fr' ? 'Aucun directeur artistique créé' : 'No art directors created'}
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {artDirectors.map((da) => (
+                    <div 
+                      key={da.id}
+                      className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors"
+                    >
+                      {da.logo_url && (
+                        <img src={da.logo_url} alt={da.name} className="w-16 h-16 rounded-lg object-cover border border-white/20" />
+                      )}
+                      <div className="flex-1">
+                        <h3 className="text-white font-medium mb-1">{da.name}</h3>
+                        <p className="text-white/50 text-sm mb-2">{da.activity}</p>
+                        <div className="flex gap-2">
+                          {da.color_palette?.map((color, idx) => (
+                            <div 
+                              key={idx}
+                              className="w-6 h-6 rounded border border-white/20"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingDA(da);
+                            setShowDAModal(true);
+                          }}
+                          className="text-white/60 hover:text-white hover:bg-white/10"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            if (confirm(language === 'fr' ? 'Supprimer ce DA ?' : 'Delete this AD?')) {
+                              await base44.entities.ArtDirector.update(da.id, { is_active: false });
+                              setArtDirectors(prev => prev.filter(d => d.id !== da.id));
+                            }
+                          }}
+                          className="text-white/60 hover:text-red-400 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* My Visuals Card */}
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
               <div className="flex items-center justify-between mb-6">
@@ -554,6 +643,28 @@ export default function Account() {
                 </div>
               )}
             </div>
+
+            {/* Art Director Modal */}
+            <ArtDirectorModal
+              isOpen={showDAModal}
+              onClose={() => {
+                setShowDAModal(false);
+                setEditingDA(null);
+              }}
+              editingDA={editingDA}
+              onSave={async (daData) => {
+                if (editingDA) {
+                  await base44.entities.ArtDirector.update(editingDA.id, daData);
+                  setArtDirectors(prev => prev.map(da => da.id === editingDA.id ? { ...da, ...daData } : da));
+                } else {
+                  const newDA = await base44.entities.ArtDirector.create({
+                    ...daData,
+                    user_email: user.email
+                  });
+                  setArtDirectors(prev => [newDA, ...prev]);
+                }
+              }}
+            />
           </div>
         );
       }}
