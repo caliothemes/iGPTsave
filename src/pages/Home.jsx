@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video, Pencil } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video, Pencil, Users } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -2400,9 +2400,7 @@ export default function Home() {
                           ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                           : "bg-blue-600/10 border-blue-500/20 text-blue-300 hover:bg-blue-600/20"
                       )}>
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
+                        <Users className="w-3 h-3" />
                         {selectedDA ? selectedDA.name : 'DA'}
                       </button>
                     </DropdownMenuTrigger>
