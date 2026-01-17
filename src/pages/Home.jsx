@@ -833,21 +833,82 @@ export default function Home() {
 
         const [width, height] = dimensions.split('x').map(Number);
 
-        // MODE CANVA: Créer les calques sans composition d'image
+        // MODE CANVA: Créer les calques avec IA pour couleurs
         if (canvaMode && canvaTexts && canvaTexts.length > 0) {
-          console.log('🎨 Mode Canva ACTIF - Création de', canvaTexts.length, 'calques');
+          console.log('🎨 Mode Canva - IA styling pour', canvaTexts.length, 'textes');
 
-          editorLayers = canvaTexts.map((text, idx) => {
-            const spacing = height / (canvaTexts.length + 1);
-            const y = spacing * (idx + 1);
-            const x = width / 2 - 100;
+          try {
+            const aiResult = await base44.integrations.Core.InvokeLLM({
+              prompt: `Analyze this image and suggest optimal text styling for these ${canvaTexts.length} texts: ${canvaTexts.join(', ')}. 
+              
+              For each text, choose:
+              - A color that contrasts well with the image (readable and eye-catching)
+              - Whether to add a semi-transparent background for better readability
+              - Font size based on importance (first = title = larger, 60-80px; others 40-60px)
+              
+              Canvas: ${width}x${height}px
+              Position texts evenly spaced vertically.
+              Use center alignment.
+              
+              Return JSON with layers array.`,
+              response_json_schema: {
+                type: "object",
+                properties: {
+                  layers: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: { type: "string" },
+                        x: { type: "number" },
+                        y: { type: "number" },
+                        fontSize: { type: "number" },
+                        color: { type: "string" },
+                        backgroundColor: { type: "string" },
+                        fontWeight: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              },
+              file_urls: [result.url]
+            });
 
-            return {
+            if (aiResult.layers && aiResult.layers.length > 0) {
+              editorLayers = aiResult.layers.map((layer, idx) => ({
+                id: `layer-${Date.now()}-${idx}`,
+                type: 'text',
+                text: layer.text,
+                x: width / 2,
+                y: Math.max(80, Math.min(layer.y || (height / (canvaTexts.length + 1)) * (idx + 1), height - 80)),
+                fontSize: Math.max(layer.fontSize || (idx === 0 ? 72 : 48), 30),
+                fontFamily: 'Arial',
+                fontWeight: layer.fontWeight || 700,
+                color: layer.color || '#ffffff',
+                backgroundColor: layer.backgroundColor || 'transparent',
+                padding: 20,
+                borderRadius: 12,
+                opacity: 100,
+                visible: true,
+                align: 'center',
+                bold: true,
+                italic: false,
+                shadow: false,
+                stroke: false
+              }));
+              console.log('✅ IA styling OK:', editorLayers);
+            } else {
+              throw new Error('No layers from AI');
+            }
+          } catch (aiError) {
+            console.error('❌ IA error:', aiError);
+            // Fallback manuel
+            editorLayers = canvaTexts.map((text, idx) => ({
               id: `layer-${Date.now()}-${idx}`,
               type: 'text',
               text: text,
-              x: Math.max(80, Math.min(x, width - 250)),
-              y: Math.max(80, Math.min(y, height - 80)),
+              x: width / 2,
+              y: (height / (canvaTexts.length + 1)) * (idx + 1),
               fontSize: idx === 0 ? 72 : 48,
               fontFamily: 'Arial',
               fontWeight: 700,
@@ -857,15 +918,14 @@ export default function Home() {
               borderRadius: 12,
               opacity: 100,
               visible: true,
-              align: 'left',
+              align: 'center',
               bold: true,
               italic: false,
               shadow: false,
               stroke: false
-            };
-          });
-
-          console.log('✅ CALQUES CRÉÉS:', editorLayers);
+            }));
+            console.log('✅ Fallback layers:', editorLayers);
+          }
         } else if (activeCategory?.id === 'pub_ads') {
           console.log('🎨 Génération automatique de calques publicitaires...');
           try {
@@ -951,83 +1011,6 @@ export default function Home() {
             console.error('❌ Échec calques pub:', e);
           }
 
-          // Composition de l'image avec textes
-          console.log('🔍 DEBUG - Avant composition, editorLayers.length:', editorLayers.length);
-          if (editorLayers.length > 0) {
-            console.log('✅ Début composition avec', editorLayers.length, 'calques');
-            try {
-              const canvas = document.createElement('canvas');
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-
-              const bgImage = new Image();
-              bgImage.crossOrigin = 'anonymous';
-              await new Promise((resolve, reject) => {
-                bgImage.onload = resolve;
-                bgImage.onerror = reject;
-                bgImage.src = result.url;
-              });
-
-              ctx.drawImage(bgImage, 0, 0, width, height);
-
-              editorLayers.forEach((layer) => {
-                if (layer.type === 'text' && layer.text) {
-                  ctx.save();
-                  const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
-                  const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
-                  ctx.font = fontStyle;
-                  ctx.fillStyle = layer.color;
-                  ctx.textAlign = layer.align || 'left';
-
-                  const metrics = ctx.measureText(layer.text);
-                  const textWidth = metrics.width;
-
-                  if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-                    const padding = layer.padding || 28;
-                    const borderRadius = layer.borderRadius || 18;
-                    const boxX = layer.x - padding;
-                    const boxY = layer.y - layer.fontSize * 0.85 - padding;
-                    const boxWidth = textWidth + padding * 2;
-                    const boxHeight = layer.fontSize * 1.15 + padding * 2;
-
-                    ctx.fillStyle = layer.backgroundColor;
-                    const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
-                    ctx.beginPath();
-                    ctx.moveTo(boxX + radius, boxY);
-                    ctx.lineTo(boxX + boxWidth - radius, boxY);
-                    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
-                    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
-                    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
-                    ctx.lineTo(boxX + radius, boxY + boxHeight);
-                    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
-                    ctx.lineTo(boxX, boxY + radius);
-                    ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.fillStyle = layer.color;
-                  }
-
-                  ctx.fillText(layer.text, layer.x, layer.y);
-                  ctx.restore();
-                }
-              });
-
-              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
-              if (blob) {
-                const file = new File([blob], 'composite.png', { type: 'image/png' });
-                const uploadResult = await base44.integrations.Core.UploadFile({ file });
-                if (uploadResult?.file_url) {
-                  compositeImageUrl = uploadResult.file_url;
-                  console.log('✅ Image composite créée avec URL:', compositeImageUrl);
-                  console.log('✅ Layers sauvegardés:', editorLayers.length);
-                }
-              }
-            } catch (e) {
-              console.error('❌ Échec composition:', e);
-              console.error('❌ Stack:', e.stack);
-            }
-          }
         }
 
         const visualData = {
