@@ -1018,151 +1018,70 @@ export default function Home() {
                   italic: false,
                   shadow: false,
                   stroke: false
-                  };
-                  });
-                  console.log('✅ Calques générés:', editorLayers);
-                  }
-                  }
-
-                  // Composition de l'image avec textes
-                  if (editorLayers.length > 0) {
-                // Compose image with text layers using canvas
-                console.log('🖼️ Composition de l\'image avec les textes...');
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-
-              // Load and draw background image
-              const bgImage = new Image();
-              bgImage.crossOrigin = 'anonymous';
-
-              await new Promise((resolve, reject) => {
-                bgImage.onload = () => {
-                  console.log('✅ Image de fond chargée');
-                  resolve();
                 };
-                bgImage.onerror = (err) => {
-                  console.error('❌ Erreur chargement image:', err);
-                  reject(err);
-                };
-                bgImage.src = result.url;
               });
+              console.log('✅ Calques générés:', editorLayers);
+              }
+              }
 
-              // Draw background
-              ctx.drawImage(bgImage, 0, 0, width, height);
-              console.log('✅ Fond dessiné');
+              // Composition de l'image avec textes
+              if (editorLayers.length > 0) {
+              // Compose image with text layers using canvas
+              console.log('🖼️ Composition de l\'image avec les textes...');
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
 
-              // Draw text layers EXACTLY like VisualEditor does
-              editorLayers.forEach((layer, idx) => {
-                if (layer.type === 'text' && layer.text) {
-                  console.log(`🎨 Dessin calque ${idx}:`, layer.text);
-                  ctx.save();
+              // Generate editor layers automatically for pub_ads category OR canva mode
+              let editorLayers = [];
+              let compositeImageUrl = result.url;
 
-                  // Set font - EXACTLY like VisualEditor
-                  const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
-                  const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
-                  ctx.font = fontStyle;
-                  ctx.fillStyle = layer.color;
-                  ctx.textAlign = layer.align || 'left';
-                  ctx.letterSpacing = `${layer.letterSpacing || 0}px`;
+              if (canvaMode || activeCategory?.id === 'pub_ads') {
+                try {
+                  const [width, height] = dimensions.split('x').map(Number);
 
-                  // Reset shadows
-                  ctx.shadowColor = 'transparent';
-                  ctx.shadowBlur = 0;
-                  ctx.shadowOffsetX = 0;
-                  ctx.shadowOffsetY = 0;
+                  // MODE CANVA: Utiliser les textes prédéfinis par l'utilisateur
+                  if (canvaMode && canvaTexts.length > 0) {
+                    console.log('🎨 Mode Canva - Création des calques à partir des textes utilisateur:', canvaTexts);
 
-                  // Text positioning - EXACTLY like VisualEditor
-                  const lines = [layer.text]; // Single line for pub ads
-                  const lineHeight = layer.fontSize * 1.2;
-                  const startY = layer.y - (lines.length - 1) * lineHeight / 2;
+                    // Créer les calques directement à partir des textes de l'utilisateur
+                    editorLayers = canvaTexts.map((text, idx) => {
+                      // Position répartie verticalement
+                      const spacing = height / (canvaTexts.length + 1);
+                      const y = spacing * (idx + 1);
+                      const x = width / 2 - 100; // Centré approximativement
 
-                  // Measure text for background box
-                  const metrics = ctx.measureText(layer.text);
-                  const textWidth = metrics.width;
-
-                  // Draw background box - only for pub_ads mode, Canva has transparent background
-                  if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-                    const padding = layer.padding || 28;
-                    const borderRadius = layer.borderRadius || 18;
-
-                    // Calculate box position to center the text vertically in the box
-                    const boxX = layer.x - padding;
-                    const boxY = layer.y - layer.fontSize * 0.85 - padding;
-                    const boxWidth = textWidth + padding * 2;
-                    const boxHeight = layer.fontSize * 1.15 + padding * 2;
-
-                    ctx.fillStyle = layer.backgroundColor;
-
-                    // Draw rounded rectangle
-                    const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
-                    ctx.beginPath();
-                    ctx.moveTo(boxX + radius, boxY);
-                    ctx.lineTo(boxX + boxWidth - radius, boxY);
-                    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
-                    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
-                    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
-                    ctx.lineTo(boxX + radius, boxY + boxHeight);
-                    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
-                    ctx.lineTo(boxX, boxY + radius);
-                    ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
-                    ctx.closePath();
-                    ctx.fill();
-                  }
-
-                  // Draw text with shadow if enabled
-                  if (layer.shadow) {
-                    ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
-                    ctx.shadowBlur = layer.shadowBlur || 6;
-                    ctx.shadowOffsetX = layer.shadowOffsetX || 3;
-                    ctx.shadowOffsetY = layer.shadowOffsetY || 3;
-                  }
-
-                  // Draw stroke if enabled
-                  if (layer.stroke) {
-                    ctx.strokeStyle = layer.strokeColor || '#000000';
-                    ctx.lineWidth = layer.strokeWidth || 2;
-                    lines.forEach((line, lineIdx) => {
-                      ctx.strokeText(line, layer.x, startY + lineIdx * lineHeight);
+                      return {
+                        id: `layer-${Date.now()}-${idx}`,
+                        type: 'text',
+                        text: text,
+                        x: Math.max(80, Math.min(x, width - 250)),
+                        y: Math.max(80, Math.min(y, height - 80)),
+                        fontSize: idx === 0 ? 72 : 48, // Premier texte plus grand
+                        fontFamily: 'Arial',
+                        fontWeight: 700,
+                        color: '#ffffff',
+                        backgroundColor: 'transparent',
+                        padding: 0,
+                        borderRadius: 0,
+                        opacity: 100,
+                        visible: true,
+                        align: 'left',
+                        bold: true,
+                        italic: false,
+                        shadow: false,
+                        stroke: false
+                      };
                     });
-                  }
 
-                  // Draw text
-                  lines.forEach((line, lineIdx) => {
-                    ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
-                  });
+                    console.log('✅ Calques Canva créés:', editorLayers);
+                  } else {
+                    // MODE PUB_ADS: Génération automatique via LLM
+                    console.log('🎨 Génération automatique de calques publicitaires...');
 
-                  ctx.restore();
-                }
-              });
-
-              console.log('✅ Tous les calques dessinés');
-
-              // Convert canvas to blob and upload
-              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
-              if (!blob) {
-                throw new Error('Failed to create blob from canvas');
-              }
-
-              const file = new File([blob], 'pub_ad_composite.png', { type: 'image/png' });
-              console.log('📤 Upload de l\'image composite...');
-              const uploadResult = await base44.integrations.Core.UploadFile({ file });
-
-                if (uploadResult?.file_url) {
-                  compositeImageUrl = uploadResult.file_url;
-                  console.log('✅ Image composite créée:', compositeImageUrl);
-                } else {
-                  console.error('❌ Pas d\'URL retournée par l\'upload');
-                  throw new Error('Upload failed - no URL returned');
-                  }
-                  console.log('✅ Image composite créée avec calques éditables');
-              } catch (e) {
-                console.error('❌ Échec génération calques:', e);
-                // En cas d'erreur, on garde l'image originale
-                compositeImageUrl = result.url;
-              }
-            }
+                    const layersResult = await base44.integrations.Core.InvokeLLM({
+                      prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}".
 
         const visualData = {
           user_email: user?.email || 'anonymous',
