@@ -323,7 +323,7 @@ export default function VisualCard({
           {/* Action Buttons - Icons and Regenerate on same line */}
           <div className="flex gap-2">
             {/* Action Icons - only for images, always visible */}
-            {!isVideo && onEdit && !hideEditButton && (
+            {!isVideo && onEdit && (
               <button
                 onClick={() => onEdit(visual)}
                 disabled={isRegenerating}
