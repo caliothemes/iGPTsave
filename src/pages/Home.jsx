@@ -922,16 +922,22 @@ export default function Home() {
                   fontFamily: 'Arial',
                   fontWeight: 700,
                   color: '#ffffff',
-                  backgroundColor: 'transparent',
-                  padding: 0,
-                  borderRadius: 0,
+                  backgroundColor: 'rgba(0,0,0,0.75)',
+                  padding: 20,
+                  borderRadius: 12,
                   opacity: 100,
                   visible: true,
                   align: 'left',
                   bold: true,
                   italic: false,
-                  shadow: false,
-                  stroke: false
+                  shadow: true,
+                  shadowColor: 'rgba(0,0,0,0.8)',
+                  shadowBlur: 8,
+                  shadowOffsetX: 2,
+                  shadowOffsetY: 2,
+                  stroke: true,
+                  strokeColor: '#000000',
+                  strokeWidth: 2
                 };
               });
 
