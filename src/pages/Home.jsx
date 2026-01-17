@@ -900,54 +900,46 @@ export default function Home() {
 
         // Generate editor layers
         let editorLayers = [];
-        let compositeImageUrl = result.url;
 
-        console.log('🔍 DEBUG Canva - canvaMode:', canvaMode, 'canvaTexts:', canvaTexts, 'length:', canvaTexts?.length);
+        console.log('🔍 AVANT TOUT - canvaMode:', canvaMode, 'canvaTexts:', canvaTexts);
 
-        if (canvaMode || activeCategory?.id === 'pub_ads') {
-          const [width, height] = dimensions.split('x').map(Number);
+        const [width, height] = dimensions.split('x').map(Number);
 
+        // MODE CANVA: Créer les calques sans composition d'image
+        if (canvaMode && canvaTexts && canvaTexts.length > 0) {
+          console.log('🎨 Mode Canva ACTIF - Création de', canvaTexts.length, 'calques');
+
+          editorLayers = canvaTexts.map((text, idx) => {
+            const spacing = height / (canvaTexts.length + 1);
+            const y = spacing * (idx + 1);
+            const x = width / 2 - 100;
+
+            return {
+              id: `layer-${Date.now()}-${idx}`,
+              type: 'text',
+              text: text,
+              x: Math.max(80, Math.min(x, width - 250)),
+              y: Math.max(80, Math.min(y, height - 80)),
+              fontSize: idx === 0 ? 72 : 48,
+              fontFamily: 'Arial',
+              fontWeight: 700,
+              color: '#ffffff',
+              backgroundColor: 'transparent',
+              padding: 20,
+              borderRadius: 12,
+              opacity: 100,
+              visible: true,
+              align: 'left',
+              bold: true,
+              italic: false,
+              shadow: false,
+              stroke: false
+            };
+          });
+
+          console.log('✅ CALQUES CRÉÉS:', editorLayers);
+        } else if (activeCategory?.id === 'pub_ads') {
           try {
-            // MODE CANVA: Utiliser les textes prédéfinis par l'utilisateur
-            if (canvaMode && canvaTexts.length > 0) {
-              console.log('🎨 Mode Canva - Création des calques à partir des textes utilisateur:', canvaTexts);
-
-              editorLayers = canvaTexts.map((text, idx) => {
-                const spacing = height / (canvaTexts.length + 1);
-                const y = spacing * (idx + 1);
-                const x = width / 2 - 100;
-
-                return {
-                  id: `layer-${Date.now()}-${idx}`,
-                  type: 'text',
-                  text: text,
-                  x: Math.max(80, Math.min(x, width - 250)),
-                  y: Math.max(80, Math.min(y, height - 80)),
-                  fontSize: idx === 0 ? 72 : 48,
-                  fontFamily: 'Arial',
-                  fontWeight: 700,
-                  color: '#ffffff',
-                  backgroundColor: 'rgba(0,0,0,0.75)',
-                  padding: 20,
-                  borderRadius: 12,
-                  opacity: 100,
-                  visible: true,
-                  align: 'left',
-                  bold: true,
-                  italic: false,
-                  shadow: true,
-                  shadowColor: 'rgba(0,0,0,0.8)',
-                  shadowBlur: 8,
-                  shadowOffsetX: 2,
-                  shadowOffsetY: 2,
-                  stroke: true,
-                  strokeColor: '#000000',
-                  strokeWidth: 2
-                };
-              });
-
-              console.log('✅ Calques Canva créés:', editorLayers.length, editorLayers);
-            } else if (activeCategory?.id === 'pub_ads') {
               console.log('🎨 Génération automatique de calques publicitaires...');
 
               const layersResult = await base44.integrations.Core.InvokeLLM({
@@ -1114,7 +1106,7 @@ export default function Home() {
         const visualData = {
           user_email: user?.email || 'anonymous',
           conversation_id: activeConversation?.id,
-          image_url: compositeImageUrl,
+          image_url: result.url,
           original_image_url: result.url,
           title: userMessage.slice(0, 50),
           original_prompt: isModification 
