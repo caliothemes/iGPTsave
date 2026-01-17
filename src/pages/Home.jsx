@@ -895,29 +895,30 @@ export default function Home() {
             const layersResult = await base44.integrations.Core.InvokeLLM({
               prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
 
-              CRITICAL TEXT GUIDELINES:
-              - Keep texts SHORT (2-6 words max per text)
-              - Headline: 2-4 words, bold and catchy
-              - Subtext: 3-6 words, descriptive
-              - CTA: 1-3 words (ex: "BUY NOW", "DISCOVER", "ORDER TODAY")
+              TEXT DETECTION:
+              - If you detect existing texts in the image, extract them exactly as they appear
+              - Position each text layer at its actual location in the image
+              - Keep the original text content, font size, and color as close as possible
+              - If no clear text is visible, return an empty layers array
 
               DESIGN & COLOR:
-              - Extract 1-2 dominant vibrant colors from the image
-              - Use BOLD, eye-catching semi-transparent backgrounds (rgba with 0.88-0.95 opacity)
-              - Colors: hot pink, electric blue, deep purple, neon orange, vivid red
-              - Large padding: 28-35px for impact
-              - Border radius: 16-22px for modern look
+              - Extract the dominant colors from the image background for text backgrounds
+              - Use semi-transparent backgrounds (rgba with 0.85-0.95 opacity)
+              - Preserve the visual style of the original image
+              - Moderate padding: 20-30px
+              - Border radius: 12-18px
 
               POSITIONING (Canvas ${width}x${height}px):
-              - Spread texts across different areas (top, middle, bottom)
-              - Leave 80px+ margin from edges
-              - Don't cluster texts together
+              - Place texts at their detected positions in the image
+              - If creating new texts, spread them naturally across the canvas
+              - Leave appropriate margins from edges
 
               FONTS & SIZES:
-              - Headline: 56-72px, bold (700-900 weight), Arial or Montserrat
-              - Subtext: 38-48px, medium-bold (600-700), Arial
-              - CTA: 42-52px, extra-bold (800-900), Arial
-              - ALWAYS use textAlign: 'left' (never center or right)`,
+              - Detect font sizes from the image context
+              - For headlines: 48-72px, bold (700-900 weight)
+              - For body text: 32-48px, medium (500-700)
+              - For small text: 24-36px, regular (400-600)
+              - Use textAlign: 'left' by default`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -945,7 +946,7 @@ export default function Home() {
               file_urls: [result.url]
             });
 
-            if (layersResult.layers && layersResult.layers.length > 0) {
+            if (layersResult.layers && Array.isArray(layersResult.layers) && layersResult.layers.length > 0) {
               // Create editor layers with proper structure
               editorLayers = layersResult.layers.map((layer, idx) => ({
                 id: `layer-${Date.now()}-${idx}`,
@@ -968,7 +969,7 @@ export default function Home() {
                 shadow: false,
                 stroke: false
               }));
-              console.log('✅ Calques générés:', editorLayers);
+              console.log('✅ Calques de texte générés:', editorLayers);
 
               // Compose image with text layers using canvas
               console.log('🖼️ Composition de l\'image avec les textes...');
@@ -1100,13 +1101,18 @@ export default function Home() {
                 console.error('❌ Pas d\'URL retournée par l\'upload');
                 throw new Error('Upload failed - no URL returned');
               }
+            } else {
+              console.log('ℹ️ Aucun texte détecté dans l\'image');
             }
-          } catch (e) {
-            console.error('❌ Échec composition pub:', e);
-            // En cas d'erreur, on garde l'image originale et les calques
+            } catch (e) {
+            console.error('❌ Échec génération calques:', e);
+            // En cas d'erreur, on garde l'image originale sans calques
             compositeImageUrl = result.url;
-          }
-        }
+            }
+            } catch (outerError) {
+            console.error('❌ Erreur génération calques:', outerError);
+            compositeImageUrl = result.url;
+            }
 
         const visualData = {
           user_email: user?.email || 'anonymous',
