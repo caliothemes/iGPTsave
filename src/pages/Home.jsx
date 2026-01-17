@@ -928,7 +928,87 @@ export default function Home() {
             }));
             console.log('✅ Fallback layers:', editorLayers);
           }
-        } else if (activeCategory?.id === 'pub_ads') {
+        }
+
+        console.log('📊 LAYERS FINAL:', editorLayers);
+
+        // Composer l'image avec les textes pour affichage
+        if (editorLayers.length > 0) {
+          console.log('🎨 Composition:', editorLayers.length, 'layers');
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            const bgImage = new Image();
+            bgImage.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+              bgImage.onload = resolve;
+              bgImage.onerror = reject;
+              bgImage.src = result.url;
+            });
+
+            ctx.drawImage(bgImage, 0, 0, width, height);
+
+            editorLayers.forEach((layer) => {
+              if (layer.type === 'text' && layer.text) {
+                ctx.save();
+                const fontWeight = layer.fontWeight || 700;
+                const fontStyle = `${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+                ctx.font = fontStyle;
+                ctx.fillStyle = layer.color;
+                ctx.textAlign = layer.align || 'center';
+
+                const metrics = ctx.measureText(layer.text);
+                const textWidth = metrics.width;
+
+                if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+                  const padding = layer.padding || 20;
+                  const borderRadius = layer.borderRadius || 12;
+                  let boxX = layer.x - textWidth / 2 - padding;
+                  if (layer.align === 'left') boxX = layer.x - padding;
+                  const boxY = layer.y - layer.fontSize * 0.85 - padding;
+                  const boxWidth = textWidth + padding * 2;
+                  const boxHeight = layer.fontSize * 1.15 + padding * 2;
+
+                  ctx.fillStyle = layer.backgroundColor;
+                  const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+                  ctx.beginPath();
+                  ctx.moveTo(boxX + radius, boxY);
+                  ctx.lineTo(boxX + boxWidth - radius, boxY);
+                  ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+                  ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+                  ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+                  ctx.lineTo(boxX + radius, boxY + boxHeight);
+                  ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+                  ctx.lineTo(boxX, boxY + radius);
+                  ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+                  ctx.closePath();
+                  ctx.fill();
+                  ctx.fillStyle = layer.color;
+                }
+
+                ctx.fillText(layer.text, layer.x, layer.y);
+                ctx.restore();
+              }
+            });
+
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+            if (blob) {
+              const file = new File([blob], 'composite.png', { type: 'image/png' });
+              const uploadResult = await base44.integrations.Core.UploadFile({ file });
+              if (uploadResult?.file_url) {
+                finalImageUrl = uploadResult.file_url;
+                console.log('✅ Composite créée:', finalImageUrl);
+              }
+            }
+          } catch (e) {
+            console.error('❌ Composition error:', e);
+          }
+        }
+
+        if (activeCategory?.id === 'pub_ads') {
           console.log('🎨 Génération automatique de calques publicitaires...');
           try {
 
