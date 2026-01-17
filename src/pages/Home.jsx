@@ -2386,14 +2386,7 @@ export default function Home() {
 
                 {/* Tag Canva */}
                 <button
-                  onClick={() => {
-                    if (canvaMode) {
-                      setCanvaMode(false);
-                      setCanvaTexts([]);
-                    } else {
-                      setShowCanvaTextModal(true);
-                    }
-                  }}
+                  onClick={() => setShowCanvaTextModal(true)}
                   className={cn(
                     "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
                     canvaMode
@@ -2930,6 +2923,12 @@ export default function Home() {
           setCanvaTexts(texts);
           setCanvaMode(true);
         }}
+        onCancel={() => {
+          setCanvaMode(false);
+          setCanvaTexts([]);
+        }}
+        currentTexts={canvaTexts}
+        isActive={canvaMode}
       />
       </div>
       );

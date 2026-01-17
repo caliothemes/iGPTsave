@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 
-export default function CanvaTextModal({ isOpen, onClose, onConfirm }) {
+export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, currentTexts = [], isActive = false }) {
   const { language } = useLanguage();
   const [texts, setTexts] = useState(['']);
 
