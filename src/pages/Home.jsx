@@ -753,7 +753,14 @@ export default function Home() {
         }
 
         // Si c'est une modification, utiliser le prompt enrichi directement
-        const promptToUse = isModification ? finalPrompt : enhancedPrompt;
+        let promptToUse = isModification ? finalPrompt : enhancedPrompt;
+        
+        // En mode Canva, ajouter --no text pour générer l'image sans texte intégré
+        if (canvaMode && !isModification) {
+          promptToUse += ' --no text --no letters --no typography --no words --no writing';
+          console.log('🎨 Mode Canva: génération sans texte intégré');
+        }
+        
         console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
         // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
@@ -894,26 +901,29 @@ export default function Home() {
             console.log(canvaMode ? '🎨 Mode Canva activé - Détection OCR des textes...' : '🎨 Génération automatique de calques publicitaires...');
             const [width, height] = dimensions.split('x').map(Number);
 
-            const ocrPrompt = canvaMode 
-              ? `Analyze this image and detect ALL text elements present in it. Extract each text as a separate layer with its exact position, size, and styling.
+            const layerPrompt = canvaMode 
+              ? `Based on this request: "${userMessage}", create text layers that should appear on this image.
 
-              CRITICAL INSTRUCTIONS:
-              - ONLY extract text that is ACTUALLY VISIBLE in the image
-              - Do NOT invent or create new text
-              - If NO text is visible, return an empty layers array
-              - Extract EXACT text content as it appears
-              - Estimate font size from visual appearance (range: 24-120px)
-              - Determine accurate position (x, y coordinates on canvas ${width}x${height}px)
-              - Detect text color (as hex code)
+              Create 2-4 text elements that are relevant to the user's request.
+              
+              INSTRUCTIONS:
+              - Extract key information from the user request
+              - Create SHORT, impactful texts (2-8 words max per text)
+              - Position them strategically on canvas ${width}x${height}px
+              - Use appropriate font sizes (30-90px based on importance)
+              - Choose colors that contrast well with the image
               - NO background color (set backgroundColor to "transparent")
-              - Font: Arial or Helvetica
+              - Font: Arial
               - Set textAlign to "left"
               
-              Return {"layers": []} if no text is found in the image.`
+              Example for "social media post for coffee shop":
+              - "FRESH COFFEE" at top
+              - "Daily from 7am" in middle
+              - "Visit us today!" at bottom`
               : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}".`;
 
             const layersResult = await base44.integrations.Core.InvokeLLM({
-              prompt: canvaMode ? ocrPrompt : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
+              prompt: canvaMode ? layerPrompt : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
 
               CRITICAL TEXT GUIDELINES:
               - Keep texts SHORT (2-6 words max per text)
@@ -994,12 +1004,14 @@ export default function Home() {
               });
               console.log('✅ Calques générés:', editorLayers);
 
-              // Compose image with text layers using canvas
-              console.log('🖼️ Composition de l\'image avec les textes...');
-              const canvas = document.createElement('canvas');
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
+              // En mode Canva, on ne fait PAS de composition - on garde l'image propre + calques séparés
+              if (!canvaMode) {
+                // Compose image with text layers using canvas (pour pub_ads seulement)
+                console.log('🖼️ Composition de l\'image avec les textes...');
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
 
               // Load and draw background image
               const bgImage = new Image();
@@ -1117,16 +1129,19 @@ export default function Home() {
               console.log('📤 Upload de l\'image composite...');
               const uploadResult = await base44.integrations.Core.UploadFile({ file });
 
-              if (uploadResult?.file_url) {
-                compositeImageUrl = uploadResult.file_url;
-                console.log('✅ Image composite créée:', compositeImageUrl);
+                if (uploadResult?.file_url) {
+                  compositeImageUrl = uploadResult.file_url;
+                  console.log('✅ Image composite créée:', compositeImageUrl);
+                } else {
+                  console.error('❌ Pas d\'URL retournée par l\'upload');
+                  throw new Error('Upload failed - no URL returned');
+                }
               } else {
-                console.error('❌ Pas d\'URL retournée par l\'upload');
-                throw new Error('Upload failed - no URL returned');
+                console.log('✅ Mode Canva: image propre sans texte + calques séparés');
               }
             }
           } catch (e) {
-            console.error('❌ Échec composition pub:', e);
+            console.error('❌ Échec génération calques:', e);
             // En cas d'erreur, on garde l'image originale et les calques
             compositeImageUrl = result.url;
           }
