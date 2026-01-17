@@ -841,14 +841,20 @@ export default function Home() {
 
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this image and suggest optimal text styling for these ${canvaTexts.length} texts: ${canvaTexts.join(', ')}. 
+              prompt: `Analyze this image composition and intelligently place these ${canvaTexts.length} texts: ${canvaTexts.join(', ')}. 
+              
+              CRITICAL - Analyze the image elements:
+              - Identify free space areas (avoid placing text over important visual elements)
+              - Detect the main subject/focus areas and place text around them
+              - Find optimal positions with good contrast
               
               For each text:
-              - Choose a color that contrasts well and is very readable
+              - Choose a color with excellent contrast and readability
               - NO background (transparent)
               - Font size: first text (title) 60-80px, others 40-60px
-              - Position evenly spaced vertically
+              - Position based on image composition (not just evenly spaced)
               - Center aligned
+              - Ensure text doesn't overlap important image elements
               
               Canvas: ${width}x${height}px
               Return JSON with layers array.`,
@@ -931,8 +937,8 @@ export default function Home() {
 
         console.log('📊 LAYERS FINAL:', editorLayers);
 
-        // Composer l'image avec les textes pour affichage
-        if (editorLayers.length > 0) {
+        // Composer l'image avec les textes pour affichage (SAUF mode Canva - layers seuls)
+        if (editorLayers.length > 0 && !canvaMode) {
           console.log('🎨 Composition:', editorLayers.length, 'layers');
           try {
             const canvas = document.createElement('canvas');
