@@ -540,7 +540,8 @@ export default function Home() {
       content: displayMessage,
       attachedImages: currentAttachedImages.length > 0 ? currentAttachedImages : undefined,
       artDirector: selectedDA ? selectedDA.name : null,
-      canvaMode: canvaMode
+      canvaMode: canvaMode,
+      canvaTextsCount: canvaTexts.length
     }]);
     
     // Clear attached images immediately after sending

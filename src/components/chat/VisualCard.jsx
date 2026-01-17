@@ -401,10 +401,15 @@ export default function VisualCard({
               <button
                 onClick={() => onEdit(visual)}
                 disabled={isRegenerating}
-                className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="relative p-2 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title={language === 'fr' ? 'Éditeur magique' : 'Magic editor'}
               >
                 <Wand2 className="h-4 w-4" />
+                {visual.editor_layers && visual.editor_layers.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                    {visual.editor_layers.length}
+                  </span>
+                )}
               </button>
             )}
 
