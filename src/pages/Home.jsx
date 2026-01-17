@@ -526,6 +526,9 @@ export default function Home() {
     // Reset mode après envoi
     setPromptMode(null);
     
+    // Sauvegarder les images attachées AVANT de les clear
+    const currentAttachedImages = [...attachedImages];
+    
     setInputValue('');
     // Reset textarea height
     if (inputRef.current) {
@@ -535,7 +538,7 @@ export default function Home() {
     setMessages(prev => [...prev, { 
       role: 'user', 
       content: displayMessage,
-      attachedImages: attachedImages.length > 0 ? [...attachedImages] : undefined,
+      attachedImages: currentAttachedImages.length > 0 ? currentAttachedImages : undefined,
       artDirector: selectedDA ? selectedDA.name : null,
       canvaMode: canvaMode
     }]);
@@ -767,7 +770,7 @@ export default function Home() {
         console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
         // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
-        if (attachedImages.length > 0) {
+        if (currentAttachedImages.length > 0) {
           try {
             setMessages(prev => [
               ...prev.slice(0, -1),
@@ -778,14 +781,14 @@ export default function Home() {
             const compositionPrompt = `Create this design: ${userMessage}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${promptToUse}`;
 
             console.log('🎨 Generating with InvokeLLM:', {
-              additionalImagesCount: attachedImages.length,
-              additionalImages: attachedImages,
+              additionalImagesCount: currentAttachedImages.length,
+              additionalImages: currentAttachedImages,
               prompt: compositionPrompt
             });
 
             const result = await base44.integrations.Core.GenerateImage({
               prompt: compositionPrompt,
-              existing_image_urls: attachedImages
+              existing_image_urls: currentAttachedImages
             });
 
             if (!result.url) {
