@@ -129,6 +129,7 @@ export default function Home() {
   const [selectedDA, setSelectedDA] = useState(null);
   const [showDAModal, setShowDAModal] = useState(false);
   const [editingDA, setEditingDA] = useState(null);
+  const [canvaMode, setCanvaMode] = useState(false);
 
 
   const messagesEndRef = useRef(null);
@@ -883,17 +884,33 @@ export default function Home() {
           }
         }
 
-        // Generate editor layers automatically for pub_ads category
+        // Generate editor layers automatically for pub_ads category OR canva mode
         let editorLayers = [];
         let compositeImageUrl = result.url;
 
-        if (activeCategory?.id === 'pub_ads') {
+        if (activeCategory?.id === 'pub_ads' || canvaMode) {
           try {
-            console.log('🎨 Génération automatique de calques publicitaires...');
+            console.log(canvaMode ? '🎨 Mode Canva activé - Détection OCR des textes...' : '🎨 Génération automatique de calques publicitaires...');
             const [width, height] = dimensions.split('x').map(Number);
 
+            const ocrPrompt = canvaMode 
+              ? `Analyze this image and detect ALL text elements present in it. Extract each text as a separate layer with its exact position, size, and styling. If NO text is visible in the image, return an empty layers array.
+
+              CRITICAL: Only extract text that is VISIBLE in the image. Do not create new text.
+              
+              For each detected text:
+              - Extract the EXACT text content
+              - Estimate font size from visual appearance (typical range: 24-72px)
+              - Determine position (x, y coordinates on canvas ${width}x${height}px)
+              - Detect text color (as hex)
+              - Add semi-transparent background matching the image style
+              - Font: Clean sans-serif (Arial, Helvetica)
+              
+              Return empty array if no text is found in the image.`
+              : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}".`;
+
             const layersResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
+              prompt: canvaMode ? ocrPrompt : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
 
               CRITICAL TEXT GUIDELINES:
               - Keep texts SHORT (2-6 words max per text)
@@ -2389,6 +2406,22 @@ export default function Home() {
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                {/* Tag Canva */}
+                <button
+                  onClick={() => setCanvaMode(!canvaMode)}
+                  className={cn(
+                    "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
+                    canvaMode
+                      ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
+                      : "bg-pink-600/10 border-pink-500/20 text-pink-300 hover:bg-pink-600/20"
+                  )}
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Canva
+                </button>
 
                 {/* Tag DA (Directeur Artistique) */}
                 <DropdownMenu>
