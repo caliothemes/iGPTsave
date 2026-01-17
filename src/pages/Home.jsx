@@ -40,6 +40,7 @@ import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
 import ArtDirectorModal from '@/components/ArtDirectorModal';
 import FeaturesCarousel from '@/components/FeaturesCarousel';
+import CanvaTextModal from '@/components/chat/CanvaTextModal';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -130,6 +131,8 @@ export default function Home() {
   const [showDAModal, setShowDAModal] = useState(false);
   const [editingDA, setEditingDA] = useState(null);
   const [canvaMode, setCanvaMode] = useState(false);
+  const [showCanvaTextModal, setShowCanvaTextModal] = useState(false);
+  const [canvaTexts, setCanvaTexts] = useState([]);
 
 
   const messagesEndRef = useRef(null);
@@ -898,34 +901,51 @@ export default function Home() {
 
         if (canvaMode || activeCategory?.id === 'pub_ads') {
           try {
-            console.log(canvaMode ? '🎨 Mode Canva activé - Détection OCR des textes...' : '🎨 Génération automatique de calques publicitaires...');
             const [width, height] = dimensions.split('x').map(Number);
 
-            const layerPrompt = canvaMode 
-              ? `Based on this request: "${userMessage}", create text layers that should appear on this image.
+            // MODE CANVA: Utiliser les textes prédéfinis par l'utilisateur
+            if (canvaMode && canvaTexts.length > 0) {
+              console.log('🎨 Mode Canva - Création des calques à partir des textes utilisateur:', canvaTexts);
 
-              Create 2-4 text elements that are relevant to the user's request.
-              
-              INSTRUCTIONS:
-              - Extract key information from the user request
-              - Create SHORT, impactful texts (2-8 words max per text)
-              - Position them strategically on canvas ${width}x${height}px
-              - Use appropriate font sizes (30-90px based on importance)
-              - Choose colors that contrast well with the image
-              - NO background color (set backgroundColor to "transparent")
-              - Font: Arial
-              - Set textAlign to "left"
-              
-              Example for "social media post for coffee shop":
-              - "FRESH COFFEE" at top
-              - "Daily from 7am" in middle
-              - "Visit us today!" at bottom`
-              : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}".`;
+              // Créer les calques directement à partir des textes de l'utilisateur
+              editorLayers = canvaTexts.map((text, idx) => {
+                // Position répartie verticalement
+                const spacing = height / (canvaTexts.length + 1);
+                const y = spacing * (idx + 1);
+                const x = width / 2 - 100; // Centré approximativement
 
-            const layersResult = await base44.integrations.Core.InvokeLLM({
-              prompt: canvaMode ? layerPrompt : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
+                return {
+                  id: `layer-${Date.now()}-${idx}`,
+                  type: 'text',
+                  text: text,
+                  x: Math.max(80, Math.min(x, width - 250)),
+                  y: Math.max(80, Math.min(y, height - 80)),
+                  fontSize: idx === 0 ? 72 : 48, // Premier texte plus grand
+                  fontFamily: 'Arial',
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  backgroundColor: 'transparent',
+                  padding: 0,
+                  borderRadius: 0,
+                  opacity: 100,
+                  visible: true,
+                  align: 'left',
+                  bold: true,
+                  italic: false,
+                  shadow: false,
+                  stroke: false
+                };
+              });
 
-              CRITICAL TEXT GUIDELINES:
+              console.log('✅ Calques Canva créés:', editorLayers);
+            } else {
+              // MODE PUB_ADS: Génération automatique via LLM
+              console.log('🎨 Génération automatique de calques publicitaires...');
+
+              const layersResult = await base44.integrations.Core.InvokeLLM({
+                prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
+
+                CRITICAL TEXT GUIDELINES:
               - Keep texts SHORT (2-6 words max per text)
               - Headline: 2-4 words, bold and catchy
               - Subtext: 3-6 words, descriptive
@@ -973,13 +993,11 @@ export default function Home() {
                 }
               },
               file_urls: [result.url]
-            });
+              });
 
-            if (layersResult.layers && layersResult.layers.length > 0) {
+              if (layersResult.layers && layersResult.layers.length > 0) {
               // Create editor layers with proper structure
               editorLayers = layersResult.layers.map((layer, idx) => {
-                // Mode Canva: textes sans background, mode Pub: textes avec background
-                const isCanvaMode = canvaMode;
                 return {
                   id: `layer-${Date.now()}-${idx}`,
                   type: 'text',
@@ -990,9 +1008,9 @@ export default function Home() {
                   fontFamily: layer.fontFamily || 'Arial',
                   fontWeight: layer.fontWeight || 700,
                   color: layer.color || '#ffffff',
-                  backgroundColor: isCanvaMode ? 'transparent' : (layer.backgroundColor || 'rgba(255,20,147,0.9)'),
-                  padding: isCanvaMode ? 0 : Math.max(layer.padding || 28, 25),
-                  borderRadius: isCanvaMode ? 0 : Math.max(layer.borderRadius || 18, 12),
+                  backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
+                  padding: Math.max(layer.padding || 28, 25),
+                  borderRadius: Math.max(layer.borderRadius || 18, 12),
                   opacity: 100,
                   visible: true,
                   align: layer.textAlign || 'left',
@@ -1000,14 +1018,14 @@ export default function Home() {
                   italic: false,
                   shadow: false,
                   stroke: false
-                };
-              });
-              console.log('✅ Calques générés:', editorLayers);
-              console.log('🎨 Mode Canva actif:', canvaMode);
+                  };
+                  });
+                  console.log('✅ Calques générés:', editorLayers);
+                  }
+                  }
 
-              // En mode Canva, on garde l'image propre SANS composer les textes dessus
-              // Les textes restent en calques séparés pour être éditables
-              if (!canvaMode) {
+                  // Composition de l'image avec textes (uniquement pub_ads)
+                  if (!canvaMode && editorLayers.length > 0) {
                 // Compose image with text layers using canvas (pour pub_ads seulement)
                 console.log('🖼️ Composition de l\'image avec les textes (mode Pub)...');
                 const canvas = document.createElement('canvas');
@@ -1138,16 +1156,15 @@ export default function Home() {
                   console.error('❌ Pas d\'URL retournée par l\'upload');
                   throw new Error('Upload failed - no URL returned');
                 }
-              } else {
-                console.log('✅ Mode Canva: image propre sans texte + calques séparés');
+                } else {
+                  console.log('✅ Mode Canva: image propre sans texte + calques séparés');
+                }
+              } catch (e) {
+                console.error('❌ Échec génération calques:', e);
+                // En cas d'erreur, on garde l'image originale
+                compositeImageUrl = result.url;
               }
             }
-          } catch (e) {
-            console.error('❌ Échec génération calques:', e);
-            // En cas d'erreur, on garde l'image originale et les calques
-            compositeImageUrl = result.url;
-          }
-        }
 
         const visualData = {
           user_email: user?.email || 'anonymous',
@@ -2439,7 +2456,14 @@ export default function Home() {
 
                 {/* Tag Canva */}
                 <button
-                  onClick={() => setCanvaMode(!canvaMode)}
+                  onClick={() => {
+                    if (canvaMode) {
+                      setCanvaMode(false);
+                      setCanvaTexts([]);
+                    } else {
+                      setShowCanvaTextModal(true);
+                    }
+                  }}
                   className={cn(
                     "px-2 py-1 rounded-full text-[11px] font-medium transition-all border flex items-center gap-1",
                     canvaMode
@@ -2450,7 +2474,7 @@ export default function Home() {
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                  Canva
+                  Canva {canvaTexts.length > 0 && `(${canvaTexts.length})`}
                 </button>
 
                 {/* Tag DA (Directeur Artistique) */}
@@ -2967,6 +2991,16 @@ export default function Home() {
           </p>
         </DialogContent>
       </Dialog>
+
+      {/* Canva Text Modal */}
+      <CanvaTextModal
+        isOpen={showCanvaTextModal}
+        onClose={() => setShowCanvaTextModal(false)}
+        onConfirm={(texts) => {
+          setCanvaTexts(texts);
+          setCanvaMode(true);
+        }}
+      />
       </div>
       );
       }
