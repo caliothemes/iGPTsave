@@ -725,7 +725,9 @@ export default function Home() {
         }
 
         // Enrichir avec le DA si sélectionné
+        let daApplied = false;
         if (selectedDA) {
+          daApplied = true;
           let daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
 
           // Analyser le site web si présent
@@ -825,6 +827,81 @@ export default function Home() {
             extractedColors = colorResult.colors;
           } catch (e) {
             console.error('Color extraction failed:', e);
+          }
+        }
+
+        // Si DA appliqué, extraire les textes de l'image pour les rendre éditables
+        if (daApplied && !canvaMode) {
+          try {
+            setMessages(prev => [
+              ...prev.slice(0, -1),
+              { role: 'assistant', content: language === 'fr' ? '📝 Extraction des textes...' : '📝 Extracting texts...', isStreaming: true }
+            ]);
+
+            const textExtraction = await base44.integrations.Core.InvokeLLM({
+              prompt: `Analyze this image and detect ALL text elements visible in the image.
+
+              For each text found:
+              - Extract the exact text content
+              - Estimate its position (x, y coordinates on ${width}x${height} canvas)
+              - Estimate font size (in pixels)
+              - Detect text color (as hex)
+              - Detect if there's a background color (hex or "transparent")
+              - Determine alignment (left, center, right)
+              - Estimate font weight (400-900)
+
+              Return ONLY texts that are clearly visible and readable.
+              Return empty array if no text detected.`,
+              response_json_schema: {
+                type: "object",
+                properties: {
+                  layers: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: { type: "string" },
+                        x: { type: "number" },
+                        y: { type: "number" },
+                        fontSize: { type: "number" },
+                        color: { type: "string" },
+                        backgroundColor: { type: "string" },
+                        align: { type: "string" },
+                        fontWeight: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              },
+              file_urls: [result.url]
+            });
+
+            if (textExtraction.layers && textExtraction.layers.length > 0) {
+              editorLayers = textExtraction.layers.map((layer, idx) => ({
+                id: `layer-${Date.now()}-${idx}`,
+                type: 'text',
+                text: layer.text,
+                x: Math.max(50, Math.min(layer.x, width - 50)),
+                y: Math.max(50, Math.min(layer.y, height - 50)),
+                fontSize: Math.max(layer.fontSize || 48, 20),
+                fontFamily: 'Arial',
+                fontWeight: layer.fontWeight || 700,
+                color: layer.color || '#ffffff',
+                backgroundColor: layer.backgroundColor || 'transparent',
+                padding: 20,
+                borderRadius: 12,
+                opacity: 100,
+                visible: true,
+                align: layer.align || 'center',
+                bold: true,
+                italic: false,
+                shadow: false,
+                stroke: false
+              }));
+              console.log('✅ Textes DA extraits:', editorLayers.length);
+            }
+          } catch (e) {
+            console.error('❌ Extraction textes DA échouée:', e);
           }
         }
 
