@@ -939,8 +939,8 @@ export default function Home() {
 
           console.log('✅ CALQUES CRÉÉS:', editorLayers);
         } else if (activeCategory?.id === 'pub_ads') {
+          console.log('🎨 Génération automatique de calques publicitaires...');
           try {
-              console.log('🎨 Génération automatique de calques publicitaires...');
 
               const layersResult = await base44.integrations.Core.InvokeLLM({
                 prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
@@ -995,33 +995,32 @@ export default function Home() {
                 file_urls: [result.url]
               });
 
-              if (layersResult.layers && layersResult.layers.length > 0) {
-                editorLayers = layersResult.layers.map((layer, idx) => ({
-                  id: `layer-${Date.now()}-${idx}`,
-                  type: 'text',
-                  text: layer.text || '',
-                  x: Math.max(80, Math.min(layer.x || 100, width - 250)),
-                  y: Math.max(80, Math.min(layer.y || 100, height - 150)),
-                  fontSize: layer.fontSize || 48,
-                  fontFamily: layer.fontFamily || 'Arial',
-                  fontWeight: layer.fontWeight || 700,
-                  color: layer.color || '#ffffff',
-                  backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
-                  padding: Math.max(layer.padding || 28, 25),
-                  borderRadius: Math.max(layer.borderRadius || 18, 12),
-                  opacity: 100,
-                  visible: true,
-                  align: layer.textAlign || 'left',
-                  bold: true,
-                  italic: false,
-                  shadow: false,
-                  stroke: false
-                }));
-                console.log('✅ Calques générés:', editorLayers);
-              }
+            if (layersResult.layers && layersResult.layers.length > 0) {
+              editorLayers = layersResult.layers.map((layer, idx) => ({
+                id: `layer-${Date.now()}-${idx}`,
+                type: 'text',
+                text: layer.text || '',
+                x: Math.max(80, Math.min(layer.x || 100, width - 250)),
+                y: Math.max(80, Math.min(layer.y || 100, height - 150)),
+                fontSize: layer.fontSize || 48,
+                fontFamily: layer.fontFamily || 'Arial',
+                fontWeight: layer.fontWeight || 700,
+                color: layer.color || '#ffffff',
+                backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
+                padding: Math.max(layer.padding || 28, 25),
+                borderRadius: Math.max(layer.borderRadius || 18, 12),
+                opacity: 100,
+                visible: true,
+                align: layer.textAlign || 'left',
+                bold: true,
+                italic: false,
+                shadow: false,
+                stroke: false
+              }));
+              console.log('✅ Calques PUB créés:', editorLayers);
             }
           } catch (e) {
-            console.error('❌ Échec création calques:', e);
+            console.error('❌ Échec calques pub:', e);
           }
 
           // Composition de l'image avec textes
