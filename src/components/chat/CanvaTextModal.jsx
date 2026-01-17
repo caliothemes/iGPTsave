@@ -9,6 +9,15 @@ export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, c
   const { language } = useLanguage();
   const [texts, setTexts] = useState(['']);
 
+  // Initialize with current texts when modal opens
+  useEffect(() => {
+    if (isOpen && currentTexts.length > 0) {
+      setTexts(currentTexts);
+    } else if (isOpen && currentTexts.length === 0) {
+      setTexts(['']);
+    }
+  }, [isOpen, currentTexts]);
+
   const addTextLine = () => {
     setTexts([...texts, '']);
   };
@@ -83,12 +92,26 @@ export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, c
         </div>
 
         <div className="flex gap-3 mt-6">
+          {isActive && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                onCancel?.();
+                setTexts(['']);
+                onClose();
+              }}
+              className="flex-1 bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
+            >
+              {language === 'fr' ? 'Désactiver' : 'Disable'}
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={onClose}
             className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20"
           >
-            {language === 'fr' ? 'Annuler' : 'Cancel'}
+            {language === 'fr' ? 'Fermer' : 'Close'}
           </Button>
           <Button
             onClick={handleConfirm}
