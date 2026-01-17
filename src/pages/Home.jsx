@@ -883,13 +883,12 @@ export default function Home() {
           }
         }
 
-        // Generate editor layers automatically for pub_ads category
+        // Generate editor layers automatically for all categories
         let editorLayers = [];
         let compositeImageUrl = result.url;
 
-        if (activeCategory?.id === 'pub_ads') {
-          try {
-            console.log('🎨 Génération automatique de calques publicitaires...');
+        try {
+          console.log('🎨 Génération automatique de calques de texte...');
             const [width, height] = dimensions.split('x').map(Number);
 
             const layersResult = await base44.integrations.Core.InvokeLLM({
