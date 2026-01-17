@@ -901,19 +901,16 @@ export default function Home() {
 
         if (canvaMode || activeCategory?.id === 'pub_ads') {
           const [width, height] = dimensions.split('x').map(Number);
-          
-          try {
 
+          try {
             // MODE CANVA: Utiliser les textes prédéfinis par l'utilisateur
             if (canvaMode && canvaTexts.length > 0) {
               console.log('🎨 Mode Canva - Création des calques à partir des textes utilisateur:', canvaTexts);
 
-              // Créer les calques directement à partir des textes de l'utilisateur
               editorLayers = canvaTexts.map((text, idx) => {
-                // Position répartie verticalement
                 const spacing = height / (canvaTexts.length + 1);
                 const y = spacing * (idx + 1);
-                const x = width / 2 - 100; // Centré approximativement
+                const x = width / 2 - 100;
 
                 return {
                   id: `layer-${Date.now()}-${idx}`,
@@ -921,7 +918,7 @@ export default function Home() {
                   text: text,
                   x: Math.max(80, Math.min(x, width - 250)),
                   y: Math.max(80, Math.min(y, height - 80)),
-                  fontSize: idx === 0 ? 72 : 48, // Premier texte plus grand
+                  fontSize: idx === 0 ? 72 : 48,
                   fontFamily: 'Arial',
                   fontWeight: 700,
                   color: '#ffffff',
@@ -940,66 +937,63 @@ export default function Home() {
 
               console.log('✅ Calques Canva créés:', editorLayers);
             } else if (activeCategory?.id === 'pub_ads') {
-              // MODE PUB_ADS: Génération automatique via LLM
               console.log('🎨 Génération automatique de calques publicitaires...');
 
               const layersResult = await base44.integrations.Core.InvokeLLM({
                 prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
 
                 CRITICAL TEXT GUIDELINES:
-              - Keep texts SHORT (2-6 words max per text)
-              - Headline: 2-4 words, bold and catchy
-              - Subtext: 3-6 words, descriptive
-              - CTA: 1-3 words (ex: "BUY NOW", "DISCOVER", "ORDER TODAY")
+                - Keep texts SHORT (2-6 words max per text)
+                - Headline: 2-4 words, bold and catchy
+                - Subtext: 3-6 words, descriptive
+                - CTA: 1-3 words (ex: "BUY NOW", "DISCOVER", "ORDER TODAY")
 
-              DESIGN & COLOR:
-              - Extract 1-2 dominant vibrant colors from the image
-              - Use BOLD, eye-catching semi-transparent backgrounds (rgba with 0.88-0.95 opacity)
-              - Colors: hot pink, electric blue, deep purple, neon orange, vivid red
-              - Large padding: 28-35px for impact
-              - Border radius: 16-22px for modern look
+                DESIGN & COLOR:
+                - Extract 1-2 dominant vibrant colors from the image
+                - Use BOLD, eye-catching semi-transparent backgrounds (rgba with 0.88-0.95 opacity)
+                - Colors: hot pink, electric blue, deep purple, neon orange, vivid red
+                - Large padding: 28-35px for impact
+                - Border radius: 16-22px for modern look
 
-              POSITIONING (Canvas ${width}x${height}px):
-              - Spread texts across different areas (top, middle, bottom)
-              - Leave 80px+ margin from edges
-              - Don't cluster texts together
+                POSITIONING (Canvas ${width}x${height}px):
+                - Spread texts across different areas (top, middle, bottom)
+                - Leave 80px+ margin from edges
+                - Don't cluster texts together
 
-              FONTS & SIZES:
-              - Headline: 56-72px, bold (700-900 weight), Arial or Montserrat
-              - Subtext: 38-48px, medium-bold (600-700), Arial
-              - CTA: 42-52px, extra-bold (800-900), Arial
-              - ALWAYS use textAlign: 'left' (never center or right)`,
-              response_json_schema: {
-                type: "object",
-                properties: {
-                  layers: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        type: { type: "string" },
-                        text: { type: "string" },
-                        x: { type: "number" },
-                        y: { type: "number" },
-                        fontSize: { type: "number" },
-                        fontFamily: { type: "string" },
-                        fontWeight: { type: "number" },
-                        color: { type: "string" },
-                        backgroundColor: { type: "string" },
-                        padding: { type: "number" },
-                        borderRadius: { type: "number" }
+                FONTS & SIZES:
+                - Headline: 56-72px, bold (700-900 weight), Arial or Montserrat
+                - Subtext: 38-48px, medium-bold (600-700), Arial
+                - CTA: 42-52px, extra-bold (800-900), Arial
+                - ALWAYS use textAlign: 'left' (never center or right)`,
+                response_json_schema: {
+                  type: "object",
+                  properties: {
+                    layers: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          type: { type: "string" },
+                          text: { type: "string" },
+                          x: { type: "number" },
+                          y: { type: "number" },
+                          fontSize: { type: "number" },
+                          fontFamily: { type: "string" },
+                          fontWeight: { type: "number" },
+                          color: { type: "string" },
+                          backgroundColor: { type: "string" },
+                          padding: { type: "number" },
+                          borderRadius: { type: "number" }
+                        }
                       }
                     }
                   }
-                }
-              },
-              file_urls: [result.url]
+                },
+                file_urls: [result.url]
               });
 
               if (layersResult.layers && layersResult.layers.length > 0) {
-              // Create editor layers with proper structure
-              editorLayers = layersResult.layers.map((layer, idx) => {
-                return {
+                editorLayers = layersResult.layers.map((layer, idx) => ({
                   id: `layer-${Date.now()}-${idx}`,
                   type: 'text',
                   text: layer.text || '',
@@ -1019,74 +1013,88 @@ export default function Home() {
                   italic: false,
                   shadow: false,
                   stroke: false
-                };
-              });
-              console.log('✅ Calques générés:', editorLayers);
+                }));
+                console.log('✅ Calques générés:', editorLayers);
               }
-              }
-              } catch (e) {
-              console.error('❌ Échec création calques:', e);
-              }
+            }
+          } catch (e) {
+            console.error('❌ Échec création calques:', e);
+          }
 
-              // Composition de l'image avec textes
-              if (editorLayers.length > 0) {
-              try {
-              // Compose image with text layers using canvas
-              console.log('🖼️ Composition de l\'image avec les textes...');
+          // Composition de l'image avec textes
+          if (editorLayers.length > 0) {
+            try {
               const canvas = document.createElement('canvas');
               canvas.width = width;
               canvas.height = height;
               const ctx = canvas.getContext('2d');
 
-              // Generate editor layers automatically for pub_ads category OR canva mode
-              let editorLayers = [];
-              let compositeImageUrl = result.url;
+              const bgImage = new Image();
+              bgImage.crossOrigin = 'anonymous';
+              await new Promise((resolve, reject) => {
+                bgImage.onload = resolve;
+                bgImage.onerror = reject;
+                bgImage.src = result.url;
+              });
 
-              if (canvaMode || activeCategory?.id === 'pub_ads') {
-                try {
-                  const [width, height] = dimensions.split('x').map(Number);
+              ctx.drawImage(bgImage, 0, 0, width, height);
 
-                  // MODE CANVA: Utiliser les textes prédéfinis par l'utilisateur
-                  if (canvaMode && canvaTexts.length > 0) {
-                    console.log('🎨 Mode Canva - Création des calques à partir des textes utilisateur:', canvaTexts);
+              editorLayers.forEach((layer) => {
+                if (layer.type === 'text' && layer.text) {
+                  ctx.save();
+                  const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
+                  const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+                  ctx.font = fontStyle;
+                  ctx.fillStyle = layer.color;
+                  ctx.textAlign = layer.align || 'left';
 
-                    // Créer les calques directement à partir des textes de l'utilisateur
-                    editorLayers = canvaTexts.map((text, idx) => {
-                      // Position répartie verticalement
-                      const spacing = height / (canvaTexts.length + 1);
-                      const y = spacing * (idx + 1);
-                      const x = width / 2 - 100; // Centré approximativement
+                  const metrics = ctx.measureText(layer.text);
+                  const textWidth = metrics.width;
 
-                      return {
-                        id: `layer-${Date.now()}-${idx}`,
-                        type: 'text',
-                        text: text,
-                        x: Math.max(80, Math.min(x, width - 250)),
-                        y: Math.max(80, Math.min(y, height - 80)),
-                        fontSize: idx === 0 ? 72 : 48, // Premier texte plus grand
-                        fontFamily: 'Arial',
-                        fontWeight: 700,
-                        color: '#ffffff',
-                        backgroundColor: 'transparent',
-                        padding: 0,
-                        borderRadius: 0,
-                        opacity: 100,
-                        visible: true,
-                        align: 'left',
-                        bold: true,
-                        italic: false,
-                        shadow: false,
-                        stroke: false
-                      };
-                    });
+                  if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+                    const padding = layer.padding || 28;
+                    const borderRadius = layer.borderRadius || 18;
+                    const boxX = layer.x - padding;
+                    const boxY = layer.y - layer.fontSize * 0.85 - padding;
+                    const boxWidth = textWidth + padding * 2;
+                    const boxHeight = layer.fontSize * 1.15 + padding * 2;
 
-                    console.log('✅ Calques Canva créés:', editorLayers);
-                  } else {
-                    // MODE PUB_ADS: Génération automatique via LLM
-                    console.log('🎨 Génération automatique de calques publicitaires...');
+                    ctx.fillStyle = layer.backgroundColor;
+                    const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+                    ctx.beginPath();
+                    ctx.moveTo(boxX + radius, boxY);
+                    ctx.lineTo(boxX + boxWidth - radius, boxY);
+                    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+                    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+                    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+                    ctx.lineTo(boxX + radius, boxY + boxHeight);
+                    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+                    ctx.lineTo(boxX, boxY + radius);
+                    ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = layer.color;
+                  }
 
-                    const layersResult = await base44.integrations.Core.InvokeLLM({
-                      prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}".
+                  ctx.fillText(layer.text, layer.x, layer.y);
+                  ctx.restore();
+                }
+              });
+
+              const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+              if (blob) {
+                const file = new File([blob], 'composite.png', { type: 'image/png' });
+                const uploadResult = await base44.integrations.Core.UploadFile({ file });
+                if (uploadResult?.file_url) {
+                  compositeImageUrl = uploadResult.file_url;
+                  console.log('✅ Image composite créée');
+                }
+              }
+            } catch (e) {
+              console.error('❌ Échec composition:', e);
+            }
+          }
+        }
 
         const visualData = {
           user_email: user?.email || 'anonymous',
