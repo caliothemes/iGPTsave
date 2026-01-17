@@ -1103,15 +1103,11 @@ export default function Home() {
             } else {
               console.log('ℹ️ Aucun texte détecté dans l\'image');
             }
-            } catch (e) {
+          } catch (e) {
             console.error('❌ Échec génération calques:', e);
             // En cas d'erreur, on garde l'image originale sans calques
             compositeImageUrl = result.url;
-            }
-            } catch (outerError) {
-            console.error('❌ Erreur génération calques:', outerError);
-            compositeImageUrl = result.url;
-            }
+          }
 
         const visualData = {
           user_email: user?.email || 'anonymous',
