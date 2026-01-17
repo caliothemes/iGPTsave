@@ -806,6 +806,8 @@ export default function Home() {
 
         // Traitement commun pour les deux cas (avec ou sans images attachées)
         if (result.url) {
+        let finalImageUrl = result.url;
+        
         // Extract color palette from generated image
         let extractedColors = selectedPalette?.colors;
         if (!extractedColors) {
