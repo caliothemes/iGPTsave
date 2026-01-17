@@ -899,6 +899,8 @@ export default function Home() {
         let editorLayers = [];
         let compositeImageUrl = result.url;
 
+        console.log('🔍 DEBUG Canva - canvaMode:', canvaMode, 'canvaTexts:', canvaTexts, 'length:', canvaTexts?.length);
+
         if (canvaMode || activeCategory?.id === 'pub_ads') {
           const [width, height] = dimensions.split('x').map(Number);
 
@@ -941,7 +943,7 @@ export default function Home() {
                 };
               });
 
-              console.log('✅ Calques Canva créés:', editorLayers);
+              console.log('✅ Calques Canva créés:', editorLayers.length, editorLayers);
             } else if (activeCategory?.id === 'pub_ads') {
               console.log('🎨 Génération automatique de calques publicitaires...');
 
@@ -1028,7 +1030,9 @@ export default function Home() {
           }
 
           // Composition de l'image avec textes
+          console.log('🔍 DEBUG - Avant composition, editorLayers.length:', editorLayers.length);
           if (editorLayers.length > 0) {
+            console.log('✅ Début composition avec', editorLayers.length, 'calques');
             try {
               const canvas = document.createElement('canvas');
               canvas.width = width;
@@ -1093,11 +1097,13 @@ export default function Home() {
                 const uploadResult = await base44.integrations.Core.UploadFile({ file });
                 if (uploadResult?.file_url) {
                   compositeImageUrl = uploadResult.file_url;
-                  console.log('✅ Image composite créée');
+                  console.log('✅ Image composite créée avec URL:', compositeImageUrl);
+                  console.log('✅ Layers sauvegardés:', editorLayers.length);
                 }
               }
             } catch (e) {
               console.error('❌ Échec composition:', e);
+              console.error('❌ Stack:', e.stack);
             }
           }
         }
@@ -1125,7 +1131,9 @@ export default function Home() {
         console.log('📦 Visual data to save:', {
           ...visualData,
           editor_layers_count: editorLayers.length,
-          canva_mode: canvaMode
+          canva_mode: canvaMode,
+          has_layers: editorLayers.length > 0,
+          layers_preview: editorLayers.map(l => ({ type: l.type, text: l.text, visible: l.visible }))
         });
 
         let savedVisual = visualData;
