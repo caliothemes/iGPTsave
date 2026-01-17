@@ -769,6 +769,9 @@ export default function Home() {
         
         console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
+        // Générer l'image
+        let result;
+        
         // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
         if (currentAttachedImages.length > 0) {
           try {
@@ -777,16 +780,9 @@ export default function Home() {
               { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
             ]);
 
-            // Utiliser InvokeLLM avec les images attachées pour générer directement
             const compositionPrompt = `Create this design: ${userMessage}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${promptToUse}`;
 
-            console.log('🎨 Generating with InvokeLLM:', {
-              additionalImagesCount: currentAttachedImages.length,
-              additionalImages: currentAttachedImages,
-              prompt: compositionPrompt
-            });
-
-            const result = await base44.integrations.Core.GenerateImage({
+            result = await base44.integrations.Core.GenerateImage({
               prompt: compositionPrompt,
               existing_image_urls: currentAttachedImages
             });
@@ -795,88 +791,20 @@ export default function Home() {
               throw new Error(language === 'fr' ? 'Erreur lors de la génération' : 'Generation error');
             }
 
-            console.log('✅ Composition created:', result.url);
+            console.log('✅ Image créée avec images attachées:', result.url);
 
-            // Extraction couleurs
-            let extractedColors = selectedPalette?.colors;
-            if (!extractedColors) {
-              try {
-                const colorResult = await base44.integrations.Core.InvokeLLM({
-                  prompt: 'Extract the 5 most dominant colors from this image as HEX codes. Return only an array of hex codes.',
-                  response_json_schema: {
-                    type: "object",
-                    properties: {
-                      colors: { type: "array", items: { type: "string" } }
-                    }
-                  },
-                  file_urls: [result.url]
-                });
-                extractedColors = colorResult.colors;
-              } catch (e) {
-                console.error('Color extraction failed:', e);
-              }
-            }
-
-            const visualData = {
-              user_email: user?.email || 'anonymous',
-              conversation_id: activeConversation?.id,
-              image_url: result.url,
-              original_image_url: result.url,
-              title: userMessage.slice(0, 50),
-              original_prompt: userMessage,
-              image_prompt: compositionPrompt,
-              dimensions: dimensions,
-              visual_type: activeCategory?.id,
-              format_name: selectedFormat?.name || null,
-              category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
-              style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
-              color_palette: extractedColors
-            };
-
-            let savedVisual = visualData;
-            if (user) {
-              savedVisual = await base44.entities.Visual.create(visualData);
-              setSessionVisuals(prev => [savedVisual, ...prev]);
-            }
-
-            setCurrentVisual(savedVisual);
-            setVisualsHistory(prev => [...prev, savedVisual]);
-
-            const successMessage = `✨ ${language === 'fr' ? 'Visuel créé avec vos images !' : 'Visual created with your images!'}`;
-
-            setMessages(prev => [
-              ...prev.slice(0, -1),
-              { role: 'assistant', content: successMessage },
-              { role: 'assistant', content: '', visual: savedVisual }
-            ]);
-
-            if (activeConversation && user) {
-              try {
-                const updatedMessages = [
-                  ...(activeConversation.messages || []),
-                  { role: 'user', content: userMessage },
-                  { role: 'assistant', content: successMessage }
-                ];
-                await base44.entities.Conversation.update(activeConversation.id, {
-                  messages: updatedMessages,
-                  title: activeConversation.title || userMessage.slice(0, 50),
-                  visual_id: savedVisual.id
-                });
-                setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
-              } catch (e) {
-                console.error('Failed to update conversation:', e);
-              }
-            }
           } catch (compError) {
             console.error('❌ Composition error:', compError);
             throw compError;
           }
         } else {
-        // CAS NORMAL: Génération simple
-        const result = await base44.integrations.Core.GenerateImage({
-          prompt: promptToUse
-        });
+          // CAS NORMAL: Génération simple
+          result = await base44.integrations.Core.GenerateImage({
+            prompt: promptToUse
+          });
+        }
 
+        // Traitement commun pour les deux cas (avec ou sans images attachées)
         if (result.url) {
         // Extract color palette from generated image
         let extractedColors = selectedPalette?.colors;
@@ -1122,13 +1050,7 @@ export default function Home() {
           art_director_name: selectedDA ? selectedDA.name : null
         };
 
-        console.log('📦 Visual data to save:', {
-          ...visualData,
-          editor_layers_count: editorLayers.length,
-          canva_mode: canvaMode,
-          has_layers: editorLayers.length > 0,
-          layers_preview: editorLayers.map(l => ({ type: l.type, text: l.text, visible: l.visible }))
-        });
+        console.log('📦 SAVE - Layers:', editorLayers.length, 'Canva:', canvaMode, 'Layers:', editorLayers);
 
         let savedVisual = visualData;
         if (user) {
@@ -1170,9 +1092,8 @@ export default function Home() {
             console.error('Failed to update conversation:', e);
           }
         }
-      }
-      }
-    } catch (error) {
+        }
+        } catch (error) {
       console.error(error);
       const errorMsg = t('error');
       setMessages(prev => {
