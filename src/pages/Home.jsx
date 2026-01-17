@@ -932,8 +932,8 @@ export default function Home() {
 
         console.log('📊 LAYERS FINAL:', editorLayers);
 
-        // Composer l'image avec les textes pour affichage (uniquement pour pub_ads, pas Canva)
-        if (editorLayers.length > 0 && activeCategory?.id === 'pub_ads') {
+        // Composer l'image avec les textes pour affichage
+        if (editorLayers.length > 0) {
           console.log('🎨 Composition:', editorLayers.length, 'layers');
           try {
             const canvas = document.createElement('canvas');
