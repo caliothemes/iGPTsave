@@ -1024,10 +1024,10 @@ export default function Home() {
                   }
                   }
 
-                  // Composition de l'image avec textes (uniquement pub_ads)
-                  if (!canvaMode && editorLayers.length > 0) {
-                // Compose image with text layers using canvas (pour pub_ads seulement)
-                console.log('🖼️ Composition de l\'image avec les textes (mode Pub)...');
+                  // Composition de l'image avec textes
+                  if (editorLayers.length > 0) {
+                // Compose image with text layers using canvas
+                console.log('🖼️ Composition de l\'image avec les textes...');
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
@@ -1082,7 +1082,7 @@ export default function Home() {
                   const metrics = ctx.measureText(layer.text);
                   const textWidth = metrics.width;
 
-                  // Draw background box EXACTLY like VisualEditor - with padding around text
+                  // Draw background box - only for pub_ads mode, Canva has transparent background
                   if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
                     const padding = layer.padding || 28;
                     const borderRadius = layer.borderRadius || 18;
@@ -1155,10 +1155,8 @@ export default function Home() {
                 } else {
                   console.error('❌ Pas d\'URL retournée par l\'upload');
                   throw new Error('Upload failed - no URL returned');
-                }
-                } else {
-                  console.log('✅ Mode Canva: image propre sans texte + calques séparés');
-                }
+                  }
+                  console.log('✅ Image composite créée avec calques éditables');
               } catch (e) {
                 console.error('❌ Échec génération calques:', e);
                 // En cas d'erreur, on garde l'image originale
