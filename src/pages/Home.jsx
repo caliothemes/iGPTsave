@@ -533,7 +533,8 @@ export default function Home() {
       role: 'user', 
       content: displayMessage,
       attachedImages: attachedImages.length > 0 ? [...attachedImages] : undefined,
-      artDirector: selectedDA ? selectedDA.name : null
+      artDirector: selectedDA ? selectedDA.name : null,
+      canvaMode: canvaMode
     }]);
     
     // Clear attached images immediately after sending
@@ -888,25 +889,27 @@ export default function Home() {
         let editorLayers = [];
         let compositeImageUrl = result.url;
 
-        if (activeCategory?.id === 'pub_ads' || canvaMode) {
+        if (canvaMode || activeCategory?.id === 'pub_ads') {
           try {
             console.log(canvaMode ? '🎨 Mode Canva activé - Détection OCR des textes...' : '🎨 Génération automatique de calques publicitaires...');
             const [width, height] = dimensions.split('x').map(Number);
 
             const ocrPrompt = canvaMode 
-              ? `Analyze this image and detect ALL text elements present in it. Extract each text as a separate layer with its exact position, size, and styling. If NO text is visible in the image, return an empty layers array.
+              ? `Analyze this image and detect ALL text elements present in it. Extract each text as a separate layer with its exact position, size, and styling.
 
-              CRITICAL: Only extract text that is VISIBLE in the image. Do not create new text.
+              CRITICAL INSTRUCTIONS:
+              - ONLY extract text that is ACTUALLY VISIBLE in the image
+              - Do NOT invent or create new text
+              - If NO text is visible, return an empty layers array
+              - Extract EXACT text content as it appears
+              - Estimate font size from visual appearance (range: 24-120px)
+              - Determine accurate position (x, y coordinates on canvas ${width}x${height}px)
+              - Detect text color (as hex code)
+              - NO background color (set backgroundColor to "transparent")
+              - Font: Arial or Helvetica
+              - Set textAlign to "left"
               
-              For each detected text:
-              - Extract the EXACT text content
-              - Estimate font size from visual appearance (typical range: 24-72px)
-              - Determine position (x, y coordinates on canvas ${width}x${height}px)
-              - Detect text color (as hex)
-              - Add semi-transparent background matching the image style
-              - Font: Clean sans-serif (Arial, Helvetica)
-              
-              Return empty array if no text is found in the image.`
+              Return {"layers": []} if no text is found in the image.`
               : `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}".`;
 
             const layersResult = await base44.integrations.Core.InvokeLLM({
@@ -964,27 +967,31 @@ export default function Home() {
 
             if (layersResult.layers && layersResult.layers.length > 0) {
               // Create editor layers with proper structure
-              editorLayers = layersResult.layers.map((layer, idx) => ({
-                id: `layer-${Date.now()}-${idx}`,
-                type: 'text',
-                text: layer.text || '',
-                x: Math.max(80, Math.min(layer.x || 100, width - 250)),
-                y: Math.max(80, Math.min(layer.y || 100, height - 150)),
-                fontSize: layer.fontSize || 48,
-                fontFamily: layer.fontFamily || 'Arial',
-                fontWeight: layer.fontWeight || 700,
-                color: layer.color || '#ffffff',
-                backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
-                padding: Math.max(layer.padding || 28, 25),
-                borderRadius: Math.max(layer.borderRadius || 18, 12),
-                opacity: 100,
-                visible: true,
-                align: 'left',
-                bold: true,
-                italic: false,
-                shadow: false,
-                stroke: false
-              }));
+              editorLayers = layersResult.layers.map((layer, idx) => {
+                // Mode Canva: textes sans background, mode Pub: textes avec background
+                const isCanvaMode = canvaMode;
+                return {
+                  id: `layer-${Date.now()}-${idx}`,
+                  type: 'text',
+                  text: layer.text || '',
+                  x: Math.max(80, Math.min(layer.x || 100, width - 250)),
+                  y: Math.max(80, Math.min(layer.y || 100, height - 150)),
+                  fontSize: layer.fontSize || 48,
+                  fontFamily: layer.fontFamily || 'Arial',
+                  fontWeight: layer.fontWeight || 700,
+                  color: layer.color || '#ffffff',
+                  backgroundColor: isCanvaMode ? 'transparent' : (layer.backgroundColor || 'rgba(255,20,147,0.9)'),
+                  padding: isCanvaMode ? 0 : Math.max(layer.padding || 28, 25),
+                  borderRadius: isCanvaMode ? 0 : Math.max(layer.borderRadius || 18, 12),
+                  opacity: 100,
+                  visible: true,
+                  align: layer.textAlign || 'left',
+                  bold: true,
+                  italic: false,
+                  shadow: false,
+                  stroke: false
+                };
+              });
               console.log('✅ Calques générés:', editorLayers);
 
               // Compose image with text layers using canvas

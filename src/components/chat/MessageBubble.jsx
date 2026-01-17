@@ -136,13 +136,23 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
                 </div>
               )}
 
-              {/* Art Director Tag - sous la bulle pour user */}
-              {isUser && message.artDirector && (
-                <div className="mt-2">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-600/20 border border-blue-500/30 text-blue-300">
-                    <Users className="w-3.5 h-3.5" />
-                    <span>DA: {message.artDirector}</span>
-                  </div>
+              {/* Tags sous la bulle pour user */}
+              {isUser && (message.artDirector || message.canvaMode) && (
+                <div className="mt-2 flex items-center gap-2">
+                  {message.artDirector && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-600/20 border border-blue-500/30 text-blue-300">
+                      <Users className="w-3.5 h-3.5" />
+                      <span>DA: {message.artDirector}</span>
+                    </div>
+                  )}
+                  {message.canvaMode && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-pink-600/20 border border-pink-500/30 text-pink-300">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      <span>Canva</span>
+                    </div>
+                  )}
                 </div>
               )}
             </>
