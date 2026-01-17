@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
-import { X } from 'lucide-react';
+import { X, Users } from 'lucide-react';
 
 
 function TypingIndicator() {
@@ -140,9 +140,7 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
               {isUser && message.artDirector && (
                 <div className="mt-2">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-600/20 border border-blue-500/30 text-blue-300">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                    <Users className="w-3.5 h-3.5" />
                     <span>DA: {message.artDirector}</span>
                   </div>
                 </div>
