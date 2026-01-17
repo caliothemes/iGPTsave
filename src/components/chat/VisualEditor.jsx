@@ -386,6 +386,42 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 
                 setCanvasSize({ width: displayWidth, height: displayHeight });
                 
+                // Scale factor from original to display size
+                const scaleFactor = displayWidth / targetWidth;
+                console.log('🔍 Scale factor:', scaleFactor, 'Original:', targetWidth, 'Display:', displayWidth);
+                
+                // Scale all saved layers to match display size
+                const scaledLayers = visual.editor_layers.map(layer => {
+                  if (layer.type === 'text') {
+                    return {
+                      ...layer,
+                      x: layer.x * scaleFactor,
+                      y: layer.y * scaleFactor,
+                      fontSize: layer.fontSize * scaleFactor,
+                      maxWidth: layer.maxWidth ? layer.maxWidth * scaleFactor : 0,
+                      padding: layer.padding ? layer.padding * scaleFactor : 0,
+                      borderRadius: layer.borderRadius ? layer.borderRadius * scaleFactor : 0,
+                      strokeWidth: layer.strokeWidth ? layer.strokeWidth * scaleFactor : 2,
+                      shadowBlur: layer.shadowBlur ? layer.shadowBlur * scaleFactor : 6,
+                      shadowOffsetX: layer.shadowOffsetX ? layer.shadowOffsetX * scaleFactor : 3,
+                      shadowOffsetY: layer.shadowOffsetY ? layer.shadowOffsetY * scaleFactor : 3,
+                      glowSize: layer.glowSize ? layer.glowSize * scaleFactor : 10,
+                      haloSize: layer.haloSize ? layer.haloSize * scaleFactor : 15
+                    };
+                  } else if (layer.type === 'image' || layer.type === 'shape') {
+                    return {
+                      ...layer,
+                      x: layer.x * scaleFactor,
+                      y: layer.y * scaleFactor,
+                      width: layer.width * scaleFactor,
+                      height: layer.height * scaleFactor,
+                      borderRadius: layer.borderRadius ? layer.borderRadius * scaleFactor : 0,
+                      strokeWidth: layer.strokeWidth ? layer.strokeWidth * scaleFactor : 2
+                    };
+                  }
+                  return layer;
+                });
+                
                 if (!hasBaseImageLayer) {
                   // Add base image layer at the beginning
                   const img = imagesToLoad.get(baseUrl);
@@ -416,13 +452,11 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                     isBaseImage: true
                   };
                   
-                  // Add base layer at the start, then saved layers
-                  console.log('📦 Layers finaux:', [baseImageLayer, ...visual.editor_layers]);
-                  setLayers([baseImageLayer, ...visual.editor_layers]);
+                  console.log('📦 Layers finaux (scalés):', [baseImageLayer, ...scaledLayers]);
+                  setLayers([baseImageLayer, ...scaledLayers]);
                 } else {
-                  // Just use saved layers as-is
-                  console.log('📦 Utilisation des layers sauvegardés');
-                  setLayers(visual.editor_layers);
+                  console.log('📦 Utilisation des layers sauvegardés (scalés)');
+                  setLayers(scaledLayers);
                 }
                 
                 setImageLoaded(true);
@@ -2292,6 +2326,33 @@ Réponds en JSON avec:
 
         // Calculate scale factor from display size to original size
         const scaleToOriginal = originalWidth / canvasSize.width;
+        
+        // Scale layers back to original size for saving
+        const layersToSave = layers.map(layer => {
+          if (layer.type === 'text') {
+            return {
+              ...layer,
+              x: layer.x / (canvasSize.width / originalWidth),
+              y: layer.y / (canvasSize.width / originalWidth),
+              fontSize: layer.fontSize / (canvasSize.width / originalWidth),
+              maxWidth: layer.maxWidth ? layer.maxWidth / (canvasSize.width / originalWidth) : 0,
+              padding: layer.padding ? layer.padding / (canvasSize.width / originalWidth) : 0,
+              borderRadius: layer.borderRadius ? layer.borderRadius / (canvasSize.width / originalWidth) : 0,
+              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2
+            };
+          } else if (layer.type === 'image' || layer.type === 'shape') {
+            return {
+              ...layer,
+              x: layer.x / (canvasSize.width / originalWidth),
+              y: layer.y / (canvasSize.width / originalWidth),
+              width: layer.width / (canvasSize.width / originalWidth),
+              height: layer.height / (canvasSize.width / originalWidth),
+              borderRadius: layer.borderRadius ? layer.borderRadius / (canvasSize.width / originalWidth) : 0,
+              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2
+            };
+          }
+          return layer;
+        });
 
         // Create a canvas at ORIGINAL resolution
         const exportCanvas = document.createElement('canvas');
@@ -2834,14 +2895,14 @@ Réponds en JSON avec:
       if (visual.id) {
         await base44.entities.Visual.update(visual.id, {
           image_url: file_url,
-          original_image_url: originalImageUrl, // Keep original for re-editing
-          editor_layers: layers // Keep layers for re-editing
+          original_image_url: originalImageUrl,
+          editor_layers: layersToSave // Save layers at original size
         });
       }
       
       setSaving(false);
-      // Pass the new URL, layers, and original back so the parent can update immediately
-      onSave?.(file_url, layers, originalImageUrl);
+      // Pass the new URL, scaled back layers, and original back so the parent can update immediately
+      onSave?.(file_url, layersToSave, originalImageUrl);
     } catch (e) {
       console.error(e);
       setSaving(false);
