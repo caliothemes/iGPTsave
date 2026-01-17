@@ -895,13 +895,14 @@ export default function Home() {
           }
         }
 
-        // Generate editor layers automatically for pub_ads category OR canva mode
+        // Generate editor layers
         let editorLayers = [];
         let compositeImageUrl = result.url;
 
         if (canvaMode || activeCategory?.id === 'pub_ads') {
+          const [width, height] = dimensions.split('x').map(Number);
+          
           try {
-            const [width, height] = dimensions.split('x').map(Number);
 
             // MODE CANVA: Utiliser les textes prédéfinis par l'utilisateur
             if (canvaMode && canvaTexts.length > 0) {
@@ -938,7 +939,7 @@ export default function Home() {
               });
 
               console.log('✅ Calques Canva créés:', editorLayers);
-            } else {
+            } else if (activeCategory?.id === 'pub_ads') {
               // MODE PUB_ADS: Génération automatique via LLM
               console.log('🎨 Génération automatique de calques publicitaires...');
 
@@ -1023,9 +1024,13 @@ export default function Home() {
               console.log('✅ Calques générés:', editorLayers);
               }
               }
+              } catch (e) {
+              console.error('❌ Échec création calques:', e);
+              }
 
               // Composition de l'image avec textes
               if (editorLayers.length > 0) {
+              try {
               // Compose image with text layers using canvas
               console.log('🖼️ Composition de l\'image avec les textes...');
               const canvas = document.createElement('canvas');
