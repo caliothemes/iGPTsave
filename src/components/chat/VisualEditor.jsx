@@ -406,7 +406,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                       shadowOffsetX: layer.shadowOffsetX ? layer.shadowOffsetX * scaleFactor : 3,
                       shadowOffsetY: layer.shadowOffsetY ? layer.shadowOffsetY * scaleFactor : 3,
                       glowSize: layer.glowSize ? layer.glowSize * scaleFactor : 10,
-                      haloSize: layer.haloSize ? layer.haloSize * scaleFactor : 15
+                      haloSize: layer.haloSize ? layer.haloSize * scaleFactor : 15,
+                      visible: layer.visible !== undefined ? layer.visible : true
                     };
                   } else if (layer.type === 'image' || layer.type === 'shape') {
                     return {
@@ -416,7 +417,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                       width: layer.width * scaleFactor,
                       height: layer.height * scaleFactor,
                       borderRadius: layer.borderRadius ? layer.borderRadius * scaleFactor : 0,
-                      strokeWidth: layer.strokeWidth ? layer.strokeWidth * scaleFactor : 2
+                      strokeWidth: layer.strokeWidth ? layer.strokeWidth * scaleFactor : 2,
+                      visible: layer.visible !== undefined ? layer.visible : true
                     };
                   }
                   return layer;
@@ -706,6 +708,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
 
           // Draw all layers in order (first = bottom, last = top)
           layers.forEach((layer, idx) => {
+            // Skip invisible layers
+            if (layer.visible === false) return;
+            
             ctx.save();
             
             // RESET ALL context properties to defaults before each layer
@@ -2363,6 +2368,9 @@ Réponds en JSON avec:
 
         // Draw all layers in order (same as rendering)
         for (const layer of layers) {
+          // Skip invisible layers
+          if (layer.visible === false) continue;
+          
           exportCtx.save();
           
           // RESET ALL context properties to defaults before each layer
