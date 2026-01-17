@@ -1788,6 +1788,7 @@ export default function Home() {
                             visual={msg.visual}
                             onRegenerate={handleRegenerate}
                             onDownload={handleDownload}
+                            hideEditButton={!msg.visual.editor_layers || msg.visual.editor_layers.length === 0}
                             onToggleFavorite={async (v) => {
                               if (user && v.id) {
                                 await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
