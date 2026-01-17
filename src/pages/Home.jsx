@@ -1003,11 +1003,13 @@ export default function Home() {
                 };
               });
               console.log('✅ Calques générés:', editorLayers);
+              console.log('🎨 Mode Canva actif:', canvaMode);
 
-              // En mode Canva, on ne fait PAS de composition - on garde l'image propre + calques séparés
+              // En mode Canva, on garde l'image propre SANS composer les textes dessus
+              // Les textes restent en calques séparés pour être éditables
               if (!canvaMode) {
                 // Compose image with text layers using canvas (pour pub_ads seulement)
-                console.log('🖼️ Composition de l\'image avec les textes...');
+                console.log('🖼️ Composition de l\'image avec les textes (mode Pub)...');
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
@@ -1166,6 +1168,12 @@ export default function Home() {
           editor_layers: editorLayers.length > 0 ? editorLayers : undefined,
           art_director_name: selectedDA ? selectedDA.name : null
         };
+
+        console.log('📦 Visual data to save:', {
+          ...visualData,
+          editor_layers_count: editorLayers.length,
+          canva_mode: canvaMode
+        });
 
         let savedVisual = visualData;
         if (user) {
