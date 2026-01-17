@@ -937,8 +937,8 @@ export default function Home() {
 
         console.log('📊 LAYERS FINAL:', editorLayers);
 
-        // Composer l'image avec les textes pour affichage (SAUF mode Canva - layers seuls)
-        if (editorLayers.length > 0 && !canvaMode) {
+        // Composer l'image avec les textes pour affichage dans le card
+        if (editorLayers.length > 0) {
           console.log('🎨 Composition:', editorLayers.length, 'layers');
           try {
             const canvas = document.createElement('canvas');
