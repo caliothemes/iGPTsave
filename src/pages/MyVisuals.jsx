@@ -158,7 +158,12 @@ export default function MyVisuals() {
       original_image_url: originalImageUrl
     });
     
-    setVisuals(prev => prev.map(v => v.id === editingVisual.id ? updatedVisual : v));
+    setVisuals(prev => prev.map(v => v.id === editingVisual.id ? { 
+      ...v, 
+      image_url: newImageUrl,
+      editor_layers: layers,
+      original_image_url: originalImageUrl
+    } : v));
     setShowEditor(false);
     
     // Scroll to the edited visual after closing editor
