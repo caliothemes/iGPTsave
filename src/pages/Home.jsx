@@ -2273,7 +2273,7 @@ export default function Home() {
 
 
             {/* Input Bar */}
-            <div className="relative bg-gray-900 border border-white/10 rounded-2xl overflow-hidden">
+            <div className="relative bg-gray-900 border-2 border-gradient-animated rounded-2xl overflow-hidden">
               {/* Attached Images Thumbnails */}
               {(attachedImages.length > 0 || uploadingImages > 0) && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-white/5">
@@ -2724,6 +2724,25 @@ export default function Home() {
           background: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6);
           background-size: 300% 100%;
           animation: gradient-rotate 3s linear infinite;
+        }
+        .border-gradient-animated {
+          border-image: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6) 1;
+          animation: border-glow 3s linear infinite;
+          position: relative;
+        }
+        .border-gradient-animated::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: 1rem;
+          padding: 2px;
+          background: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6);
+          background-size: 300% 100%;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          animation: gradient-rotate 3s linear infinite;
+          pointer-events: none;
         }
         @keyframes gradient-rotate {
           0% { background-position: 0% 50%; }
