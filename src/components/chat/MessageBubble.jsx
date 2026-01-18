@@ -137,8 +137,18 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
               )}
 
               {/* Tags sous la bulle pour user */}
-              {isUser && (message.artDirector || message.canvaMode) && (
-                <div className="mt-2 flex items-center gap-2">
+              {isUser && (message.selectedFormat || message.selectedCategory || message.artDirector || message.canvaMode) && (
+                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                  {message.selectedFormat && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-green-600/20 border border-green-500/30 text-green-300">
+                      <span>{message.selectedFormat}</span>
+                    </div>
+                  )}
+                  {message.selectedCategory && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-violet-600/20 border border-violet-500/30 text-violet-300">
+                      <span>{message.selectedCategory}</span>
+                    </div>
+                  )}
                   {message.artDirector && (
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-600/20 border border-blue-500/30 text-blue-300">
                       <Users className="w-3.5 h-3.5" />
