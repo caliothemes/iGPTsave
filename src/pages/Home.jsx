@@ -2506,7 +2506,7 @@ export default function Home() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className={cn(
-                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all border flex items-center gap-1.5",
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border flex items-center gap-1.5",
                       selectedFormat
                         ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                         : "bg-amber-600/10 border-amber-500/20 text-amber-300 hover:bg-amber-600/20"
@@ -2549,7 +2549,7 @@ export default function Home() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className={cn(
-                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all border flex items-center gap-1.5",
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border flex items-center gap-1.5",
                       selectedCategory
                         ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                         : "bg-violet-600/10 border-violet-500/20 text-violet-300 hover:bg-violet-600/20"
@@ -2580,7 +2580,7 @@ export default function Home() {
                 <button
                   onClick={() => setShowCanvaTextModal(true)}
                   className={cn(
-                    "px-3 py-1.5 rounded-full text-sm font-medium transition-all border flex items-center gap-1.5",
+                    "px-3 py-1.5 rounded-full text-xs font-medium transition-all border flex items-center gap-1.5",
                     canvaMode
                       ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                       : "bg-pink-600/10 border-pink-500/20 text-pink-300 hover:bg-pink-600/20"
@@ -2596,7 +2596,7 @@ export default function Home() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className={cn(
-                      "px-3 py-1.5 rounded-full text-sm font-medium transition-all border flex items-center gap-1.5",
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border flex items-center gap-1.5",
                       selectedDA
                         ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
                         : "bg-blue-600/10 border-blue-500/20 text-blue-300 hover:bg-blue-600/20"
@@ -2681,7 +2681,7 @@ export default function Home() {
                 {/* Tag Upload */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-full text-sm font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-300 shadow-md flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-300 shadow-md flex items-center gap-1.5"
                 >
                   <Upload className="w-3 h-3" />
                   {language === 'fr' ? 'Upload' : 'Upload'}
