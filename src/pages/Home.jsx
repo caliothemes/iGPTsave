@@ -2725,15 +2725,22 @@ export default function Home() {
           background-size: 300% 100%;
           animation: gradient-rotate 3s linear infinite;
         }
+        .prompt-glow {
+          position: relative;
+        }
         .prompt-glow::before {
           content: '';
           position: absolute;
-          inset: -20px;
-          border-radius: 1.5rem;
-          background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+          inset: -30px;
+          border-radius: 2rem;
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.2) 40%, transparent 70%);
           animation: pulse-glow 3s ease-in-out infinite;
           pointer-events: none;
-          z-index: -1;
+          z-index: 0;
+        }
+        .prompt-glow > * {
+          position: relative;
+          z-index: 1;
         }
         @keyframes gradient-rotate {
           0% { background-position: 0% 50%; }
