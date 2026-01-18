@@ -71,13 +71,6 @@ export default function VisualCard({
       if (!visual.editor_layers || visual.editor_layers.length === 0) return;
       if (isVideo) return;
       
-      const [width, height] = (visual.dimensions || '1080x1080').split('x').map(Number);
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      
       const bgImage = new Image();
       bgImage.crossOrigin = 'anonymous';
       await new Promise((resolve, reject) => {
@@ -85,6 +78,15 @@ export default function VisualCard({
         bgImage.onerror = reject;
         bgImage.src = visual.original_image_url || visual.image_url;
       });
+      
+      // Use actual image dimensions, not visual.dimensions
+      const width = bgImage.naturalWidth;
+      const height = bgImage.naturalHeight;
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
       
       ctx.drawImage(bgImage, 0, 0, width, height);
       
