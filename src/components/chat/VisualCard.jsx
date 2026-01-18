@@ -68,7 +68,10 @@ export default function VisualCard({
   // Compose image with text layers on mount if needed
   React.useEffect(() => {
     const composeImage = async () => {
-      if (!visual.editor_layers || visual.editor_layers.length === 0) return;
+      if (!visual.editor_layers || visual.editor_layers.length === 0) {
+        setComposedImageUrl(null);
+        return;
+      }
       if (isVideo) return;
       
       const bgImage = new Image();
@@ -138,7 +141,7 @@ export default function VisualCard({
     };
     
     composeImage().catch(console.error);
-  }, [visual, isVideo]);
+  }, [visual.image_url, visual.editor_layers, isVideo]);
 
   // Show watermark banner on mount if hasWatermark
   React.useEffect(() => {
