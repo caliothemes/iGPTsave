@@ -2726,27 +2726,27 @@ export default function Home() {
           animation: gradient-rotate 3s linear infinite;
         }
         .border-gradient-animated {
-          border-image: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6) 1;
-          animation: border-glow 3s linear infinite;
-          position: relative;
-        }
-        .border-gradient-animated::before {
-          content: '';
-          position: absolute;
-          inset: -2px;
-          border-radius: 1rem;
-          padding: 2px;
-          background: linear-gradient(90deg, #8b5cf6, #3b82f6, #a855f7, #8b5cf6);
-          background-size: 300% 100%;
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          animation: gradient-rotate 3s linear infinite;
-          pointer-events: none;
+          border: 1px solid transparent;
+          background: 
+            linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+            linear-gradient(90deg, 
+              rgba(236, 72, 153, 0.3),
+              rgba(168, 85, 247, 0.3),
+              rgba(249, 115, 22, 0.3),
+              rgba(234, 179, 8, 0.3),
+              rgba(34, 197, 94, 0.3),
+              rgba(236, 72, 153, 0.3)
+            ) border-box;
+          background-size: 100% 100%, 300% 100%;
+          animation: border-flow 8s linear infinite;
         }
         @keyframes gradient-rotate {
           0% { background-position: 0% 50%; }
           100% { background-position: 300% 50%; }
+        }
+        @keyframes border-flow {
+          0% { background-position: 0% 0%, 0% 50%; }
+          100% { background-position: 0% 0%, 300% 50%; }
         }
       `}</style>
 
