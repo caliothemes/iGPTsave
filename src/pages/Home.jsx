@@ -1573,25 +1573,12 @@ export default function Home() {
 
   const handleEditorSave = async (newImageUrl, layers, originalImageUrl) => {
     // Editor returns: newImageUrl (string), layers (array), originalImageUrl (string)
-    
-    // Reload visual from database to get all updated properties
-    let updatedVisual = {
+    const updatedVisual = {
       ...editingVisual,
       image_url: newImageUrl,
       editor_layers: layers,
       original_image_url: originalImageUrl
     };
-    
-    if (user && editingVisual.id) {
-      try {
-        const reloadedVisuals = await base44.entities.Visual.filter({ id: editingVisual.id });
-        if (reloadedVisuals.length > 0) {
-          updatedVisual = reloadedVisuals[0];
-        }
-      } catch (e) {
-        console.error('Failed to reload visual:', e);
-      }
-    }
 
     // Update in messages history
     setMessages(prev => prev.map(m => 
