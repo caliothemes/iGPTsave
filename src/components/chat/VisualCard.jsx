@@ -452,7 +452,7 @@ export default function VisualCard({
                 size="sm"
                 onClick={() => onRegenerate(visual)}
                 disabled={isRegenerating}
-                className="flex-1 bg-gradient-to-r from-blue-600/80 to-cyan-600/80 hover:from-blue-700 hover:to-cyan-700 text-white border-0 disabled:opacity-50"
+                className="flex-1 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950 text-white border-0 disabled:opacity-50"
               >
                 <RefreshCw className={cn("h-4 w-4 mr-1.5", isRegenerating && "animate-spin")} />
                 <span className="text-xs">{t('regenerate')}</span>
