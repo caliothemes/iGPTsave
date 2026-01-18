@@ -1199,7 +1199,8 @@ export default function Home() {
           style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
           color_palette: extractedColors,
           editor_layers: editorLayers.length > 0 ? editorLayers : undefined,
-          art_director_name: selectedDA ? selectedDA.name : null
+          art_director_name: selectedDA ? selectedDA.name : null,
+          attached_images: currentAttachedImages.length > 0 ? currentAttachedImages : undefined
         };
 
         console.log('📦 SAVE - Layers:', editorLayers.length, 'Canva:', canvaMode, 'Layers:', editorLayers);
@@ -1331,9 +1332,21 @@ export default function Home() {
 
       const finalPrompt = daPrompt + (visual.image_prompt || visual.original_prompt + ', high quality, professional design') + canvaPromptSuffix;
 
-      const result = await base44.integrations.Core.GenerateImage({
-        prompt: finalPrompt
-      });
+      let result;
+      
+      // Si des images étaient attachées à l'original, les réutiliser
+      if (visual.attached_images && visual.attached_images.length > 0) {
+        const compositionPrompt = `Create this design: ${visual.original_prompt}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${finalPrompt}`;
+        
+        result = await base44.integrations.Core.GenerateImage({
+          prompt: compositionPrompt,
+          existing_image_urls: visual.attached_images
+        });
+      } else {
+        result = await base44.integrations.Core.GenerateImage({
+          prompt: finalPrompt
+        });
+      }
 
       if (result.url) {
         // Extract new color palette from regenerated image
@@ -1445,7 +1458,8 @@ export default function Home() {
           version: (visual.version || 1) + 1,
           parent_visual_id: visual.id,
           art_director_name: visual.art_director_name || null,
-          editor_layers: newEditorLayers.length > 0 ? newEditorLayers : undefined
+          editor_layers: newEditorLayers.length > 0 ? newEditorLayers : undefined,
+          attached_images: visual.attached_images || undefined
         };
 
         let newVisual = visualData;
