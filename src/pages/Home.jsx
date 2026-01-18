@@ -2273,7 +2273,7 @@ export default function Home() {
 
 
             {/* Input Bar */}
-            <div className="relative bg-gray-900 border-2 border-gradient-animated rounded-2xl overflow-hidden">
+            <div className="relative bg-gray-900 border border-white/10 rounded-2xl overflow-hidden prompt-glow">
               {/* Attached Images Thumbnails */}
               {(attachedImages.length > 0 || uploadingImages > 0) && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-2 border-b border-white/5">
@@ -2725,28 +2725,29 @@ export default function Home() {
           background-size: 300% 100%;
           animation: gradient-rotate 3s linear infinite;
         }
-        .border-gradient-animated {
-          border: 1px solid transparent;
-          background: 
-            linear-gradient(#0a0a0f, #0a0a0f) padding-box,
-            linear-gradient(90deg, 
-              rgba(236, 72, 153, 0.3),
-              rgba(168, 85, 247, 0.3),
-              rgba(249, 115, 22, 0.3),
-              rgba(234, 179, 8, 0.3),
-              rgba(34, 197, 94, 0.3),
-              rgba(236, 72, 153, 0.3)
-            ) border-box;
-          background-size: 100% 100%, 300% 100%;
-          animation: border-flow 8s linear infinite;
+        .prompt-glow::before {
+          content: '';
+          position: absolute;
+          inset: -20px;
+          border-radius: 1.5rem;
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+          animation: pulse-glow 3s ease-in-out infinite;
+          pointer-events: none;
+          z-index: -1;
         }
         @keyframes gradient-rotate {
           0% { background-position: 0% 50%; }
           100% { background-position: 300% 50%; }
         }
-        @keyframes border-flow {
-          0% { background-position: 0% 0%, 0% 50%; }
-          100% { background-position: 0% 0%, 300% 50%; }
+        @keyframes pulse-glow {
+          0%, 100% { 
+            transform: scale(0.95);
+            opacity: 0.5;
+          }
+          50% { 
+            transform: scale(1.05);
+            opacity: 0.8;
+          }
         }
       `}</style>
 
