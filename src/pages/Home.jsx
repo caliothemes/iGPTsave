@@ -1453,6 +1453,8 @@ export default function Home() {
           image_prompt: visual.image_prompt,
           dimensions: visual.dimensions,
           visual_type: visual.visual_type,
+          format_name: visual.format_name || null,
+          category_name: visual.category_name || null,
           style: visual.style,
           color_palette: extractedColors,
           version: (visual.version || 1) + 1,
