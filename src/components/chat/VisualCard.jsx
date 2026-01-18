@@ -141,7 +141,7 @@ export default function VisualCard({
     };
     
     composeImage().catch(console.error);
-  }, [visual, isVideo]);
+  }, [JSON.stringify(visual.editor_layers), visual.original_image_url, visual.image_url, isVideo]);
 
   // Show watermark banner on mount if hasWatermark
   React.useEffect(() => {
