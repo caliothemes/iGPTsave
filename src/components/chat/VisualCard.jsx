@@ -74,74 +74,93 @@ export default function VisualCard({
       }
       if (isVideo) return;
       
-      const bgImage = new Image();
-      bgImage.crossOrigin = 'anonymous';
-      await new Promise((resolve, reject) => {
-        bgImage.onload = resolve;
-        bgImage.onerror = reject;
-        bgImage.src = visual.original_image_url || visual.image_url;
-      });
-      
-      // Use actual image dimensions, not visual.dimensions
-      const width = bgImage.naturalWidth;
-      const height = bgImage.naturalHeight;
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      
-      ctx.drawImage(bgImage, 0, 0, width, height);
-      
-      visual.editor_layers.forEach((layer) => {
-        if (layer.type === 'text' && layer.text && layer.visible !== false) {
-          ctx.save();
-          const fontWeight = layer.fontWeight || 700;
-          const fontStyle = `${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
-          ctx.font = fontStyle;
-          ctx.fillStyle = layer.color;
-          ctx.textAlign = layer.align || 'center';
-          
-          const metrics = ctx.measureText(layer.text);
-          const textWidth = metrics.width;
-          
-          if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-            const padding = layer.padding || 20;
-            const borderRadius = layer.borderRadius || 12;
-            let boxX = layer.x - textWidth / 2 - padding;
-            if (layer.align === 'left') boxX = layer.x - padding;
-            const boxY = layer.y - layer.fontSize * 0.85 - padding;
-            const boxWidth = textWidth + padding * 2;
-            const boxHeight = layer.fontSize * 1.15 + padding * 2;
-            
-            ctx.fillStyle = layer.backgroundColor;
-            const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
-            ctx.beginPath();
-            ctx.moveTo(boxX + radius, boxY);
-            ctx.lineTo(boxX + boxWidth - radius, boxY);
-            ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
-            ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
-            ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
-            ctx.lineTo(boxX + radius, boxY + boxHeight);
-            ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
-            ctx.lineTo(boxX, boxY + radius);
-            ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
-            ctx.closePath();
-            ctx.fill();
+      try {
+        const bgImage = new Image();
+        bgImage.crossOrigin = 'anonymous';
+        
+        // Wait for image to fully load with timeout
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('Image load timeout')), 10000);
+          bgImage.onload = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          bgImage.onerror = () => {
+            clearTimeout(timeout);
+            reject(new Error('Image load error'));
+          };
+          bgImage.src = visual.original_image_url || visual.image_url;
+        });
+        
+        // Use actual image dimensions, not visual.dimensions
+        const width = bgImage.naturalWidth;
+        const height = bgImage.naturalHeight;
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.drawImage(bgImage, 0, 0, width, height);
+        
+        visual.editor_layers.forEach((layer) => {
+          if (layer.type === 'text' && layer.text && layer.visible !== false) {
+            ctx.save();
+            const fontWeight = layer.fontWeight || 700;
+            const fontStyle = `${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+            ctx.font = fontStyle;
             ctx.fillStyle = layer.color;
+            ctx.textAlign = layer.align || 'center';
+            
+            const metrics = ctx.measureText(layer.text);
+            const textWidth = metrics.width;
+            
+            if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
+              const padding = layer.padding || 20;
+              const borderRadius = layer.borderRadius || 12;
+              let boxX = layer.x - textWidth / 2 - padding;
+              if (layer.align === 'left') boxX = layer.x - padding;
+              const boxY = layer.y - layer.fontSize * 0.85 - padding;
+              const boxWidth = textWidth + padding * 2;
+              const boxHeight = layer.fontSize * 1.15 + padding * 2;
+              
+              ctx.fillStyle = layer.backgroundColor;
+              const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+              ctx.beginPath();
+              ctx.moveTo(boxX + radius, boxY);
+              ctx.lineTo(boxX + boxWidth - radius, boxY);
+              ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+              ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+              ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+              ctx.lineTo(boxX + radius, boxY + boxHeight);
+              ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+              ctx.lineTo(boxX, boxY + radius);
+              ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+              ctx.closePath();
+              ctx.fill();
+              ctx.fillStyle = layer.color;
+            }
+            
+            ctx.fillText(layer.text, layer.x, layer.y);
+            ctx.restore();
           }
-          
-          ctx.fillText(layer.text, layer.x, layer.y);
-          ctx.restore();
-        }
-      });
-      
-      const dataUrl = canvas.toDataURL('image/png', 0.95);
-      setComposedImageUrl(dataUrl);
+        });
+        
+        const dataUrl = canvas.toDataURL('image/png', 0.95);
+        setComposedImageUrl(dataUrl);
+      } catch (error) {
+        console.error('❌ Composition failed:', error);
+        setComposedImageUrl(null);
+      }
     };
     
-    composeImage().catch(console.error);
-  }, [JSON.stringify(visual.editor_layers), visual.original_image_url, visual.image_url, isVideo]);
+    // Small delay to ensure visual is fully mounted
+    const timer = setTimeout(() => {
+      composeImage();
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, [visual.id, visual.editor_layers?.length, visual.original_image_url, visual.image_url, isVideo]);
 
   // Show watermark banner on mount if hasWatermark
   React.useEffect(() => {
