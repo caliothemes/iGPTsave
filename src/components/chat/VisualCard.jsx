@@ -666,41 +666,92 @@ export default function VisualCard({
       )}
 
       {/* Image Modal - Exact Store system */}
-      {showImageModal && (
-        <div
-          className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
-          style={{ zIndex: 99999 }}
-          onClick={() => setShowImageModal(false)}
-        >
-          <button
+      {showImageModal && (() => {
+        const dims = visual.dimensions || '1080x1080';
+        const [w, h] = dims.split('x').map(n => parseInt(n));
+        
+        if (!w || !h) {
+          console.error('Invalid dimensions:', dims);
+          return null;
+        }
+        
+        const aspectRatio = w / h;
+        
+        // Calculate max dimensions based on viewport
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = window.innerHeight * 0.9;
+        
+        let displayWidth, displayHeight;
+        if (aspectRatio > maxWidth / maxHeight) {
+          // Width-constrained
+          displayWidth = maxWidth;
+          displayHeight = maxWidth / aspectRatio;
+        } else {
+          // Height-constrained
+          displayHeight = maxHeight;
+          displayWidth = maxHeight * aspectRatio;
+        }
+        
+        return (
+          <div
+            className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center"
+            style={{ zIndex: 99999 }}
             onClick={() => setShowImageModal(false)}
-            className="absolute top-4 left-1/2 -translate-x-1/2 p-3 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl z-[100]"
           >
-            <X className="w-6 h-6" />
-          </button>
-          <div 
-            className="relative max-w-[90vw] max-h-[90vh]"
-            style={{ aspectRatio: getAspectRatio(visual.dimensions || '1080x1080') }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {isVideo ? (
-              <video 
-                src={visual.video_url || visual.image_url}
-                controls
-                autoPlay
-                loop
-                className="w-full h-full object-contain rounded-lg shadow-2xl"
-              />
-            ) : (
-              <img
-                src={visual.image_url}
-                alt={visual.title || 'Preview'}
-                className="w-full h-full object-contain rounded-lg shadow-2xl"
-              />
-            )}
+            <div 
+              className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div 
+                className="relative"
+                style={{
+                  width: `${displayWidth}px`,
+                  height: `${displayHeight}px`,
+                  aspectRatio: `${w} / ${h}`
+                }}
+              >
+                {isVideo ? (
+                  <video 
+                    src={visual.video_url || visual.image_url}
+                    controls
+                    autoPlay
+                    loop
+                    className="rounded-lg shadow-2xl"
+                    style={{ 
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      aspectRatio: `${w} / ${h}`
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={composedImageUrl || visual.image_url}
+                    alt={visual.title || 'Preview'}
+                    className="rounded-lg shadow-2xl"
+                    style={{ 
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      aspectRatio: `${w} / ${h}`
+                    }}
+                  />
+                )}
+              </div>
+              
+              {/* Close button - outside image container */}
+              <button
+                onClick={() => setShowImageModal(false)}
+                className="absolute top-4 left-1/2 -translate-x-1/2 p-4 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl z-10"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </>
   );
 }
