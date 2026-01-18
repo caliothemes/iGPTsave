@@ -206,11 +206,24 @@ export default function VisualCard({
               style={{ aspectRatio: getAspectRatio(visual.dimensions) }}
             />
           ) : (
-            <img 
-              src={composedImageUrl || visual.image_url} 
-              alt={visual.title || 'Visuel généré'}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+            <div 
+              className="relative w-full h-full cursor-pointer"
+              onClick={() => setShowImageModal(true)}
+            >
+              <img 
+                src={composedImageUrl || visual.image_url} 
+                alt={visual.title || 'Visuel généré'}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              {/* Hover Overlay with + Icon */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           )}
         
         {/* Top Right - Favorite Button Only (inside image) */}
