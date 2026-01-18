@@ -674,7 +674,7 @@ export default function VisualCard({
         >
           <button
             onClick={() => setShowImageModal(false)}
-            className="absolute top-4 right-4 p-3 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl z-[100]"
+            className="absolute top-4 left-1/2 -translate-x-1/2 p-3 bg-red-600 hover:bg-red-700 rounded-full text-white transition-all shadow-2xl z-[100]"
           >
             <X className="w-6 h-6" />
           </button>
