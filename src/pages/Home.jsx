@@ -1313,8 +1313,26 @@ export default function Home() {
         }
       }
 
+      // Récupérer le DA si présent
+      let daPrompt = '';
+      if (visual.art_director_name) {
+        const visualDA = artDirectors.find(da => da.name === visual.art_director_name);
+        if (visualDA) {
+          daPrompt = `Brand identity for ${visualDA.name} (${visualDA.activity}). ${visualDA.description || ''}. Style: ${visualDA.style_keywords || 'professional'}. Brand colors: ${visualDA.color_palette.join(', ')}. `;
+        }
+      }
+
+      // Récupérer les textes Canva si présents
+      const hasCanvaTexts = visual.editor_layers && visual.editor_layers.some(layer => layer.type === 'text');
+      let canvaPromptSuffix = '';
+      if (hasCanvaTexts) {
+        canvaPromptSuffix = ' --no text --no letters --no typography --no words --no writing';
+      }
+
+      const finalPrompt = daPrompt + (visual.image_prompt || visual.original_prompt + ', high quality, professional design') + canvaPromptSuffix;
+
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: visual.image_prompt || visual.original_prompt + ', high quality, professional design'
+        prompt: finalPrompt
       });
 
       if (result.url) {
@@ -1337,6 +1355,81 @@ export default function Home() {
           extractedColors = visual.color_palette; // Fallback to old colors
         }
 
+        // Régénérer les calques Canva si présents
+        let newEditorLayers = [];
+        if (hasCanvaTexts) {
+          const canvaTextsToRegenerate = visual.editor_layers.filter(l => l.type === 'text').map(l => l.text);
+          const [width, height] = visual.dimensions.split('x').map(Number);
+          
+          try {
+            const aiResult = await base44.integrations.Core.InvokeLLM({
+              prompt: `You must create EXACTLY ${canvaTextsToRegenerate.length} separate text layers for this image.
+              
+              The ${canvaTextsToRegenerate.length} texts to place are:
+              ${canvaTextsToRegenerate.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
+              
+              IMPORTANT RULES:
+              - Create ONE layer per text (total: ${canvaTextsToRegenerate.length} layers)
+              - Each layer must contain ONLY its corresponding text, nothing else
+              - Analyze the image to find free space areas
+              - Choose colors with excellent contrast for readability
+              - Use transparent backgrounds
+              - Font size: first text 60-80px, others 40-60px
+              - Position intelligently based on composition
+              - Center aligned
+              
+              Canvas size: ${width}x${height}px`,
+              response_json_schema: {
+                type: "object",
+                properties: {
+                  layers: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: { type: "string" },
+                        x: { type: "number" },
+                        y: { type: "number" },
+                        fontSize: { type: "number" },
+                        color: { type: "string" },
+                        backgroundColor: { type: "string" },
+                        fontWeight: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              },
+              file_urls: [result.url]
+            });
+
+            if (aiResult.layers && aiResult.layers.length > 0) {
+              newEditorLayers = aiResult.layers.map((layer, idx) => ({
+                id: `layer-${Date.now()}-${idx}`,
+                type: 'text',
+                text: layer.text,
+                x: width / 2,
+                y: Math.max(80, Math.min(layer.y || (height / (canvaTextsToRegenerate.length + 1)) * (idx + 1), height - 80)),
+                fontSize: Math.max(layer.fontSize || (idx === 0 ? 72 : 48), 30),
+                fontFamily: 'Arial',
+                fontWeight: layer.fontWeight || 700,
+                color: layer.color || '#ffffff',
+                backgroundColor: layer.backgroundColor || 'transparent',
+                padding: 20,
+                borderRadius: 12,
+                opacity: 100,
+                visible: true,
+                align: 'center',
+                bold: true,
+                italic: false,
+                shadow: false,
+                stroke: false
+              }));
+            }
+          } catch (e) {
+            console.error('Failed to regenerate Canva layers:', e);
+          }
+        }
+
         // Create new visual instead of updating
         const visualData = {
           user_email: user?.email || 'anonymous',
@@ -1350,7 +1443,9 @@ export default function Home() {
           style: visual.style,
           color_palette: extractedColors,
           version: (visual.version || 1) + 1,
-          parent_visual_id: visual.id
+          parent_visual_id: visual.id,
+          art_director_name: visual.art_director_name || null,
+          editor_layers: newEditorLayers.length > 0 ? newEditorLayers : undefined
         };
 
         let newVisual = visualData;
