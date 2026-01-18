@@ -2731,9 +2731,9 @@ export default function Home() {
         .prompt-glow::before {
           content: '';
           position: absolute;
-          inset: -40px;
+          inset: -35px;
           border-radius: 2rem;
-          background: radial-gradient(circle, rgba(139, 92, 246, 0.5), rgba(168, 85, 247, 0.3) 40%, transparent 70%);
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.4), rgba(168, 85, 247, 0.25) 40%, transparent 70%);
           animation: pulse-glow 3s ease-in-out infinite;
           pointer-events: none;
           z-index: 0;
@@ -2748,12 +2748,12 @@ export default function Home() {
         }
         @keyframes pulse-glow {
           0%, 100% { 
-            transform: scale(0.9);
-            opacity: 0.6;
+            transform: scale(0.92);
+            opacity: 0.5;
           }
           50% { 
-            transform: scale(1.1);
-            opacity: 1;
+            transform: scale(1.08);
+            opacity: 0.85;
           }
         }
       `}</style>
