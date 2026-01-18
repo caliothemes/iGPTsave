@@ -541,7 +541,9 @@ export default function Home() {
       attachedImages: currentAttachedImages.length > 0 ? currentAttachedImages : undefined,
       artDirector: selectedDA ? selectedDA.name : null,
       canvaMode: canvaMode,
-      canvaTextsCount: canvaTexts.length
+      canvaTextsCount: canvaTexts.length,
+      selectedFormat: selectedFormat ? selectedFormat.name : null,
+      selectedCategory: selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : null
     }]);
     
     // Clear attached images immediately after sending
