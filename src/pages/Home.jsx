@@ -919,23 +919,25 @@ export default function Home() {
 
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this image composition and intelligently place these ${canvaTexts.length} texts: ${canvaTexts.join(', ')}. 
-              
-              CRITICAL - Analyze the image elements:
-              - Identify free space areas (avoid placing text over important visual elements)
-              - Detect the main subject/focus areas and place text around them
-              - Find optimal positions with good contrast
-              
-              For each text:
-              - Choose a color with excellent contrast and readability
-              - NO background (transparent)
-              - Font size: first text (title) 60-80px, others 40-60px
-              - Position based on image composition (not just evenly spaced)
+              prompt: `You must create EXACTLY ${canvaTexts.length} separate text layers for this image.
+
+              The ${canvaTexts.length} texts to place are:
+              ${canvaTexts.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
+
+              IMPORTANT RULES:
+              - Create ONE layer per text (total: ${canvaTexts.length} layers)
+              - Each layer must contain ONLY its corresponding text, nothing else
+              - Do NOT add any additional words like "CRITICAL", "IMPORTANT", etc.
+              - Analyze the image to find free space areas
+              - Avoid placing text over important visual elements
+              - Choose colors with excellent contrast for readability
+              - Use transparent backgrounds
+              - Font size: first text 60-80px, others 40-60px
+              - Position intelligently based on composition
               - Center aligned
-              - Ensure text doesn't overlap important image elements
-              
-              Canvas: ${width}x${height}px
-              Return JSON with layers array.`,
+
+              Canvas size: ${width}x${height}px
+              Return a JSON object with a "layers" array containing exactly ${canvaTexts.length} layers.`,
               response_json_schema: {
                 type: "object",
                 properties: {
