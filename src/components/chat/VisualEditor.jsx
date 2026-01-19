@@ -991,7 +991,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               
               // Apply effects to curved text
               if (layer.shadow && !layer.glow && !layer.neon) {
-                ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                const opacity = (layer.shadowOpacity !== undefined ? layer.shadowOpacity : 60) / 100;
+                const shadowColor = layer.shadowColor || '#000000';
+                const rgb = shadowColor.startsWith('#') ? 
+                  [parseInt(shadowColor.slice(1,3), 16), parseInt(shadowColor.slice(3,5), 16), parseInt(shadowColor.slice(5,7), 16)] :
+                  [0, 0, 0];
+                ctx.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
                 ctx.shadowBlur = layer.shadowBlur || 6;
                 ctx.shadowOffsetX = layer.shadowOffsetX || 3;
                 ctx.shadowOffsetY = layer.shadowOffsetY || 3;
@@ -1125,7 +1130,12 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             
             // Shadow effect
             if (layer.shadow && !layer.glow && !layer.neon) {
-              ctx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+              const opacity = (layer.shadowOpacity !== undefined ? layer.shadowOpacity : 60) / 100;
+              const shadowColor = layer.shadowColor || '#000000';
+              const rgb = shadowColor.startsWith('#') ? 
+                [parseInt(shadowColor.slice(1,3), 16), parseInt(shadowColor.slice(3,5), 16), parseInt(shadowColor.slice(5,7), 16)] :
+                [0, 0, 0];
+              ctx.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
               ctx.shadowBlur = layer.shadowBlur || 6;
               ctx.shadowOffsetX = layer.shadowOffsetX || 3;
               ctx.shadowOffsetY = layer.shadowOffsetY || 3;
@@ -2642,7 +2652,12 @@ Réponds en JSON avec:
                 }
                 
                 if (layer.shadow && !layer.glow && !layer.neon) {
-                  exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                  const opacity = (layer.shadowOpacity !== undefined ? layer.shadowOpacity : 60) / 100;
+                  const shadowColor = layer.shadowColor || '#000000';
+                  const rgb = shadowColor.startsWith('#') ? 
+                    [parseInt(shadowColor.slice(1,3), 16), parseInt(shadowColor.slice(3,5), 16), parseInt(shadowColor.slice(5,7), 16)] :
+                    [0, 0, 0];
+                  exportCtx.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
                   exportCtx.shadowBlur = layer.shadowBlur || 6;
                   exportCtx.shadowOffsetX = layer.shadowOffsetX || 3;
                   exportCtx.shadowOffsetY = layer.shadowOffsetY || 3;
@@ -2769,7 +2784,12 @@ Réponds en JSON avec:
               }
               
               if (layer.shadow && !layer.glow && !layer.neon) {
-                exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.6)';
+                const opacity = (layer.shadowOpacity !== undefined ? layer.shadowOpacity : 60) / 100;
+                const shadowColor = layer.shadowColor || '#000000';
+                const rgb = shadowColor.startsWith('#') ? 
+                  [parseInt(shadowColor.slice(1,3), 16), parseInt(shadowColor.slice(3,5), 16), parseInt(shadowColor.slice(5,7), 16)] :
+                  [0, 0, 0];
+                exportCtx.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
                 exportCtx.shadowBlur = layer.shadowBlur || 6;
                 exportCtx.shadowOffsetX = layer.shadowOffsetX || 3;
                 exportCtx.shadowOffsetY = layer.shadowOffsetY || 3;
@@ -3551,49 +3571,76 @@ Réponds en JSON avec:
 
       {/* Layer Properties Panel - BEFORE Canvas */}
       {currentLayer && (
-        <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 mb-3 border border-white/10 space-y-4">
+        <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-3 mb-3 border border-white/10 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {currentLayer.type === 'text' && <Type className="h-4 w-4 text-violet-400" />}
-              {currentLayer.type === 'image' && <ImagePlus className="h-4 w-4 text-blue-400" />}
-              {currentLayer.type === 'shape' && <Square className="h-4 w-4 text-purple-400" />}
-              {currentLayer.type === 'background' && <PaintBucket className="h-4 w-4 text-cyan-400" />}
-              <span className="text-white/80 text-sm font-medium">
+              {currentLayer.type === 'text' && <Type className="h-3.5 w-3.5 text-violet-400" />}
+              {currentLayer.type === 'image' && <ImagePlus className="h-3.5 w-3.5 text-blue-400" />}
+              {currentLayer.type === 'shape' && <Square className="h-3.5 w-3.5 text-purple-400" />}
+              {currentLayer.type === 'background' && <PaintBucket className="h-3.5 w-3.5 text-cyan-400" />}
+              <span className="text-white/80 text-xs font-medium">
                 {language === 'fr' ? 'Propriétés du calque' : 'Layer Properties'}
               </span>
             </div>
             <div className="flex gap-1">
+              {/* AI Stylize for text */}
+              {currentLayer.type === 'text' && (
+                <button
+                  onClick={stylizeTextWithAI}
+                  disabled={stylizingText}
+                  className="p-2 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors"
+                  title={language === 'fr' ? 'Styliser avec l\'IA' : 'Stylize with AI'}
+                >
+                  {stylizingText ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                </button>
+              )}
+              {/* Remove BG for images */}
+              {currentLayer.type === 'image' && !currentLayer.isBaseImage && (
+                <button
+                  onClick={async () => {
+                    setRemovingBgFromLayer(true);
+                    try {
+                      const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
+                      if (response.data?.success && response.data?.image_url) {
+                        updateLayer(selectedLayer, { imageUrl: response.data.image_url });
+                        showHelp(language === 'fr' ? '✅ Fond supprimé !' : '✅ Background removed!');
+                      } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
+                        setServiceErrorType(response.data?.error);
+                        setShowServiceUnavailable(true);
+                      }
+                    } catch (err) {
+                      console.error(err);
+                    }
+                    setRemovingBgFromLayer(false);
+                  }}
+                  disabled={removingBgFromLayer}
+                  className="p-2 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors"
+                  title={language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+                >
+                  {removingBgFromLayer ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Scissors className="h-3.5 w-3.5" />}
+                </button>
+              )}
               <button onClick={() => duplicateLayer(selectedLayer)} className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors" title={language === 'fr' ? 'Dupliquer' : 'Duplicate'}>
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3.5 w-3.5" />
               </button>
-              <button onClick={() => moveLayer(selectedLayer, 'up')} className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors"><ChevronUp className="h-4 w-4" /></button>
-              <button onClick={() => moveLayer(selectedLayer, 'down')} className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors"><ChevronDown className="h-4 w-4" /></button>
-              <button onClick={() => deleteLayer(selectedLayer)} className="p-2 text-red-400/60 hover:text-red-400 bg-white/5 hover:bg-red-500/10 rounded transition-colors"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={() => moveLayer(selectedLayer, 'up')} className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors"><ChevronUp className="h-3.5 w-3.5" /></button>
+              <button onClick={() => moveLayer(selectedLayer, 'down')} className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors"><ChevronDown className="h-3.5 w-3.5" /></button>
+              <button onClick={() => deleteLayer(selectedLayer)} className="p-2 text-red-400/60 hover:text-red-400 bg-white/5 hover:bg-red-500/10 rounded transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
             </div>
           </div>
 
           {/* TEXT LAYER PROPERTIES */}
           {currentLayer.type === 'text' && (
-            <div className="space-y-3">
-              {/* AI Stylize Button */}
-              <Button
-                onClick={stylizeTextWithAI}
-                disabled={stylizingText}
-                className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-violet-600 hover:from-pink-700 hover:via-purple-700 hover:to-violet-700 text-white font-medium shadow-lg shadow-purple-500/20"
-              >
-                {stylizingText ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                {language === 'fr' ? '✨ Styliser avec l\'IA' : '✨ Stylize with AI'}
-              </Button>
-
+            <div className="space-y-2">
               {/* Text Input */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Texte' : 'Text'}</label>
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Texte' : 'Text'}</label>
                 <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white" />
               </div>
 
               {/* Font Family */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Police' : 'Font'}</label>
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Police' : 'Font'}</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white/70 text-sm transition-colors">
@@ -3617,42 +3664,42 @@ Réponds en JSON avec:
               </div>
 
               {/* Font Size, Weight, Spacing */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer.fontSize}px</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer.fontSize}px</label>
                   <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={5} max={120} step={1} />
                 </div>
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Poids' : 'Weight'}: {currentLayer.fontWeight || 400}</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Poids' : 'Weight'}: {currentLayer.fontWeight || 400}</label>
                   <Slider value={[currentLayer.fontWeight || 400]} onValueChange={([v]) => updateLayer(selectedLayer, { fontWeight: v, bold: v >= 600 })} min={100} max={900} step={100} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Espacement' : 'Spacing'}: {currentLayer.letterSpacing || 0}px</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Espacement' : 'Spacing'}: {currentLayer.letterSpacing || 0}px</label>
                   <Slider value={[currentLayer.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} />
                 </div>
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer.rotation || 0}°</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer.rotation || 0}°</label>
                   <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur max' : 'Max Width'}: {currentLayer.maxWidth || (language === 'fr' ? 'Auto' : 'Auto')}</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Largeur max' : 'Max Width'}: {currentLayer.maxWidth || (language === 'fr' ? 'Auto' : 'Auto')}</label>
                   <Slider value={[currentLayer.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={5} />
                 </div>
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
                   <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
                 </div>
               </div>
 
               {/* Alignment & Style */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Alignement & Style' : 'Alignment & Style'}</label>
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Alignement & Style' : 'Alignment & Style'}</label>
                 <div className="grid grid-cols-5 gap-2">
                   <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("p-2 rounded-lg", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}><Italic className="h-4 w-4 mx-auto" /></button>
                   <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-2 rounded-lg", currentLayer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}><AlignLeft className="h-4 w-4 mx-auto" /></button>
@@ -3663,8 +3710,8 @@ Réponds en JSON avec:
               </div>
 
               {/* Color Picker */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
                 <div className="flex gap-2 flex-wrap">
                   {PRESET_COLORS.map(color => (
                     <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
@@ -3675,13 +3722,13 @@ Réponds en JSON avec:
 
               {/* Curved Text Options */}
               {currentLayer.curvedText && (
-                <div className="space-y-3 p-3 bg-violet-500/10 rounded-lg border border-violet-500/20">
-                  <p className="text-white/80 text-sm font-medium flex items-center gap-2">
-                    <Circle className="h-4 w-4 text-violet-400" />
+                <div className="space-y-2 p-2.5 bg-violet-500/10 rounded-lg border border-violet-500/20">
+                  <p className="text-white/80 text-xs font-medium flex items-center gap-2">
+                    <Circle className="h-3.5 w-3.5 text-violet-400" />
                     {language === 'fr' ? 'Texte en cercle' : 'Curved text'}
                   </p>
-                  <div className="space-y-2">
-                    <label className="text-white/60 text-sm">{language === 'fr' ? 'Rayon' : 'Radius'}: {currentLayer.curveRadius || 100}</label>
+                  <div className="space-y-1.5">
+                    <label className="text-white/60 text-xs">{language === 'fr' ? 'Rayon' : 'Radius'}: {currentLayer.curveRadius || 100}</label>
                     <Slider value={[currentLayer.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={40} max={400} step={5} />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -3696,9 +3743,9 @@ Réponds en JSON avec:
               )}
 
               {/* Text Effects */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-amber-400" />
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium flex items-center gap-2">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                   {language === 'fr' ? 'Effets de texte' : 'Text effects'}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -3716,8 +3763,8 @@ Réponds en JSON avec:
 
               {/* Effect-specific controls */}
               {currentLayer.textGradient && (
-                <div className="space-y-3 p-3 bg-pink-500/10 rounded-lg border border-pink-500/20">
-                  <p className="text-white/80 text-sm font-medium">🌈 {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}</p>
+                <div className="space-y-2 p-2.5 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                  <p className="text-white/80 text-xs font-medium">🌈 {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}</p>
                   <div className="grid grid-cols-2 gap-2">
                     <button onClick={() => updateLayer(selectedLayer, { gradientDirection: 'horizontal' })} className={cn("p-2 rounded-lg text-sm", (currentLayer.gradientDirection || 'horizontal') === 'horizontal' ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60")}>← → {language === 'fr' ? 'Horizontal' : 'Horizontal'}</button>
                     <button onClick={() => updateLayer(selectedLayer, { gradientDirection: 'vertical' })} className={cn("p-2 rounded-lg text-sm", currentLayer.gradientDirection === 'vertical' ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60")}>↑ ↓ {language === 'fr' ? 'Vertical' : 'Vertical'}</button>
@@ -3731,8 +3778,8 @@ Réponds en JSON avec:
               )}
 
               {currentLayer.stroke && (
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/60 text-sm">{language === 'fr' ? 'Contour' : 'Stroke'}</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/60 text-xs">{language === 'fr' ? 'Contour' : 'Stroke'}</label>
                   <div className="flex gap-2 items-center">
                     <input type="color" value={currentLayer.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
                     <Slider value={[currentLayer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={10} step={1} className="flex-1" />
@@ -3742,26 +3789,31 @@ Réponds en JSON avec:
               )}
 
               {currentLayer.shadow && (
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/60 text-sm">{language === 'fr' ? 'Ombre' : 'Shadow'}</label>
-                  <div className="space-y-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/60 text-xs">{language === 'fr' ? 'Ombre' : 'Shadow'}</label>
+                  <div className="space-y-1.5">
                     <div className="flex gap-2 items-center">
-                      <input type="color" value={currentLayer.shadowColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { shadowColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-white/40 text-xs w-8">Blur</span>
+                      <input type="color" value={currentLayer.shadowColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { shadowColor: e.target.value })} className="w-7 h-7 rounded cursor-pointer" />
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/40 text-[10px] w-8">Blur</span>
                           <Slider value={[currentLayer.shadowBlur || 6]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowBlur: v })} min={1} max={30} step={1} className="flex-1" />
-                          <span className="text-white/60 text-xs w-8">{currentLayer.shadowBlur || 6}</span>
+                          <span className="text-white/60 text-[10px] w-6">{currentLayer.shadowBlur || 6}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/40 text-[10px] w-8">Opac.</span>
+                          <Slider value={[currentLayer.shadowOpacity || 60]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOpacity: v })} min={0} max={100} step={5} className="flex-1" />
+                          <span className="text-white/60 text-[10px] w-6">{currentLayer.shadowOpacity || 60}%</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2 items-center">
-                      <span className="text-white/40 text-xs w-8">X</span>
+                      <span className="text-white/40 text-[10px] w-6">X</span>
                       <Slider value={[currentLayer.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} className="flex-1" />
-                      <span className="text-white/60 text-xs w-8">{currentLayer.shadowOffsetX || 3}</span>
-                      <span className="text-white/40 text-xs w-8">Y</span>
+                      <span className="text-white/60 text-[10px] w-6">{currentLayer.shadowOffsetX || 3}</span>
+                      <span className="text-white/40 text-[10px] w-6">Y</span>
                       <Slider value={[currentLayer.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} className="flex-1" />
-                      <span className="text-white/60 text-xs w-8">{currentLayer.shadowOffsetY || 3}</span>
+                      <span className="text-white/60 text-[10px] w-6">{currentLayer.shadowOffsetY || 3}</span>
                     </div>
                   </div>
                 </div>
@@ -3790,8 +3842,8 @@ Réponds en JSON avec:
               )}
 
               {currentLayer.neon && (
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/60 text-sm">Néon</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/60 text-xs">Néon</label>
                   <div className="flex gap-2 items-center">
                     <input type="color" value={currentLayer.neonColor || '#ff00ff'} onChange={(e) => updateLayer(selectedLayer, { neonColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
                     <Slider value={[currentLayer.neonIntensity || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { neonIntensity: v })} min={5} max={30} step={1} className="flex-1" />
@@ -3819,8 +3871,8 @@ Réponds en JSON avec:
               )}
 
               {currentLayer.sparkle && (
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/60 text-sm">✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/60 text-xs">✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</label>
                   <div className="flex gap-2 items-center">
                     <Slider value={[currentLayer.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(selectedLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="flex-1" />
                     <span className="text-white/60 text-sm w-12">{currentLayer.sparkleIntensity || 50}%</span>
@@ -3832,42 +3884,11 @@ Réponds en JSON avec:
 
           {/* IMAGE LAYER PROPERTIES */}
           {currentLayer.type === 'image' && (
-            <div className="space-y-3">
-              {/* Remove Background for uploaded images */}
-              {!currentLayer.isBaseImage && (
-                <Button
-                  onClick={async () => {
-                    setRemovingBgFromLayer(true);
-                    try {
-                      const response = await base44.functions.invoke('removeBg', { image_url: currentLayer.imageUrl });
-                      if (response.data?.success && response.data?.image_url) {
-                        updateLayer(selectedLayer, { imageUrl: response.data.image_url });
-                        showHelp(language === 'fr' ? '✅ Fond supprimé de l\'image ! (1 crédit utilisé)' : '✅ Background removed from image! (1 credit used)');
-                      } else if (response.data?.error === 'service_unavailable' || response.data?.error === 'no_credits') {
-                        setServiceErrorType(response.data?.error);
-                        setShowServiceUnavailable(true);
-                      } else {
-                        showHelp(language === 'fr' ? `❌ ${response.data?.error || 'Erreur'}` : `❌ ${response.data?.error || 'Error'}`);
-                      }
-                    } catch (err) {
-                      console.error(err);
-                      showHelp(language === 'fr' ? '❌ Erreur lors de la suppression du fond' : '❌ Error removing background');
-                    }
-                    setRemovingBgFromLayer(false);
-                  }}
-                  disabled={removingBgFromLayer}
-                  className="w-full bg-gradient-to-r from-pink-600 to-red-600 hover:from-pink-700 hover:to-red-700"
-                  size="sm"
-                >
-                  {removingBgFromLayer ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Scissors className="h-4 w-4 mr-2" />}
-                  {language === 'fr' ? 'Supprimer le fond (1 crédit)' : 'Remove background (1 credit)'}
-                </Button>
-              )}
-
+            <div className="space-y-2">
               {/* Size */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {currentLayer.width}px</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {currentLayer.width}px</label>
                   <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
                 </div>
                 <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
@@ -3877,8 +3898,8 @@ Réponds en JSON avec:
               </div>
 
               {/* Opacity */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
                 <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
               </div>
 
@@ -3969,11 +3990,11 @@ Réponds en JSON avec:
 
           {/* SHAPE LAYER PROPERTIES */}
           {currentLayer.type === 'shape' && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {/* Size */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {currentLayer.width}px</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {currentLayer.width}px</label>
                   <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
                 </div>
                 <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
@@ -3983,20 +4004,20 @@ Réponds en JSON avec:
               </div>
 
               {/* Rotation & Opacity */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer.rotation || 0}°</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer.rotation || 0}°</label>
                   <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
                 </div>
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
                   <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
                 </div>
               </div>
 
               {/* Color */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
                 <div className="flex gap-2 flex-wrap">
                   {PRESET_COLORS.map(color => (
                     <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
@@ -4051,8 +4072,8 @@ Réponds en JSON avec:
 
           {/* BACKGROUND LAYER */}
           {currentLayer.type === 'background' && (
-            <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-              <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
+            <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+              <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
               <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
             </div>
           )}
