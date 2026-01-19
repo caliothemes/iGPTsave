@@ -2942,7 +2942,7 @@ Réponds en JSON avec:
               }
             }
           }
-          exportCtx.restore();
+        exportCtx.restore();
     }
 
     // Convert to blob with maximum quality
