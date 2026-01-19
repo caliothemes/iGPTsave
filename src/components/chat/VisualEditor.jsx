@@ -1229,6 +1229,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               tempCtx.font = ctx.font;
               tempCtx.textAlign = layer.align || 'left';
               tempCtx.fillStyle = layer.color;
+              tempCtx.letterSpacing = `${layer.letterSpacing || 0}px`;
 
               // Flip vertically
               tempCtx.translate(0, reflectionHeight);
@@ -2898,6 +2899,7 @@ Réponds en JSON avec:
                 tempCtx.font = exportCtx.font;
                 tempCtx.textAlign = layer.align || 'left';
                 tempCtx.fillStyle = layer.color;
+                tempCtx.letterSpacing = `${layer.letterSpacing || 0}px`;
 
                 // Flip vertically
                 tempCtx.translate(0, reflectionHeight);
@@ -3776,8 +3778,8 @@ Réponds en JSON avec:
                   <button onClick={() => updateLayer(selectedLayer, { effect3d: !currentLayer.effect3d })} className={cn("p-2 rounded-lg text-sm", currentLayer.effect3d ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>3D</button>
                   <button onClick={() => updateLayer(selectedLayer, { neon: !currentLayer.neon })} className={cn("p-2 rounded-lg text-sm", currentLayer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>Néon</button>
                   <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-2 rounded-lg text-sm", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>{language === 'fr' ? 'Reflet' : 'Reflect'}</button>
-                  <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-2 rounded-lg text-sm", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>✨</button>
-                  <button onClick={() => updateLayer(selectedLayer, { textGradient: !currentLayer.textGradient })} className={cn("p-2 rounded-lg text-sm", currentLayer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>🌈</button>
+                  <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-2 rounded-lg text-sm", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</button>
+                  <button onClick={() => updateLayer(selectedLayer, { textGradient: !currentLayer.textGradient })} className={cn("p-2 rounded-lg text-sm", currentLayer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60 hover:bg-white/20")}>🌈 {language === 'fr' ? 'Dégradé' : 'Gradient'}</button>
                 </div>
               </div>
 
@@ -5262,7 +5264,7 @@ Réponds en JSON avec:
                           </div>
                           <div className="flex gap-2 items-center">
                             <span className="text-white/40 text-xs w-20">{language === 'fr' ? 'Distance' : 'Distance'}</span>
-                            <Slider value={[layer.reflectionGap || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionGap: v })} min={-50} max={100} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+                            <Slider value={[layer.reflectionGap || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { reflectionGap: v })} min={-200} max={500} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                             <span className="text-white/60 text-sm w-12">{layer.reflectionGap || 0}px</span>
                           </div>
                         </div>
