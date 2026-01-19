@@ -92,9 +92,25 @@ export default function VisualCard({
           bgImage.src = visual.original_image_url || visual.image_url;
         });
         
-        // Use actual image dimensions, not visual.dimensions
+        // Get original metadata dimensions
+        let metadataWidth = bgImage.naturalWidth;
+        let metadataHeight = bgImage.naturalHeight;
+        
+        if (visual.dimensions) {
+          const [w, h] = visual.dimensions.split('x').map(Number);
+          if (w && h) {
+            metadataWidth = w;
+            metadataHeight = h;
+          }
+        }
+        
+        // Use actual image dimensions for canvas
         const width = bgImage.naturalWidth;
         const height = bgImage.naturalHeight;
+        
+        // Calculate scale factor if metadata differs from actual image size
+        const scaleX = width / metadataWidth;
+        const scaleY = height / metadataHeight;
         
         const canvas = document.createElement('canvas');
         canvas.width = width;
@@ -106,8 +122,16 @@ export default function VisualCard({
         visual.editor_layers.forEach((layer) => {
           if (layer.type === 'text' && layer.text && layer.visible !== false) {
             ctx.save();
+            
+            // Scale layer coordinates to match actual image size
+            const scaledX = layer.x * scaleX;
+            const scaledY = layer.y * scaleY;
+            const scaledFontSize = layer.fontSize * scaleX;
+            const scaledPadding = (layer.padding || 20) * scaleX;
+            const scaledBorderRadius = (layer.borderRadius || 12) * scaleX;
+            
             const fontWeight = layer.fontWeight || 700;
-            const fontStyle = `${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+            const fontStyle = `${fontWeight} ${scaledFontSize}px ${layer.fontFamily}`;
             ctx.font = fontStyle;
             ctx.fillStyle = layer.color;
             ctx.textAlign = layer.align || 'center';
@@ -116,16 +140,14 @@ export default function VisualCard({
             const textWidth = metrics.width;
             
             if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-              const padding = layer.padding || 20;
-              const borderRadius = layer.borderRadius || 12;
-              let boxX = layer.x - textWidth / 2 - padding;
-              if (layer.align === 'left') boxX = layer.x - padding;
-              const boxY = layer.y - layer.fontSize * 0.85 - padding;
-              const boxWidth = textWidth + padding * 2;
-              const boxHeight = layer.fontSize * 1.15 + padding * 2;
+              let boxX = scaledX - textWidth / 2 - scaledPadding;
+              if (layer.align === 'left') boxX = scaledX - scaledPadding;
+              const boxY = scaledY - scaledFontSize * 0.85 - scaledPadding;
+              const boxWidth = textWidth + scaledPadding * 2;
+              const boxHeight = scaledFontSize * 1.15 + scaledPadding * 2;
               
               ctx.fillStyle = layer.backgroundColor;
-              const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
+              const radius = Math.min(scaledBorderRadius, boxWidth / 2, boxHeight / 2);
               ctx.beginPath();
               ctx.moveTo(boxX + radius, boxY);
               ctx.lineTo(boxX + boxWidth - radius, boxY);
@@ -141,7 +163,7 @@ export default function VisualCard({
               ctx.fillStyle = layer.color;
             }
             
-            ctx.fillText(layer.text, layer.x, layer.y);
+            ctx.fillText(layer.text, scaledX, scaledY);
             ctx.restore();
           }
         });
