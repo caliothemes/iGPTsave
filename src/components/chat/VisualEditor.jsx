@@ -780,7 +780,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                   ctx.stroke();
                 }
               }
-            } else if (layer.type === 'image' && loadedImages[layer.imageUrl]) {
+            } else if (layer?.type === 'image' && loadedImages[layer?.imageUrl]) {
               // MOCKUP FILL - Rectangle clip
               if (layer.clipMask) {
                 ctx.save();
