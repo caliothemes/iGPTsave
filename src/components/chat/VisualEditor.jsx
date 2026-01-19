@@ -3665,7 +3665,7 @@ Réponds en JSON avec:
           </div>
 
           {/* TEXT LAYER PROPERTIES - Icon Grid */}
-          {currentLayer.type === 'text' && (
+          {currentLayer?.type === 'text' && (
             <div>
               <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Propriétés' : 'Properties'}</label>
               <div className="grid grid-cols-5 gap-2">
