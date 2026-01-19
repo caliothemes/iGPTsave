@@ -180,7 +180,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 setProgress(100);
                 
                 setTimeout(() => {
-                  const modelName = provider === 'wan' ? 'Wan v2.5 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
+                  const modelName = provider === 'wan' ? 'Wan v2.6 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
                   const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
                   const videoAspectRatio = provider === 'replicate' ? aspectRatio : provider === 'sora' ? soraAspectRatio : '16:9';
                   onVideoGenerated(statusResponse.data.video_url, promptWithMetadata, videoAspectRatio);
@@ -939,8 +939,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     </div>
                     <p className="text-green-100 text-sm leading-relaxed">
                       {language === 'fr' 
-                        ? 'La génération de votre vidéo est en cours, cela peut prendre de 1min à 4min. Ne baissez/fermez pas cette fenêtre pendant le processus. iGPT vous remercie de votre patience...'
-                        : 'Your video generation is in progress, it may take 1min to 4min. Do not minimize/close this window during the process. iGPT thanks you for your patience...'}
+                        ? 'La génération de votre vidéo est en cours, cela peut prendre jusqu\'à 10min. Ne baissez/fermez pas cette fenêtre pendant le processus. iGPT vous remercie de votre patience...'
+                        : 'Your video generation is in progress, it may take up to 10min. Do not minimize/close this window during the process. iGPT thanks you for your patience...'}
                     </p>
                   </div>
                 </motion.div>

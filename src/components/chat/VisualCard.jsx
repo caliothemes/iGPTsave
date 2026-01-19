@@ -64,6 +64,20 @@ export default function VisualCard({
   
   // Detect if this is a video
   const isVideo = visual.video_url || (visual.image_url && (visual.image_url.includes('.mp4') || visual.image_url.includes('/video')));
+  
+  // Parse video metadata from prompt
+  const parseVideoMetadata = (prompt) => {
+    if (!prompt) return { cleanPrompt: prompt, model: null, duration: null };
+    const modelMatch = prompt.match(/^\[([^\]]+)\]/);
+    const durationMatch = prompt.match(/\[(\d+)s\]/);
+    if (modelMatch && durationMatch) {
+      const cleanPrompt = prompt.replace(/^\[[^\]]+\]\s*\[\d+s\]\s*/, '');
+      return { cleanPrompt, model: modelMatch[1], duration: durationMatch[1] };
+    }
+    return { cleanPrompt: prompt, model: null, duration: null };
+  };
+  
+  const { cleanPrompt, model: videoModel, duration: videoDuration } = isVideo ? parseVideoMetadata(visual.original_prompt) : { cleanPrompt: visual.original_prompt };
 
   // Compose image with text layers on mount if needed
   React.useEffect(() => {
@@ -376,23 +390,23 @@ export default function VisualCard({
       {showActions && (
         <div className="p-4 pt-2 space-y-3">
           {/* Original Prompt - Clickable */}
-          {visual.original_prompt && (
+          {cleanPrompt && (
             <button
               onClick={() => setShowPromptModal(true)}
               className="w-full text-left p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all group"
               title={language === 'fr' ? 'Cliquer pour voir le prompt complet' : 'Click to see full prompt'}
             >
               <p className="text-white/60 text-xs line-clamp-4 group-hover:text-white/80 transition-colors">
-                {visual.original_prompt}
+                {cleanPrompt}
               </p>
             </button>
           )}
           
           <div className="flex items-center gap-2 text-xs flex-wrap">
             {/* Uploaded Badge */}
-            {(visual.original_prompt === 'Image uploadée' || visual.original_prompt === 'Uploaded image') && (
+            {(cleanPrompt === 'Image uploadée' || cleanPrompt === 'Uploaded image') && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-600/90 text-white text-xs font-medium border border-orange-500/20">
-                {visual.original_prompt}
+                {cleanPrompt}
               </span>
             )}
 
@@ -402,26 +416,19 @@ export default function VisualCard({
                 {visual.dimensions}
               </span>
             )}
-            
+
             {/* Video-specific badges */}
-            {isVideo && visual.original_prompt && (
+            {isVideo && videoModel && (
               <>
                 {/* Model Badge */}
-                {visual.original_prompt.toLowerCase().includes('kling') && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 text-xs font-medium border border-violet-500/30">
-                    Kling v2.5 Pro
-                  </span>
-                )}
-                {visual.original_prompt.toLowerCase().includes('runway') && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-500/30">
-                    RunwayML Gen-3
-                  </span>
-                )}
-                
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 text-xs font-medium border border-violet-500/30">
+                  {videoModel}
+                </span>
+
                 {/* Duration Badge */}
-                {(visual.original_prompt.match(/(\d+)s/) || visual.title?.match(/(\d+)s/)) && (
+                {videoDuration && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium border border-emerald-500/30">
-                    {(visual.original_prompt.match(/(\d+)s/) || visual.title?.match(/(\d+)s/))[1]}s
+                    {videoDuration}s
                   </span>
                 )}
               </>
@@ -621,13 +628,13 @@ export default function VisualCard({
           <div className="space-y-3">
             <div className="bg-white/5 border border-white/10 rounded-lg p-4 max-h-96 overflow-y-auto">
               <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">
-                {visual.original_prompt}
+                {cleanPrompt}
               </p>
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={() => {
-                  navigator.clipboard.writeText(visual.original_prompt);
+                  navigator.clipboard.writeText(cleanPrompt);
                   toast.success(language === 'fr' ? 'Prompt copié' : 'Prompt copied');
                 }}
                 className="flex-1 bg-violet-600 hover:bg-violet-700"
@@ -640,7 +647,7 @@ export default function VisualCard({
               {onPromptClick && (
                 <Button
                   onClick={() => {
-                    onPromptClick(visual.original_prompt);
+                    onPromptClick(cleanPrompt);
                     setShowPromptModal(false);
                   }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
