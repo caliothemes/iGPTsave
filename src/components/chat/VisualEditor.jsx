@@ -2940,13 +2940,13 @@ Réponds en JSON avec:
 
                 exportCtx.restore();
               }
-              }
-              }
-              exportCtx.restore();
-        }
+            }
+          }
+          exportCtx.restore();
+    }
 
-        // Convert to blob with maximum quality
-        const blob = await new Promise(resolve => exportCanvas.toBlob(resolve, 'image/png', 1.0));
+    // Convert to blob with maximum quality
+    const blob = await new Promise(resolve => exportCanvas.toBlob(resolve, 'image/png', 1.0));
     const file = new File([blob], `${visual.title || 'visual'}-edited.png`, { type: 'image/png' });
     
     try {
