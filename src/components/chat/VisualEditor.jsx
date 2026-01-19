@@ -3901,18 +3901,6 @@ Réponds en JSON avec:
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-              {currentLayer.sparkle && (
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/60 text-xs">✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</label>
-                  <div className="flex gap-2 items-center">
-                    <Slider value={[currentLayer.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(selectedLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="flex-1" />
-                    <span className="text-white/60 text-sm w-12">{currentLayer.sparkleIntensity || 50}%</span>
-                  </div>
-                </div>
-              )}
 
               {currentLayer.reflection && (
                 <div className="space-y-2 p-2.5 bg-white/5 rounded-lg border border-white/10">
@@ -3943,8 +3931,8 @@ Réponds en JSON avec:
                   <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Largeur' : 'Width'}: {currentLayer.width}px</label>
                   <Slider value={[currentLayer.width]} onValueChange={([v]) => updateLayer(selectedLayer, { width: v })} min={20} max={canvasSize.width} step={1} />
                 </div>
-                <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Hauteur' : 'Height'}: {currentLayer.height}px</label>
+                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Hauteur' : 'Height'}: {currentLayer.height}px</label>
                   <Slider value={[currentLayer.height]} onValueChange={([v]) => updateLayer(selectedLayer, { height: v })} min={20} max={canvasSize.height} step={1} />
                 </div>
               </div>
@@ -3973,9 +3961,9 @@ Réponds en JSON avec:
               </div>
 
               {/* Effects */}
-              <div className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-sm font-medium flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-amber-400" />
+              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
+                <label className="text-white/70 text-xs font-medium flex items-center gap-2">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                   {language === 'fr' ? 'Effets' : 'Effects'}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
