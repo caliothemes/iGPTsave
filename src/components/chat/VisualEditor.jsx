@@ -2342,31 +2342,51 @@ Réponds en JSON avec:
         // Calculate scale factor from display size to original size
         const scaleToOriginal = originalWidth / canvasSize.width;
         
-        // Scale layers back to original size for saving
+        // Scale layers back to original size for saving - PRESERVE ALL PROPERTIES
         const layersToSave = layers.map(layer => {
           if (layer.type === 'text') {
             return {
-              ...layer,
+              ...layer, // Keep ALL properties
               x: layer.x / (canvasSize.width / originalWidth),
               y: layer.y / (canvasSize.width / originalWidth),
               fontSize: layer.fontSize / (canvasSize.width / originalWidth),
               maxWidth: layer.maxWidth ? layer.maxWidth / (canvasSize.width / originalWidth) : 0,
               padding: layer.padding ? layer.padding / (canvasSize.width / originalWidth) : 0,
               borderRadius: layer.borderRadius ? layer.borderRadius / (canvasSize.width / originalWidth) : 0,
-              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2
+              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2,
+              shadowBlur: layer.shadowBlur ? layer.shadowBlur / (canvasSize.width / originalWidth) : 6,
+              shadowOffsetX: layer.shadowOffsetX ? layer.shadowOffsetX / (canvasSize.width / originalWidth) : 3,
+              shadowOffsetY: layer.shadowOffsetY ? layer.shadowOffsetY / (canvasSize.width / originalWidth) : 3,
+              glowSize: layer.glowSize ? layer.glowSize / (canvasSize.width / originalWidth) : 10,
+              haloSize: layer.haloSize ? layer.haloSize / (canvasSize.width / originalWidth) : 15,
+              curveRadius: layer.curveRadius ? layer.curveRadius / (canvasSize.width / originalWidth) : 100,
+              sparkleIntensity: layer.sparkleIntensity || 50,
+              neonIntensity: layer.neonIntensity || 15,
+              letterSpacing: layer.letterSpacing || 0,
+              reflectionOpacity: layer.reflectionOpacity || 40,
+              reflectionGap: layer.reflectionGap || 0,
             };
           } else if (layer.type === 'image' || layer.type === 'shape') {
             return {
-              ...layer,
+              ...layer, // Keep ALL properties
               x: layer.x / (canvasSize.width / originalWidth),
               y: layer.y / (canvasSize.width / originalWidth),
               width: layer.width / (canvasSize.width / originalWidth),
               height: layer.height / (canvasSize.width / originalWidth),
               borderRadius: layer.borderRadius ? layer.borderRadius / (canvasSize.width / originalWidth) : 0,
-              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2
+              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2,
+              shadowBlur: layer.shadowBlur ? layer.shadowBlur / (canvasSize.width / originalWidth) : 10,
+              glowSize: layer.glowSize ? layer.glowSize / (canvasSize.width / originalWidth) : 10,
+              haloSize: layer.haloSize ? layer.haloSize / (canvasSize.width / originalWidth) : 15,
+              reflectionOpacity: layer.reflectionOpacity || 40,
+              reflectionGap: layer.reflectionGap || 2,
+              clipX: layer.clipX ? layer.clipX / (canvasSize.width / originalWidth) : undefined,
+              clipY: layer.clipY ? layer.clipY / (canvasSize.width / originalWidth) : undefined,
+              clipWidth: layer.clipWidth ? layer.clipWidth / (canvasSize.width / originalWidth) : undefined,
+              clipHeight: layer.clipHeight ? layer.clipHeight / (canvasSize.width / originalWidth) : undefined,
             };
           }
-          return layer;
+          return layer; // background layers - keep as is
         });
 
         // Create a canvas at ORIGINAL resolution
