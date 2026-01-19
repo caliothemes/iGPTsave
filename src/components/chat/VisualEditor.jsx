@@ -15,7 +15,7 @@ import {
   FolderOpen, Plus, Save, Palette, Eraser, Brush,
   MessageSquare, FileText, Bookmark, Check, Copy,
   PaintBucket, RotateCw, Upload, ChevronDown as ChevronDownIcon, Scissors, Frame,
-  SlidersHorizontal, ChevronRight
+  SlidersHorizontal, ChevronRight, Maximize2, Droplet, Sliders, Layout
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -3662,118 +3662,44 @@ Réponds en JSON avec:
             </div>
           </div>
 
-          {/* TEXT LAYER PROPERTIES */}
+          {/* TEXT LAYER PROPERTIES - Icon Grid */}
           {currentLayer.type === 'text' && (
-            <div className="space-y-2">
-              {/* Text Input */}
-              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Texte' : 'Text'}</label>
-                <Input value={currentLayer.text} onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })} className="bg-white/5 border-white/10 text-white" />
+            <div>
+              <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Propriétés' : 'Properties'}</label>
+              <div className="grid grid-cols-5 gap-2">
+                <button onClick={() => setActivePropertyModal('text')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Modifier le texte' : 'Edit text'}>
+                  <Type className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('font')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Police' : 'Font'}>
+                  <svg className="h-5 w-5 text-white/70 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                </button>
+                <button onClick={() => setActivePropertyModal('format')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Format' : 'Format'}>
+                  <Sliders className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('color')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Couleur' : 'Color'}>
+                  <Palette className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('maxwidth')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Largeur max' : 'Max width'}>
+                  <Maximize2 className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('opacity')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Opacité' : 'Opacity'}>
+                  <Droplet className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('align')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Alignement' : 'Alignment'}>
+                  <AlignCenter className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('background')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Arrière-plan' : 'Background'}>
+                  <Square className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => setActivePropertyModal('layout')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title="Padding & Radius">
+                  <Layout className="h-5 w-5 text-white/70 mx-auto" />
+                </button>
+                <button onClick={() => updateLayer(selectedLayer, { curvedText: !currentLayer.curvedText })} className={cn("p-3 rounded-lg transition-all", currentLayer.curvedText ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30")} title={language === 'fr' ? 'Texte courbe' : 'Curved text'}>
+                  <Circle className="h-5 w-5 mx-auto" />
+                </button>
               </div>
-
-              {/* Font Family */}
-              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Police' : 'Font'}</label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white/70 text-sm transition-colors">
-                      <span style={{ fontFamily: currentLayer.fontFamily }}>{FONTS.find(f => f.family === currentLayer.fontFamily)?.name || 'Police'}</span>
-                      <ChevronDownIcon className="h-4 w-4 opacity-50" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-gray-900 border-white/10 max-h-64 overflow-y-auto w-64">
-                    {FONTS.map(font => (
-                      <DropdownMenuItem 
-                        key={font.id} 
-                        onClick={() => updateLayer(selectedLayer, { fontFamily: font.family })}
-                        className={cn("text-white/70 hover:text-white hover:bg-white/10 cursor-pointer", currentLayer.fontFamily === font.family && "bg-violet-500/20 text-violet-300")}
-                        style={{ fontFamily: font.family }}
-                      >
-                        {font.name}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              {/* Font Size, Weight, Spacing */}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer.fontSize}px</label>
-                  <Slider value={[currentLayer.fontSize]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={5} max={120} step={1} />
-                </div>
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Poids' : 'Weight'}: {currentLayer.fontWeight || 400}</label>
-                  <Slider value={[currentLayer.fontWeight || 400]} onValueChange={([v]) => updateLayer(selectedLayer, { fontWeight: v, bold: v >= 600 })} min={100} max={900} step={100} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Espacement' : 'Spacing'}: {currentLayer.letterSpacing || 0}px</label>
-                  <Slider value={[currentLayer.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} />
-                </div>
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer.rotation || 0}°</label>
-                  <Slider value={[currentLayer.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={0} max={360} step={1} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Largeur max' : 'Max Width'}: {currentLayer.maxWidth || (language === 'fr' ? 'Auto' : 'Auto')}</label>
-                  <Slider value={[currentLayer.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={5} />
-                </div>
-                <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
-                  <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
-                </div>
-              </div>
-
-              {/* Alignment & Style */}
-              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Alignement & Style' : 'Alignment & Style'}</label>
-                <div className="grid grid-cols-5 gap-2">
-                  <button onClick={() => updateLayer(selectedLayer, { italic: !currentLayer.italic })} className={cn("p-2 rounded-lg", currentLayer.italic ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}><Italic className="h-4 w-4 mx-auto" /></button>
-                  <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-2 rounded-lg", currentLayer.align === 'left' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}><AlignLeft className="h-4 w-4 mx-auto" /></button>
-                  <button onClick={() => updateLayer(selectedLayer, { align: 'center' })} className={cn("p-2 rounded-lg", currentLayer.align === 'center' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}><AlignCenter className="h-4 w-4 mx-auto" /></button>
-                  <button onClick={() => updateLayer(selectedLayer, { align: 'right' })} className={cn("p-2 rounded-lg", currentLayer.align === 'right' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")}><AlignRight className="h-4 w-4 mx-auto" /></button>
-                  <button onClick={() => updateLayer(selectedLayer, { curvedText: !currentLayer.curvedText })} className={cn("p-2 rounded-lg", currentLayer.curvedText ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60 hover:bg-white/20")} title={language === 'fr' ? 'Texte en cercle' : 'Curved text'}><Circle className="h-4 w-4 mx-auto" /></button>
-                </div>
-              </div>
-
-              {/* Color Picker */}
-              <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Couleur' : 'Color'}</label>
-                <div className="flex gap-2 flex-wrap">
-                  {PRESET_COLORS.map(color => (
-                    <button key={color} onClick={() => updateLayer(selectedLayer, { color })} className={cn("w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110", currentLayer.color === color ? "border-violet-400" : "border-transparent")} style={{ backgroundColor: color }} />
-                  ))}
-                  <input type="color" value={currentLayer.color} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-8 h-8 rounded-lg cursor-pointer" />
-                </div>
-              </div>
-
-              {/* Curved Text Options */}
-              {currentLayer.curvedText && (
-                <div className="space-y-2 p-2.5 bg-violet-500/10 rounded-lg border border-violet-500/20">
-                  <p className="text-white/80 text-xs font-medium flex items-center gap-2">
-                    <Circle className="h-3.5 w-3.5 text-violet-400" />
-                    {language === 'fr' ? 'Texte en cercle' : 'Curved text'}
-                  </p>
-                  <div className="space-y-1.5">
-                    <label className="text-white/60 text-xs">{language === 'fr' ? 'Rayon' : 'Radius'}: {currentLayer.curveRadius || 100}</label>
-                    <Slider value={[currentLayer.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={40} max={400} step={5} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => updateLayer(selectedLayer, { curveDirection: 'top' })} className={cn("p-2 rounded-lg text-sm", (currentLayer.curveDirection || 'top') === 'top' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>
-                      ⌒ {language === 'fr' ? 'Haut' : 'Top'}
-                    </button>
-                    <button onClick={() => updateLayer(selectedLayer, { curveDirection: 'bottom' })} className={cn("p-2 rounded-lg text-sm", currentLayer.curveDirection === 'bottom' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>
-                      ⌣ {language === 'fr' ? 'Bas' : 'Bottom'}
-                    </button>
-                  </div>
-                </div>
-              )}
+            </div>
+          )}
 
               {/* Effect Icons - Compact */}
               <div className="flex items-center gap-1 flex-wrap">
