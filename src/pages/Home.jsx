@@ -1889,10 +1889,17 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 rounded-2xl px-5 py-4 max-w-lg shadow-lg shadow-violet-500/5">
-                  <div 
-                    className="text-white/80 text-sm leading-relaxed welcome-message-content"
-                    dangerouslySetInnerHTML={{ __html: getWelcomeMessage() }}
-                  />
+                  <div className="text-white/80 text-sm leading-relaxed welcome-message-content">
+                    {(() => {
+                      const msg = getWelcomeMessage();
+                      // If message contains HTML tags, render as HTML
+                      if (msg && (msg.includes('<p>') || msg.includes('<strong>') || msg.includes('<em>') || msg.includes('<br'))) {
+                        return <div dangerouslySetInnerHTML={{ __html: msg }} />;
+                      }
+                      // Otherwise render as plain text
+                      return msg;
+                    })()}
+                  </div>
                 </div>
               </div>
             </div>
