@@ -8,6 +8,7 @@ import { Loader2, Save, Globe, Layout, MessageSquare, Building2 } from 'lucide-r
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
