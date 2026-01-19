@@ -740,7 +740,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               } else if (layer.bgType === 'image' && loadedImages[layer.bgValue]) {
                 ctx.drawImage(loadedImages[layer.bgValue], 0, 0, canvas.width, canvas.height);
               }
-            } else if (layer.type === 'shape') {
+            } else if (layer?.type === 'shape') {
               // Apply rotation
               const centerX = layer.x + layer.width / 2;
               const centerY = layer.y + layer.height / 2;
