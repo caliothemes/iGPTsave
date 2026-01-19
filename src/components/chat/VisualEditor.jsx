@@ -3779,7 +3779,7 @@ Réponds en JSON avec:
           )}
 
           {/* SHAPE LAYER PROPERTIES */}
-          {currentLayer.type === 'shape' && (
+          {currentLayer?.type === 'shape' && (
             <div className="space-y-2">
               {/* Size */}
               <div className="grid grid-cols-2 gap-2">
