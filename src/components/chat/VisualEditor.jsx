@@ -4508,10 +4508,9 @@ Réponds en JSON avec:
           </div>
         </div>
       )}
-    </div>
 
       {/* Custom Texture Generator Modal */}
-              <Dialog open={showTextureGenerator} onOpenChange={setShowTextureGenerator}>
+      <Dialog open={showTextureGenerator} onOpenChange={setShowTextureGenerator}>
                 <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2"><Brush className="h-5 w-5 text-violet-400" />{language === 'fr' ? 'Générer une texture IA' : 'Generate AI texture'}</DialogTitle>
