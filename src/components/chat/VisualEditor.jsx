@@ -3578,7 +3578,7 @@ Réponds en JSON avec:
                 <div key={idx} onClick={() => setSelectedLayer(idx)}
                   className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all cursor-pointer", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
                   <LayerIcon className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate flex-1 text-left">{layer.type === 'text' ? layer.text.slice(0, 15) : layer.type === 'image' ? 'Image' : layer.type === 'background' ? (language === 'fr' ? 'Fond' : 'Background') : layer.shape}</span>
+                  <span className="truncate flex-1 text-left">{layer?.type === 'text' ? layer?.text?.slice(0, 15) : layer?.type === 'image' ? 'Image' : layer?.type === 'background' ? (language === 'fr' ? 'Fond' : 'Background') : layer?.shape}</span>
                   <div className="flex items-center gap-0.5 flex-shrink-0">
                     <button onClick={(e) => { e.stopPropagation(); moveLayer(idx, 'up'); }} disabled={idx === layers.length - 1} className="p-1 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed"><ChevronUp className="h-3 w-3" /></button>
                     <button onClick={(e) => { e.stopPropagation(); moveLayer(idx, 'down'); }} disabled={idx === 0} className="p-1 text-white/40 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed"><ChevronDown className="h-3 w-3" /></button>
