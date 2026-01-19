@@ -3588,10 +3588,10 @@ Réponds en JSON avec:
                 <button
                   onClick={stylizeTextWithAI}
                   disabled={stylizingText}
-                  className="p-2 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors"
-                  title={language === 'fr' ? 'Styliser avec l\'IA' : 'Stylize with AI'}
+                  className="px-2 py-1.5 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors flex items-center gap-1.5"
                 >
                   {stylizingText ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                  <span className="text-xs font-medium">{language === 'fr' ? 'Styliser IA' : 'AI Style'}</span>
                 </button>
               )}
               {/* Remove BG for images */}
@@ -3614,10 +3614,10 @@ Réponds en JSON avec:
                     setRemovingBgFromLayer(false);
                   }}
                   disabled={removingBgFromLayer}
-                  className="p-2 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors"
-                  title={language === 'fr' ? 'Supprimer le fond' : 'Remove background'}
+                  className="px-2 py-1.5 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors flex items-center gap-1.5"
                 >
                   {removingBgFromLayer ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Scissors className="h-3.5 w-3.5" />}
+                  <span className="text-xs font-medium">{language === 'fr' ? 'Suppr. fond' : 'Rem. BG'}</span>
                 </button>
               )}
               <button onClick={() => duplicateLayer(selectedLayer)} className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors" title={language === 'fr' ? 'Dupliquer' : 'Duplicate'}>
