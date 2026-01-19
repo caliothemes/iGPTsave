@@ -901,8 +901,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                   }
                 }
               }
-            } else if (layer.type === 'text') {
-          const fontWeight = layer.fontWeight || (layer.bold ? 700 : 400);
+            } else if (layer?.type === 'text') {
+            const fontWeight = layer?.fontWeight || (layer?.bold ? 700 : 400);
           const fontStyle = `${layer.italic ? 'italic ' : ''}${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
           ctx.font = fontStyle;
           ctx.fillStyle = layer.color;
