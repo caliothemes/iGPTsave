@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Save, Globe, Layout, MessageSquare, Building2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
+import ReactQuill from 'react-quill';
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
@@ -155,43 +156,83 @@ export default function AdminSettings() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-white/60 mb-2">Utilisateur connecté (Français)</label>
-                <Textarea
-                  value={settings.welcome_message_fr}
-                  onChange={(e) => setSettings(prev => ({ ...prev, welcome_message_fr: e.target.value }))}
-                  placeholder="Bonjour {name} ! 👋&#10;&#10;Je suis **iGPT**. Décrivez-moi le visuel..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
-                />
+                <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                  <ReactQuill
+                    value={settings.welcome_message_fr || ''}
+                    onChange={(value) => setSettings(prev => ({ ...prev, welcome_message_fr: value }))}
+                    theme="snow"
+                    modules={{
+                      toolbar: [
+                        ['bold', 'italic'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['clean']
+                      ]
+                    }}
+                    className="quill-dark"
+                    style={{ minHeight: '150px' }}
+                  />
+                </div>
                 <p className="text-xs text-white/40 mt-1">Utilisez {'{name}'} pour le nom de l'utilisateur</p>
               </div>
               <div>
                 <label className="block text-sm text-white/60 mb-2">Logged in user (English)</label>
-                <Textarea
-                  value={settings.welcome_message_en}
-                  onChange={(e) => setSettings(prev => ({ ...prev, welcome_message_en: e.target.value }))}
-                  placeholder="Hello {name}! 👋&#10;&#10;I'm **iGPT**. Describe the visual..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
-                />
+                <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                  <ReactQuill
+                    value={settings.welcome_message_en || ''}
+                    onChange={(value) => setSettings(prev => ({ ...prev, welcome_message_en: value }))}
+                    theme="snow"
+                    modules={{
+                      toolbar: [
+                        ['bold', 'italic'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['clean']
+                      ]
+                    }}
+                    className="quill-dark"
+                    style={{ minHeight: '150px' }}
+                  />
+                </div>
                 <p className="text-xs text-white/40 mt-1">Use {'{name}'} for the user's name</p>
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-white/60 mb-2">Visiteur non connecté (Français)</label>
-                <Textarea
-                  value={settings.guest_message_fr}
-                  onChange={(e) => setSettings(prev => ({ ...prev, guest_message_fr: e.target.value }))}
-                  placeholder="Bienvenue sur **iGPT** ! 👋&#10;&#10;Décrivez-moi ce que vous souhaitez créer..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
-                />
+                <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                  <ReactQuill
+                    value={settings.guest_message_fr || ''}
+                    onChange={(value) => setSettings(prev => ({ ...prev, guest_message_fr: value }))}
+                    theme="snow"
+                    modules={{
+                      toolbar: [
+                        ['bold', 'italic'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['clean']
+                      ]
+                    }}
+                    className="quill-dark"
+                    style={{ minHeight: '150px' }}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm text-white/60 mb-2">Guest visitor (English)</label>
-                <Textarea
-                  value={settings.guest_message_en}
-                  onChange={(e) => setSettings(prev => ({ ...prev, guest_message_en: e.target.value }))}
-                  placeholder="Welcome to **iGPT**! 👋&#10;&#10;Describe what you want to create..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
-                />
+                <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                  <ReactQuill
+                    value={settings.guest_message_en || ''}
+                    onChange={(value) => setSettings(prev => ({ ...prev, guest_message_en: e.target.value }))}
+                    theme="snow"
+                    modules={{
+                      toolbar: [
+                        ['bold', 'italic'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['clean']
+                      ]
+                    }}
+                    className="quill-dark"
+                    style={{ minHeight: '150px' }}
+                  />
+                </div>
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
@@ -465,6 +506,41 @@ export default function AdminSettings() {
         </div>
 
       </div>
+
+      <style>{`
+        .quill-dark .ql-toolbar {
+          background: rgba(255, 255, 255, 0.05);
+          border: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .quill-dark .ql-container {
+          background: rgba(255, 255, 255, 0.03);
+          border: none;
+          color: white;
+        }
+        .quill-dark .ql-editor {
+          min-height: 120px;
+          color: white;
+        }
+        .quill-dark .ql-editor.ql-blank::before {
+          color: rgba(255, 255, 255, 0.4);
+        }
+        .quill-dark .ql-stroke {
+          stroke: rgba(255, 255, 255, 0.6);
+        }
+        .quill-dark .ql-fill {
+          fill: rgba(255, 255, 255, 0.6);
+        }
+        .quill-dark .ql-picker-label {
+          color: rgba(255, 255, 255, 0.6);
+        }
+        .quill-dark .ql-active .ql-stroke {
+          stroke: white;
+        }
+        .quill-dark .ql-active .ql-fill {
+          fill: white;
+        }
+      `}</style>
     </AdminLayout>
   );
 }

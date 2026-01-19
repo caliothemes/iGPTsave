@@ -20,6 +20,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminVideoExamples from './pages/AdminVideoExamples';
 import AdminVideoPrompts from './pages/AdminVideoPrompts';
 import AdminVisuals from './pages/AdminVisuals';
+import Home from './pages/Home';
 import homeBackup from './pages/Home_backup';
 import Legal from './pages/Legal';
 import MyVisuals from './pages/MyVisuals';
@@ -29,7 +30,6 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
-import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -56,6 +56,7 @@ export const PAGES = {
     "AdminVideoExamples": AdminVideoExamples,
     "AdminVideoPrompts": AdminVideoPrompts,
     "AdminVisuals": AdminVisuals,
+    "Home": Home,
     "Home_backup": homeBackup,
     "Legal": Legal,
     "MyVisuals": MyVisuals,
@@ -65,7 +66,6 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
-    "Home": Home,
 }
 
 export const pagesConfig = {

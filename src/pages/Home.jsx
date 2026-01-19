@@ -1889,9 +1889,10 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-violet-500/10 to-purple-500/5 backdrop-blur-md border border-violet-500/10 rounded-2xl px-5 py-4 max-w-lg shadow-lg shadow-violet-500/5">
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    {getWelcomeMessage()}
-                  </p>
+                  <div 
+                    className="text-white/80 text-sm leading-relaxed welcome-message-content"
+                    dangerouslySetInnerHTML={{ __html: getWelcomeMessage() }}
+                  />
                 </div>
               </div>
             </div>
@@ -2769,6 +2770,16 @@ export default function Home() {
             transform: scale(1.08);
             opacity: 0.85;
           }
+        }
+        .welcome-message-content p {
+          margin: 0;
+        }
+        .welcome-message-content strong {
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.95);
+        }
+        .welcome-message-content em {
+          font-style: italic;
         }
       `}</style>
 
