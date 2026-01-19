@@ -1156,9 +1156,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             lines.forEach((line, lineIdx) => {
               ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
             });
+          }
 
-            // Sparkle effect (stars and dots around text)
-            if (layer.sparkle) {
+          // Sparkle effect (stars and dots around text)
+          if (layer.sparkle) {
               const intensity = layer.sparkleIntensity || 50;
               const numSparkles = Math.floor(intensity / 5);
               const metrics = ctx.measureText(layer.text);
@@ -2838,9 +2839,10 @@ Réponds en JSON avec:
               linesExport.forEach((line, lineIdx) => {
                 exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
               });
+            }
 
-              // Sparkle effect for export
-              if (layer.sparkle) {
+            // Sparkle effect for export
+            if (layer.sparkle) {
                 const intensity = layer.sparkleIntensity || 50;
                 const numSparkles = Math.floor(intensity / 5);
                 const metrics = exportCtx.measureText(layer.text);
