@@ -711,8 +711,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
 
           // Draw all layers in order (first = bottom, last = top)
           layers.forEach((layer, idx) => {
-            // Skip invisible layers
-            if (layer.visible === false) return;
+            // Skip null/invalid layers and invisible layers
+            if (!layer || layer.visible === false) return;
             
             ctx.save();
             
