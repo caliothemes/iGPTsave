@@ -220,7 +220,7 @@ export default function AdminSettings() {
                 <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
                   <ReactQuill
                     value={settings.guest_message_en || ''}
-                    onChange={(value) => setSettings(prev => ({ ...prev, guest_message_en: e.target.value }))}
+                    onChange={(value) => setSettings(prev => ({ ...prev, guest_message_en: value }))}
                     theme="snow"
                     modules={{
                       toolbar: [
