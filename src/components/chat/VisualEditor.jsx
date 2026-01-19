@@ -4149,7 +4149,7 @@ Réponds en JSON avec:
               )}
 
               {/* Mini toolbar for text layers */}
-              {selectedLayer !== null && currentLayer?.type === 'text' && editingTextInline === null && (() => {
+              {selectedLayer !== null && currentLayer?.type === 'text' && editingTextInline === null && currentLayer && (() => {
                 const ctx = canvasRef.current.getContext('2d');
                 ctx.font = `${currentLayer.fontSize}px ${currentLayer.fontFamily}`;
                 
