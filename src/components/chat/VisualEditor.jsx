@@ -2938,16 +2938,15 @@ Réponds en JSON avec:
                 exportCtx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
                 exportCtx.drawImage(tempCanvas, 0, reflectY);
 
-                exportCtx.restore();
-                }
-                }
-                }
-                exportCtx.restore();
-                }
+              exportCtx.restore();
+            }
+          }
+          exportCtx.restore();
+        }
 
-                // Convert to blob with maximum quality
-                const blob = await new Promise(resolve => exportCanvas.toBlob(resolve, 'image/png', 1.0));
-                const file = new File([blob], `${visual.title || 'visual'}-edited.png`, { type: 'image/png' });
+        // Convert to blob with maximum quality
+        const blob = await new Promise(resolve => exportCanvas.toBlob(resolve, 'image/png', 1.0));
+        const file = new File([blob], `${visual.title || 'visual'}-edited.png`, { type: 'image/png' });
     
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
