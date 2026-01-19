@@ -2984,7 +2984,6 @@ Réponds en JSON avec:
   const currentLayer = selectedLayer !== null ? layers[selectedLayer] : null;
 
   return (
-    <>
     <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 border border-white/10 rounded-2xl p-3 md:p-4 w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
@@ -5864,6 +5863,6 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
