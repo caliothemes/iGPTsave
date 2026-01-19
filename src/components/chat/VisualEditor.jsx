@@ -718,7 +718,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             
             // RESET ALL context properties to defaults before each layer
             ctx.globalCompositeOperation = 'source-over';
-            ctx.globalAlpha = layer.opacity / 100;
+            ctx.globalAlpha = (layer.opacity || 100) / 100;
             ctx.filter = 'none';
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
