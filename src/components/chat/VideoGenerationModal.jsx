@@ -176,6 +176,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
               if (statusResponse.data.status === 'succeeded') {
                 clearInterval(progressInterval);
+                clearInterval(timerInterval);
                 setProgress(100);
                 
                 setTimeout(() => {
@@ -188,6 +189,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 break;
               } else if (statusResponse.data.status === 'failed' || statusResponse.data.status === 'canceled') {
                 clearInterval(progressInterval);
+                clearInterval(timerInterval);
                 throw new Error(statusResponse.data.error || `Replicate: ${statusResponse.data.status}`);
               }
               
