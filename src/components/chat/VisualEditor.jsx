@@ -5319,24 +5319,25 @@ Réponds en JSON avec:
       </Dialog>
 
       {/* Property Mini Modals */}
-      <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Type className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Modifier le texte' : 'Edit text'}
-            </DialogTitle>
-          </DialogHeader>
-          <textarea
-            value={currentLayer?.text || ''}
-            onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })}
-            className="w-full bg-white/10 text-white rounded-lg p-3 text-sm min-h-[120px] resize-none"
-            placeholder={language === 'fr' ? 'Votre texte...' : 'Your text...'}
-          />
-        </DialogContent>
-      </Dialog>
+      <>
+        <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
+          <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Type className="h-5 w-5 text-violet-400" />
+                {language === 'fr' ? 'Modifier le texte' : 'Edit text'}
+              </DialogTitle>
+            </DialogHeader>
+            <textarea
+              value={currentLayer?.text || ''}
+              onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })}
+              className="w-full bg-white/10 text-white rounded-lg p-3 text-sm min-h-[120px] resize-none"
+              placeholder={language === 'fr' ? 'Votre texte...' : 'Your text...'}
+            />
+          </DialogContent>
+        </Dialog>
 
-      <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
+        <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Police' : 'Font'}</DialogTitle>
@@ -5518,9 +5519,11 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
+      </>
 
       {/* Effect Mini Modals */}
-      <Dialog open={activeEffectModal === 'curved'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
+      <>
+        <Dialog open={activeEffectModal === 'curved'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -5705,6 +5708,7 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
+      </>
 
       {/* Mockup Magic Fill Modal */}
       <Dialog open={showMockupModal} onOpenChange={(open) => {
