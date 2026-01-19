@@ -540,6 +540,17 @@ export default function AdminSettings() {
         .quill-dark .ql-active .ql-fill {
           fill: white;
         }
+        .quill-dark .ql-toolbar button {
+          width: 28px;
+          height: 28px;
+        }
+        .quill-dark .ql-toolbar button svg {
+          width: 18px;
+          height: 18px;
+        }
+        .quill-dark .ql-picker {
+          color: rgba(255, 255, 255, 0.6);
+        }
       `}</style>
     </AdminLayout>
   );
