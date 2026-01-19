@@ -2322,32 +2322,32 @@ Réponds en JSON avec:
   };
 
   const handleSave = async () => {
-        setSaving(true);
+    setSaving(true);
 
-        // Wait a frame to ensure canvas is fully rendered with all effects
-        await new Promise(resolve => setTimeout(resolve, 200));
+    // Wait a frame to ensure canvas is fully rendered with all effects
+    await new Promise(resolve => setTimeout(resolve, 200));
 
-        // Calculate original dimensions from visual metadata or from original image
-        let originalWidth = canvasSize.width;
-        let originalHeight = canvasSize.height;
+    // Calculate original dimensions from visual metadata or from original image
+    let originalWidth = canvasSize.width;
+    let originalHeight = canvasSize.height;
         
-        if (visual.dimensions) {
-          const [w, h] = visual.dimensions.split('x').map(Number);
-          if (w && h) {
-            originalWidth = w;
-            originalHeight = h;
-          }
-        } else if (loadedImages[originalImageUrl]) {
-          const img = loadedImages[originalImageUrl];
-          originalWidth = img.width;
-          originalHeight = img.height;
-        }
+    if (visual.dimensions) {
+      const [w, h] = visual.dimensions.split('x').map(Number);
+      if (w && h) {
+        originalWidth = w;
+        originalHeight = h;
+      }
+    } else if (loadedImages[originalImageUrl]) {
+      const img = loadedImages[originalImageUrl];
+      originalWidth = img.width;
+      originalHeight = img.height;
+    }
 
-        // Calculate scale factor from display size to original size
-        const scaleToOriginal = originalWidth / canvasSize.width;
-        
-        // Scale layers back to original size for saving - PRESERVE ALL PROPERTIES
-        const layersToSave = layers.map(layer => {
+    // Calculate scale factor from display size to original size
+    const scaleToOriginal = originalWidth / canvasSize.width;
+    
+    // Scale layers back to original size for saving - PRESERVE ALL PROPERTIES
+    const layersToSave = layers.map(layer => {
           if (layer.type === 'text') {
             return {
               ...layer, // Keep ALL properties
@@ -2390,33 +2390,33 @@ Réponds en JSON avec:
               clipHeight: layer.clipHeight ? layer.clipHeight / (canvasSize.width / originalWidth) : undefined,
             };
           }
-          return layer; // background layers - keep as is
-        });
+      return layer; // background layers - keep as is
+    });
 
-        // Create a canvas at ORIGINAL resolution
-        const exportCanvas = document.createElement('canvas');
-        exportCanvas.width = originalWidth;
-        exportCanvas.height = originalHeight;
-        const exportCtx = exportCanvas.getContext('2d');
-        exportCtx.scale(scaleToOriginal, scaleToOriginal);
+    // Create a canvas at ORIGINAL resolution
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = originalWidth;
+    exportCanvas.height = originalHeight;
+    const exportCtx = exportCanvas.getContext('2d');
+    exportCtx.scale(scaleToOriginal, scaleToOriginal);
 
-        // Draw all layers in order (same as rendering)
-        for (const layer of layers) {
-          // Skip invisible layers
-          if (layer.visible === false) continue;
+    // Draw all layers in order (same as rendering)
+    for (const layer of layers) {
+      // Skip invisible layers
+      if (layer.visible === false) continue;
+      
+      exportCtx.save();
           
-          exportCtx.save();
-          
-          // RESET ALL context properties to defaults before each layer
-          exportCtx.globalCompositeOperation = 'source-over';
-          exportCtx.globalAlpha = layer.opacity / 100;
-          exportCtx.filter = 'none';
-          exportCtx.shadowColor = 'transparent';
-          exportCtx.shadowBlur = 0;
-          exportCtx.shadowOffsetX = 0;
-          exportCtx.shadowOffsetY = 0;
-          exportCtx.imageSmoothingEnabled = true;
-          exportCtx.imageSmoothingQuality = 'high';
+      // RESET ALL context properties to defaults before each layer
+      exportCtx.globalCompositeOperation = 'source-over';
+      exportCtx.globalAlpha = layer.opacity / 100;
+      exportCtx.filter = 'none';
+      exportCtx.shadowColor = 'transparent';
+      exportCtx.shadowBlur = 0;
+      exportCtx.shadowOffsetX = 0;
+      exportCtx.shadowOffsetY = 0;
+      exportCtx.imageSmoothingEnabled = true;
+      exportCtx.imageSmoothingQuality = 'high';
           
           if (layer.type === 'background') {
             if (layer.bgType === 'solid') {
