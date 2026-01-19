@@ -2450,6 +2450,8 @@ Réponds en JSON avec:
             if (layer.glow) {
               exportCtx.shadowColor = layer.glowColor || '#ffffff';
               exportCtx.shadowBlur = layer.glowSize || 10;
+              exportCtx.shadowOffsetX = 0;
+              exportCtx.shadowOffsetY = 0;
             }
             exportCtx.fillStyle = layer.color;
             // Use roundRect for rectangle with border radius
@@ -2497,9 +2499,13 @@ Réponds en JSON avec:
               if (layer.halo) {
                 exportCtx.shadowColor = layer.haloColor || '#FFD700';
                 exportCtx.shadowBlur = layer.haloSize || 15;
+                exportCtx.shadowOffsetX = 0;
+                exportCtx.shadowOffsetY = 0;
               } else if (layer.glow) {
                 exportCtx.shadowColor = layer.glowColor || '#ffffff';
                 exportCtx.shadowBlur = layer.glowSize || 10;
+                exportCtx.shadowOffsetX = 0;
+                exportCtx.shadowOffsetY = 0;
               } else if (layer.shadow) {
                 exportCtx.shadowColor = layer.shadowColor || 'rgba(0,0,0,0.5)';
                 exportCtx.shadowBlur = layer.shadowBlur || 10;
@@ -2802,6 +2808,8 @@ Réponds en JSON avec:
               if (layer.glow) {
                 exportCtx.shadowColor = layer.glowColor || '#ffffff';
                 exportCtx.shadowBlur = layer.glowSize || 10;
+                exportCtx.shadowOffsetX = 0;
+                exportCtx.shadowOffsetY = 0;
               }
               
               if (layer.shadow && !layer.glow && !layer.neon) {
