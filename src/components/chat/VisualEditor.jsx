@@ -5318,8 +5318,9 @@ Réponds en JSON avec:
         </DialogContent>
       </Dialog>
 
-      {/* Property Mini Modals */}
+      {/* All Modals */}
       <>
+        {/* Property Mini Modals */}
         <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
           <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
             <DialogHeader>
@@ -5519,10 +5520,8 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
-      </>
 
-      {/* Effect Mini Modals */}
-      <>
+        {/* Effect Mini Modals */}
         <Dialog open={activeEffectModal === 'curved'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
           <DialogHeader>
@@ -5708,10 +5707,9 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
-      </>
 
-      {/* Mockup Magic Fill Modal */}
-      <Dialog open={showMockupModal} onOpenChange={(open) => {
+        {/* Mockup Magic Fill Modal */}
+        <Dialog open={showMockupModal} onOpenChange={(open) => {
         setShowMockupModal(open);
         if (!open) {
           setMockupImageFile(null);
@@ -5865,6 +5863,7 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
+      </>
     </div>
   );
 }
