@@ -52,16 +52,9 @@ export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, c
           </DialogTitle>
           <p className="text-white/60 text-sm mt-2">
             {language === 'fr' 
-              ? 'Entrez les textes que vous souhaitez voir apparaître sur votre visuel. Ils seront modifiables après génération.'
-              : 'Enter the texts you want to see on your visual. They will be editable after generation.'}
+              ? 'Entrez les textes que vous souhaitez voir apparaître sur votre visuel. Ils seront modifiables après génération dans l\'éditeur magique ( Position, taille, couleur, style etc )'
+              : 'Enter the texts you want to see on your visual. They will be editable after generation in the magic editor ( Position, size, color, style etc )'}
           </p>
-          <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-3 mt-3">
-            <p className="text-violet-200 text-xs leading-relaxed">
-              ✨ {language === 'fr' 
-                ? 'Ces textes seront entièrement modifiables dans l\'Éditeur Magique après génération : position, taille, couleur, style, etc.'
-                : 'These texts will be fully editable in the Magic Editor after generation: position, size, color, style, etc.'}
-            </p>
-          </div>
         </DialogHeader>
 
         <div className="space-y-3 mt-4">
