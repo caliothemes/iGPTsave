@@ -24,6 +24,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [showExamplesModal, setShowExamplesModal] = useState(false);
   const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   React.useEffect(() => {
     const loadPromptExamples = async () => {
@@ -77,6 +78,13 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
     setIsGenerating(true);
     setProgress(0);
+    setElapsedTime(0);
+    
+    // Start timer
+    const startTime = Date.now();
+    const timerInterval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
 
     try {
       if (provider === 'replicate' || provider === 'wan' || provider === 'sora') {
@@ -190,6 +198,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             } catch (pollError) {
               console.error('Polling error:', pollError);
               clearInterval(progressInterval);
+              clearInterval(timerInterval);
               throw pollError;
             }
           }
@@ -256,6 +265,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           } catch (pollError) {
             console.error('Poll error:', pollError);
             clearInterval(pollInterval);
+            clearInterval(timerInterval);
             setIsGenerating(false);
             alert(language === 'fr' ? `Erreur de vérification: ${pollError.message}` : `Status check error: ${pollError.message}`);
           }
@@ -264,6 +274,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
     } catch (error) {
       console.error('Generation error:', error);
+      clearInterval(timerInterval);
       setIsGenerating(false);
       const errorMsg = error.message || error.toString();
       alert(language === 'fr' 
@@ -884,7 +895,13 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             <div className="mb-4">
               <div className="flex items-center justify-between text-xs text-white/60 mb-2">
                 <span>{language === 'fr' ? 'Génération en cours...' : 'Generating...'}</span>
-                <span>{Math.round(progress)}%</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-violet-400 font-mono">
+                    {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+                  </span>
+                  <span>•</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div 
