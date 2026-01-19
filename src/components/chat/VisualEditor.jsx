@@ -3701,77 +3701,78 @@ Réponds en JSON avec:
             </div>
           )}
 
-              {/* Effect Icons - Compact */}
-              <div className="flex items-center gap-1 flex-wrap">
-                {currentLayer.curvedText && (
-                  <button onClick={() => setActiveEffectModal('curved')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Texte en cercle' : 'Curved text'}>
-                    <Circle className="h-4 w-4" />
-                  </button>
-                )}
-                {currentLayer.stroke && (
-                  <button onClick={() => setActiveEffectModal('stroke')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Contour' : 'Stroke'}>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
-                  </button>
-                )}
-                {currentLayer.shadow && (
-                  <button onClick={() => setActiveEffectModal('shadow')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Ombre' : 'Shadow'}>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="8" strokeWidth={2}/><path d="M12 4v16M4 12h16" strokeWidth={1} opacity={0.3}/></svg>
-                  </button>
-                )}
-                {currentLayer.glow && (
-                  <button onClick={() => setActiveEffectModal('glow')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Lueur' : 'Glow'}>
-                    <Sparkles className="h-4 w-4" />
-                  </button>
-                )}
-                {currentLayer.halo && (
-                  <button onClick={() => setActiveEffectModal('halo')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title="Halo">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth={2}/><circle cx="12" cy="12" r="9" strokeWidth={1} strokeDasharray="2 2"/></svg>
-                  </button>
-                )}
-                {currentLayer.neon && (
-                  <button onClick={() => setActiveEffectModal('neon')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title="Néon">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  </button>
-                )}
-                {currentLayer.effect3d && (
-                  <button onClick={() => setActiveEffectModal('3d')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title="3D">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
-                  </button>
-                )}
-                {currentLayer.reflection && (
-                  <button onClick={() => setActiveEffectModal('reflection')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Reflet' : 'Reflection'}>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} strokeDasharray="2 2" d="M3 15a4 4 0 004 4h9a5 5 0 100-9.999" transform="translate(0 5) scale(1 -1)" opacity={0.4}/></svg>
-                  </button>
-                )}
-                {currentLayer.sparkle && (
-                  <button onClick={() => setActiveEffectModal('sparkle')} className="p-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-colors" title={language === 'fr' ? 'Scintillement' : 'Sparkle'}>
-                    ✨
-                  </button>
-                )}
-                {currentLayer.textGradient && (
-                  <button onClick={() => setActiveEffectModal('gradient')} className="p-2 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 transition-colors" title={language === 'fr' ? 'Dégradé' : 'Gradient'}>
-                    🌈
-                  </button>
-                )}
+              {/* Effect Toggles */}
+              <div className="mt-3">
+                <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Effets' : 'Effects'}</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-2 rounded-lg text-xs", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Contour' : 'Stroke'}</button>
+                  <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("p-2 rounded-lg text-xs", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Ombre' : 'Shadow'}</button>
+                  <button onClick={() => updateLayer(selectedLayer, { glow: !currentLayer.glow })} className={cn("p-2 rounded-lg text-xs", currentLayer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Lueur' : 'Glow'}</button>
+                  <button onClick={() => updateLayer(selectedLayer, { halo: !currentLayer.halo })} className={cn("p-2 rounded-lg text-xs", currentLayer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>Halo</button>
+                  <button onClick={() => updateLayer(selectedLayer, { neon: !currentLayer.neon })} className={cn("p-2 rounded-lg text-xs", currentLayer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>Néon</button>
+                  <button onClick={() => updateLayer(selectedLayer, { effect3d: !currentLayer.effect3d })} className={cn("p-2 rounded-lg text-xs", currentLayer.effect3d ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>3D</button>
+                  <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-2 rounded-lg text-xs", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Reflet' : 'Reflect'}</button>
+                  <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-2 rounded-lg text-xs", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white/60")}>✨</button>
+                  <button onClick={() => updateLayer(selectedLayer, { textGradient: !currentLayer.textGradient })} className={cn("p-2 rounded-lg text-xs", currentLayer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60")}>🌈</button>
+                </div>
               </div>
 
-              {currentLayer.reflection && (
-                <div className="space-y-2 p-2.5 bg-white/5 rounded-lg border border-white/10">
-                  <label className="text-white/60 text-xs">{language === 'fr' ? 'Reflet' : 'Reflection'}</label>
-                  <div className="space-y-1.5">
-                    <div className="flex gap-2 items-center">
-                      <span className="text-white/40 text-xs w-20">{language === 'fr' ? 'Opacité' : 'Opacity'}</span>
-                      <Slider value={[currentLayer.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="flex-1" />
-                      <span className="text-white/60 text-xs w-12">{currentLayer.reflectionOpacity || 40}%</span>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <span className="text-white/40 text-xs w-20">{language === 'fr' ? 'Distance' : 'Distance'}</span>
-                      <Slider value={[currentLayer.reflectionGap || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-200} max={500} step={1} className="flex-1" />
-                      <span className="text-white/60 text-xs w-12">{currentLayer.reflectionGap || 0}px</span>
-                    </div>
-                  </div>
+              {/* Effect Icons - Compact */}
+              <div className="mt-3">
+                <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Réglages effets' : 'Effect settings'}</label>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {currentLayer.curvedText && (
+                    <button onClick={() => setActiveEffectModal('curved')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Texte en cercle' : 'Curved text'}>
+                      <Circle className="h-4 w-4" />
+                    </button>
+                  )}
+                  {currentLayer.stroke && (
+                    <button onClick={() => setActiveEffectModal('stroke')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Contour' : 'Stroke'}>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                    </button>
+                  )}
+                  {currentLayer.shadow && (
+                    <button onClick={() => setActiveEffectModal('shadow')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Ombre' : 'Shadow'}>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="8" strokeWidth={2}/><path d="M12 4v16M4 12h16" strokeWidth={1} opacity={0.3}/></svg>
+                    </button>
+                  )}
+                  {currentLayer.glow && (
+                    <button onClick={() => setActiveEffectModal('glow')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Lueur' : 'Glow'}>
+                      <Sparkles className="h-4 w-4" />
+                    </button>
+                  )}
+                  {currentLayer.halo && (
+                    <button onClick={() => setActiveEffectModal('halo')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title="Halo">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth={2}/><circle cx="12" cy="12" r="9" strokeWidth={1} strokeDasharray="2 2"/></svg>
+                    </button>
+                  )}
+                  {currentLayer.neon && (
+                    <button onClick={() => setActiveEffectModal('neon')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title="Néon">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </button>
+                  )}
+                  {currentLayer.effect3d && (
+                    <button onClick={() => setActiveEffectModal('3d')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title="3D">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+                    </button>
+                  )}
+                  {currentLayer.reflection && (
+                    <button onClick={() => setActiveEffectModal('reflection')} className="p-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 transition-colors" title={language === 'fr' ? 'Reflet' : 'Reflection'}>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} strokeDasharray="2 2" d="M3 15a4 4 0 004 4h9a5 5 0 100-9.999" transform="translate(0 5) scale(1 -1)" opacity={0.4}/></svg>
+                    </button>
+                  )}
+                  {currentLayer.sparkle && (
+                    <button onClick={() => setActiveEffectModal('sparkle')} className="p-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition-colors" title={language === 'fr' ? 'Scintillement' : 'Sparkle'}>
+                      ✨
+                    </button>
+                  )}
+                  {currentLayer.textGradient && (
+                    <button onClick={() => setActiveEffectModal('gradient')} className="p-2 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 transition-colors" title={language === 'fr' ? 'Dégradé' : 'Gradient'}>
+                      🌈
+                    </button>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
