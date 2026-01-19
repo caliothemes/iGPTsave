@@ -727,8 +727,8 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             
-            if (layer.type === 'background') {
-              if (layer.bgType === 'solid') {
+            if (layer?.type === 'background') {
+              if (layer?.bgType === 'solid') {
                 ctx.fillStyle = layer.bgValue;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
               } else if (layer.bgType === 'gradient') {
