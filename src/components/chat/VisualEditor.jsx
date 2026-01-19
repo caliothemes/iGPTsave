@@ -3861,7 +3861,7 @@ Réponds en JSON avec:
           )}
 
           {/* BACKGROUND LAYER */}
-          {currentLayer.type === 'background' && (
+          {currentLayer?.type === 'background' && (
             <div className="space-y-1.5 p-2.5 bg-white/5 rounded-lg border border-white/10">
               <label className="text-white/70 text-xs font-medium">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer.opacity}%</label>
               <Slider value={[currentLayer.opacity]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={10} max={100} step={1} />
