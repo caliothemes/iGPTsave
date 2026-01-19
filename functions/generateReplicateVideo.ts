@@ -101,7 +101,10 @@ Deno.serve(async (req) => {
       input = {
         image: image_url,
         prompt: prompt,
-        duration: duration.toString() // API expects string
+        duration: Number(duration), // API expects integer
+        resolution: "720p",
+        enable_prompt_expansion: true,
+        multi_shots: false
       };
       if (audio_url) {
         input.audio = audio_url;
