@@ -407,6 +407,7 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                       shadowOffsetY: layer.shadowOffsetY ? layer.shadowOffsetY * scaleFactor : 3,
                       glowSize: layer.glowSize ? layer.glowSize * scaleFactor : 10,
                       haloSize: layer.haloSize ? layer.haloSize * scaleFactor : 15,
+                      reflectionGap: layer.reflectionGap !== undefined ? layer.reflectionGap * scaleFactor : 0,
                       visible: layer.visible !== undefined ? layer.visible : true
                     };
                   } else if (layer.type === 'image' || layer.type === 'shape') {
