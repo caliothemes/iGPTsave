@@ -96,12 +96,12 @@ Deno.serve(async (req) => {
       
       console.log('Sora 2 Pro final input:', JSON.stringify(input, null, 2));
     } else if (model === 'wan') {
-      // Wan v2.5 I2V
-      modelEndpoint = 'https://api.replicate.com/v1/models/lucataco/wan-v2.5-i2v/predictions';
+      // Wan v2.5 I2V - Model migré vers wan-ai/wanx-i2v
+      modelEndpoint = 'https://api.replicate.com/v1/models/wan-ai/wanx-i2v/predictions';
       input = {
         image: image_url,
         prompt: prompt,
-        duration: duration
+        duration: duration.toString() // API expects string
       };
       if (audio_url) {
         input.audio = audio_url;
