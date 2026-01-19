@@ -1262,9 +1262,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
 
               ctx.restore();
             }
-          }
-            
-          ctx.restore();
+            }
+
+            ctx.restore();
           });
           
           // Apply brush strokes
