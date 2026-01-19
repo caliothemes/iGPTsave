@@ -3630,7 +3630,7 @@ Réponds en JSON avec:
                 </button>
               )}
               {/* Remove BG for images */}
-              {currentLayer.type === 'image' && !currentLayer.isBaseImage && (
+              {currentLayer?.type === 'image' && !currentLayer?.isBaseImage && (
                 <button
                   onClick={async () => {
                     setRemovingBgFromLayer(true);
