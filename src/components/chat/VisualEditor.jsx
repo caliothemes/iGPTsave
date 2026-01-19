@@ -3869,8 +3869,8 @@ Réponds en JSON avec:
         </div>
       )}
 
-              {/* Canvas - Responsive with Vertical Toolbars */}
-              <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
+      {/* Canvas - Responsive with Vertical Toolbars */}
+      <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
         {/* Left Toolbar - Main Tools - Sticky */}
         <div className="flex flex-col gap-2 bg-white/5 rounded-lg p-2 border border-white/10 items-start sticky top-4 self-start max-h-[calc(100vh-200px)] overflow-y-auto">
           <button
@@ -4509,6 +4509,7 @@ Réponds en JSON avec:
           </div>
         </div>
       )}
+    </div>
 
       {/* Custom Texture Generator Modal */}
               <Dialog open={showTextureGenerator} onOpenChange={setShowTextureGenerator}>
