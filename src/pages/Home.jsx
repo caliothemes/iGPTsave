@@ -133,6 +133,7 @@ export default function Home() {
   const [canvaMode, setCanvaMode] = useState(false);
   const [showCanvaTextModal, setShowCanvaTextModal] = useState(false);
   const [canvaTexts, setCanvaTexts] = useState([]);
+  const [canvaDecompose, setCanvaDecompose] = useState(false);
 
 
   const messagesEndRef = useRef(null);
@@ -3176,13 +3177,15 @@ export default function Home() {
       <CanvaTextModal
         isOpen={showCanvaTextModal}
         onClose={() => setShowCanvaTextModal(false)}
-        onConfirm={(texts) => {
+        onConfirm={(texts, decompose) => {
           setCanvaTexts(texts);
           setCanvaMode(true);
+          setCanvaDecompose(decompose);
         }}
         onCancel={() => {
           setCanvaMode(false);
           setCanvaTexts([]);
+          setCanvaDecompose(false);
         }}
         currentTexts={canvaTexts}
         isActive={canvaMode}
