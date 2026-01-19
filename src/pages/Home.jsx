@@ -2788,6 +2788,12 @@ export default function Home() {
         .welcome-message-content em {
           font-style: italic;
         }
+        .welcome-message-content span[style*="background-color"],
+        .welcome-message-content span[style*="background"] {
+          border-radius: 6px;
+          padding: 2px 6px;
+          display: inline-block;
+        }
       `}</style>
 
       {/* Art Director Modal */}
