@@ -8,6 +8,7 @@ import { useLanguage } from '../LanguageContext';
 export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, currentTexts = [], isActive = false }) {
   const { language } = useLanguage();
   const [texts, setTexts] = useState(['']);
+  const [decomposeImage, setDecomposeImage] = useState(true);
 
   // Initialize with current texts when modal opens
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, c
       alert(language === 'fr' ? 'Veuillez entrer au moins un texte' : 'Please enter at least one text');
       return;
     }
-    onConfirm(validTexts);
+    onConfirm(validTexts, decomposeImage);
     setTexts(['']);
     onClose();
   };
@@ -56,6 +57,28 @@ export default function CanvaTextModal({ isOpen, onClose, onConfirm, onCancel, c
               : 'Enter the texts you want to see on your visual. They will be editable after generation in the magic editor ( Position, size, color, style etc )'}
           </p>
         </DialogHeader>
+
+        {/* Decompose Image Option */}
+        <div className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-xl p-4 mt-4">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={decomposeImage}
+              onChange={(e) => setDecomposeImage(e.target.checked)}
+              className="mt-1 w-5 h-5 rounded border-violet-500/30 bg-white/10 checked:bg-violet-600 focus:ring-violet-500"
+            />
+            <div className="flex-1">
+              <div className="text-white font-medium text-sm mb-1">
+                {language === 'fr' ? '✨ Décomposer l\'image en calques' : '✨ Decompose image into layers'}
+              </div>
+              <div className="text-white/60 text-xs leading-relaxed">
+                {language === 'fr' 
+                  ? 'Chaque élément visuel (objets, décors) sera extrait comme un calque séparé pour un contrôle total dans l\'éditeur'
+                  : 'Each visual element (objects, decor) will be extracted as a separate layer for total control in the editor'}
+              </div>
+            </div>
+          </label>
+        </div>
 
         <div className="space-y-3 mt-4">
           {texts.map((text, index) => (

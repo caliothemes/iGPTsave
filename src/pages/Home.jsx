@@ -133,6 +133,7 @@ export default function Home() {
   const [canvaMode, setCanvaMode] = useState(false);
   const [showCanvaTextModal, setShowCanvaTextModal] = useState(false);
   const [canvaTexts, setCanvaTexts] = useState([]);
+  const [canvaDecompose, setCanvaDecompose] = useState(true);
 
 
   const messagesEndRef = useRef(null);
@@ -1018,6 +1019,31 @@ export default function Home() {
         }
 
         console.log('📊 LAYERS FINAL:', editorLayers);
+
+        // MODE CANVA avec décomposition : appeler SAM
+        if (canvaMode && canvaDecompose) {
+          try {
+            console.log('🔍 SAM: Décomposition de l\'image...');
+            setMessages(prev => [
+              ...prev.slice(0, -1),
+              { role: 'assistant', content: language === 'fr' ? '🔍 Décomposition de l\'image en calques...' : '🔍 Decomposing image into layers...', isStreaming: true }
+            ]);
+
+            const samResult = await base44.functions.invoke('decomposeImageWithSAM', {
+              image_url: result.url,
+              dimensions: dimensions
+            });
+
+            if (samResult.data?.layers && samResult.data.layers.length > 0) {
+              // Ajouter les calques SAM AVANT les calques texte
+              editorLayers = [...samResult.data.layers, ...editorLayers];
+              console.log(`✅ SAM: ${samResult.data.mask_count} segments détectés, ${samResult.data.layers.length} calques créés`);
+            }
+          } catch (samError) {
+            console.error('❌ SAM Error:', samError);
+            // Continue sans décomposition en cas d'erreur
+          }
+        }
 
         // Composer l'image avec les textes SAUF en mode Canva (évite doublons éditeur)
         // En mode Canva: image_url = original (sans textes), layers seuls
@@ -3176,13 +3202,15 @@ export default function Home() {
       <CanvaTextModal
         isOpen={showCanvaTextModal}
         onClose={() => setShowCanvaTextModal(false)}
-        onConfirm={(texts) => {
+        onConfirm={(texts, decompose) => {
           setCanvaTexts(texts);
           setCanvaMode(true);
+          setCanvaDecompose(decompose);
         }}
         onCancel={() => {
           setCanvaMode(false);
           setCanvaTexts([]);
+          setCanvaDecompose(true);
         }}
         currentTexts={canvaTexts}
         isActive={canvaMode}
