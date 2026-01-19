@@ -3868,6 +3868,7 @@ Réponds en JSON avec:
           )}
         </div>
       )}
+    </div>
 
               {/* Canvas - Responsive with Vertical Toolbars */}
               <div className="flex items-start gap-3 bg-black/30 rounded-xl p-2 md:p-4 mb-3 overflow-hidden">
@@ -5320,7 +5321,6 @@ Réponds en JSON avec:
       </Dialog>
 
       {/* All Modals */}
-      <>
         {/* Property Mini Modals */}
         <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
           <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
