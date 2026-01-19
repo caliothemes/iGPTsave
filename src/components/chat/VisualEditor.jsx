@@ -2402,8 +2402,8 @@ Réponds en JSON avec:
 
     // Draw all layers in order (same as rendering)
     for (const layer of layers) {
-      // Skip invisible layers
-      if (layer.visible === false) continue;
+      // Skip null/invalid layers and invisible layers
+      if (!layer || layer.visible === false) continue;
       
       exportCtx.save();
           
