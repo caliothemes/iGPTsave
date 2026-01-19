@@ -5319,9 +5319,8 @@ Réponds en JSON avec:
         </DialogContent>
       </Dialog>
 
-      {/* All Modals */}
-        {/* Property Mini Modals */}
-        <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
+      {/* Property Mini Modals */}
+      <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
           <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -5336,9 +5335,9 @@ Réponds en JSON avec:
               placeholder={language === 'fr' ? 'Votre texte...' : 'Your text...'}
             />
           </DialogContent>
-        </Dialog>
+      </Dialog>
 
-        <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
+      <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Police' : 'Font'}</DialogTitle>
