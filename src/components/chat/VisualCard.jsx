@@ -68,12 +68,17 @@ export default function VisualCard({
   // Parse video metadata from prompt
   const parseVideoMetadata = (prompt) => {
     if (!prompt) return { cleanPrompt: prompt, model: null, duration: null };
-    const modelMatch = prompt.match(/^\[([^\]]+)\]/);
-    const durationMatch = prompt.match(/\[(\d+)s\]/);
-    if (modelMatch && durationMatch) {
-      const cleanPrompt = prompt.replace(/^\[[^\]]+\]\s*\[\d+s\]\s*/, '');
-      return { cleanPrompt, model: modelMatch[1], duration: durationMatch[1] };
+    
+    // Match pattern: [Model Name] [5s] actual prompt
+    const fullMatch = prompt.match(/^\[([^\]]+)\]\s*\[(\d+)s\]\s*(.*)$/);
+    if (fullMatch) {
+      return { 
+        cleanPrompt: fullMatch[3], 
+        model: fullMatch[1], 
+        duration: fullMatch[2] 
+      };
     }
+    
     return { cleanPrompt: prompt, model: null, duration: null };
   };
   
