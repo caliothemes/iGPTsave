@@ -3572,7 +3572,8 @@ Réponds en JSON avec:
               <p className="text-white/40 text-xs text-center py-4">{language === 'fr' ? 'Aucun calque' : 'No layers'}</p>
               ) : [...layers].reverse().map((layer, reversedIdx) => {
               const idx = layers.length - 1 - reversedIdx;
-              const LayerIcon = layer.type === 'text' ? Type : layer.type === 'image' ? ImagePlus : layer.type === 'background' ? PaintBucket : Square;
+              if (!layer) return null;
+              const LayerIcon = layer?.type === 'text' ? Type : layer?.type === 'image' ? ImagePlus : layer?.type === 'background' ? PaintBucket : Square;
               return (
                 <div key={idx} onClick={() => setSelectedLayer(idx)}
                   className={cn("w-full px-2 py-1.5 rounded-lg flex items-center gap-2 text-xs transition-all cursor-pointer", selectedLayer === idx ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 text-white/50 hover:bg-white/10")}>
