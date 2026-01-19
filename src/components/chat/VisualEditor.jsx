@@ -3619,8 +3619,8 @@ Réponds en JSON avec:
             </div>
             <div className="flex gap-1">
               {/* AI Stylize for text */}
-              {currentLayer.type === 'text' && (
-                <button
+              {currentLayer?.type === 'text' && (
+               <button
                   onClick={stylizeTextWithAI}
                   disabled={stylizingText}
                   className="px-2 py-1.5 text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 rounded transition-colors flex items-center gap-1.5"
