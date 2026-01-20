@@ -5382,11 +5382,11 @@ Réponds en JSON avec:
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer?.fontSize}</label>
-              <Slider value={[currentLayer?.fontSize || 48]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={200} step={1} />
+              <Slider value={[currentLayer?.fontSize || 48]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={200} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Espacement lettres' : 'Letter spacing'}: {currentLayer?.letterSpacing || 0}</label>
-              <Slider value={[currentLayer?.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} />
+              <Slider value={[currentLayer?.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Poids' : 'Weight'}</label>
@@ -5443,7 +5443,7 @@ Réponds en JSON avec:
             <p className="text-white/60 text-xs">{language === 'fr' ? 'Limite la largeur du texte (0 = illimitée)' : 'Limits text width (0 = unlimited)'}</p>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{currentLayer?.maxWidth || 0}px</label>
-              <Slider value={[currentLayer?.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={10} />
+              <Slider value={[currentLayer?.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={10} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
