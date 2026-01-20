@@ -3774,12 +3774,12 @@ Réponds en JSON avec:
                     </button>
                   )}
                 </div>
-              </div>
-            </div>
-          )}
+                </div>
+                </div>
+                )}
 
-          {/* SHAPE LAYER PROPERTIES */}
-          {currentLayer?.type === 'shape' && (
+                {/* SHAPE LAYER PROPERTIES */}
+                {currentLayer?.type === 'shape' && (
             <div className="space-y-2">
               {/* Size */}
               <div className="grid grid-cols-2 gap-2">
