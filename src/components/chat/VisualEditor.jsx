@@ -5324,7 +5324,7 @@ Réponds en JSON avec:
 
       {/* Property Mini Modals */}
       <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-          <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
+          <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Type className="h-5 w-5 text-violet-400" />
@@ -5341,7 +5341,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Police' : 'Font'}</DialogTitle>
           </DialogHeader>
@@ -5369,7 +5369,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'format'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-md">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sliders className="h-5 w-5 text-violet-400" />
@@ -5412,7 +5412,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'color'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Palette className="h-5 w-5 text-violet-400" />
@@ -5429,7 +5429,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'maxwidth'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Maximize2 className="h-5 w-5 text-violet-400" />
@@ -5447,7 +5447,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'opacity'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Droplet className="h-5 w-5 text-violet-400" />
@@ -5464,7 +5464,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'align'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Alignement' : 'Alignment'}</DialogTitle>
           </DialogHeader>
@@ -5486,7 +5486,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'background'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Square className="h-5 w-5 text-violet-400" />
@@ -5503,7 +5503,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activePropertyModal === 'layout'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Layout className="h-5 w-5 text-violet-400" />
@@ -5525,7 +5525,7 @@ Réponds en JSON avec:
 
         {/* Effect Mini Modals */}
         <Dialog open={activeEffectModal === 'curved'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Circle className="h-5 w-5 text-violet-400" />
@@ -5550,7 +5550,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'stroke'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Contour' : 'Stroke'}</DialogTitle>
           </DialogHeader>
@@ -5567,7 +5567,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'shadow'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Ombre' : 'Shadow'}</DialogTitle>
           </DialogHeader>
@@ -5599,7 +5599,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'glow'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-violet-400" />
@@ -5620,7 +5620,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'halo'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>Halo</DialogTitle>
           </DialogHeader>
@@ -5638,7 +5638,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'neon'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>Néon</DialogTitle>
           </DialogHeader>
@@ -5656,7 +5656,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'reflection'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>{language === 'fr' ? 'Reflet' : 'Reflection'}</DialogTitle>
           </DialogHeader>
@@ -5674,7 +5674,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'sparkle'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</DialogTitle>
           </DialogHeader>
@@ -5688,7 +5688,7 @@ Réponds en JSON avec:
       </Dialog>
 
       <Dialog open={activeEffectModal === 'gradient'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900/95 border-white/10 text-white max-w-sm">
+        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
           <DialogHeader>
             <DialogTitle>🌈 {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}</DialogTitle>
           </DialogHeader>
