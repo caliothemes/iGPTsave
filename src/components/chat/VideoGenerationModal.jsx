@@ -587,23 +587,23 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     : 'RunwayML Gen-3 Alpha Turbo'}
                 </p>
                 <p className={`text-xs leading-relaxed ${
-                  provider === 'replicate' ? 'text-violet-300/80' : provider === 'wan' ? 'text-blue-300/80' : provider === 'sora' ? 'text-pink-300/80' : 'text-amber-200/80'
+                 provider === 'replicate' ? 'text-violet-300/80' : provider === 'wan' ? 'text-blue-300/80' : provider === 'sora' ? 'text-pink-300/80' : 'text-amber-200/80'
                 }`}>
-                  {provider === 'replicate'
-                    ? (language === 'fr' 
-                        ? <>Vidéo cinématographique pro.<br />5s = 20 crédits, 10s = 30 crédits</> 
-                        : <>Professional cinematic video.<br />5s = 20 credits, 10s = 30 credits</>)
+                 {provider === 'replicate'
+                   ? (language === 'fr' 
+                       ? <>Vidéo cinématographique pro.<br />5s = 200 crédits, 10s = 300 crédits</> 
+                       : <>Professional cinematic video.<br />5s = 200 credits, 10s = 300 credits</>)
                     : provider === 'wan'
                     ? (language === 'fr'
-                        ? <>Vidéo produit en 720p avec audio optionnel.<br />5s = 20 crédits, 10s = 30 crédits</>
-                        : <>Product video in 720p with optional audio.<br />5s = 20 credits, 10s = 30 credits</>)
+                        ? <>Vidéo produit en 720p avec audio optionnel.<br />5s = 200 crédits, 10s = 300 crédits</>
+                        : <>Product video in 720p with optional audio.<br />5s = 200 credits, 10s = 300 credits</>)
                     : provider === 'sora'
                     ? (language === 'fr'
-                        ? <>Génération ultra-réaliste par OpenAI.<br />4s = 30 crédits, 8s = 50 crédits, 12s = 70 crédits</>
-                        : <>Ultra-realistic generation by OpenAI.<br />4s = 30 credits, 8s = 50 credits, 12s = 70 credits</>)
+                        ? <>Génération ultra-réaliste par OpenAI.<br />4s = 300 crédits, 8s = 500 crédits, 12s = 700 crédits</>
+                        : <>Ultra-realistic generation by OpenAI.<br />4s = 300 credits, 8s = 500 credits, 12s = 700 credits</>)
                     : (language === 'fr'
-                        ? <>Animation fluide HD uniquement en 16:9.<br />5s = 20 crédits, 10s = 30 crédits</>
-                        : <>Smooth HD animation 16:9 only.<br />5s = 20 credits, 10s = 30 credits</>)}
+                        ? <>Animation fluide HD uniquement en 16:9.<br />5s = 200 crédits, 10s = 300 crédits</>
+                        : <>Smooth HD animation 16:9 only.<br />5s = 200 credits, 10s = 300 credits</>)}
                 </p>
               </div>
             </div>
