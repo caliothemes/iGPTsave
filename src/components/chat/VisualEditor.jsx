@@ -3708,16 +3708,34 @@ Réponds en JSON avec:
             <>
               <div className="mt-3">
                 <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Effets' : 'Effects'}</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-2 rounded-lg text-xs", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Contour' : 'Stroke'}</button>
-                  <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("p-2 rounded-lg text-xs", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Ombre' : 'Shadow'}</button>
-                  <button onClick={() => updateLayer(selectedLayer, { glow: !currentLayer.glow })} className={cn("p-2 rounded-lg text-xs", currentLayer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Lueur' : 'Glow'}</button>
-                  <button onClick={() => updateLayer(selectedLayer, { halo: !currentLayer.halo })} className={cn("p-2 rounded-lg text-xs", currentLayer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>Halo</button>
-                  <button onClick={() => updateLayer(selectedLayer, { neon: !currentLayer.neon })} className={cn("p-2 rounded-lg text-xs", currentLayer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>Néon</button>
-                  <button onClick={() => updateLayer(selectedLayer, { effect3d: !currentLayer.effect3d })} className={cn("p-2 rounded-lg text-xs", currentLayer.effect3d ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>3D</button>
-                  <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-2 rounded-lg text-xs", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Reflet' : 'Reflect'}</button>
-                  <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-2 rounded-lg text-xs", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white/60")}>✨</button>
-                  <button onClick={() => updateLayer(selectedLayer, { textGradient: !currentLayer.textGradient })} className={cn("p-2 rounded-lg text-xs", currentLayer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60")}>🌈</button>
+                <div className="flex gap-1 flex-wrap">
+                  <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-2 rounded-lg", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title={language === 'fr' ? 'Contour' : 'Stroke'}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { shadow: !currentLayer.shadow })} className={cn("p-2 rounded-lg", currentLayer.shadow ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title={language === 'fr' ? 'Ombre' : 'Shadow'}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="8" strokeWidth={2}/><path d="M12 4v16M4 12h16" strokeWidth={1} opacity={0.3}/></svg>
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { glow: !currentLayer.glow })} className={cn("p-2 rounded-lg", currentLayer.glow ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title={language === 'fr' ? 'Lueur' : 'Glow'}>
+                    <Sparkles className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { halo: !currentLayer.halo })} className={cn("p-2 rounded-lg", currentLayer.halo ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title="Halo">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth={2}/><circle cx="12" cy="12" r="9" strokeWidth={1} strokeDasharray="2 2"/></svg>
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { neon: !currentLayer.neon })} className={cn("p-2 rounded-lg", currentLayer.neon ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title="Néon">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { effect3d: !currentLayer.effect3d })} className={cn("p-2 rounded-lg", currentLayer.effect3d ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title="3D">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { reflection: !currentLayer.reflection })} className={cn("p-2 rounded-lg", currentLayer.reflection ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")} title={language === 'fr' ? 'Reflet' : 'Reflection'}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { sparkle: !currentLayer.sparkle })} className={cn("p-2 rounded-lg", currentLayer.sparkle ? "bg-amber-500/30 text-amber-300" : "bg-white/10 text-white/60")} title={language === 'fr' ? 'Scintillement' : 'Sparkle'}>
+                    ✨
+                  </button>
+                  <button onClick={() => updateLayer(selectedLayer, { textGradient: !currentLayer.textGradient })} className={cn("p-2 rounded-lg", currentLayer.textGradient ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60")} title={language === 'fr' ? 'Dégradé' : 'Gradient'}>
+                    🌈
+                  </button>
                 </div>
               </div>
 
