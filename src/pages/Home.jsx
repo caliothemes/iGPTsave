@@ -41,6 +41,7 @@ import ImageEditModal from '@/components/chat/ImageEditModal';
 import ArtDirectorModal from '@/components/ArtDirectorModal';
 import FeaturesCarousel from '@/components/FeaturesCarousel';
 import CanvaTextModal from '@/components/chat/CanvaTextModal';
+import LoadingProgress from '@/components/LoadingProgress';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -1735,7 +1736,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
         <AnimatedBackground />
-        <Logo size="large" animate showText={false} />
+        <LoadingProgress />
       </div>
     );
   }
