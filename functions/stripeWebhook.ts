@@ -69,11 +69,15 @@ Deno.serve(async (req) => {
         
         if (userCredits.length > 0) {
           const credits = userCredits[0];
-          const updateData = {
-            paid_credits: (credits.paid_credits || 0) + productConfig.credits
-          };
+          const updateData = {};
 
-          if (productConfig.type === 'subscription') {
+          if (productConfig.type === 'pack') {
+            // Pour les packs one-shot : AJOUTER les crédits
+            updateData.paid_credits = (credits.paid_credits || 0) + productConfig.credits;
+          } else {
+            // Pour les abonnements : DÉFINIR les crédits (renouvellement)
+            updateData.paid_credits = productConfig.credits;
+            
             const endDate = new Date();
             if (productConfig.yearly) {
               endDate.setFullYear(endDate.getFullYear() + 1);
@@ -82,6 +86,7 @@ Deno.serve(async (req) => {
             }
             updateData.subscription_type = productConfig.plan;
             updateData.subscription_end_date = endDate.toISOString().split('T')[0];
+            updateData.last_free_reset = new Date().toISOString().split('T')[0];
           }
 
           await base44.asServiceRole.entities.UserCredits.update(credits.id, updateData);
@@ -124,8 +129,9 @@ Deno.serve(async (req) => {
               }
 
               await base44.asServiceRole.entities.UserCredits.update(credits.id, {
-                paid_credits: (credits.paid_credits || 0) + productConfig.credits,
-                subscription_end_date: endDate.toISOString().split('T')[0]
+                paid_credits: productConfig.credits,
+                subscription_end_date: endDate.toISOString().split('T')[0],
+                last_free_reset: new Date().toISOString().split('T')[0]
               });
 
               await base44.asServiceRole.entities.Transaction.create({
