@@ -12,17 +12,27 @@ Deno.serve(async (req) => {
 
     const today = new Date().toISOString().split('T')[0];
     
-    // Récupérer tous les crédits utilisateur avec plan FREE
+    // Récupérer tous les plans d'abonnement
+    const plans = await base44.asServiceRole.entities.SubscriptionPlan.filter({ is_active: true });
+    const planCreditsMap = {};
+    plans.forEach(plan => {
+      planCreditsMap[plan.plan_id] = plan.messages_per_month || 0;
+    });
+    
+    // Récupérer tous les crédits utilisateur
     const allCredits = await base44.asServiceRole.entities.UserCredits.list();
     
     let renewedCount = 0;
     const errors = [];
     
     for (const credits of allCredits) {
-      // Ignorer si ce n'est pas un compte FREE
-      if (credits.subscription_type !== 'free') {
+      // Ignorer les comptes unlimited
+      if (credits.subscription_type === 'unlimited') {
         continue;
       }
+      
+      const subscriptionType = credits.subscription_type || 'free';
+      const creditsToRenew = planCreditsMap[subscriptionType] || 150;
       
       // Vérifier si le renouvellement est nécessaire
       const lastReset = credits.last_free_reset ? new Date(credits.last_free_reset) : null;
@@ -32,11 +42,11 @@ Deno.serve(async (req) => {
         // Pas de dernière date de reset, on initialise
         try {
           await base44.asServiceRole.entities.UserCredits.update(credits.id, {
-            free_downloads: 150,
+            paid_credits: creditsToRenew,
             last_free_reset: today
           });
           renewedCount++;
-          console.log(`✅ Initialized free credits for ${credits.user_email}`);
+          console.log(`✅ Initialized ${subscriptionType} credits (${creditsToRenew}) for ${credits.user_email}`);
         } catch (error) {
           errors.push({ email: credits.user_email, error: error.message });
         }
@@ -48,14 +58,14 @@ Deno.serve(async (req) => {
                                (now.getMonth() - lastReset.getMonth());
       
       if (monthsSinceReset >= 1) {
-        // Renouveler les crédits FREE
+        // Renouveler les crédits selon le plan
         try {
           await base44.asServiceRole.entities.UserCredits.update(credits.id, {
-            free_downloads: 150,
+            paid_credits: creditsToRenew,
             last_free_reset: today
           });
           renewedCount++;
-          console.log(`✅ Renewed free credits for ${credits.user_email}`);
+          console.log(`✅ Renewed ${subscriptionType} credits (${creditsToRenew}) for ${credits.user_email}`);
         } catch (error) {
           errors.push({ email: credits.user_email, error: error.message });
         }
@@ -65,7 +75,7 @@ Deno.serve(async (req) => {
     return Response.json({
       success: true,
       renewed_count: renewedCount,
-      total_free_users: allCredits.filter(c => c.subscription_type === 'free').length,
+      total_users: allCredits.filter(c => c.subscription_type !== 'unlimited').length,
       errors: errors.length > 0 ? errors : undefined
     });
     
