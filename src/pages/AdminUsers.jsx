@@ -89,7 +89,8 @@ export default function AdminUsers() {
 
     const credits = getUserCredits(selectedUser.email);
     if (!credits) {
-      toast.error('Crédits non trouvés');
+      toast.error('Crédits non trouvés pour cet utilisateur');
+      setSaving(false);
       return;
     }
 
@@ -113,9 +114,10 @@ export default function AdminUsers() {
       setCreditsToAdd(0);
     } catch (error) {
       console.error('Error adding credits:', error);
-      toast.error('Erreur lors de l\'ajout des crédits');
+      toast.error(`Erreur: ${error.message || 'Impossible d\'ajouter les crédits'}`);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const filteredUsers = users.filter(u => 
