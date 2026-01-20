@@ -1860,8 +1860,8 @@ export default function Home() {
             </p>
             {(settings.home_text3_fr || settings.home_text3_en) && (
               <div className="flex justify-center mb-2">
-                <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-500/30 via-amber-500/30 to-yellow-500/30 border border-yellow-500/50 backdrop-blur-sm shadow-lg shadow-yellow-500/20">
-                  <span className="text-xs md:text-sm text-yellow-100 font-medium">
+                <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-pink-500/30 via-fuschia-500/30 to-pink-500/30 border border-pink-500/50 backdrop-blur-sm shadow-lg shadow-pink-500/20">
+                  <span className="text-xs md:text-sm text-pink-100 font-medium">
                     {language === 'fr' ? (settings.home_text3_fr || '') : (settings.home_text3_en || settings.home_text3_fr || '')}
                   </span>
                 </div>
