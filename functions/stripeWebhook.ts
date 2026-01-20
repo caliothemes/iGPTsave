@@ -71,13 +71,11 @@ Deno.serve(async (req) => {
           const credits = userCredits[0];
           const updateData = {};
 
-          if (productConfig.type === 'pack') {
-            // Pour les packs one-shot : AJOUTER les crédits
-            updateData.paid_credits = (credits.paid_credits || 0) + productConfig.credits;
-          } else {
-            // Pour les abonnements : DÉFINIR les crédits (renouvellement)
-            updateData.paid_credits = productConfig.credits;
-            
+          // TOUJOURS ajouter les crédits (pack ou abonnement)
+          updateData.paid_credits = (credits.paid_credits || 0) + productConfig.credits;
+
+          if (productConfig.type === 'subscription') {
+            // Pour les abonnements : mettre à jour le plan et la date de fin
             const endDate = new Date();
             if (productConfig.yearly) {
               endDate.setFullYear(endDate.getFullYear() + 1);
@@ -129,7 +127,7 @@ Deno.serve(async (req) => {
               }
 
               await base44.asServiceRole.entities.UserCredits.update(credits.id, {
-                paid_credits: productConfig.credits,
+                paid_credits: (credits.paid_credits || 0) + productConfig.credits,
                 subscription_end_date: endDate.toISOString().split('T')[0],
                 last_free_reset: new Date().toISOString().split('T')[0]
               });
