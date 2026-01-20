@@ -4,21 +4,26 @@ import Stripe from 'npm:stripe@14.5.0';
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
-// Mapping des produits Stripe vers les crédits (IDs vérifiés)
+// Mapping des produits Stripe vers les crédits
+// ⚠️ IMPORTANT: Mettre à jour les product IDs Stripe ici quand vous créez les produits sur Stripe
 const PRODUCT_CREDITS = {
-  // Packs one-time
-  'prod_TWLcf4UtzqMQe4': { credits: 250, type: 'pack' },       // Pack 250
-  'prod_TWLc6dyHxZtKJS': { credits: 500, type: 'pack' },       // Pack 500
+  // Packs one-time (crédits à usage unique)
+  'pack_50': { credits: 500, type: 'pack' },        // Pack 50 → 500 crédits
+  'pack_100': { credits: 1000, type: 'pack' },      // Pack 100 → 1000 crédits
+  'pack_250': { credits: 2500, type: 'pack' },      // Pack 250 → 2500 crédits
+  'pack_500': { credits: 5000, type: 'pack' },      // Pack 500 → 5000 crédits
+  
   // Abonnements mensuels
-  'prod_TWLeCLUbXfQ4KF': { credits: 100, type: 'subscription', plan: 'starter' },      // STARTER mensuel
-  'prod_TWLhV1pSXRSz3Q': { credits: 250, type: 'subscription', plan: 'pro' },          // PRO mensuel
-  'prod_TWLjEEHP8GyXTV': { credits: 500, type: 'subscription', plan: 'elite' },        // ELITE mensuel
-  'prod_TWLlhvQGwnrOHX': { credits: 1000, type: 'subscription', plan: 'elite_plus' },  // ELITE PLUS mensuel
+  'STARTER_monthly': { credits: 500, type: 'subscription', plan: 'STARTER' },           // STARTER 500 crédits/mois
+  'PRO_monthly': { credits: 1500, type: 'subscription', plan: 'PRO' },                  // PRO 1500 crédits/mois
+  'ELITE_monthly': { credits: 5000, type: 'subscription', plan: 'ELITE' },              // ELITE 5000 crédits/mois
+  'ELITE_PLUS_monthly': { credits: 10000, type: 'subscription', plan: 'ELITE_PLUS' },   // ELITE PLUS 10000 crédits/mois
+  
   // Abonnements annuels
-  'prod_TWLfJW2UaDTeo5': { credits: 1200, type: 'subscription', plan: 'starter', yearly: true },     // STARTER annuel
-  'prod_TWLirA98VTt6kD': { credits: 3000, type: 'subscription', plan: 'pro', yearly: true },         // PRO annuel
-  'prod_TWLkczcFEQ2ebe': { credits: 6000, type: 'subscription', plan: 'elite', yearly: true },       // ELITE annuel
-  'prod_TWLm7SIvUgDBGh': { credits: 12000, type: 'subscription', plan: 'elite_plus', yearly: true }, // ELITE PLUS annuel
+  'STARTER_yearly': { credits: 6000, type: 'subscription', plan: 'STARTER', yearly: true },         // STARTER 6000 crédits/an
+  'PRO_yearly': { credits: 18000, type: 'subscription', plan: 'PRO', yearly: true },                // PRO 18000 crédits/an
+  'ELITE_yearly': { credits: 60000, type: 'subscription', plan: 'ELITE', yearly: true },            // ELITE 60000 crédits/an
+  'ELITE_PLUS_yearly': { credits: 120000, type: 'subscription', plan: 'ELITE_PLUS', yearly: true }, // ELITE PLUS 120000 crédits/an
 };
 
 Deno.serve(async (req) => {
