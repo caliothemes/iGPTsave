@@ -5325,7 +5325,7 @@ Réponds en JSON avec:
       {/* Property Mini Modals */}
       <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
           <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
-            <DialogHeader>
+            <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
               <DialogTitle className="flex items-center gap-2">
                 <Type className="h-5 w-5 text-violet-400" />
                 {language === 'fr' ? 'Modifier le texte' : 'Edit text'}
@@ -5342,8 +5342,11 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{language === 'fr' ? 'Police' : 'Font'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+              {language === 'fr' ? 'Police' : 'Font'}
+            </DialogTitle>
           </DialogHeader>
           <select
             value={currentLayer?.fontFamily || 'Arial'}
@@ -5370,7 +5373,7 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'format'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Sliders className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Format' : 'Format'}
@@ -5413,7 +5416,7 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'color'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Palette className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Couleur du texte' : 'Text color'}
@@ -5430,7 +5433,7 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'maxwidth'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Maximize2 className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Largeur max' : 'Max width'}
@@ -5448,7 +5451,7 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'opacity'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Droplet className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Opacité' : 'Opacity'}
@@ -5465,8 +5468,11 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'align'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{language === 'fr' ? 'Alignement' : 'Alignment'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <AlignCenter className="h-5 w-5 text-violet-400" />
+              {language === 'fr' ? 'Alignement' : 'Alignment'}
+            </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-3 gap-3">
             <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'left' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
@@ -5487,7 +5493,7 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'background'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Square className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Arrière-plan' : 'Background'}
@@ -5504,7 +5510,7 @@ Réponds en JSON avec:
 
       <Dialog open={activePropertyModal === 'layout'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Layout className="h-5 w-5 text-violet-400" />
               Padding & Radius
@@ -5526,7 +5532,7 @@ Réponds en JSON avec:
         {/* Effect Mini Modals */}
         <Dialog open={activeEffectModal === 'curved'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Circle className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Texte en cercle' : 'Curved text'}
@@ -5551,8 +5557,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'stroke'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{language === 'fr' ? 'Contour' : 'Stroke'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+              {language === 'fr' ? 'Contour' : 'Stroke'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
@@ -5568,8 +5577,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'shadow'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{language === 'fr' ? 'Ombre' : 'Shadow'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="8" strokeWidth={2}/><path d="M12 4v16M4 12h16" strokeWidth={1} opacity={0.3}/></svg>
+              {language === 'fr' ? 'Ombre' : 'Shadow'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
@@ -5600,7 +5612,7 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'glow'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-violet-400" />
               {language === 'fr' ? 'Lueur' : 'Glow'}
@@ -5621,8 +5633,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'halo'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Halo</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth={2}/><circle cx="12" cy="12" r="9" strokeWidth={1} strokeDasharray="2 2"/></svg>
+              Halo
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
@@ -5639,8 +5654,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'neon'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Néon</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Néon
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
@@ -5657,8 +5675,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'reflection'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{language === 'fr' ? 'Reflet' : 'Reflection'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+              {language === 'fr' ? 'Reflet' : 'Reflection'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-2">
@@ -5675,8 +5696,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'sparkle'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>✨ {language === 'fr' ? 'Scintillement' : 'Sparkle'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <span className="text-violet-400">✨</span>
+              {language === 'fr' ? 'Scintillement' : 'Sparkle'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-2">
@@ -5689,8 +5713,11 @@ Réponds en JSON avec:
 
       <Dialog open={activeEffectModal === 'gradient'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
         <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle>🌈 {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}</DialogTitle>
+          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
+            <DialogTitle className="flex items-center gap-2">
+              <span className="text-violet-400">🌈</span>
+              {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
