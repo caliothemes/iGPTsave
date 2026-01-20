@@ -877,17 +877,17 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 </svg>
                 {provider === 'sora'
                   ? (duration === 4 
-                      ? (language === 'fr' ? '30 crédits' : '30 credits')
+                      ? (language === 'fr' ? '300 crédits' : '300 credits')
                       : duration === 8
-                      ? (language === 'fr' ? '50 crédits' : '50 credits')
-                      : (language === 'fr' ? '70 crédits' : '70 credits'))
+                      ? (language === 'fr' ? '500 crédits' : '500 credits')
+                      : (language === 'fr' ? '700 crédits' : '700 credits'))
                   : provider === 'replicate' 
                   ? (duration === 5 
-                      ? (language === 'fr' ? '20 crédits' : '20 credits') 
-                      : (language === 'fr' ? '30 crédits' : '30 credits'))
+                      ? (language === 'fr' ? '200 crédits' : '200 credits') 
+                      : (language === 'fr' ? '300 crédits' : '300 credits'))
                   : (duration === 5 
-                      ? (language === 'fr' ? '20 crédits' : '20 credits') 
-                      : (language === 'fr' ? '30 crédits' : '30 credits'))}
+                      ? (language === 'fr' ? '200 crédits' : '200 credits') 
+                      : (language === 'fr' ? '300 crédits' : '300 credits'))}
               </span>
             </div>
           </div>
