@@ -3705,7 +3705,8 @@ Réponds en JSON avec:
 
           {/* Effect Toggles */}
           {currentLayer?.type === 'text' && (
-            <div className="mt-3">
+            <>
+              <div className="mt-3">
                 <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Effets' : 'Effects'}</label>
                 <div className="grid grid-cols-3 gap-2">
                   <button onClick={() => updateLayer(selectedLayer, { stroke: !currentLayer.stroke })} className={cn("p-2 rounded-lg text-xs", currentLayer.stroke ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>{language === 'fr' ? 'Contour' : 'Stroke'}</button>
