@@ -82,47 +82,48 @@ export default function AdminUsers() {
   };
 
   const handleAddCredits = async () => {
-    console.log('handleAddCredits appelé', { selectedUser, creditsToAdd, creditType });
-    
     if (!selectedUser) {
-      console.error('Pas d\'utilisateur sélectionné');
       toast.error('Aucun utilisateur sélectionné');
       return;
     }
 
     if (creditsToAdd <= 0) {
-      console.error('Montant invalide:', creditsToAdd);
       toast.error('Veuillez entrer un montant valide');
-      return;
-    }
-
-    const credits = getUserCredits(selectedUser.email);
-    console.log('Crédits trouvés:', credits);
-    
-    if (!credits) {
-      toast.error('Crédits non trouvés pour cet utilisateur');
       return;
     }
 
     setSaving(true);
     try {
-      const updateData = creditType === 'paid' 
-        ? { paid_credits: (credits.paid_credits || 0) + creditsToAdd }
-        : { free_downloads: (credits.free_downloads || 0) + creditsToAdd };
+      let credits = getUserCredits(selectedUser.email);
+      
+      // Si l'utilisateur n'a pas de crédits, les créer
+      if (!credits) {
+        const newCredits = await base44.entities.UserCredits.create({
+          user_email: selectedUser.email,
+          free_downloads: creditType === 'free' ? creditsToAdd : 150,
+          paid_credits: creditType === 'paid' ? creditsToAdd : 0,
+          subscription_type: 'free'
+        });
+        
+        setAllCredits(prev => [...prev, newCredits]);
+        toast.success(`${creditsToAdd} crédits ajoutés avec succès`);
+      } else {
+        // Sinon, mettre à jour les crédits existants
+        const updateData = creditType === 'paid' 
+          ? { paid_credits: (credits.paid_credits || 0) + creditsToAdd }
+          : { free_downloads: (credits.free_downloads || 0) + creditsToAdd };
+        
+        await base44.entities.UserCredits.update(credits.id, updateData);
+        
+        setAllCredits(prev => prev.map(c => 
+          c.user_email === selectedUser.email 
+            ? { ...c, ...updateData }
+            : c
+        ));
+        
+        toast.success(`${creditsToAdd} crédits ajoutés avec succès`);
+      }
 
-      console.log('Mise à jour avec:', updateData);
-      
-      await base44.entities.UserCredits.update(credits.id, updateData);
-      
-      console.log('Mise à jour réussie');
-      
-      setAllCredits(prev => prev.map(c => 
-        c.user_email === selectedUser.email 
-          ? { ...c, ...updateData }
-          : c
-      ));
-
-      toast.success(`${creditsToAdd} crédits ajoutés avec succès`);
       setShowAddCreditsModal(false);
       setSelectedUser(null);
       setCreditsToAdd(0);
