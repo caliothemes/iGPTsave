@@ -38,7 +38,9 @@ Deno.serve(async (req) => {
       'EditorAsset',
       'GeneratedText',
       'AppPresentation',
-      'Visit'
+      'Visit',
+      'FeatureCard',
+      'ArtDirector'
     ];
 
     const exportData = {

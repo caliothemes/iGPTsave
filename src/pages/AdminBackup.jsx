@@ -147,13 +147,15 @@ export default function AdminBackup() {
           <div className="grid grid-cols-2 gap-3 text-sm">
             {[
               'User', 'UserCredits', 'Visual', 'Story', 'Sticker', 'Conversation',
-              'Transaction', 'PromptExample', 'VideoExample', 'PromptTemplate',
-              'StoreItem', 'StoreCategory', 'StorePurchase', 'SubscriptionPlan',
-              'CreditPack', 'AppSettings', 'Newsletter', 'FAQItem'
+              'Transaction', 'PromptExample', 'VideoExample', 'VideoPromptExample',
+              'ImageEditExample', 'PromptTemplate', 'StoreItem', 'StoreCategory',
+              'StorePurchase', 'SubscriptionPlan', 'CreditPack', 'AppSettings',
+              'Newsletter', 'NewsletterTemplate', 'FAQItem', 'LegalSection',
+              'EditorAsset', 'GeneratedText', 'AppPresentation', 'Visit',
+              'FeatureCard', 'ArtDirector', 'StoryAnimation'
             ].map(entity => (
               <div key={entity} className="text-blue-200/80">• {entity}</div>
             ))}
-            <div className="text-blue-200/80">• {language === 'fr' ? '... et plus' : '... and more'}</div>
           </div>
         </div>
       </div>
