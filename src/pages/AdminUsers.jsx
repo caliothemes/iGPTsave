@@ -82,15 +82,25 @@ export default function AdminUsers() {
   };
 
   const handleAddCredits = async () => {
-    if (!selectedUser || creditsToAdd <= 0) {
-      toast.error('Montant invalide');
+    console.log('handleAddCredits appelé', { selectedUser, creditsToAdd, creditType });
+    
+    if (!selectedUser) {
+      console.error('Pas d\'utilisateur sélectionné');
+      toast.error('Aucun utilisateur sélectionné');
+      return;
+    }
+
+    if (creditsToAdd <= 0) {
+      console.error('Montant invalide:', creditsToAdd);
+      toast.error('Veuillez entrer un montant valide');
       return;
     }
 
     const credits = getUserCredits(selectedUser.email);
+    console.log('Crédits trouvés:', credits);
+    
     if (!credits) {
       toast.error('Crédits non trouvés pour cet utilisateur');
-      setSaving(false);
       return;
     }
 
@@ -100,7 +110,11 @@ export default function AdminUsers() {
         ? { paid_credits: (credits.paid_credits || 0) + creditsToAdd }
         : { free_downloads: (credits.free_downloads || 0) + creditsToAdd };
 
+      console.log('Mise à jour avec:', updateData);
+      
       await base44.entities.UserCredits.update(credits.id, updateData);
+      
+      console.log('Mise à jour réussie');
       
       setAllCredits(prev => prev.map(c => 
         c.user_email === selectedUser.email 
@@ -113,7 +127,7 @@ export default function AdminUsers() {
       setSelectedUser(null);
       setCreditsToAdd(0);
     } catch (error) {
-      console.error('Error adding credits:', error);
+      console.error('Erreur lors de l\'ajout des crédits:', error);
       toast.error(`Erreur: ${error.message || 'Impossible d\'ajouter les crédits'}`);
     } finally {
       setSaving(false);
