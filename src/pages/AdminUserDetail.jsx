@@ -146,7 +146,7 @@ export default function AdminUserDetail() {
         <body>
           <div class="email-container">
             <div class="header">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/1df0e0151_iGPT-icon.png" alt="iGPT" class="logo-img" />
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692a3549022b223ef419900f/31669c91a_2.png" alt="iGPT" class="logo-img" />
               <div class="header-title">Message Administrateur</div>
             </div>
             <div class="content">
