@@ -45,6 +45,17 @@ export default function PageWrapper({ children, requireAuth = false, fullWidth =
 
           if (userCredits.length > 0) {
             setCredits(userCredits[0]);
+          } else {
+            // Create initial credits for new user
+            const today = new Date().toISOString().split('T')[0];
+            const newCredits = await base44.entities.UserCredits.create({
+              user_email: currentUser.email,
+              free_downloads: 150,
+              paid_credits: 0,
+              subscription_type: 'free',
+              last_free_reset: today
+            });
+            setCredits(newCredits);
           }
           setVisuals(userVisuals);
           setConversations(userConversations);
