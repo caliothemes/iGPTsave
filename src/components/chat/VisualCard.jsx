@@ -154,6 +154,7 @@ export default function VisualCard({
             ctx.font = fontStyle;
             ctx.fillStyle = layer.color;
             ctx.textAlign = layer.align || 'center';
+            ctx.letterSpacing = `${(layer.letterSpacing || 0) * scaleX}px`;
             
             const metrics = ctx.measureText(layer.text);
             const textWidth = metrics.width;
@@ -183,6 +184,47 @@ export default function VisualCard({
             }
             
             ctx.fillText(layer.text, scaledX, scaledY);
+            
+            // Reflection effect
+            if (layer.reflection) {
+              ctx.save();
+              
+              const textHeight = scaledFontSize;
+              const reflectionGap = (layer.reflectionGap || 0) * scaleX;
+              const reflectY = scaledY + reflectionGap;
+              const reflectionHeight = textHeight * 1.2;
+              
+              const tempCanvas = document.createElement('canvas');
+              tempCanvas.width = width;
+              tempCanvas.height = reflectionHeight + 20;
+              const tempCtx = tempCanvas.getContext('2d');
+              
+              tempCtx.save();
+              tempCtx.font = ctx.font;
+              tempCtx.textAlign = layer.align || 'center';
+              tempCtx.fillStyle = layer.color;
+              tempCtx.letterSpacing = `${(layer.letterSpacing || 0) * scaleX}px`;
+              
+              tempCtx.translate(0, reflectionHeight);
+              tempCtx.scale(1, -1);
+              
+              tempCtx.fillText(layer.text, scaledX, textHeight - 5);
+              tempCtx.restore();
+              
+              tempCtx.globalCompositeOperation = 'destination-out';
+              const fadeGradient = tempCtx.createLinearGradient(0, 0, 0, reflectionHeight);
+              fadeGradient.addColorStop(0, 'rgba(0,0,0,0)');
+              fadeGradient.addColorStop(0.3, 'rgba(0,0,0,0.3)');
+              fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
+              tempCtx.fillStyle = fadeGradient;
+              tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+              
+              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              ctx.drawImage(tempCanvas, 0, reflectY);
+              
+              ctx.restore();
+            }
+            
             ctx.restore();
           }
         });
