@@ -3775,8 +3775,6 @@ Réponds en JSON avec:
                   )}
                 </div>
                 </div>
-                </div>
-                )}
 
                 {/* SHAPE LAYER PROPERTIES */}
                 {currentLayer?.type === 'shape' && (
