@@ -3701,7 +3701,6 @@ Réponds en JSON avec:
                 </button>
               </div>
             </div>
-          )}
 
               {/* Effect Toggles */}
               <div className="mt-3">
