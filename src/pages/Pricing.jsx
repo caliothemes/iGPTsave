@@ -261,7 +261,7 @@ export default function Pricing() {
 
                     {/* Cost per credit */}
                     {!isFree && credits > 0 && (
-                      <p className="text-xs text-emerald-400 mb-3 text-center">
+                      <p className="text-xs text-emerald-400 mb-3 text-center hidden">
                         {(price / credits).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                       </p>
                     )}
@@ -334,7 +334,7 @@ export default function Pricing() {
                     <p className="text-4xl font-bold text-white mb-1">{pack.credits}</p>
                     <p className="text-white/60 mb-2">{language === 'fr' ? 'crédits' : 'credits'}</p>
                     <p className="text-3xl font-bold text-white mb-2">{pack.price}€</p>
-                    <p className="text-xs text-emerald-400 mb-4">
+                    <p className="text-xs text-emerald-400 mb-4 hidden">
                       {(pack.price / pack.credits).toFixed(2)}€/{language === 'fr' ? 'crédit' : 'credit'}
                     </p>
                     <Button 
