@@ -148,13 +148,14 @@ export default function VisualCard({
             const scaledFontSize = layer.fontSize * scaleX;
             const scaledPadding = (layer.padding || 20) * scaleX;
             const scaledBorderRadius = (layer.borderRadius || 12) * scaleX;
+            const scaledLetterSpacing = (layer.letterSpacing || 0) * scaleX;
             
             const fontWeight = layer.fontWeight || 700;
             const fontStyle = `${fontWeight} ${scaledFontSize}px ${layer.fontFamily}`;
             ctx.font = fontStyle;
             ctx.fillStyle = layer.color;
             ctx.textAlign = layer.align || 'center';
-            ctx.letterSpacing = `${(layer.letterSpacing || 0) * scaleX}px`;
+            ctx.letterSpacing = `${scaledLetterSpacing}px`;
             
             const metrics = ctx.measureText(layer.text);
             const textWidth = metrics.width;
@@ -183,12 +184,13 @@ export default function VisualCard({
               ctx.fillStyle = layer.color;
             }
             
-            ctx.fillText(layer.text, scaledX, scaledY);
+            // Only draw main text if NO reflection (to avoid doubling)
+            if (!layer.reflection) {
+              ctx.fillText(layer.text, scaledX, scaledY);
+            }
             
             // Reflection effect
             if (layer.reflection) {
-              ctx.save();
-              
               const textHeight = scaledFontSize;
               const reflectionGap = (layer.reflectionGap || 0) * scaleX;
               const reflectY = scaledY + reflectionGap;
@@ -200,10 +202,10 @@ export default function VisualCard({
               const tempCtx = tempCanvas.getContext('2d');
               
               tempCtx.save();
-              tempCtx.font = ctx.font;
+              tempCtx.font = fontStyle;
               tempCtx.textAlign = layer.align || 'center';
               tempCtx.fillStyle = layer.color;
-              tempCtx.letterSpacing = `${(layer.letterSpacing || 0) * scaleX}px`;
+              tempCtx.letterSpacing = `${scaledLetterSpacing}px`;
               
               tempCtx.translate(0, reflectionHeight);
               tempCtx.scale(1, -1);
@@ -217,12 +219,15 @@ export default function VisualCard({
               fadeGradient.addColorStop(0.3, 'rgba(0,0,0,0.3)');
               fadeGradient.addColorStop(1, 'rgba(0,0,0,1)');
               tempCtx.fillStyle = fadeGradient;
-              tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+              tempCtx.fillRect(0, 0, width, reflectionHeight);
               
-              ctx.globalAlpha = (layer.opacity / 100) * (layer.reflectionOpacity || 40) / 100;
+              ctx.globalAlpha = (layer.reflectionOpacity || 40) / 100;
               ctx.drawImage(tempCanvas, 0, reflectY);
               
-              ctx.restore();
+              // Also draw main text (after reflection so it's on top)
+              ctx.globalAlpha = 1;
+              ctx.fillStyle = layer.color;
+              ctx.fillText(layer.text, scaledX, scaledY);
             }
             
             ctx.restore();
