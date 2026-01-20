@@ -3606,7 +3606,7 @@ Réponds en JSON avec:
 
       {/* Layer Properties Panel - BEFORE Canvas */}
       {currentLayer && (
-        <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-3 mb-3 border border-white/10 space-y-3">
+        <div className="bg-gradient-to-br from-violet-500/8 to-purple-500/5 rounded-xl p-3 mb-3 border border-violet-500/20 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {currentLayer.type === 'text' && <Type className="h-3.5 w-3.5 text-violet-400" />}
@@ -3668,36 +3668,36 @@ Réponds en JSON avec:
           {currentLayer?.type === 'text' && (
             <div>
               <label className="text-white/70 text-xs font-medium mb-2 block">{language === 'fr' ? 'Propriétés' : 'Properties'}</label>
-              <div className="grid grid-cols-5 gap-2">
-                <button onClick={() => setActivePropertyModal('text')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Modifier le texte' : 'Edit text'}>
-                  <Type className="h-5 w-5 text-white/70 mx-auto" />
+              <div className="flex gap-1 flex-wrap">
+                <button onClick={() => setActivePropertyModal('text')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Modifier le texte' : 'Edit text'}>
+                  <Type className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('font')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Police' : 'Font'}>
-                  <svg className="h-5 w-5 text-white/70 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                <button onClick={() => setActivePropertyModal('font')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Police' : 'Font'}>
+                  <svg className="h-4 w-4 text-white/70 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
                 </button>
-                <button onClick={() => setActivePropertyModal('format')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Format' : 'Format'}>
-                  <Sliders className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('format')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Format' : 'Format'}>
+                  <Sliders className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('color')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Couleur' : 'Color'}>
-                  <Palette className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('color')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Couleur' : 'Color'}>
+                  <Palette className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('maxwidth')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Largeur max' : 'Max width'}>
-                  <Maximize2 className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('maxwidth')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Largeur max' : 'Max width'}>
+                  <Maximize2 className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('opacity')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Opacité' : 'Opacity'}>
-                  <Droplet className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('opacity')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Opacité' : 'Opacity'}>
+                  <Droplet className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('align')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Alignement' : 'Alignment'}>
-                  <AlignCenter className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('align')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Alignement' : 'Alignment'}>
+                  <AlignCenter className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('background')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Arrière-plan' : 'Background'}>
-                  <Square className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('background')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title={language === 'fr' ? 'Arrière-plan' : 'Background'}>
+                  <Square className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => setActivePropertyModal('layout')} className="p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title="Padding & Radius">
-                  <Layout className="h-5 w-5 text-white/70 mx-auto" />
+                <button onClick={() => setActivePropertyModal('layout')} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 transition-all" title="Padding & Radius">
+                  <Layout className="h-4 w-4 text-white/70 mx-auto" />
                 </button>
-                <button onClick={() => updateLayer(selectedLayer, { curvedText: !currentLayer.curvedText })} className={cn("p-3 rounded-lg transition-all", currentLayer.curvedText ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30")} title={language === 'fr' ? 'Texte courbe' : 'Curved text'}>
-                  <Circle className="h-5 w-5 mx-auto" />
+                <button onClick={() => updateLayer(selectedLayer, { curvedText: !currentLayer.curvedText })} className={cn("p-2 rounded-lg transition-all", currentLayer.curvedText ? "bg-violet-500/30 text-violet-300 border border-violet-500/50" : "bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30")} title={language === 'fr' ? 'Texte courbe' : 'Curved text'}>
+                  <Circle className="h-4 w-4 mx-auto" />
                 </button>
               </div>
             </div>
