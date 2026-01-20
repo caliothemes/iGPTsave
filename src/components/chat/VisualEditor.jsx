@@ -5408,7 +5408,7 @@ Réponds en JSON avec:
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer?.rotation || 0}°</label>
-              <Slider value={[currentLayer?.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={-180} max={180} step={1} />
+              <Slider value={[currentLayer?.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={-180} max={180} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5460,7 +5460,7 @@ Réponds en JSON avec:
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{currentLayer?.opacity || 100}%</label>
-              <Slider value={[currentLayer?.opacity || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={0} max={100} step={5} />
+              <Slider value={[currentLayer?.opacity || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={0} max={100} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5519,11 +5519,11 @@ Réponds en JSON avec:
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">Padding: {currentLayer?.padding || 0}px</label>
-              <Slider value={[currentLayer?.padding || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { padding: v })} min={0} max={100} step={2} />
+              <Slider value={[currentLayer?.padding || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { padding: v })} min={0} max={100} step={2} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Bordure arrondie' : 'Border radius'}: {currentLayer?.borderRadius || 0}px</label>
-              <Slider value={[currentLayer?.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={50} step={1} />
+              <Slider value={[currentLayer?.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={50} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5541,7 +5541,7 @@ Réponds en JSON avec:
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Rayon' : 'Radius'}: {currentLayer?.curveRadius || 100}</label>
-              <Slider value={[currentLayer?.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={40} max={400} step={5} />
+              <Slider value={[currentLayer?.curveRadius || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { curveRadius: v })} min={40} max={400} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => updateLayer(selectedLayer, { curveDirection: 'top' })} className={cn("p-2 rounded-lg text-sm", (currentLayer?.curveDirection || 'top') === 'top' ? "bg-violet-500/30 text-violet-300" : "bg-white/10 text-white/60")}>
@@ -5568,7 +5568,7 @@ Réponds en JSON avec:
               <input type="color" value={currentLayer?.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
               <div className="flex-1 space-y-1">
                 <label className="text-white/60 text-xs">{language === 'fr' ? 'Épaisseur' : 'Width'}: {currentLayer?.strokeWidth || 2}px</label>
-                <Slider value={[currentLayer?.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={10} step={1} />
+                <Slider value={[currentLayer?.strokeWidth || 2]} onValueChange={([v]) => updateLayer(selectedLayer, { strokeWidth: v })} min={1} max={10} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
               </div>
             </div>
           </div>
@@ -5590,20 +5590,20 @@ Réponds en JSON avec:
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">Blur: {currentLayer?.shadowBlur || 6}</label>
-              <Slider value={[currentLayer?.shadowBlur || 6]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowBlur: v })} min={1} max={30} step={1} />
+              <Slider value={[currentLayer?.shadowBlur || 6]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowBlur: v })} min={1} max={30} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer?.shadowOpacity || 60}%</label>
-              <Slider value={[currentLayer?.shadowOpacity || 60]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOpacity: v })} min={0} max={100} step={5} />
+              <Slider value={[currentLayer?.shadowOpacity || 60]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOpacity: v })} min={0} max={100} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="text-white/60 text-xs">Offset X: {currentLayer?.shadowOffsetX || 3}</label>
-                <Slider value={[currentLayer?.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} />
+                <Slider value={[currentLayer?.shadowOffsetX || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetX: v })} min={-20} max={20} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
               </div>
               <div className="space-y-1">
                 <label className="text-white/60 text-xs">Offset Y: {currentLayer?.shadowOffsetY || 3}</label>
-                <Slider value={[currentLayer?.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} />
+                <Slider value={[currentLayer?.shadowOffsetY || 3]} onValueChange={([v]) => updateLayer(selectedLayer, { shadowOffsetY: v })} min={-20} max={20} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
               </div>
             </div>
           </div>
@@ -5625,7 +5625,7 @@ Réponds en JSON avec:
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Intensité' : 'Intensity'}: {currentLayer?.glowSize || 10}</label>
-              <Slider value={[currentLayer?.glowSize || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { glowSize: v })} min={5} max={40} step={1} />
+              <Slider value={[currentLayer?.glowSize || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { glowSize: v })} min={5} max={40} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5646,7 +5646,7 @@ Réponds en JSON avec:
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer?.haloSize || 15}</label>
-              <Slider value={[currentLayer?.haloSize || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { haloSize: v })} min={5} max={50} step={1} />
+              <Slider value={[currentLayer?.haloSize || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { haloSize: v })} min={5} max={50} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5667,7 +5667,7 @@ Réponds en JSON avec:
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Intensité' : 'Intensity'}: {currentLayer?.neonIntensity || 15}</label>
-              <Slider value={[currentLayer?.neonIntensity || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { neonIntensity: v })} min={5} max={30} step={1} />
+              <Slider value={[currentLayer?.neonIntensity || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { neonIntensity: v })} min={5} max={30} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5684,11 +5684,11 @@ Réponds en JSON avec:
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer?.reflectionOpacity || 40}%</label>
-              <Slider value={[currentLayer?.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} />
+              <Slider value={[currentLayer?.reflectionOpacity || 40]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionOpacity: v })} min={10} max={80} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Distance' : 'Distance'}: {currentLayer?.reflectionGap || 0}px</label>
-              <Slider value={[currentLayer?.reflectionGap || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-200} max={500} step={1} />
+              <Slider value={[currentLayer?.reflectionGap || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-200} max={500} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
@@ -5705,7 +5705,7 @@ Réponds en JSON avec:
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Intensité' : 'Intensity'}: {currentLayer?.sparkleIntensity || 50}%</label>
-              <Slider value={[currentLayer?.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(selectedLayer, { sparkleIntensity: v })} min={10} max={100} step={5} />
+              <Slider value={[currentLayer?.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(selectedLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
         </DialogContent>
