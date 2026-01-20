@@ -5863,6 +5863,7 @@ Réponds en JSON avec:
           </div>
         </DialogContent>
       </Dialog>
+    </div>
     </>
   );
 }
