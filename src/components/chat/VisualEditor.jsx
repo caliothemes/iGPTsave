@@ -3774,12 +3774,13 @@ Réponds en JSON avec:
                     <button onClick={() => setActiveEffectModal('gradient')} className="p-2 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 transition-colors" title={language === 'fr' ? 'Dégradé' : 'Gradient'}>
                       🌈
                     </button>
-                  )}
-                </div>
-                </div>
-                )}
+                    )}
+                    </div>
+                    </div>
+                    </>
+                    )}
 
-                {/* SHAPE LAYER PROPERTIES */}
+                    {/* SHAPE LAYER PROPERTIES */}
                 {currentLayer?.type === 'shape' && (
             <div className="space-y-2">
               {/* Size */}
