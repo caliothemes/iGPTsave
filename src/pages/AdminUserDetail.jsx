@@ -3,10 +3,11 @@ import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ArrowLeft, User, Mail, Crown, Zap, Image, Receipt, Download, FileText, Video, Send } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Mail, Crown, Zap, Image, Receipt, Download, FileText, Video, Send, Plus } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useLanguage } from '@/components/LanguageContext';
 import moment from 'moment';
+import { toast } from 'sonner';
 
 export default function AdminUserDetail() {
   const { language } = useLanguage();
@@ -20,6 +21,9 @@ export default function AdminUserDetail() {
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [showAddCreditsModal, setShowAddCreditsModal] = useState(false);
+  const [creditsToAdd, setCreditsToAdd] = useState(0);
+  const [creditType, setCreditType] = useState('paid');
 
   useEffect(() => {
     const init = async () => {
@@ -76,6 +80,37 @@ export default function AdminUserDetail() {
       });
     } catch (error) {
       console.error('Error updating credits:', error);
+    }
+    setSaving(false);
+  };
+
+  const handleAddCredits = async () => {
+    if (!credits || creditsToAdd <= 0) {
+      toast.error('Montant invalide');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const updateData = creditType === 'paid' 
+        ? { paid_credits: (credits.paid_credits || 0) + creditsToAdd }
+        : { free_downloads: (credits.free_downloads || 0) + creditsToAdd };
+
+      await base44.entities.UserCredits.update(credits.id, updateData);
+      
+      setCredits({ 
+        ...credits, 
+        ...(creditType === 'paid' 
+          ? { paid_credits: (credits.paid_credits || 0) + creditsToAdd }
+          : { free_downloads: (credits.free_downloads || 0) + creditsToAdd })
+      });
+
+      toast.success(`${creditsToAdd} crédits ajoutés avec succès`);
+      setShowAddCreditsModal(false);
+      setCreditsToAdd(0);
+    } catch (error) {
+      console.error('Error adding credits:', error);
+      toast.error('Erreur lors de l\'ajout des crédits');
     }
     setSaving(false);
   };
@@ -304,14 +339,23 @@ export default function AdminUserDetail() {
                   />
                 </div>
 
-                <Button
-                  onClick={handleUpdateCredits}
-                  disabled={saving}
-                  className="w-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
-                >
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Mettre à jour les crédits
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => setShowAddCreditsModal(true)}
+                    className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter
+                  </Button>
+                  <Button
+                    onClick={handleUpdateCredits}
+                    disabled={saving}
+                    className="flex-1 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
+                  >
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Modifier
+                  </Button>
+                </div>
               </div>
             ) : (
               <p className="text-white/40 text-center py-4">Aucun crédit trouvé</p>
@@ -402,6 +446,91 @@ export default function AdminUserDetail() {
           )}
         </div>
       </div>
+
+      {/* Add Credits Modal */}
+      {showAddCreditsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowAddCreditsModal(false)}>
+          <div className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 space-y-4">
+              <h2 className="text-xl font-bold text-white">Ajouter des crédits</h2>
+              
+              <div>
+                <label className="block text-white/80 text-sm mb-2 font-medium">Type de crédits</label>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => setCreditType('paid')}
+                    variant={creditType === 'paid' ? 'default' : 'outline'}
+                    className={creditType === 'paid' ? 'flex-1 bg-violet-600 hover:bg-violet-700' : 'flex-1'}
+                  >
+                    Payants
+                  </Button>
+                  <Button
+                    onClick={() => setCreditType('free')}
+                    variant={creditType === 'free' ? 'default' : 'outline'}
+                    className={creditType === 'free' ? 'flex-1 bg-blue-600 hover:bg-blue-700' : 'flex-1'}
+                  >
+                    Gratuits
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-white/80 text-sm mb-2 font-medium">Nombre de crédits à ajouter</label>
+                <Input
+                  type="number"
+                  value={creditsToAdd}
+                  onChange={(e) => setCreditsToAdd(parseInt(e.target.value) || 0)}
+                  placeholder="Ex: 100"
+                  className="bg-white/5 border-white/10 text-white text-lg"
+                  min="0"
+                />
+              </div>
+
+              {creditsToAdd > 0 && (
+                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                  <p className="text-white/60 text-sm">
+                    Nouveau total ({creditType === 'paid' ? 'payants' : 'gratuits'}) : 
+                    <span className="text-white font-bold ml-2">
+                      {(creditType === 'paid' ? (credits?.paid_credits || 0) : (credits?.free_downloads || 0)) + creditsToAdd}
+                    </span>
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4 border-t border-white/10">
+                <Button
+                  onClick={() => {
+                    setShowAddCreditsModal(false);
+                    setCreditsToAdd(0);
+                  }}
+                  variant="ghost"
+                  className="flex-1 text-white/60 hover:text-white hover:bg-white/10"
+                  disabled={saving}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleAddCredits}
+                  disabled={saving || creditsToAdd <= 0}
+                  className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Ajout...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Ajouter {creditsToAdd} crédits
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Email Modal */}
       {showEmailModal && (
