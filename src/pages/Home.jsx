@@ -1574,25 +1574,13 @@ export default function Home() {
   };
 
   const handleEditorSave = async (newImageUrl, layers, originalImageUrl) => {
-    // Editor returns: newImageUrl (string), layers (array), originalImageUrl (string)
-    // Reload from database to get the exact saved state
-    let updatedVisual;
-    if (user && editingVisual.id) {
-      const freshVisuals = await base44.entities.Visual.filter({ id: editingVisual.id });
-      updatedVisual = freshVisuals[0] || {
-        ...editingVisual,
-        image_url: newImageUrl,
-        editor_layers: layers,
-        original_image_url: originalImageUrl
-      };
-    } else {
-      updatedVisual = {
-        ...editingVisual,
-        image_url: newImageUrl,
-        editor_layers: layers,
-        original_image_url: originalImageUrl
-      };
-    }
+    // Use the values directly from the editor to avoid DB timing issues
+    const updatedVisual = {
+      ...editingVisual,
+      image_url: newImageUrl,
+      editor_layers: layers,
+      original_image_url: originalImageUrl
+    };
 
     // Update in messages history
     setMessages(prev => prev.map(m => 
