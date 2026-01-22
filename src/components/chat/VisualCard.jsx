@@ -248,7 +248,7 @@ export default function VisualCard({
     }, 50);
     
     return () => clearTimeout(timer);
-  }, [visual.id, visual.editor_layers?.length, visual.original_image_url, visual.image_url, isVideo]);
+  }, [visual.id, JSON.stringify(visual.editor_layers), visual.original_image_url, visual.image_url, isVideo]);
 
   // Show watermark banner on mount if hasWatermark
   React.useEffect(() => {
