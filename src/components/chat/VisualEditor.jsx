@@ -711,8 +711,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
 
           // Draw all layers in order (first = bottom, last = top)
           layers.forEach((layer, idx) => {
-            // Skip null/invalid layers and invisible layers
-            if (!layer || layer.visible === false) return;
+            // Skip null/invalid layers only (not invisible ones - visible is true by default)
+            if (!layer) return;
+            // Skip only explicitly hidden layers
+            if (layer.visible === false) return;
             
             ctx.save();
             
@@ -2402,8 +2404,10 @@ Réponds en JSON avec:
 
     // Draw all layers in order (same as rendering)
     for (const layer of layers) {
-      // Skip null/invalid layers and invisible layers
-      if (!layer || layer.visible === false) continue;
+      // Skip null/invalid layers only
+      if (!layer) continue;
+      // Skip only explicitly hidden layers
+      if (layer.visible === false) continue;
       
       exportCtx.save();
           

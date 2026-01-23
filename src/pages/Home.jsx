@@ -980,12 +980,12 @@ export default function Home() {
                 padding: 20,
                 borderRadius: 12,
                 opacity: 100,
-                visible: true,
                 align: 'center',
                 bold: true,
                 italic: false,
                 shadow: false,
-                stroke: false
+                stroke: false,
+                letterSpacing: 0
               }));
               console.log('✅ IA styling OK:', editorLayers);
             } else {
@@ -1008,12 +1008,12 @@ export default function Home() {
               padding: 20,
               borderRadius: 12,
               opacity: 100,
-              visible: true,
               align: 'center',
               bold: true,
               italic: false,
               shadow: false,
-              stroke: false
+              stroke: false,
+              letterSpacing: 0
             }));
             console.log('✅ Fallback layers:', editorLayers);
           }
@@ -1434,12 +1434,12 @@ export default function Home() {
                 padding: 20,
                 borderRadius: 12,
                 opacity: 100,
-                visible: true,
                 align: 'center',
                 bold: true,
                 italic: false,
                 shadow: false,
-                stroke: false
+                stroke: false,
+                letterSpacing: 0
               }));
             }
           } catch (e) {
