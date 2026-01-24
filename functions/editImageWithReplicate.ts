@@ -109,8 +109,24 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No output URL returned from Replicate' }, { status: 500 });
     }
 
+    // Download and re-upload to permanent storage to avoid expiration
+    console.log('Downloading edited image from Replicate...');
+    const editedImageResponse = await fetch(outputUrl);
+    if (!editedImageResponse.ok) {
+      throw new Error(`Failed to download edited image: ${editedImageResponse.status}`);
+    }
+    
+    const editedBlob = await editedImageResponse.blob();
+    const editedFile = new File([editedBlob], 'edited-image.png', { type: 'image/png' });
+    
+    // Upload to Base44 permanent storage
+    const permanentUpload = await base44.integrations.Core.UploadFile({ file: editedFile });
+    const permanentUrl = permanentUpload.file_url;
+    
+    console.log('✅ Edited image saved permanently:', permanentUrl);
+
     return Response.json({ 
-      url: outputUrl,
+      url: permanentUrl,
       status: result.status
     });
 
