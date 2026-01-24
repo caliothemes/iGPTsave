@@ -5,24 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from '@/lib/utils';
 
-const CATEGORIES = [
-  { id: 'style', name_fr: 'Style', name_en: 'Style' },
-  { id: 'color', name_fr: 'Couleur', name_en: 'Color' },
-  { id: 'texture', name_fr: 'Texture', name_en: 'Texture' },
-  { id: 'artistic', name_fr: 'Artistique', name_en: 'Artistic' },
-  { id: 'filter', name_fr: 'Filtre', name_en: 'Filter' },
-  { id: 'transform', name_fr: 'Transformation', name_en: 'Transform' }
-];
-
 export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
   const { language } = useLanguage();
   const [effects, setEffects] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     if (isOpen) {
       loadEffects();
+      loadCategories();
     }
   }, [isOpen]);
 
@@ -35,6 +28,15 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
       console.error('Failed to load effects:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const data = await base44.entities.EffectCategory.filter({ is_active: true }, 'order');
+      setCategories(data);
+    } catch (e) {
+      console.error('Failed to load categories:', e);
     }
   };
 
@@ -94,18 +96,18 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
               >
                 {language === 'fr' ? 'Tous' : 'All'}
               </button>
-              {CATEGORIES.map(cat => (
+              {categories.map(cat => (
                 <button
                   key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
+                  onClick={() => setSelectedCategory(cat.id_slug)}
                   className={cn(
                     "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
-                    selectedCategory === cat.id
+                    selectedCategory === cat.id_slug
                       ? "bg-emerald-600 text-white"
                       : "bg-white/5 text-white/60 hover:bg-white/10"
                   )}
                 >
-                  {language === 'fr' ? cat.name_fr : cat.name_en}
+                  {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
                 </button>
               ))}
             </div>
