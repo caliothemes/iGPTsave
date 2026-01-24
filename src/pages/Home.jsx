@@ -1684,6 +1684,7 @@ export default function Home() {
         newVisual = await base44.entities.Visual.create(editedVisualData);
         console.log('✅ Visual created:', newVisual.id);
         setSessionVisuals(prev => [newVisual, ...prev]);
+        setTotalVisualsCount(prev => prev + 1);
       } catch (error) {
         console.error('❌ Create failed:', error);
         alert(language === 'fr' ? `Erreur: ${error.message}` : `Error: ${error.message}`);
