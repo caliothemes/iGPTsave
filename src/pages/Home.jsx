@@ -1336,12 +1336,38 @@ export default function Home() {
 
       const finalPrompt = daPrompt + (visual.image_prompt || visual.original_prompt + ', high quality, professional design') + canvaPromptSuffix;
 
+      // Détecter si c'est un effet magique (présence de "• EFFET:" dans original_prompt)
+      const isEffect = visual.original_prompt && visual.original_prompt.includes('• EFFET:');
+
       let result;
-      
-      // Si des images étaient attachées à l'original, les réutiliser
-      if (visual.attached_images && visual.attached_images.length > 0) {
+
+      if (isEffect && visual.parent_visual_id) {
+        // Récupérer l'image originale (avant l'effet)
+        try {
+          const parentVisuals = await base44.entities.Visual.filter({ id: visual.parent_visual_id });
+          if (parentVisuals.length > 0) {
+            const parentVisual = parentVisuals[0];
+            // Régénérer avec l'image originale comme référence
+            result = await base44.integrations.Core.GenerateImage({
+              prompt: visual.image_prompt,
+              existing_image_urls: [parentVisual.original_image_url || parentVisual.image_url]
+            });
+          } else {
+            // Fallback si pas de parent trouvé
+            result = await base44.integrations.Core.GenerateImage({
+              prompt: finalPrompt
+            });
+          }
+        } catch (e) {
+          console.error('Failed to load parent visual:', e);
+          result = await base44.integrations.Core.GenerateImage({
+            prompt: finalPrompt
+          });
+        }
+      } else if (visual.attached_images && visual.attached_images.length > 0) {
+        // Si des images étaient attachées à l'original, les réutiliser
         const compositionPrompt = `Create this design: ${visual.original_prompt}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${finalPrompt}`;
-        
+
         result = await base44.integrations.Core.GenerateImage({
           prompt: compositionPrompt,
           existing_image_urls: visual.attached_images
