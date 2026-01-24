@@ -1069,6 +1069,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
               ctx.closePath();
               ctx.fill();
+              
+              // Reset fill style to text color
+              ctx.fillStyle = layer.color;
             }
             
             // 3D Effect (draw multiple offset layers)
@@ -2771,7 +2774,7 @@ Réponds en JSON avec:
                 exportCtx.closePath();
                 exportCtx.fill();
                 
-                // Reset fill style for text
+                // Reset fill style to text color
                 exportCtx.fillStyle = layer.color;
               }
               
