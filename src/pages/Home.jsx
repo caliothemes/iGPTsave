@@ -2010,6 +2010,17 @@ export default function Home() {
                               setCropVisual(v);
                               setShowCropModal(true);
                             }}
+                            onEffectApply={async (visual, effect) => {
+                              // Remplir et envoyer automatiquement le prompt avec l'effet
+                              setCurrentVisual(visual);
+                              setInputValue(effect.prompt);
+
+                              // Auto-send après un petit délai
+                              setTimeout(() => {
+                                const sendEvent = new Event('submit');
+                                handleSend();
+                              }, 100);
+                            }}
                             onPromptClick={(prompt) => {
                               setInputValue(prompt);
                               setTimeout(() => {

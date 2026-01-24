@@ -1,0 +1,170 @@
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { X, Loader2, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/components/LanguageContext';
+import { cn } from '@/lib/utils';
+
+const CATEGORIES = [
+  { id: 'style', name_fr: 'Style', name_en: 'Style' },
+  { id: 'color', name_fr: 'Couleur', name_en: 'Color' },
+  { id: 'texture', name_fr: 'Texture', name_en: 'Texture' },
+  { id: 'artistic', name_fr: 'Artistique', name_en: 'Artistic' },
+  { id: 'filter', name_fr: 'Filtre', name_en: 'Filter' },
+  { id: 'transform', name_fr: 'Transformation', name_en: 'Transform' }
+];
+
+export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
+  const { language } = useLanguage();
+  const [effects, setEffects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    if (isOpen) {
+      loadEffects();
+    }
+  }, [isOpen]);
+
+  const loadEffects = async () => {
+    setLoading(true);
+    try {
+      const data = await base44.entities.EffectPreset.filter({ is_active: true }, 'order');
+      setEffects(data);
+    } catch (e) {
+      console.error('Failed to load effects:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredEffects = selectedCategory === 'all' 
+    ? effects 
+    : effects.filter(e => e.category === selectedCategory);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <div 
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="bg-gray-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-600 to-green-600">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">
+                  {language === 'fr' ? 'Effets magiques' : 'Magic effects'}
+                </h3>
+                <p className="text-white/60 text-sm">
+                  {language === 'fr' ? 'Appliquez un effet en un clic' : 'Apply an effect with one click'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <X className="h-5 w-5 text-white" />
+            </button>
+          </div>
+
+          {/* Categories */}
+          <div className="px-6 py-4 border-b border-white/10 overflow-x-auto">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+                  selectedCategory === 'all'
+                    ? "bg-emerald-600 text-white"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                )}
+              >
+                {language === 'fr' ? 'Tous' : 'All'}
+              </button>
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={cn(
+                    "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+                    selectedCategory === cat.id
+                      ? "bg-emerald-600 text-white"
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  )}
+                >
+                  {language === 'fr' ? cat.name_fr : cat.name_en}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Effects Grid */}
+          <div className="p-6 overflow-y-auto max-h-[calc(85vh-200px)]">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+              </div>
+            ) : filteredEffects.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-white/60">
+                  {language === 'fr' ? 'Aucun effet disponible' : 'No effects available'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredEffects.map((effect) => (
+                  <button
+                    key={effect.id}
+                    onClick={() => {
+                      onApplyEffect(effect);
+                      onClose();
+                    }}
+                    className="group relative rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/50 transition-all"
+                  >
+                    {/* Thumbnail */}
+                    <div className="aspect-square relative">
+                      {effect.thumbnail_url ? (
+                        <img
+                          src={effect.thumbnail_url}
+                          alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center">
+                          <Sparkles className="h-8 w-8 text-white/50" />
+                        </div>
+                      )}
+                      
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/20 transition-all" />
+                    </div>
+
+                    {/* Name */}
+                    <div className="p-3">
+                      <p className="text-white text-sm font-medium line-clamp-2">
+                        {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}

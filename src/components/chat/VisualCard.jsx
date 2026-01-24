@@ -8,6 +8,7 @@ import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import ADSModal from '@/components/chat/ADSModal';
 import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
+import EffectsModal from '@/components/chat/EffectsModal';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -37,6 +38,7 @@ export default function VisualCard({
   onCropOpen,
   onVideoOpen,
   onImageEditOpen,
+  onEffectApply,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -54,6 +56,7 @@ export default function VisualCard({
   const [showADSModal, setShowADSModal] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [showImageEditModal, setShowImageEditModal] = useState(false);
+  const [showEffectsModal, setShowEffectsModal] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [showWatermarkBanner, setShowWatermarkBanner] = useState(false);
   const [showColorModal, setShowColorModal] = useState(false);
@@ -562,6 +565,17 @@ export default function VisualCard({
               </button>
             )}
 
+            {!isVideo && onEffectApply && (
+              <button
+                onClick={() => setShowEffectsModal(true)}
+                disabled={isRegenerating}
+                className="p-2 rounded-lg bg-gradient-to-br from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                title={language === 'fr' ? 'Effets magiques' : 'Magic effects'}
+              >
+                <Sparkles className="h-4 w-4" />
+              </button>
+            )}
+
             {!isVideo && onCropOpen && (
               <button
                 onClick={() => onCropOpen(visual)}
@@ -673,6 +687,13 @@ export default function VisualCard({
         onClose={() => setShowImageEditModal(false)}
         visual={visual}
         onEditComplete={handleImageEditComplete}
+      />
+
+      {/* Effects Modal */}
+      <EffectsModal
+        isOpen={showEffectsModal}
+        onClose={() => setShowEffectsModal(false)}
+        onApplyEffect={(effect) => onEffectApply?.(visual, effect)}
       />
 
       {/* Prompt Modal */}
