@@ -1039,7 +1039,18 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               const borderRadius = layer.borderRadius || 18;
               
               ctx.fillStyle = layer.backgroundColor;
-              const boxX = layer.x - padding;
+              
+              // Calculate box position based on text alignment
+              let boxX;
+              if (layer.align === 'center') {
+                boxX = layer.x - textWidth / 2 - padding;
+              } else if (layer.align === 'right') {
+                boxX = layer.x - textWidth - padding;
+              } else {
+                // left or default
+                boxX = layer.x - padding;
+              }
+              
               const boxY = layer.y - layer.fontSize * 0.85 - padding;
               const boxWidth = textWidth + padding * 2;
               const boxHeight = layer.fontSize * 1.15 + padding * 2;
@@ -2729,7 +2740,18 @@ Réponds en JSON avec:
                 const borderRadius = layer.borderRadius || 18;
                 
                 exportCtx.fillStyle = layer.backgroundColor;
-                const boxX = layer.x - padding;
+                
+                // Calculate box position based on text alignment
+                let boxX;
+                if (layer.align === 'center') {
+                  boxX = layer.x - textWidth / 2 - padding;
+                } else if (layer.align === 'right') {
+                  boxX = layer.x - textWidth - padding;
+                } else {
+                  // left or default
+                  boxX = layer.x - padding;
+                }
+                
                 const boxY = layer.y - layer.fontSize * 0.85 - padding;
                 const boxWidth = textWidth + padding * 2;
                 const boxHeight = layer.fontSize * 1.15 + padding * 2;
