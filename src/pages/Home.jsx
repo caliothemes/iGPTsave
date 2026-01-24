@@ -2011,15 +2011,95 @@ export default function Home() {
                               setShowCropModal(true);
                             }}
                             onEffectApply={async (visual, effect) => {
-                              // Remplir et envoyer automatiquement le prompt avec l'effet
-                              setCurrentVisual(visual);
-                              setInputValue(effect.prompt);
+                              // Générer directement avec l'effet et l'image actuelle
+                              if (!user) {
+                                if (guestPrompts >= 3) {
+                                  setShowGuestCreditsModal(true);
+                                  return;
+                                }
+                              } else if (credits) {
+                                const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+                                const isUnlimited = credits?.subscription_type === 'unlimited';
+                                const isAdmin = user?.role === 'admin';
 
-                              // Auto-send après un petit délai
-                              setTimeout(() => {
-                                const sendEvent = new Event('submit');
-                                handleSend();
-                              }, 100);
+                                if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+                                  setShowNoCreditsModal(true);
+                                  return;
+                                }
+                              }
+
+                              setIsGenerating(true);
+                              setCurrentVisual(visual);
+
+                              const effectName = language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr);
+                              setMessages(prev => [...prev, { 
+                                role: 'assistant', 
+                                content: `✨ ${language === 'fr' ? 'Application de l\'effet' : 'Applying effect'} "${effectName}"...`, 
+                                isStreaming: true 
+                              }]);
+
+                              try {
+                                // Déduire crédit
+                                if (!user) {
+                                  const newCount = guestPrompts + 1;
+                                  setGuestPrompts(newCount);
+                                  localStorage.setItem('igpt_guest_prompts', newCount.toString());
+                                } else if (credits) {
+                                  if (credits.free_downloads > 0) {
+                                    await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+                                    setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
+                                  } else if (credits.paid_credits > 0) {
+                                    await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+                                    setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
+                                  }
+                                }
+
+                                // Générer avec l'image comme référence
+                                const result = await base44.integrations.Core.GenerateImage({
+                                  prompt: effect.prompt,
+                                  existing_image_urls: [visual.original_image_url || visual.image_url]
+                                });
+
+                                if (result.url) {
+                                  const visualData = {
+                                    user_email: user?.email || 'anonymous',
+                                    conversation_id: currentConversation?.id,
+                                    image_url: result.url,
+                                    original_image_url: result.url,
+                                    title: `${visual.title} - ${effectName}`,
+                                    original_prompt: `${visual.original_prompt} • EFFET: ${effectName}`,
+                                    image_prompt: effect.prompt,
+                                    dimensions: visual.dimensions,
+                                    visual_type: visual.visual_type,
+                                    parent_visual_id: visual.id,
+                                    version: (visual.version || 1) + 1
+                                  };
+
+                                  let newVisual = visualData;
+                                  if (user) {
+                                    newVisual = await base44.entities.Visual.create(visualData);
+                                    setSessionVisuals(prev => [newVisual, ...prev]);
+                                    setTotalVisualsCount(prev => prev + 1);
+                                  }
+
+                                  setCurrentVisual(newVisual);
+                                  setVisualsHistory(prev => [...prev, newVisual]);
+
+                                  setMessages(prev => [
+                                    ...prev.slice(0, -1),
+                                    { role: 'assistant', content: `✨ ${language === 'fr' ? 'Effet appliqué !' : 'Effect applied!'}` },
+                                    { role: 'assistant', content: '', visual: newVisual }
+                                  ]);
+                                }
+                              } catch (error) {
+                                console.error(error);
+                                setMessages(prev => [
+                                  ...prev.slice(0, -1),
+                                  { role: 'assistant', content: t('error') }
+                                ]);
+                              }
+
+                              setIsGenerating(false);
                             }}
                             onPromptClick={(prompt) => {
                               setInputValue(prompt);
