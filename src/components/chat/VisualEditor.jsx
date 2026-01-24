@@ -1169,6 +1169,9 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
               });
             }
 
+            // ALWAYS reset fillStyle to text color before drawing text
+            ctx.fillStyle = layer.color;
+            
             lines.forEach((line, lineIdx) => {
               ctx.fillText(line, layer.x, startY + lineIdx * lineHeight);
             });
@@ -2863,6 +2866,9 @@ Réponds en JSON avec:
                   exportCtx.strokeText(line, layer.x, startYExport + lineIdx * lineHeightExport);
                 });
               }
+
+              // ALWAYS reset fillStyle to text color before drawing text
+              exportCtx.fillStyle = layer.color;
 
               linesExport.forEach((line, lineIdx) => {
                 exportCtx.fillText(line, layer.x, startYExport + lineIdx * lineHeightExport);
