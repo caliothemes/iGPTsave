@@ -161,8 +161,17 @@ export default function VisualCard({
             const textWidth = metrics.width;
             
             if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-              let boxX = scaledX - textWidth / 2 - scaledPadding;
-              if (layer.align === 'left') boxX = scaledX - scaledPadding;
+              // Calculate box position based on text alignment
+              let boxX;
+              if (layer.align === 'center') {
+                boxX = scaledX - textWidth / 2 - scaledPadding;
+              } else if (layer.align === 'right') {
+                boxX = scaledX - textWidth - scaledPadding;
+              } else {
+                // left or default
+                boxX = scaledX - scaledPadding;
+              }
+              
               const boxY = scaledY - scaledFontSize * 0.85 - scaledPadding;
               const boxWidth = textWidth + scaledPadding * 2;
               const boxHeight = scaledFontSize * 1.15 + scaledPadding * 2;
