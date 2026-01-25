@@ -161,22 +161,25 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
                     : "bg-white/5 text-white/60 hover:bg-white/10"
                 )}
               >
-                {language === 'fr' ? 'Tous' : 'All'}
+                {language === 'fr' ? 'Tous' : 'All'} ({effects.length})
               </button>
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id_slug)}
-                  className={cn(
-                    "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
-                    selectedCategory === cat.id_slug
-                      ? "bg-emerald-600 text-white"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  )}
-                >
-                  {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
-                </button>
-              ))}
+              {categories.map(cat => {
+                const count = effects.filter(e => (e.categories || []).includes(cat.id_slug)).length;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id_slug)}
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+                      selectedCategory === cat.id_slug
+                        ? "bg-emerald-600 text-white"
+                        : "bg-white/5 text-white/60 hover:bg-white/10"
+                    )}
+                  >
+                    {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)} ({count})
+                  </button>
+                );
+              })}
             </div>
           </div>
 
