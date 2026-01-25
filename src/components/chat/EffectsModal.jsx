@@ -5,6 +5,54 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from '@/lib/utils';
 
+function EffectThumbnail({ effect, onClick }) {
+  const [currentImage, setCurrentImage] = useState(0);
+  const { language } = useLanguage();
+
+  useEffect(() => {
+    if (!effect.thumbnail_url_2) return;
+
+    const interval = setInterval(() => {
+      setCurrentImage(prev => prev === 0 ? 1 : 0);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [effect.thumbnail_url_2]);
+
+  const imageUrl = currentImage === 0 ? effect.thumbnail_url : effect.thumbnail_url_2;
+
+  return (
+    <button
+      onClick={onClick}
+      className="group relative rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/50 transition-all"
+    >
+      <div className="aspect-square relative">
+        {imageUrl ? (
+          <motion.img
+            key={currentImage}
+            src={imageUrl}
+            alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+            className="w-full h-full object-cover"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center">
+            <Sparkles className="h-8 w-8 text-white/50" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/20 transition-all" />
+      </div>
+      <div className="p-2">
+        <p className="text-white text-xs font-medium line-clamp-2">
+          {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+        </p>
+      </div>
+    </button>
+  );
+}
+
 export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
   const { language } = useLanguage();
   const [effects, setEffects] = useState([]);
@@ -126,41 +174,16 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {filteredEffects.map((effect) => (
-                  <button
+                  <EffectThumbnail
                     key={effect.id}
+                    effect={effect}
                     onClick={() => {
                       onApplyEffect(effect);
                       onClose();
                     }}
-                    className="group relative rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/50 transition-all"
-                  >
-                    {/* Thumbnail */}
-                    <div className="aspect-square relative">
-                      {effect.thumbnail_url ? (
-                        <img
-                          src={effect.thumbnail_url}
-                          alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center">
-                          <Sparkles className="h-8 w-8 text-white/50" />
-                        </div>
-                      )}
-                      
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/20 transition-all" />
-                    </div>
-
-                    {/* Name */}
-                    <div className="p-3">
-                      <p className="text-white text-sm font-medium line-clamp-2">
-                        {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
-                      </p>
-                    </div>
-                  </button>
+                  />
                 ))}
               </div>
             )}

@@ -79,6 +79,22 @@ export default function AdminEffects() {
     }
   };
 
+  const handleUploadThumbnail2 = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, thumbnail_url_2: file_url }));
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSave = async () => {
     try {
       if (editingEffect) {
@@ -138,6 +154,7 @@ export default function AdminEffects() {
         category: effect.category || (categories[0]?.id_slug || ''),
         prompt: effect.prompt || '',
         thumbnail_url: effect.thumbnail_url || '',
+        thumbnail_url_2: effect.thumbnail_url_2 || '',
         is_active: effect.is_active !== false,
         order: effect.order || 0
       });
@@ -149,6 +166,7 @@ export default function AdminEffects() {
         category: categories[0]?.id_slug || '',
         prompt: '',
         thumbnail_url: '',
+        thumbnail_url_2: '',
         is_active: true,
         order: 0
       });
@@ -348,7 +366,7 @@ export default function AdminEffects() {
               </div>
 
               <div>
-                <label className="text-white/80 text-sm mb-2 block">Miniature</label>
+                <label className="text-white/80 text-sm mb-2 block">Miniature 1 - Avant</label>
                 <div className="flex items-center gap-3">
                   {formData.thumbnail_url && (
                     <img src={formData.thumbnail_url} alt="" className="w-24 h-24 object-cover rounded-lg border border-white/10" />
@@ -366,6 +384,32 @@ export default function AdminEffects() {
                       type="file"
                       accept="image/*"
                       onChange={handleUploadThumbnail}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white/80 text-sm mb-2 block">Miniature 2 - Après</label>
+                <div className="flex items-center gap-3">
+                  {formData.thumbnail_url_2 && (
+                    <img src={formData.thumbnail_url_2} alt="" className="w-24 h-24 object-cover rounded-lg border border-white/10" />
+                  )}
+                  <label className="cursor-pointer">
+                    <div className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-2">
+                      {uploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      <span className="text-sm">Choisir une image</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleUploadThumbnail2}
                       className="hidden"
                       disabled={uploading}
                     />
