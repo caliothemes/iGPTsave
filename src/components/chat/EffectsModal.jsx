@@ -6,37 +6,35 @@ import { useLanguage } from '@/components/LanguageContext';
 import { cn } from '@/lib/utils';
 
 function EffectThumbnail({ effect, onClick }) {
-  const [currentImage, setCurrentImage] = useState(0);
   const { language } = useLanguage();
-
-  useEffect(() => {
-    if (!effect.thumbnail_url_2) return;
-
-    const interval = setInterval(() => {
-      setCurrentImage(prev => prev === 0 ? 1 : 0);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [effect.thumbnail_url_2]);
-
-  const imageUrl = currentImage === 0 ? effect.thumbnail_url : effect.thumbnail_url_2;
+  const hasTwoImages = effect.thumbnail_url && effect.thumbnail_url_2;
 
   return (
     <button
       onClick={onClick}
       className="group relative rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/50 transition-all"
     >
-      <div className="aspect-square relative">
-        {imageUrl ? (
-          <motion.img
-            key={currentImage}
-            src={imageUrl}
-            alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          />
+      <div className="aspect-square relative overflow-hidden">
+        {effect.thumbnail_url ? (
+          <>
+            {/* Image 1 (Avant) - Always visible */}
+            <img
+              src={effect.thumbnail_url}
+              alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            
+            {/* Image 2 (Après) - Slides in on hover */}
+            {hasTwoImages && (
+              <div className="absolute inset-0 translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-in-out">
+                <img
+                  src={effect.thumbnail_url_2}
+                  alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center">
             <Sparkles className="h-8 w-8 text-white/50" />
