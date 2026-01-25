@@ -21,10 +21,13 @@ export default function AdminEffects() {
   const [formData, setFormData] = useState({
     name_fr: '',
     name_en: '',
-    category: '',
+    categories: [],
     prompt: '',
     thumbnail_url: '',
     thumbnail_url_2: '',
+    thumbnail_url_3: '',
+    thumbnail_url_4: '',
+    thumbnail_url_5: '',
     is_active: true,
     order: 0
   });
@@ -95,6 +98,54 @@ export default function AdminEffects() {
     }
   };
 
+  const handleUploadThumbnail3 = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, thumbnail_url_3: file_url }));
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUploadThumbnail4 = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, thumbnail_url_4: file_url }));
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUploadThumbnail5 = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, thumbnail_url_5: file_url }));
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSave = async () => {
     try {
       if (editingEffect) {
@@ -151,10 +202,13 @@ export default function AdminEffects() {
       setFormData({
         name_fr: effect.name_fr || '',
         name_en: effect.name_en || '',
-        category: effect.category || (categories[0]?.id_slug || ''),
+        categories: effect.categories || [],
         prompt: effect.prompt || '',
         thumbnail_url: effect.thumbnail_url || '',
         thumbnail_url_2: effect.thumbnail_url_2 || '',
+        thumbnail_url_3: effect.thumbnail_url_3 || '',
+        thumbnail_url_4: effect.thumbnail_url_4 || '',
+        thumbnail_url_5: effect.thumbnail_url_5 || '',
         is_active: effect.is_active !== false,
         order: effect.order || 0
       });
@@ -163,10 +217,13 @@ export default function AdminEffects() {
       setFormData({
         name_fr: '',
         name_en: '',
-        category: categories[0]?.id_slug || '',
+        categories: [],
         prompt: '',
         thumbnail_url: '',
         thumbnail_url_2: '',
+        thumbnail_url_3: '',
+        thumbnail_url_4: '',
+        thumbnail_url_5: '',
         is_active: true,
         order: 0
       });
@@ -291,10 +348,12 @@ export default function AdminEffects() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs">
-                      {categories.find(c => c.id_slug === effect.category)?.name_fr || effect.category}
-                    </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {(effect.categories || []).map((catSlug, idx) => (
+                      <span key={idx} className="px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs">
+                        {categories.find(c => c.id_slug === catSlug)?.name_fr || catSlug}
+                      </span>
+                    ))}
                     {!effect.is_active && (
                       <span className="px-2 py-1 rounded-full bg-red-500/20 text-red-300 text-xs">
                         Inactif
@@ -340,19 +399,26 @@ export default function AdminEffects() {
               </div>
 
               <div>
-                <label className="text-white/80 text-sm mb-2 block">Catégorie *</label>
-                <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-white/10">
-                    {categories.map(cat => (
-                      <SelectItem key={cat.id} value={cat.id_slug} className="text-white">
-                        {cat.name_fr}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="text-white/80 text-sm mb-2 block">Catégories * (au moins une)</label>
+                <div className="space-y-2 p-3 bg-white/5 border border-white/10 rounded-lg max-h-48 overflow-y-auto">
+                  {categories.map(cat => (
+                    <label key={cat.id} className="flex items-center gap-2 cursor-pointer hover:bg-white/5 p-2 rounded">
+                      <input
+                        type="checkbox"
+                        checked={formData.categories.includes(cat.id_slug)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({ ...formData, categories: [...formData.categories, cat.id_slug] });
+                          } else {
+                            setFormData({ ...formData, categories: formData.categories.filter(c => c !== cat.id_slug) });
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-white text-sm">{cat.name_fr}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -392,7 +458,7 @@ export default function AdminEffects() {
               </div>
 
               <div>
-                <label className="text-white/80 text-sm mb-2 block">Miniature 2 - Après</label>
+                <label className="text-white/80 text-sm mb-2 block">Miniature 2</label>
                 <div className="flex items-center gap-3">
                   {formData.thumbnail_url_2 && (
                     <img src={formData.thumbnail_url_2} alt="" className="w-24 h-24 object-cover rounded-lg border border-white/10" />
@@ -410,6 +476,84 @@ export default function AdminEffects() {
                       type="file"
                       accept="image/*"
                       onChange={handleUploadThumbnail2}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white/80 text-sm mb-2 block">Miniature 3</label>
+                <div className="flex items-center gap-3">
+                  {formData.thumbnail_url_3 && (
+                    <img src={formData.thumbnail_url_3} alt="" className="w-24 h-24 object-cover rounded-lg border border-white/10" />
+                  )}
+                  <label className="cursor-pointer">
+                    <div className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-2">
+                      {uploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      <span className="text-sm">Choisir une image</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleUploadThumbnail3}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white/80 text-sm mb-2 block">Miniature 4</label>
+                <div className="flex items-center gap-3">
+                  {formData.thumbnail_url_4 && (
+                    <img src={formData.thumbnail_url_4} alt="" className="w-24 h-24 object-cover rounded-lg border border-white/10" />
+                  )}
+                  <label className="cursor-pointer">
+                    <div className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-2">
+                      {uploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      <span className="text-sm">Choisir une image</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleUploadThumbnail4}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white/80 text-sm mb-2 block">Miniature 5</label>
+                <div className="flex items-center gap-3">
+                  {formData.thumbnail_url_5 && (
+                    <img src={formData.thumbnail_url_5} alt="" className="w-24 h-24 object-cover rounded-lg border border-white/10" />
+                  )}
+                  <label className="cursor-pointer">
+                    <div className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-2">
+                      {uploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      <span className="text-sm">Choisir une image</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleUploadThumbnail5}
                       className="hidden"
                       disabled={uploading}
                     />

@@ -7,33 +7,54 @@ import { cn } from '@/lib/utils';
 
 function EffectThumbnail({ effect, onClick }) {
   const { language } = useLanguage();
-  const hasTwoImages = effect.thumbnail_url && effect.thumbnail_url_2;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const images = [
+    effect.thumbnail_url,
+    effect.thumbnail_url_2,
+    effect.thumbnail_url_3,
+    effect.thumbnail_url_4,
+    effect.thumbnail_url_5
+  ].filter(Boolean);
+
+  useEffect(() => {
+    if (!isHovered || images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % images.length);
+    }, 800);
+
+    return () => clearInterval(interval);
+  }, [isHovered, images.length]);
+
+  useEffect(() => {
+    if (!isHovered) {
+      setCurrentIndex(0);
+    }
+  }, [isHovered]);
 
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="group relative rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/50 transition-all"
     >
       <div className="aspect-square relative overflow-hidden">
-        {effect.thumbnail_url ? (
+        {images.length > 0 ? (
           <>
-            {/* Image 1 (Avant) - Always visible */}
-            <img
-              src={effect.thumbnail_url}
-              alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            
-            {/* Image 2 (Après) - Slides in on hover */}
-            {hasTwoImages && (
-              <div className="absolute inset-0 translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-in-out">
-                <img
-                  src={effect.thumbnail_url_2}
-                  alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            {images.map((img, idx) => (
+              <motion.img
+                key={idx}
+                src={img}
+                alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+                className="absolute inset-0 w-full h-full object-cover"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: currentIndex === idx ? 1 : 0 }}
+                transition={{ duration: 0.4 }}
+              />
+            ))}
           </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center">
@@ -88,7 +109,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
 
   const filteredEffects = selectedCategory === 'all' 
     ? effects 
-    : effects.filter(e => e.category === selectedCategory);
+    : effects.filter(e => (e.categories || []).includes(selectedCategory));
 
   if (!isOpen) return null;
 
