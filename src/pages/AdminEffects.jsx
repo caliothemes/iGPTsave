@@ -24,6 +24,7 @@ export default function AdminEffects() {
     category: '',
     prompt: '',
     thumbnail_url: '',
+    thumbnail_url_2: '',
     is_active: true,
     order: 0
   });
