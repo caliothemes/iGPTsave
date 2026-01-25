@@ -137,7 +137,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
                   {language === 'fr' ? 'Effets magiques' : 'Magic effects'}
                 </h3>
                 <p className="text-white/60 text-sm">
-                  {language === 'fr' ? 'Appliquez un effet en un clic' : 'Apply an effect with one click'}
+                  {language === 'fr' ? 'Appliquez un effet en cliquant dessus. Ces effets ont été testés et promptés par notre équipe. Pour appliquer un effet à votre image, cliquez simplement dessus. 1 effet = 1 crédit' : 'Apply an effect by clicking on it. These effects have been tested and prompted by our team. To apply an effect to your image, simply click on it. 1 effect = 1 credit'}
                 </p>
               </div>
             </div>
