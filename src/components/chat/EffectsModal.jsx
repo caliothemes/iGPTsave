@@ -45,14 +45,12 @@ function EffectThumbnail({ effect, onClick }) {
         {images.length > 0 ? (
           <>
             {images.map((img, idx) => (
-              <motion.img
+              <img
                 key={idx}
                 src={img}
                 alt={language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
                 className="absolute inset-0 w-full h-full object-cover"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: currentIndex === idx ? 1 : 0 }}
-                transition={{ duration: 0.4 }}
+                style={{ opacity: currentIndex === idx ? 1 : 0, transition: 'opacity 0.4s' }}
               />
             ))}
           </>
@@ -78,6 +76,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -107,9 +106,13 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
     }
   };
 
-  const filteredEffects = selectedCategory === 'all' 
-    ? effects 
-    : effects.filter(e => (e.categories || []).includes(selectedCategory));
+  const filteredEffects = effects.filter(e => {
+    const categoryMatch = selectedCategory === 'all' || (e.categories || []).includes(selectedCategory);
+    const searchMatch = searchQuery === '' || 
+      (e.name_fr?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+       e.name_en?.toLowerCase().includes(searchQuery.toLowerCase()));
+    return categoryMatch && searchMatch;
+  });
 
   if (!isOpen) return null;
 
@@ -181,6 +184,17 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
                 );
               })}
             </div>
+          </div>
+
+          {/* Search */}
+          <div className="px-6 py-3 border-b border-white/10">
+            <input
+              type="text"
+              placeholder={language === 'fr' ? 'Rechercher un effet...' : 'Search an effect...'}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-500/50"
+            />
           </div>
 
           {/* Effects Grid */}

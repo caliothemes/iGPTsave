@@ -48,7 +48,7 @@ export default function AdminEffects() {
   const loadEffects = async () => {
     setLoading(true);
     try {
-      const data = await base44.entities.EffectPreset.list('order');
+      const data = await base44.entities.EffectPreset.list('-created_date');
       setEffects(data);
     } catch (e) {
       console.error('Failed to load effects:', e);
