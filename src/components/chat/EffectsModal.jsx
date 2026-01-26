@@ -89,7 +89,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
   const loadEffects = async () => {
     setLoading(true);
     try {
-      const data = await base44.entities.EffectPreset.filter({ is_active: true }, 'order');
+      const data = await base44.entities.EffectPreset.filter({ is_active: true }, '-created_date');
       setEffects(data);
     } catch (e) {
       console.error('Failed to load effects:', e);
