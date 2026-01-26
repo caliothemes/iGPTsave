@@ -570,7 +570,7 @@ export default function VisualCard({
                 onClick={() => setShowEffectsModal(true)}
                 disabled={isRegenerating}
                 className="p-2 rounded-lg bg-gradient-to-br from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                title={language === 'fr' ? 'Effets magiques' : 'Magic effects'}
+                title={language === 'fr' ? 'Effets One-clic' : 'One-click effects'}
               >
                 <Sparkles className="h-4 w-4" />
               </button>
