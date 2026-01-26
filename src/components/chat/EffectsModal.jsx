@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from '@/lib/utils';
 
-function EffectThumbnail({ effect, onClick }) {
+function EffectThumbnail({ effect, onClick, categories }) {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -61,10 +61,28 @@ function EffectThumbnail({ effect, onClick }) {
         )}
         <div className="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/20 transition-all" />
       </div>
-      <div className="p-2">
+      <div className="p-2 space-y-1">
         <p className="text-white text-xs font-medium line-clamp-2">
           {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
         </p>
+        {effect.categories && effect.categories.length > 0 && (
+          <div className="flex gap-1 flex-wrap">
+            {effect.categories.slice(0, 2).map((catSlug, idx) => {
+              const cat = categories.find(c => c.id_slug === catSlug);
+              if (!cat) return null;
+              return (
+                <span key={idx} className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-medium border border-emerald-500/30">
+                  {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
+                </span>
+              );
+            })}
+            {effect.categories.length > 2 && (
+              <span className="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[10px]">
+                +{effect.categories.length - 2}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </button>
   );
@@ -215,6 +233,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
                   <EffectThumbnail
                     key={effect.id}
                     effect={effect}
+                    categories={categories}
                     onClick={() => {
                       onApplyEffect(effect);
                       onClose();
