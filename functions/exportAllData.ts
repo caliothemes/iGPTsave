@@ -40,7 +40,9 @@ Deno.serve(async (req) => {
       'AppPresentation',
       'Visit',
       'FeatureCard',
-      'ArtDirector'
+      'ArtDirector',
+      'EffectPreset',
+      'EffectCategory'
     ];
 
     const exportData = {
