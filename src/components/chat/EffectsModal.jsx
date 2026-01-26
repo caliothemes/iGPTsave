@@ -60,29 +60,31 @@ function EffectThumbnail({ effect, onClick, categories }) {
           </div>
         )}
         <div className="absolute inset-0 bg-emerald-600/0 group-hover:bg-emerald-600/20 transition-all" />
-      </div>
-      <div className="p-2 space-y-1">
-        <p className="text-white text-xs font-medium line-clamp-2">
-          {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
-        </p>
+
+        {/* Category Badges */}
         {effect.categories && effect.categories.length > 0 && (
-          <div className="flex gap-1 flex-wrap">
+          <div className="absolute bottom-1.5 left-1.5 right-1.5 flex gap-1 flex-wrap">
             {effect.categories.slice(0, 2).map((catSlug, idx) => {
               const cat = categories.find(c => c.id_slug === catSlug);
               if (!cat) return null;
               return (
-                <span key={idx} className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-medium border border-emerald-500/30">
+                <span key={idx} className="px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-white text-[9px] font-medium border border-white/20">
                   {language === 'fr' ? cat.name_fr : (cat.name_en || cat.name_fr)}
                 </span>
               );
             })}
             {effect.categories.length > 2 && (
-              <span className="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[10px]">
+              <span className="px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-white/70 text-[9px] border border-white/20">
                 +{effect.categories.length - 2}
               </span>
             )}
           </div>
         )}
+      </div>
+      <div className="p-2">
+        <p className="text-white text-xs font-medium line-clamp-2">
+          {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
+        </p>
       </div>
     </button>
   );
