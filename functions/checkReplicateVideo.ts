@@ -64,26 +64,49 @@ Deno.serve(async (req) => {
         });
       }
       
-      console.log('Video URL:', videoUrl);
+      console.log('Temporary video URL from Replicate:', videoUrl);
       
-      // Save video to database
+      // Download and store video permanently
       try {
+        console.log('Downloading video from Replicate...');
+        const videoResponse = await fetch(videoUrl);
+        if (!videoResponse.ok) {
+          throw new Error('Failed to download video from Replicate');
+        }
+        
+        const videoBlob = await videoResponse.blob();
+        const videoFile = new File([videoBlob], `video_${Date.now()}.mp4`, { type: 'video/mp4' });
+        
+        console.log('Uploading video to permanent storage...');
+        const { file_url: permanentUrl } = await base44.asServiceRole.integrations.Core.UploadFile({ 
+          file: videoFile 
+        });
+        
+        console.log('Video stored permanently:', permanentUrl);
+        
+        // Save video to database with permanent URL
         const visualData = await base44.asServiceRole.entities.Visual.create({
           user_email: user.email,
-          image_url: videoUrl,
+          image_url: permanentUrl,
           visual_type: 'autre',
           title: 'Vidéo générée',
           format: 'digital'
         });
         console.log('Video saved to database:', visualData.id);
-      } catch (dbError) {
-        console.error('Failed to save video to database:', dbError);
+        
+        return Response.json({ 
+          status: 'succeeded',
+          video_url: permanentUrl
+        });
+      } catch (storageError) {
+        console.error('Failed to store video permanently:', storageError);
+        // Fallback to temporary URL if storage fails
+        return Response.json({ 
+          status: 'succeeded',
+          video_url: videoUrl,
+          warning: 'Video stored with temporary URL'
+        });
       }
-      
-      return Response.json({ 
-        status: 'succeeded',
-        video_url: videoUrl
-      });
     } else if (statusData.status === 'failed' || statusData.status === 'canceled') {
       return Response.json({ 
         status: 'failed',
