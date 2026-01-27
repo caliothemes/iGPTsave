@@ -66,6 +66,20 @@ Deno.serve(async (req) => {
       
       console.log('Video URL:', videoUrl);
       
+      // Save video to database
+      try {
+        const visualData = await base44.asServiceRole.entities.Visual.create({
+          user_email: user.email,
+          image_url: videoUrl,
+          visual_type: 'autre',
+          title: 'Vidéo générée',
+          format: 'digital'
+        });
+        console.log('Video saved to database:', visualData.id);
+      } catch (dbError) {
+        console.error('Failed to save video to database:', dbError);
+      }
+      
       return Response.json({ 
         status: 'succeeded',
         video_url: videoUrl
