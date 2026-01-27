@@ -386,172 +386,134 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
             {/* Provider Features */}
             <div className="mb-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 space-y-2">
                 {provider === 'sora' && (
                   <>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Ultra réaliste' : 'Ultra realistic'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '100%' }} />
                       </div>
-                      {language === 'fr' ? 'Ultra réaliste' : 'Ultra realistic'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '100%' }} />
                       </div>
-                      {language === 'fr' ? 'Cohérence parfaite' : 'Perfect coherence'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Formats' : 'Formats'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '40%' }} />
                       </div>
-                      {language === 'fr' ? '2 formats 3:4, 16:9' : '2 formats 3:4, 16:9'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Durées' : 'Duration'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '75%' }} />
                       </div>
-                      4s, 8s {language === 'fr' ? 'ou' : 'or'} 12s
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">Audio</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '90%' }} />
                       </div>
-                      Audio
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Animation texte' : 'Text animation'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '85%' }} />
                       </div>
-                      {language === 'fr' ? 'Animations de textes' : 'Text animations'}
                     </div>
-                    </>
-                    )}
+                  </>
+                )}
                 {provider === 'replicate' && (
                   <>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '95%' }} />
                       </div>
-                      {language === 'fr' ? 'Vidéo cinématique réaliste' : 'Realistic cinematic video'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo produit' : 'Product video'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '90%' }} />
                       </div>
-                      {language === 'fr' ? 'Vidéo produit' : 'Product video'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo 360°' : '360° video'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '80%' }} />
                       </div>
-                      {language === 'fr' ? 'Vidéo 360°' : '360° video'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Formats' : 'Formats'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '75%' }} />
                       </div>
-                      {language === 'fr' ? '3 formats 1:1, 9:16, 16:9' : '3 formats 1:1, 9:16, 16:9'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Durées' : 'Duration'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '40%' }} />
                       </div>
-                      5s {language === 'fr' ? 'ou' : 'or'} 10s
                     </div>
                   </>
                 )}
                 {provider === 'wan' && (
                   <>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '90%' }} />
                       </div>
-                      {language === 'fr' ? 'Vidéo cinématique réaliste' : 'Realistic cinematic video'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo produit' : 'Product video'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '95%' }} />
                       </div>
-                      {language === 'fr' ? 'Vidéo produit' : 'Product video'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">Audio</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '85%' }} />
                       </div>
-                      Audio
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Qualité' : 'Quality'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '70%' }} />
                       </div>
-                      720p
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Durées' : 'Duration'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '40%' }} />
                       </div>
-                      Format 1:1
-                    </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      5s {language === 'fr' ? 'ou' : 'or'} 10s
                     </div>
                   </>
                 )}
                 {provider === 'runway' && (
                   <>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Style animation' : 'Animation style'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '95%' }} />
                       </div>
-                      {language === 'fr' ? 'Vidéo style animation' : 'Animation style video'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-xs font-medium">
-                      <div className="h-3 w-3 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Qualité HD' : 'HD quality'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '80%' }} />
                       </div>
-                      Format 16:9
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Formats' : 'Formats'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '25%' }} />
+                      </div>
                     </div>
                   </>
                 )}
