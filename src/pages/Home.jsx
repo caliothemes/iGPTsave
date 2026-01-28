@@ -578,8 +578,8 @@ Sois concis (2-4 phrases max) et encourageant.`
         setSelectedCategory(freePromptCategory);
       }
     
-    // Utiliser le mode choisi par l'utilisateur
-    const isModification = promptMode === 'modify' && currentVisual;
+      // Utiliser le mode choisi par l'utilisateur
+      const isModification = promptMode === 'modify' && currentVisual;
     let finalPrompt = userMessage;
     let displayMessage = userMessage;
     
