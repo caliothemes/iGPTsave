@@ -590,8 +590,8 @@ export default function Home() {
 
          COÛTS D'UTILISATION:
          - Génération d'image: 1 crédit
-         - Vidéo 5s: 200 crédits
-         - Vidéo 10s: 300 crédits
+         - Vidéos: à partir de 200 crédits (varie selon le modèle, la durée et le format)
+           → Pour voir tous les tarifs vidéo et options: clique sur l'icône rouge "Vidéo" sur un visuel généré
 
          Les invités (non connectés) ont 3 prompts gratuits pour tester.
 
