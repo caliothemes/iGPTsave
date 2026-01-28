@@ -546,9 +546,13 @@ export default function Home() {
       2. GÉNÉRATION DE VIDÉOS (OUI c'est possible !):
       - ÉTAPE 1: Générer ou uploader une image d'abord
       - ÉTAPE 2: Cliquer sur l'icône vidéo rose/rouge sous l'image
-      - ÉTAPE 3: Choisir le service (Kling, Wan, Sora ou RunwayML), la durée (5s ou 10s) et le format
-      - ÉTAPE 4: Cliquer sur Générer
+      - ÉTAPE 3: Dans la modal qui s'ouvre:
+        * Choisir le service/modèle (Kling v2.5, Wan v2.6, Sora 2 Pro ou RunwayML) - chaque modèle a ses propres caractéristiques et tarifs
+        * Sélectionner le format vidéo et la durée
+        * SOIT activer "Laissez iGPT gérer la vidéo" (recommandé pour débutants), SOIT remplir le prompt pour décrire l'animation souhaitée (mouvements de caméra, effets, transitions...)
+        * Cliquer sur Générer
       - Les vidéos sont créées à partir d'images existantes, pas directement du texte
+      - La génération peut prendre jusqu'à 10 minutes
 
       3. ÉDITEUR MAGIQUE (ajouter du texte):
       - Cliquer sur l'icône violette Baguette magique sous une image générée
