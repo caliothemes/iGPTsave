@@ -84,16 +84,7 @@ Deno.serve(async (req) => {
         
         console.log('Video stored permanently:', permanentUrl);
         
-        // Save video to database with permanent URL
-        const visualData = await base44.asServiceRole.entities.Visual.create({
-          user_email: user.email,
-          image_url: permanentUrl,
-          visual_type: 'autre',
-          title: 'Vidéo générée',
-          format: 'digital'
-        });
-        console.log('Video saved to database:', visualData.id);
-        
+        // Return permanent URL to frontend - frontend will create Visual with metadata
         return Response.json({ 
           status: 'succeeded',
           video_url: permanentUrl

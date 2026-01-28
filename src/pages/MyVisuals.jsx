@@ -177,22 +177,23 @@ export default function MyVisuals() {
     setEditingVisual(null);
   };
 
-  const handleVideoGenerated = async (videoUrl, animationPrompt) => {
+  const handleVideoGenerated = async (videoUrl, animationPrompt, aspectRatio) => {
     if (!videoVisual) return;
 
-    // Video already saved in database by backend function
-    // Just reload visuals to get the new video
-    const user = await base44.auth.me();
-    const allVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-updated_date', 200);
-    
-    const purchases = await base44.entities.StorePurchase.filter({ user_email: user.email }, '-created_date');
-    const purchasedVisualIds = new Set(purchases.map(p => p.visual_id));
-    const visualsWithPurchaseFlag = allVisuals.map(v => ({
-      ...v,
-      isPurchased: purchasedVisualIds.has(v.id)
-    }));
-    
-    setVisuals(visualsWithPurchaseFlag);
+    // Create Visual with permanent URL from backend
+    const newVisual = await base44.entities.Visual.create({
+      user_email: videoVisual.user_email,
+      image_url: videoUrl,
+      video_url: videoUrl,
+      title: videoVisual.title + ' (Vidéo)',
+      original_prompt: animationPrompt,
+      dimensions: aspectRatio === '1:1' ? '1080x1080' : aspectRatio === '9:16' ? '1080x1920' : aspectRatio === '3:4' ? '1080x1440' : aspectRatio === '16:9' ? '1920x1080' : videoVisual.dimensions,
+      visual_type: videoVisual.visual_type,
+      parent_visual_id: videoVisual.id,
+      format: 'digital'
+    });
+
+    setVisuals(prev => [newVisual, ...prev]);
     setShowVideoModal(false);
     setVideoVisual(null);
 
