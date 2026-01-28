@@ -494,8 +494,6 @@ export default function Home() {
       inputRef.current.style.height = 'auto';
       inputRef.current.style.height = '24px';
     }
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-    setMessages(prev => [...prev, { role: 'assistant', content: t('thinking'), isStreaming: true }]);
 
     try {
       const intentDetection = await base44.integrations.Core.InvokeLLM({
@@ -522,6 +520,10 @@ export default function Home() {
 
       // ÉTAPE 2: Si c'est une conversation, répondre directement (0 crédit)
       if (intent === 'conversation') {
+        // Ajouter le message utilisateur simple (sans metadata)
+        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: t('thinking'), isStreaming: true }]);
+
         const conversationResponse = await base44.integrations.Core.InvokeLLM({
           prompt: `Tu es iGPT, un assistant IA dans l'application iGPT qui aide les utilisateurs à créer des visuels professionnels.
 
@@ -597,7 +599,6 @@ export default function Home() {
       if (!user) {
         // Guest : max 3 prompts
         if (guestPrompts >= 3) {
-          setMessages(prev => prev.slice(0, -2)); // Remove user message and thinking
           setShowGuestCreditsModal(true);
           setIsGenerating(false);
           return;
@@ -609,7 +610,6 @@ export default function Home() {
         const isAdmin = user?.role === 'admin';
 
         if (!isAdmin && !isUnlimited && totalCredits <= 0) {
-          setMessages(prev => prev.slice(0, -2)); // Remove user message and thinking
           setShowNoCreditsModal(true);
           setIsGenerating(false);
           return;
@@ -641,12 +641,15 @@ export default function Home() {
       // Sauvegarder les images attachées AVANT de les clear
       const currentAttachedImages = [...attachedImages];
       
-      setInputValue('');
-      // Reset textarea height
-      if (inputRef.current) {
-        inputRef.current.style.height = 'auto';
-        inputRef.current.style.height = '24px';
+      // Clear attached images immediately
+      setAttachedImages([]);
+      
+      // Reset currentVisual seulement si c'est un nouveau prompt
+      if (promptMode === 'new') {
+        setCurrentVisual(null);
       }
+
+      // Ajouter le message utilisateur avec metadata
       setMessages(prev => [...prev, { 
         role: 'user', 
         content: displayMessage,
@@ -657,16 +660,6 @@ export default function Home() {
         selectedFormat: selectedFormat ? selectedFormat.name : null,
         selectedCategory: selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : null
       }]);
-      
-      // Clear attached images immediately after sending
-      setAttachedImages([]);
-      
-      setIsGenerating(true);
-      
-      // Reset currentVisual seulement si c'est un nouveau prompt
-      if (promptMode === 'new') {
-        setCurrentVisual(null);
-      }
 
       const generatingMessage = isModification 
         ? (language === 'fr' ? '✨ Modification en cours...' : '✨ Modifying...')
