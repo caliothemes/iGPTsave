@@ -580,71 +580,69 @@ export default function Home() {
 
       // Utiliser le mode choisi par l'utilisateur
       const isModification = promptMode === 'modify' && currentVisual;
-    let finalPrompt = userMessage;
-    let displayMessage = userMessage;
-    
-    if (isModification) {
-      // Enrichir le prompt avec l'instruction de modification
-      finalPrompt = `${currentVisual.image_prompt || currentVisual.original_prompt} MODIFICATION DEMANDÉE: ${userMessage}`;
-      displayMessage = `✏️ ${userMessage}`;
-    }
-    
-    // Reset mode après envoi
-    setPromptMode(null);
-    
-    // Sauvegarder les images attachées AVANT de les clear
-    const currentAttachedImages = [...attachedImages];
-    
-    setInputValue('');
-    // Reset textarea height
-    if (inputRef.current) {
-      inputRef.current.style.height = 'auto';
-      inputRef.current.style.height = '24px';
-    }
-    setMessages(prev => [...prev, { 
-      role: 'user', 
-      content: displayMessage,
-      attachedImages: currentAttachedImages.length > 0 ? currentAttachedImages : undefined,
-      artDirector: selectedDA ? selectedDA.name : null,
-      canvaMode: canvaMode,
-      canvaTextsCount: canvaTexts.length,
-      selectedFormat: selectedFormat ? selectedFormat.name : null,
-      selectedCategory: selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : null
-    }]);
-    
-    // Clear attached images immediately after sending
-    setAttachedImages([]);
-    
-    setIsGenerating(true);
-    
-    // Reset currentVisual seulement si c'est un nouveau prompt
-    if (promptMode === 'new') {
-      setCurrentVisual(null);
-    }
-
-    const generatingMessage = isModification 
-      ? (language === 'fr' ? '✨ Modification en cours...' : '✨ Modifying...')
-      : t('generating');
-    setMessages(prev => [...prev, { role: 'assistant', content: generatingMessage, isStreaming: true }]);
-
-    // Create conversation if it doesn't exist
-    let activeConversation = currentConversation;
-    if (!activeConversation && user) {
-      try {
-        const newConv = await base44.entities.Conversation.create({
-          user_email: user.email,
-          title: userMessage.slice(0, 50),
-          messages: [{ role: 'user', content: userMessage }]
-        });
-        setCurrentConversation(newConv);
-        setConversations(prev => [newConv, ...prev]);
-        activeConversation = newConv;
-      } catch (e) {
-        console.error('Failed to create conversation:', e);
+      let finalPrompt = userMessage;
+      let displayMessage = userMessage;
+      
+      if (isModification) {
+        // Enrichir le prompt avec l'instruction de modification
+        finalPrompt = `${currentVisual.image_prompt || currentVisual.original_prompt} MODIFICATION DEMANDÉE: ${userMessage}`;
+        displayMessage = `✏️ ${userMessage}`;
       }
-    }
+      
+      // Reset mode après envoi
+      setPromptMode(null);
+      
+      // Sauvegarder les images attachées AVANT de les clear
+      const currentAttachedImages = [...attachedImages];
+      
+      setInputValue('');
+      // Reset textarea height
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+        inputRef.current.style.height = '24px';
+      }
+      setMessages(prev => [...prev, { 
+        role: 'user', 
+        content: displayMessage,
+        attachedImages: currentAttachedImages.length > 0 ? currentAttachedImages : undefined,
+        artDirector: selectedDA ? selectedDA.name : null,
+        canvaMode: canvaMode,
+        canvaTextsCount: canvaTexts.length,
+        selectedFormat: selectedFormat ? selectedFormat.name : null,
+        selectedCategory: selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : null
+      }]);
+      
+      // Clear attached images immediately after sending
+      setAttachedImages([]);
+      
+      setIsGenerating(true);
+      
+      // Reset currentVisual seulement si c'est un nouveau prompt
+      if (promptMode === 'new') {
+        setCurrentVisual(null);
+      }
 
-    try {
+      const generatingMessage = isModification 
+        ? (language === 'fr' ? '✨ Modification en cours...' : '✨ Modifying...')
+        : t('generating');
+      setMessages(prev => [...prev, { role: 'assistant', content: generatingMessage, isStreaming: true }]);
+
+      // Create conversation if it doesn't exist
+      let activeConversation = currentConversation;
+      if (!activeConversation && user) {
+        try {
+          const newConv = await base44.entities.Conversation.create({
+            user_email: user.email,
+            title: userMessage.slice(0, 50),
+            messages: [{ role: 'user', content: userMessage }]
+          });
+          setCurrentConversation(newConv);
+          setConversations(prev => [newConv, ...prev]);
+          activeConversation = newConv;
+        } catch (e) {
+          console.error('Failed to create conversation:', e);
+        }
+      }
 
 
       // CAS NORMAL: Génération d'image
@@ -796,11 +794,11 @@ export default function Home() {
       // Enrichir avec le DA si sélectionné
       let daApplied = false;
       if (selectedDA) {
-          daApplied = true;
-          let daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
+        daApplied = true;
+        let daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
 
-          // Analyser le site web si présent
-          if (selectedDA.website) {
+        // Analyser le site web si présent
+        if (selectedDA.website) {
             try {
               setMessages(prev => [
                 ...prev.slice(0, -1),
@@ -845,7 +843,7 @@ export default function Home() {
       
       // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
       if (currentAttachedImages.length > 0) {
-          try {
+        try {
             setMessages(prev => [
               ...prev.slice(0, -1),
               { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
@@ -862,18 +860,18 @@ export default function Home() {
               throw new Error(language === 'fr' ? 'Erreur lors de la génération' : 'Generation error');
             }
 
-            console.log('✅ Image créée avec images attachées:', result.url);
+          console.log('✅ Image créée avec images attachées:', result.url);
 
-          } catch (compError) {
-            console.error('❌ Composition error:', compError);
-            throw compError;
-          }
-        } else {
-          // CAS NORMAL: Génération simple
-          result = await base44.integrations.Core.GenerateImage({
-            prompt: promptToUse
-          });
+        } catch (compError) {
+          console.error('❌ Composition error:', compError);
+          throw compError;
         }
+      } else {
+        // CAS NORMAL: Génération simple
+        result = await base44.integrations.Core.GenerateImage({
+          prompt: promptToUse
+        });
+      }
 
       // Traitement commun pour les deux cas (avec ou sans images attachées)
       if (result.url) {
