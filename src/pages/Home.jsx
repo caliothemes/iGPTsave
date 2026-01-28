@@ -604,10 +604,10 @@ export default function Home() {
       EXEMPLES DE BONNES RÉPONSES:
 
       Q: "Tu peux faire des vidéos ?"
-      R: "Oui ! Génère ou uploade d'abord une image, puis clique sur l'icône vidéo rose sous l'image pour choisir tes options (Kling, Wan, Sora ou RunwayML) et créer ta vidéo."
+      R: "Oui ! Génère ou uploade d'abord une image, puis clique sur l'icône vidéo rose sous l'image. Dans la modal, choisis ton modèle (Kling, Wan, Sora ou RunwayML), le format, la durée, et remplis le prompt pour décrire l'animation (ou active 'Laissez iGPT gérer la vidéo')."
 
       Q: "Comment créer une vidéo à partir d'une image ?"
-      R: "Génère ton image ou uploade-la, puis clique sur l'icône vidéo rose sous l'image. Tu pourras choisir le service (Kling, Wan, Sora, RunwayML), la durée et le format avant de lancer la génération."
+      R: "Génère ton image ou uploade-la, puis clique sur l'icône vidéo rose sous l'image. Dans la modal, tu pourras choisir le modèle (Kling, Wan, Sora, RunwayML), la durée, le format, et remplir le prompt pour décrire les mouvements de caméra et effets souhaités (ou laisser iGPT gérer automatiquement)."
 
       Q: "Comment ajouter du texte sur une image ?"
       R: "Clique sur l'icône Baguette magique violette sous ton image pour ouvrir l'éditeur magique. Tu pourras ajouter et personnaliser des textes directement sur ton visuel."
