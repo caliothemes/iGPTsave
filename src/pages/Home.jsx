@@ -485,34 +485,98 @@ export default function Home() {
   const handleSend = async () => {
     if (!inputValue.trim() || isGenerating) return;
 
-    // Vérification des crédits AVANT la génération
-    if (!user) {
-      // Guest : max 3 prompts
-      if (guestPrompts >= 3) {
-        setShowGuestCreditsModal(true);
-        return;
-      }
-    } else {
-      // User connecté : vérifier les crédits
-      const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
-      const isUnlimited = credits?.subscription_type === 'unlimited';
-      const isAdmin = user?.role === 'admin';
-      
-      if (!isAdmin && !isUnlimited && totalCredits <= 0) {
-        setShowNoCreditsModal(true);
-        return;
-      }
-    }
-
-    // Auto-select free_prompt if no category selected
-    let activeCategory = selectedCategory;
-    if (!activeCategory) {
-      const freePromptCategory = CATEGORIES.find(c => c.id === 'free_prompt');
-      activeCategory = freePromptCategory;
-      setSelectedCategory(freePromptCategory);
-    }
-    
     const userMessage = inputValue.trim();
+    
+    // ÉTAPE 1: Détecter l'intention (conversation vs génération)
+    setIsGenerating(true);
+    setInputValue('');
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = '24px';
+    }
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: t('thinking'), isStreaming: true }]);
+
+    try {
+      const intentDetection = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze this user message and determine if it's:
+1. A GENERATION REQUEST (user wants to create/generate/modify a visual/image/logo/design/flyer/etc.)
+2. A CONVERSATION/QUESTION (user wants to chat, ask questions, greet, or get information)
+
+User message: "${userMessage}"
+
+Examples of GENERATION: "crée un logo", "génère une carte de visite", "fais moi un flyer", "je veux une affiche", "modify the colors", "change this"
+Examples of CONVERSATION: "bonjour", "salut", "tu peux faire des vidéos ?", "comment ça marche ?", "c'est quoi iGPT ?", "aide moi"
+
+Return ONLY: {"intent": "generate"} or {"intent": "conversation"}`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            intent: { type: "string", enum: ["generate", "conversation"] }
+          }
+        }
+      });
+
+      const intent = intentDetection.intent;
+      console.log('🎯 Intent détecté:', intent);
+
+      // ÉTAPE 2: Si c'est une conversation, répondre directement (0 crédit)
+      if (intent === 'conversation') {
+        const conversationResponse = await base44.integrations.Core.InvokeLLM({
+          prompt: `Tu es iGPT, un assistant IA spécialisé dans la création de visuels professionnels (logos, cartes de visite, flyers, posts pour réseaux sociaux, publicités, etc.).
+
+L'utilisateur te pose une question ou veut discuter: "${userMessage}"
+
+Réponds de manière amicale et utile en ${language === 'fr' ? 'français' : 'anglais'}. 
+
+Informations importantes à mentionner si pertinent:
+- Tu peux créer des images, logos, designs variés
+- Tu peux générer des vidéos à partir d'images (Kling, Wan, Sora, RunwayML)
+- Tu as un éditeur magique pour ajouter du texte sur les images
+- Tu peux modifier des images avec l'IA (changer couleurs, styles, éléments)
+- Les utilisateurs ont des crédits gratuits puis peuvent acheter des packs ou s'abonner
+
+Sois concis (2-4 phrases max) et encourageant.`
+        });
+
+        setMessages(prev => [
+          ...prev.slice(0, -1),
+          { role: 'assistant', content: conversationResponse }
+        ]);
+        setIsGenerating(false);
+        return;
+      }
+
+      // ÉTAPE 3: C'est une génération - vérifier les crédits
+      if (!user) {
+        // Guest : max 3 prompts
+        if (guestPrompts >= 3) {
+          setMessages(prev => prev.slice(0, -2)); // Remove user message and thinking
+          setShowGuestCreditsModal(true);
+          setIsGenerating(false);
+          return;
+        }
+      } else {
+        // User connecté : vérifier les crédits
+        const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+        const isUnlimited = credits?.subscription_type === 'unlimited';
+        const isAdmin = user?.role === 'admin';
+        
+        if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+          setMessages(prev => prev.slice(0, -2)); // Remove user message and thinking
+          setShowNoCreditsModal(true);
+          setIsGenerating(false);
+          return;
+        }
+      }
+
+      // Auto-select free_prompt if no category selected
+      let activeCategory = selectedCategory;
+      if (!activeCategory) {
+        const freePromptCategory = CATEGORIES.find(c => c.id === 'free_prompt');
+        activeCategory = freePromptCategory;
+        setSelectedCategory(freePromptCategory);
+      }
     
     // Utiliser le mode choisi par l'utilisateur
     const isModification = promptMode === 'modify' && currentVisual;
@@ -1250,7 +1314,7 @@ export default function Home() {
           }
         }
         }
-        } catch (error) {
+    } catch (error) {
       console.error(error);
       const errorMsg = t('error');
       setMessages(prev => {
