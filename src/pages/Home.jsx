@@ -500,15 +500,15 @@ export default function Home() {
     try {
       const intentDetection = await base44.integrations.Core.InvokeLLM({
         prompt: `Analyze this user message and determine if it's:
-1. A GENERATION REQUEST (user wants to create/generate/modify a visual/image/logo/design/flyer/etc.)
-2. A CONVERSATION/QUESTION (user wants to chat, ask questions, greet, or get information)
+    1. A GENERATION REQUEST (user wants to create/generate/modify a visual/image/logo/design/flyer/etc.)
+    2. A CONVERSATION/QUESTION (user wants to chat, ask questions, greet, or get information)
 
-User message: "${userMessage}"
+    User message: "${userMessage}"
 
-Examples of GENERATION: "crée un logo", "génère une carte de visite", "fais moi un flyer", "je veux une affiche", "modify the colors", "change this"
-Examples of CONVERSATION: "bonjour", "salut", "tu peux faire des vidéos ?", "comment ça marche ?", "c'est quoi iGPT ?", "aide moi"
+    Examples of GENERATION: "crée un logo", "génère une carte de visite", "fais moi un flyer", "je veux une affiche", "modify the colors", "change this"
+    Examples of CONVERSATION: "bonjour", "salut", "tu peux faire des vidéos ?", "comment ça marche ?", "c'est quoi iGPT ?", "aide moi"
 
-Return ONLY: {"intent": "generate"} or {"intent": "conversation"}`,
+    Return ONLY: {"intent": "generate"} or {"intent": "conversation"}`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -525,18 +525,18 @@ Return ONLY: {"intent": "generate"} or {"intent": "conversation"}`,
         const conversationResponse = await base44.integrations.Core.InvokeLLM({
           prompt: `Tu es iGPT, un assistant IA spécialisé dans la création de visuels professionnels (logos, cartes de visite, flyers, posts pour réseaux sociaux, publicités, etc.).
 
-L'utilisateur te pose une question ou veut discuter: "${userMessage}"
+    L'utilisateur te pose une question ou veut discuter: "${userMessage}"
 
-Réponds de manière amicale et utile en ${language === 'fr' ? 'français' : 'anglais'}. 
+    Réponds de manière amicale et utile en ${language === 'fr' ? 'français' : 'anglais'}. 
 
-Informations importantes à mentionner si pertinent:
-- Tu peux créer des images, logos, designs variés
-- Tu peux générer des vidéos à partir d'images (Kling, Wan, Sora, RunwayML)
-- Tu as un éditeur magique pour ajouter du texte sur les images
-- Tu peux modifier des images avec l'IA (changer couleurs, styles, éléments)
-- Les utilisateurs ont des crédits gratuits puis peuvent acheter des packs ou s'abonner
+    Informations importantes à mentionner si pertinent:
+    - Tu peux créer des images, logos, designs variés
+    - Tu peux générer des vidéos à partir d'images (Kling, Wan, Sora, RunwayML)
+    - Tu as un éditeur magique pour ajouter du texte sur les images
+    - Tu peux modifier des images avec l'IA (changer couleurs, styles, éléments)
+    - Les utilisateurs ont des crédits gratuits puis peuvent acheter des packs ou s'abonner
 
-Sois concis (2-4 phrases max) et encourageant.`
+    Sois concis (2-4 phrases max) et encourageant.`
         });
 
         setMessages(prev => [
@@ -561,7 +561,7 @@ Sois concis (2-4 phrases max) et encourageant.`
         const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
         const isUnlimited = credits?.subscription_type === 'unlimited';
         const isAdmin = user?.role === 'admin';
-        
+
         if (!isAdmin && !isUnlimited && totalCredits <= 0) {
           setMessages(prev => prev.slice(0, -2)); // Remove user message and thinking
           setShowNoCreditsModal(true);
@@ -577,7 +577,7 @@ Sois concis (2-4 phrases max) et encourageant.`
         activeCategory = freePromptCategory;
         setSelectedCategory(freePromptCategory);
       }
-    
+
       // Utiliser le mode choisi par l'utilisateur
       const isModification = promptMode === 'modify' && currentVisual;
     let finalPrompt = userMessage;
