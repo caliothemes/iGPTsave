@@ -791,11 +791,11 @@ Sois concis (2-4 phrases max) et encourageant.`
 
         enhancedPrompt += ', professional quality, 4K resolution';
         console.log('📝 Prompt final enrichi:', enhancedPrompt);
-        }
+      }
 
-        // Enrichir avec le DA si sélectionné
-        let daApplied = false;
-        if (selectedDA) {
+      // Enrichir avec le DA si sélectionné
+      let daApplied = false;
+      if (selectedDA) {
           daApplied = true;
           let daPrompt = `Brand identity for ${selectedDA.name} (${selectedDA.activity}). ${selectedDA.description || ''}. Style: ${selectedDA.style_keywords || 'professional'}. Brand colors: ${selectedDA.color_palette.join(', ')}.`;
 
@@ -825,26 +825,26 @@ Sois concis (2-4 phrases max) et encourageant.`
             }
           }
 
-          enhancedPrompt = `${daPrompt} ${enhancedPrompt}`;
-          console.log('🎨 DA appliqué:', selectedDA.name);
-        }
+        enhancedPrompt = `${daPrompt} ${enhancedPrompt}`;
+        console.log('🎨 DA appliqué:', selectedDA.name);
+      }
 
-        // Si c'est une modification, utiliser le prompt enrichi directement
-        let promptToUse = isModification ? finalPrompt : enhancedPrompt;
-        
-        // En mode Canva, ajouter --no text pour générer l'image sans texte intégré
-        if (canvaMode && !isModification) {
-          promptToUse += ' --no text --no letters --no typography --no words --no writing';
-          console.log('🎨 Mode Canva: génération sans texte intégré');
-        }
-        
-        console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
+      // Si c'est une modification, utiliser le prompt enrichi directement
+      let promptToUse = isModification ? finalPrompt : enhancedPrompt;
+      
+      // En mode Canva, ajouter --no text pour générer l'image sans texte intégré
+      if (canvaMode && !isModification) {
+        promptToUse += ' --no text --no letters --no typography --no words --no writing';
+        console.log('🎨 Mode Canva: génération sans texte intégré');
+      }
+      
+      console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
-        // Générer l'image
-        let result;
-        
-        // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
-        if (currentAttachedImages.length > 0) {
+      // Générer l'image
+      let result;
+      
+      // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
+      if (currentAttachedImages.length > 0) {
           try {
             setMessages(prev => [
               ...prev.slice(0, -1),
@@ -875,8 +875,8 @@ Sois concis (2-4 phrases max) et encourageant.`
           });
         }
 
-        // Traitement commun pour les deux cas (avec ou sans images attachées)
-        if (result.url) {
+      // Traitement commun pour les deux cas (avec ou sans images attachées)
+      if (result.url) {
         let finalImageUrl = result.url;
         
         // Extract color palette from generated image
@@ -1313,8 +1313,8 @@ Sois concis (2-4 phrases max) et encourageant.`
             console.error('Failed to update conversation:', e);
           }
         }
-        }
-      } catch (error) {
+      }
+    } catch (error) {
       console.error(error);
       const errorMsg = t('error');
       setMessages(prev => {
