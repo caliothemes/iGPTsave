@@ -180,18 +180,19 @@ export default function MyVisuals() {
   const handleVideoGenerated = async (videoUrl, animationPrompt) => {
     if (!videoVisual) return;
 
-    const newVisual = await base44.entities.Visual.create({
-      user_email: videoVisual.user_email,
-      image_url: videoUrl,
-      video_url: videoUrl,
-      title: videoVisual.title + ' (Vidéo)',
-      original_prompt: animationPrompt,
-      dimensions: videoVisual.dimensions,
-      visual_type: videoVisual.visual_type,
-      parent_visual_id: videoVisual.id
-    });
-
-    setVisuals(prev => [newVisual, ...prev]);
+    // Video already saved in database by backend function
+    // Just reload visuals to get the new video
+    const user = await base44.auth.me();
+    const allVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-updated_date', 200);
+    
+    const purchases = await base44.entities.StorePurchase.filter({ user_email: user.email }, '-created_date');
+    const purchasedVisualIds = new Set(purchases.map(p => p.visual_id));
+    const visualsWithPurchaseFlag = allVisuals.map(v => ({
+      ...v,
+      isPurchased: purchasedVisualIds.has(v.id)
+    }));
+    
+    setVisuals(visualsWithPurchaseFlag);
     setShowVideoModal(false);
     setVideoVisual(null);
 
