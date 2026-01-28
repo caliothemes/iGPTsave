@@ -1313,7 +1313,7 @@ Sois concis (2-4 phrases max) et encourageant.`
             console.error('Failed to update conversation:', e);
           }
         }
-        }
+      }
     } catch (error) {
       console.error(error);
       const errorMsg = t('error');
