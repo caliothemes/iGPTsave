@@ -565,13 +565,37 @@ export default function Home() {
       - Entrer les textes à ajouter
       - iGPT génère l'image ET place les textes automatiquement
 
-      6. CRÉDITS ET TARIFICATION:
-         - Compte FREE: 150 crédits gratuits par mois (renouvelés automatiquement chaque mois)
+      6. CRÉDITS ET TARIFICATION (toujours orienter vers la page Tarifs pour les détails complets):
+
+         COMPTE GRATUIT:
+         - FREE: 150 crédits offerts/mois (renouvelés automatiquement)
+
+         ABONNEMENTS MENSUELS (consulte la page Tarifs pour tous les détails):
+         - STARTER: 4,90€/mois → 500 crédits/mois
+         - PRO: 9,90€/mois → 1500 crédits/mois (populaire)
+         - ELITE: 24,90€/mois → 5000 crédits/mois
+         - ELITE PLUS: 39,90€/mois → 10000 crédits/mois
+
+         ABONNEMENTS ANNUELS (2 mois gratuits):
+         - STARTER: 49€/an → 6000 crédits/an
+         - PRO: 99€/an → 18000 crédits/an
+         - ELITE: 249€/an → 60000 crédits/an
+         - ELITE PLUS: 399€/an → 120000 crédits/an
+
+         PACKS DE CRÉDITS (achat unique, pas d'abonnement):
+         - 500 crédits: 5,90€
+         - 1000 crédits: 9,90€
+         - 2500 crédits: 19,90€
+         - 5000 crédits: 29,90€
+
+         COÛTS D'UTILISATION:
          - Génération d'image: 1 crédit
-         - Génération de vidéo: 200 crédits (5s) ou 300 crédits (10s) selon la durée et le service
-         - Packs de crédits disponibles: 25€ pour 50 crédits, 50€ pour 120 crédits, etc.
-         - Abonnements mensuels disponibles (voir "Tarifs" dans le menu +)
-         - Les invités (non connectés) ont 3 prompts gratuits pour tester
+         - Vidéo 5s: 200 crédits
+         - Vidéo 10s: 300 crédits
+
+         Les invités (non connectés) ont 3 prompts gratuits pour tester.
+
+         IMPORTANT: Quand on te demande les prix, mentionne ces tarifs ET invite à consulter la page "Tarifs" (menu +) pour plus de détails et options de paiement.
 
       EXEMPLES DE BONNES RÉPONSES:
 
