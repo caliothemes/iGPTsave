@@ -565,10 +565,13 @@ export default function Home() {
       - Entrer les textes à ajouter
       - iGPT génère l'image ET place les textes automatiquement
 
-      6. CRÉDITS:
-      - 15 messages gratuits au départ
-      - Ensuite: acheter des packs ou s'abonner (voir "Tarifs" dans le menu +)
-      - Les invités ont 3 prompts gratuits
+      6. CRÉDITS ET TARIFICATION:
+         - Compte FREE: 150 crédits gratuits par mois (renouvelés automatiquement chaque mois)
+         - Génération d'image: 1 crédit
+         - Génération de vidéo: 200 crédits (5s) ou 300 crédits (10s) selon la durée et le service
+         - Packs de crédits disponibles: 25€ pour 50 crédits, 50€ pour 120 crédits, etc.
+         - Abonnements mensuels disponibles (voir "Tarifs" dans le menu +)
+         - Les invités (non connectés) ont 3 prompts gratuits pour tester
 
       EXEMPLES DE BONNES RÉPONSES:
 
