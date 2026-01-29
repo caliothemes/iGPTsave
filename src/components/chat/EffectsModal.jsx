@@ -218,7 +218,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
           </div>
 
           {/* Effects Grid */}
-          <div className="p-6 pb-12 overflow-y-auto max-h-[calc(85vh-200px)]">
+          <div className="p-6 pb-24 overflow-y-auto max-h-[calc(85vh-200px)]">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
