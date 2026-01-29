@@ -51,6 +51,7 @@ import Account from './pages/Account';
 import Admin from './pages/Admin';
 import AdminAssets from './pages/AdminAssets';
 import AdminBackup from './pages/AdminBackup';
+import AdminConversationalAI from './pages/AdminConversationalAI';
 import AdminEffects from './pages/AdminEffects';
 import AdminFeatures from './pages/AdminFeatures';
 import AdminFiles from './pages/AdminFiles';
@@ -80,7 +81,6 @@ import Pricing from './pages/Pricing';
 import Store from './pages/Store';
 import StoryStudio from './pages/StoryStudio';
 import Support from './pages/Support';
-import AdminConversationalAI from './pages/AdminConversationalAI';
 import __Layout from './Layout.jsx';
 
 
@@ -89,6 +89,7 @@ export const PAGES = {
     "Admin": Admin,
     "AdminAssets": AdminAssets,
     "AdminBackup": AdminBackup,
+    "AdminConversationalAI": AdminConversationalAI,
     "AdminEffects": AdminEffects,
     "AdminFeatures": AdminFeatures,
     "AdminFiles": AdminFiles,
@@ -118,7 +119,6 @@ export const PAGES = {
     "Store": Store,
     "StoryStudio": StoryStudio,
     "Support": Support,
-    "AdminConversationalAI": AdminConversationalAI,
 }
 
 export const pagesConfig = {

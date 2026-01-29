@@ -2711,7 +2711,7 @@ ${qaKnowledge}
                   onChange={(e) => {
                     setInputValue(e.target.value);
                     e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
                   }}
                   onFocus={() => {
                     // Si une image est présente et qu'aucun mode n'est sélectionné, demander
@@ -2720,7 +2720,7 @@ ${qaKnowledge}
                     }
                   }}
                   placeholder={language === 'fr' ? 'Décrivez votre visuel...' : 'Describe your visual...'}
-                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px]"
+                  className="flex-1 bg-transparent text-white placeholder:text-white/30 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
                   rows={1}
                   disabled={isGenerating}
                   style={{ height: '24px' }}
