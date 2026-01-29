@@ -42,9 +42,10 @@ export default function Sidebar({
   const [editingConv, setEditingConv] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [appVersion, setAppVersion] = useState('iGPT 1.0.1 beta');
+  const [actualTotalCount, setActualTotalCount] = useState(0);
 
   useEffect(() => {
-    const loadAppVersion = async () => {
+    const loadData = async () => {
       try {
         const settings = await base44.entities.AppSettings.list();
         if (settings.length > 0 && settings[0].app_version) {
@@ -53,9 +54,19 @@ export default function Sidebar({
       } catch (e) {
         console.error('Failed to load app version:', e);
       }
+
+      // Load actual total visuals count if user is logged in
+      if (user) {
+        try {
+          const allVisuals = await base44.entities.Visual.filter({ user_email: user.email });
+          setActualTotalCount(allVisuals.length);
+        } catch (e) {
+          console.error('Failed to load total visuals:', e);
+        }
+      }
     };
-    loadAppVersion();
-  }, []);
+    loadData();
+  }, [user]);
 
   const getTotalCredits = () => {
     if (!credits) return 0;
@@ -166,7 +177,7 @@ export default function Sidebar({
                    onClick={() => onSelectVisual && onSelectVisual({ openModal: true })}
                    className="mt-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs transition-all inline-block"
                  >
-                   {t('seeAll')} ({totalVisualsCount || visuals.length})
+                   {t('seeAll')} ({actualTotalCount || totalVisualsCount || visuals.length})
                  </button>
                 )}
               </CollapsibleContent>
