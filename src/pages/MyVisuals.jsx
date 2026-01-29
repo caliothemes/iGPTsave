@@ -395,6 +395,22 @@ export default function MyVisuals() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
                 <Input placeholder={t.search} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               </div>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
+                  <SelectValue placeholder={language === 'fr' ? 'Catégorie' : 'Category'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{language === 'fr' ? 'Toutes' : 'All'} ({visuals.length})</SelectItem>
+                  {mainCategories.map(cat => {
+                    const count = categoryCounts[cat.id] || 0;
+                    return (
+                      <SelectItem key={cat.id} value={cat.id} disabled={count === 0}>
+                        {cat.name} ({count})
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
               <Select value={formatFilter} onValueChange={setFormatFilter}>
                 <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Format" />
@@ -429,50 +445,7 @@ export default function MyVisuals() {
               </div>
             </div>
 
-            {/* Category Tags */}
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                onClick={() => setTypeFilter('all')}
-                className={cn(
-                  "px-2 py-1 rounded-md text-[11px] font-medium transition-colors",
-                  typeFilter === 'all' 
-                    ? "bg-violet-600 text-white" 
-                    : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
-                )}
-              >
-                {language === 'fr' ? 'Tous' : 'All'} ({visuals.length})
-              </button>
-              {mainCategories.map(cat => {
-                const count = categoryCounts[cat.id] || 0;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setTypeFilter(cat.id)}
-                    disabled={count === 0}
-                    className={cn(
-                      "px-2 py-1 rounded-md text-[11px] font-medium transition-colors flex items-center gap-1",
-                      typeFilter === cat.id 
-                        ? "bg-violet-600 text-white" 
-                        : count > 0
-                          ? "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
-                          : "bg-white/5 text-white/30 cursor-not-allowed"
-                    )}
-                  >
-                    {cat.name}
-                    <span className={cn(
-                      "px-1 py-0.5 rounded-full text-[9px]",
-                      typeFilter === cat.id
-                        ? "bg-white/20"
-                        : count > 0
-                          ? "bg-white/10"
-                          : "bg-white/5"
-                    )}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+
           </div>
 
           {/* Grid */}
