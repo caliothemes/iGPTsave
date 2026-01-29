@@ -21,7 +21,8 @@ import {
   FolderOpen,
   Pencil,
   Database,
-  Sparkles
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -39,6 +40,7 @@ const navItems = [
   { id: 'store-categories', label: 'Store Catégories', icon: Store, page: 'AdminStoreCategories' },
   { id: 'story-animations', label: 'Story Animations', icon: Wand2, page: 'AdminStoryAnimations' },
   { id: 'newsletters', label: 'Newsletters', icon: Mail, page: 'AdminNewsletters' },
+  { id: 'conversational-ai', label: 'IA Conversationnel', icon: MessageCircle, page: 'AdminConversationalAI' },
   { id: 'prompts', label: 'Prompts IA', icon: Wand2, page: 'AdminPrompts' },
   { id: 'assets', label: 'Assets Éditeur', icon: Brush, page: 'AdminAssets' },
   { id: 'presentation', label: 'Présentation', icon: LayoutDashboard, page: 'AdminPresentation' },
