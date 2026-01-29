@@ -4,7 +4,9 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight, Wand2, Video, Scissors } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight, Wand2, Video, Scissors, Folder, FolderPlus, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
 import { useLanguage } from '@/components/LanguageContext';
@@ -27,7 +29,14 @@ export default function MyVisuals() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [formatFilter, setFormatFilter] = useState('all');
   const [daFilter, setDaFilter] = useState('all');
+  const [folderFilter, setFolderFilter] = useState('all');
   const [artDirectors, setArtDirectors] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [showFolderDialog, setShowFolderDialog] = useState(false);
+  const [editingFolder, setEditingFolder] = useState(null);
+  const [folderName, setFolderName] = useState('');
+  const [folderColor, setFolderColor] = useState('violet');
+  const [selectedVisualsForMove, setSelectedVisualsForMove] = useState([]);
   const [gridSize, setGridSize] = useState('medium');
   const [selectedVisual, setSelectedVisual] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -95,6 +104,10 @@ export default function MyVisuals() {
         // Load Art Directors
         const das = await base44.entities.ArtDirector.filter({ user_email: user.email, is_active: true }, '-created_date');
         setArtDirectors(das);
+
+        // Load Folders
+        const foldersData = await base44.entities.Folder.filter({ user_email: user.email }, 'order');
+        setFolders(foldersData);
       } catch (e) {
         console.error(e);
       } finally {
@@ -350,8 +363,13 @@ export default function MyVisuals() {
 
     // DA filter
     const matchesDA = daFilter === 'all' || v.art_director_name === daFilter;
+
+    // Folder filter
+    const matchesFolder = folderFilter === 'all' || 
+                         (folderFilter === 'unorganized' && !v.folder_id) ||
+                         v.folder_id === folderFilter;
     
-    return matchesSearch && matchesFilter && matchesType && matchesFormat && matchesDA;
+    return matchesSearch && matchesFilter && matchesType && matchesFormat && matchesDA && matchesFolder;
   });
 
   // Pagination
@@ -363,7 +381,68 @@ export default function MyVisuals() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, filter, typeFilter, formatFilter, daFilter]);
+  }, [search, filter, typeFilter, formatFilter, daFilter, folderFilter]);
+
+  const handleCreateFolder = async () => {
+    if (!folderName.trim()) return;
+    const user = await base44.auth.me();
+    const newFolder = await base44.entities.Folder.create({
+      name: folderName.trim(),
+      user_email: user.email,
+      color: folderColor,
+      order: folders.length
+    });
+    setFolders([...folders, newFolder]);
+    setFolderName('');
+    setFolderColor('violet');
+    setShowFolderDialog(false);
+  };
+
+  const handleEditFolder = async () => {
+    if (!folderName.trim() || !editingFolder) return;
+    await base44.entities.Folder.update(editingFolder.id, {
+      name: folderName.trim(),
+      color: folderColor
+    });
+    setFolders(folders.map(f => f.id === editingFolder.id ? { ...f, name: folderName.trim(), color: folderColor } : f));
+    setEditingFolder(null);
+    setFolderName('');
+    setFolderColor('violet');
+    setShowFolderDialog(false);
+  };
+
+  const handleDeleteFolder = async (folderId) => {
+    if (!confirm(language === 'fr' ? 'Supprimer ce dossier ? Les visuels ne seront pas supprimés.' : 'Delete this folder? Visuals will not be deleted.')) return;
+    await base44.entities.Folder.delete(folderId);
+    setFolders(folders.filter(f => f.id !== folderId));
+    if (folderFilter === folderId) setFolderFilter('all');
+  };
+
+  const handleMoveToFolder = async (visualId, folderId) => {
+    await base44.entities.Visual.update(visualId, { folder_id: folderId || null });
+    setVisuals(prev => prev.map(v => v.id === visualId ? { ...v, folder_id: folderId || null } : v));
+  };
+
+  const openFolderDialog = (folder = null) => {
+    if (folder) {
+      setEditingFolder(folder);
+      setFolderName(folder.name);
+      setFolderColor(folder.color);
+    } else {
+      setEditingFolder(null);
+      setFolderName('');
+      setFolderColor('violet');
+    }
+    setShowFolderDialog(true);
+  };
+
+  const colorOptions = [
+    { value: 'violet', class: 'bg-violet-500' },
+    { value: 'blue', class: 'bg-blue-500' },
+    { value: 'emerald', class: 'bg-emerald-500' },
+    { value: 'amber', class: 'bg-amber-500' },
+    { value: 'rose', class: 'bg-rose-500' }
+  ];
 
   // Editor view
   if (showEditor && editingVisual) {
@@ -473,28 +552,48 @@ export default function MyVisuals() {
                         </span>
                       </div>
                     )}
-                    <VisualCard
-                      visual={visual}
-                      onDownload={() => handleDownload(visual, credits)}
-                      onToggleFavorite={handleToggleFavorite}
-                      onEdit={() => handleEdit(visual)}
-                      onVideoOpen={() => {
-                        setVideoVisual(visual);
-                        setShowVideoModal(true);
-                      }}
-                      onCropOpen={() => {
-                        setCropVisual(visual);
-                        setShowCropModal(true);
-                      }}
-                      onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
-                      isRegenerating={false}
-                      canDownload={true}
-                      compact={false}
-                      hideInfoMessage={true}
-                      showActions={true}
-                      showValidation={false}
-                      hideEditButton={true}
-                    />
+                    <div className="relative group/visual">
+                      <VisualCard
+                        visual={visual}
+                        onDownload={() => handleDownload(visual, credits)}
+                        onToggleFavorite={handleToggleFavorite}
+                        onEdit={() => handleEdit(visual)}
+                        onVideoOpen={() => {
+                          setVideoVisual(visual);
+                          setShowVideoModal(true);
+                        }}
+                        onCropOpen={() => {
+                          setCropVisual(visual);
+                          setShowCropModal(true);
+                        }}
+                        onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
+                        isRegenerating={false}
+                        canDownload={true}
+                        compact={false}
+                        hideInfoMessage={true}
+                        showActions={true}
+                        showValidation={false}
+                        hideEditButton={true}
+                      />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="absolute top-2 right-2 h-7 w-7 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover/visual:opacity-100 transition-opacity z-10">
+                            <Folder className="h-4 w-4 text-white" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleMoveToFolder(visual.id, null)}>
+                            {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
+                          </DropdownMenuItem>
+                          {folders.map(folder => (
+                            <DropdownMenuItem key={folder.id} onClick={() => handleMoveToFolder(visual.id, folder.id)}>
+                              <Folder className="h-4 w-4 mr-2" style={{ color: colorOptions.find(c => c.value === folder.color)?.class.replace('bg-', '') }} />
+                              {folder.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -638,6 +737,48 @@ export default function MyVisuals() {
             visual={imageEditVisual}
             onEditComplete={handleImageEditComplete}
           />
+
+          {/* Folder Dialog */}
+          <Dialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>
+            <DialogContent className="bg-[#1a1625] border-white/10 text-white">
+              <DialogHeader>
+                <DialogTitle>{editingFolder ? (language === 'fr' ? 'Renommer le dossier' : 'Rename folder') : (language === 'fr' ? 'Nouveau dossier' : 'New folder')}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm text-white/60 mb-2 block">{language === 'fr' ? 'Nom' : 'Name'}</label>
+                  <Input 
+                    value={folderName} 
+                    onChange={(e) => setFolderName(e.target.value)} 
+                    placeholder={language === 'fr' ? 'Nom du dossier' : 'Folder name'}
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-2 block">{language === 'fr' ? 'Couleur' : 'Color'}</label>
+                  <div className="flex gap-2">
+                    {colorOptions.map(color => (
+                      <button
+                        key={color.value}
+                        onClick={() => setFolderColor(color.value)}
+                        className={cn(
+                          "h-8 w-8 rounded-full transition-all",
+                          color.class,
+                          folderColor === color.value && "ring-2 ring-white ring-offset-2 ring-offset-[#1a1625]"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setShowFolderDialog(false)}>{language === 'fr' ? 'Annuler' : 'Cancel'}</Button>
+                <Button onClick={editingFolder ? handleEditFolder : handleCreateFolder} className="bg-violet-600 hover:bg-violet-700">
+                  {editingFolder ? (language === 'fr' ? 'Enregistrer' : 'Save') : (language === 'fr' ? 'Créer' : 'Create')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </PageWrapper>
