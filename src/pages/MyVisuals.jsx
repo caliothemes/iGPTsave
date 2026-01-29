@@ -622,51 +622,29 @@ export default function MyVisuals() {
                         </span>
                       </div>
                     )}
-                    <div className="relative group/visual">
-                      <VisualCard
-                        visual={visual}
-                        onDownload={() => handleDownload(visual, credits)}
-                        onToggleFavorite={handleToggleFavorite}
-                        onEdit={() => handleEdit(visual)}
-                        onVideoOpen={() => {
-                          setVideoVisual(visual);
-                          setShowVideoModal(true);
-                        }}
-                        onCropOpen={() => {
-                          setCropVisual(visual);
-                          setShowCropModal(true);
-                        }}
-                        onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
-                        isRegenerating={false}
-                        canDownload={true}
-                        compact={false}
-                        hideInfoMessage={true}
-                        showActions={true}
-                        showValidation={false}
-                        hideEditButton={true}
-                      />
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="absolute top-2 right-2 h-7 w-7 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center opacity-0 group-hover/visual:opacity-100 transition-opacity z-10">
-                            <Folder className="h-4 w-4 text-white" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleMoveToFolder(visual.id, null)}>
-                            {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
-                          </DropdownMenuItem>
-                          {folders.map(folder => {
-                            const colorClass = colorOptions.find(c => c.value === folder.color)?.class || 'bg-violet-500';
-                            return (
-                              <DropdownMenuItem key={folder.id} onClick={() => handleMoveToFolder(visual.id, folder.id)}>
-                                <Folder className={cn("h-4 w-4 mr-2", colorClass.replace('bg-', 'text-'))} />
-                                {folder.name}
-                              </DropdownMenuItem>
-                            );
-                          })}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    <VisualCard
+                      visual={visual}
+                      onDownload={() => handleDownload(visual, credits)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onEdit={() => handleEdit(visual)}
+                      onVideoOpen={() => {
+                        setVideoVisual(visual);
+                        setShowVideoModal(true);
+                      }}
+                      onCropOpen={() => {
+                        setCropVisual(visual);
+                        setShowCropModal(true);
+                      }}
+                      onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
+                      onFolderClick={(visual) => setSelectedVisualsForMove([visual.id])}
+                      isRegenerating={false}
+                      canDownload={true}
+                      compact={false}
+                      hideInfoMessage={true}
+                      showActions={true}
+                      showValidation={false}
+                      hideEditButton={true}
+                    />
                   </div>
                 ))}
               </div>
@@ -810,6 +788,42 @@ export default function MyVisuals() {
             visual={imageEditVisual}
             onEditComplete={handleImageEditComplete}
           />
+
+          {/* Move to Folder Dialog */}
+          <Dialog open={selectedVisualsForMove.length > 0} onOpenChange={(open) => !open && setSelectedVisualsForMove([])}>
+            <DialogContent className="bg-[#1a1625] border-white/10 text-white">
+              <DialogHeader>
+                <DialogTitle>{language === 'fr' ? 'Déplacer vers un dossier' : 'Move to folder'}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    selectedVisualsForMove.forEach(id => handleMoveToFolder(id, null));
+                    setSelectedVisualsForMove([]);
+                  }}
+                  className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all"
+                >
+                  {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
+                </button>
+                {folders.map(folder => {
+                  const colorClass = colorOptions.find(c => c.value === folder.color)?.class || 'bg-violet-500';
+                  return (
+                    <button
+                      key={folder.id}
+                      onClick={() => {
+                        selectedVisualsForMove.forEach(id => handleMoveToFolder(id, folder.id));
+                        setSelectedVisualsForMove([]);
+                      }}
+                      className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all flex items-center gap-2"
+                    >
+                      <Folder className={cn("h-4 w-4", colorClass.replace('bg-', 'text-'))} />
+                      {folder.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Folder Dialog */}
           <Dialog open={showFolderDialog} onOpenChange={setShowFolderDialog}>

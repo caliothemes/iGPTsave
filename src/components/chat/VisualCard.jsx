@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Feather, Sparkles, Film, X, Info, Expand, Scissors, Video, Pencil } from 'lucide-react';
+import { Download, RefreshCw, Loader2, Check, Lock, Heart, Wand2, Feather, Sparkles, Film, X, Info, Expand, Scissors, Video, Pencil, Folder } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useLanguage } from '@/components/LanguageContext';
 import DownloadModal from '@/components/DownloadModal';
@@ -39,6 +39,7 @@ export default function VisualCard({
   onVideoOpen,
   onImageEditOpen,
   onEffectApply,
+  onFolderClick,
   isRegenerating,
   canDownload,
   hasWatermark,
@@ -546,6 +547,17 @@ export default function VisualCard({
                 title={language === 'fr' ? 'Découper' : 'Crop'}
               >
                 <Scissors className="h-4 w-4" />
+              </button>
+            )}
+
+            {!isVideo && onFolderClick && (
+              <button
+                onClick={() => onFolderClick(visual)}
+                disabled={isRegenerating}
+                className="p-2 rounded-lg bg-gradient-to-br from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                title={language === 'fr' ? 'Ranger dans un dossier' : 'Move to folder'}
+              >
+                <Folder className="h-4 w-4" />
               </button>
             )}
 
