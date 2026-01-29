@@ -524,7 +524,77 @@ export default function MyVisuals() {
               </div>
             </div>
 
-
+            {/* Folders */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setFolderFilter('all')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                  folderFilter === 'all'
+                    ? "bg-violet-600 text-white shadow-lg"
+                    : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-white/10"
+                )}
+              >
+                <Folder className="h-4 w-4" />
+                {language === 'fr' ? 'Tous' : 'All'} ({visuals.length})
+              </button>
+              <button
+                onClick={() => setFolderFilter('unorganized')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                  folderFilter === 'unorganized'
+                    ? "bg-violet-600 text-white shadow-lg"
+                    : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-white/10"
+                )}
+              >
+                <Folder className="h-4 w-4" />
+                {language === 'fr' ? 'Non rangés' : 'Unorganized'} ({visuals.filter(v => !v.folder_id).length})
+              </button>
+              {folders.map(folder => {
+                const count = visuals.filter(v => v.folder_id === folder.id).length;
+                const colorClass = colorOptions.find(c => c.value === folder.color)?.class || 'bg-violet-500';
+                return (
+                  <div key={folder.id} className="relative group">
+                    <button
+                      onClick={() => setFolderFilter(folder.id)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                        folderFilter === folder.id
+                          ? `${colorClass} text-white shadow-lg`
+                          : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-white/10"
+                      )}
+                    >
+                      <Folder className={cn("h-4 w-4", folderFilter !== folder.id && colorClass.replace('bg-', 'text-'))} />
+                      {folder.name} ({count})
+                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="absolute -top-1 -right-1 h-5 w-5 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreVertical className="h-3 w-3 text-white" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => openFolderDialog(folder)}>
+                          <Edit2 className="h-4 w-4 mr-2" />
+                          {language === 'fr' ? 'Renommer' : 'Rename'}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDeleteFolder(folder.id)} className="text-red-600">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {language === 'fr' ? 'Supprimer' : 'Delete'}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                );
+              })}
+              <button
+                onClick={() => openFolderDialog()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-dashed border-white/20 transition-all"
+              >
+                <FolderPlus className="h-4 w-4" />
+                {language === 'fr' ? 'Nouveau dossier' : 'New folder'}
+              </button>
+            </div>
           </div>
 
           {/* Grid */}
@@ -585,12 +655,15 @@ export default function MyVisuals() {
                           <DropdownMenuItem onClick={() => handleMoveToFolder(visual.id, null)}>
                             {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
                           </DropdownMenuItem>
-                          {folders.map(folder => (
-                            <DropdownMenuItem key={folder.id} onClick={() => handleMoveToFolder(visual.id, folder.id)}>
-                              <Folder className="h-4 w-4 mr-2" style={{ color: colorOptions.find(c => c.value === folder.color)?.class.replace('bg-', '') }} />
-                              {folder.name}
-                            </DropdownMenuItem>
-                          ))}
+                          {folders.map(folder => {
+                            const colorClass = colorOptions.find(c => c.value === folder.color)?.class || 'bg-violet-500';
+                            return (
+                              <DropdownMenuItem key={folder.id} onClick={() => handleMoveToFolder(visual.id, folder.id)}>
+                                <Folder className={cn("h-4 w-4 mr-2", colorClass.replace('bg-', 'text-'))} />
+                                {folder.name}
+                              </DropdownMenuItem>
+                            );
+                          })}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
