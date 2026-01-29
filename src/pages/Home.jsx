@@ -99,6 +99,7 @@ export default function Home() {
   
   // Dynamic settings from admin
   const [settings, setSettings] = useState({});
+  const [conversationalQAs, setConversationalQAs] = useState([]);
   
   // Guest prompts tracking (3 max sans connexion)
   const [guestPrompts, setGuestPrompts] = useState(() => {
@@ -162,6 +163,14 @@ export default function Home() {
         setArtDirectors(das);
       } catch (e) {
         console.error('Failed to load art directors:', e);
+      }
+
+      // Load Conversational QAs
+      try {
+        const qas = await base44.entities.ConversationalQA.filter({ is_active: true }, '-priority');
+        setConversationalQAs(qas);
+      } catch (e) {
+        console.error('Failed to load conversational QAs:', e);
       }
       
       try {
@@ -524,14 +533,26 @@ export default function Home() {
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setMessages(prev => [...prev, { role: 'assistant', content: t('thinking'), isStreaming: true }]);
 
+        // Build QA knowledge base for the prompt
+        let qaKnowledge = '';
+        if (conversationalQAs.length > 0) {
+          qaKnowledge = '\n\nQUESTIONS/RÉPONSES PRÉDÉFINIES (utilise ces réponses EXACTES si la question correspond):\n';
+          conversationalQAs.forEach((qa, idx) => {
+            const question = language === 'fr' ? qa.question_fr : (qa.question_en || qa.question_fr);
+            const answer = language === 'fr' ? qa.answer_fr : (qa.answer_en || qa.answer_fr);
+            qaKnowledge += `\nQ${idx + 1}: "${question}"\nR${idx + 1}: ${answer}\n`;
+          });
+        }
+
         const conversationResponse = await base44.integrations.Core.InvokeLLM({
           prompt: `Tu es iGPT, un assistant IA dans l'application iGPT qui aide les utilisateurs à créer des visuels professionnels.
 
       Question de l'utilisateur: "${userMessage}"
-
+${qaKnowledge}
       INSTRUCTIONS CRITIQUES:
       - Réponds en ${language === 'fr' ? 'français' : 'anglais'}
-      - Sois PRÉCIS et explique COMMENT faire dans iGPT (pas de réponse générique)
+      - Si la question correspond à une Q/R prédéfinie ci-dessus, utilise la réponse EXACTE fournie
+      - Sinon, sois PRÉCIS et explique COMMENT faire dans iGPT (pas de réponse générique)
       - Donne des étapes concrètes d'utilisation de l'interface
       - 2-4 phrases maximum, concis et direct
 
