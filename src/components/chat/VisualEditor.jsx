@@ -58,6 +58,7 @@ import { useLanguage } from '../LanguageContext';
 import ServiceUnavailableModal from './ServiceUnavailableModal';
 import { cn } from "@/lib/utils";
 import { base44 } from '@/api/base44Client';
+import DraggableDialog from './DraggableDialog';
 
 const FONTS = [
   // Sans-serif modernes
@@ -5375,222 +5376,195 @@ Réponds en JSON avec:
         </DialogContent>
       </Dialog>
 
-      {/* Property Mini Modals */}
-      <Dialog open={activePropertyModal === 'text'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-          <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
-            <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-              <DialogTitle className="flex items-center gap-2">
-                <Type className="h-5 w-5 text-violet-400" />
-                {language === 'fr' ? 'Modifier le texte' : 'Edit text'}
-              </DialogTitle>
-            </DialogHeader>
-            <textarea
-              value={currentLayer?.text || ''}
-              onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })}
-              className="w-full bg-white/10 text-white rounded-lg p-3 text-sm min-h-[120px] resize-none"
-              placeholder={language === 'fr' ? 'Votre texte...' : 'Your text...'}
-            />
-          </DialogContent>
-      </Dialog>
+      {/* Property Mini Modals - Now Draggable */}
+      <DraggableDialog 
+        open={activePropertyModal === 'text'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Modifier le texte' : 'Edit text'}
+        icon={<Type className="h-5 w-5 text-violet-400" />}
+        className="max-w-md"
+      >
+        <textarea
+          value={currentLayer?.text || ''}
+          onChange={(e) => updateLayer(selectedLayer, { text: e.target.value })}
+          className="w-full bg-white/10 text-white rounded-lg p-3 text-sm min-h-[120px] resize-none"
+          placeholder={language === 'fr' ? 'Votre texte...' : 'Your text...'}
+        />
+      </DraggableDialog>
 
-      <Dialog open={activePropertyModal === 'font'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
-              {language === 'fr' ? 'Police' : 'Font'}
-            </DialogTitle>
-          </DialogHeader>
-          <select
-            value={currentLayer?.fontFamily || 'Arial'}
-            onChange={(e) => updateLayer(selectedLayer, { fontFamily: e.target.value })}
-            className="w-full bg-white/10 text-white rounded-lg p-3 text-sm"
-          >
-            <option value="Arial">Arial</option>
-            <option value="Helvetica">Helvetica</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Courier New">Courier New</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Impact">Impact</option>
-            <option value="Comic Sans MS">Comic Sans MS</option>
-            <option value="Trebuchet MS">Trebuchet MS</option>
-            <option value="Palatino">Palatino</option>
-            <option value="Garamond">Garamond</option>
-            <option value="Bookman">Bookman</option>
-            <option value="Tahoma">Tahoma</option>
-            <option value="Lucida Console">Lucida Console</option>
-          </select>
-        </DialogContent>
-      </Dialog>
+      <DraggableDialog 
+        open={activePropertyModal === 'font'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Police' : 'Font'}
+        icon={<svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>}
+      >
+        <select
+          value={currentLayer?.fontFamily || 'Arial'}
+          onChange={(e) => updateLayer(selectedLayer, { fontFamily: e.target.value })}
+          className="w-full bg-white/10 text-white rounded-lg p-3 text-sm"
+        >
+          <option value="Arial">Arial</option>
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Impact">Impact</option>
+          <option value="Comic Sans MS">Comic Sans MS</option>
+          <option value="Trebuchet MS">Trebuchet MS</option>
+          <option value="Palatino">Palatino</option>
+          <option value="Garamond">Garamond</option>
+          <option value="Bookman">Bookman</option>
+          <option value="Tahoma">Tahoma</option>
+          <option value="Lucida Console">Lucida Console</option>
+        </select>
+      </DraggableDialog>
 
-      <Dialog open={activePropertyModal === 'format'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Sliders className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Format' : 'Format'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer?.fontSize}</label>
-              <Slider value={[currentLayer?.fontSize || 48]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={200} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{language === 'fr' ? 'Espacement lettres' : 'Letter spacing'}: {currentLayer?.letterSpacing || 0}</label>
-              <Slider value={[currentLayer?.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{language === 'fr' ? 'Poids' : 'Weight'}</label>
-              <select
-                value={currentLayer?.fontWeight || 400}
-                onChange={(e) => updateLayer(selectedLayer, { fontWeight: parseInt(e.target.value) })}
-                className="w-full bg-white/10 text-white rounded-lg p-2 text-sm"
-              >
-                <option value="100">Thin (100)</option>
-                <option value="200">Extra Light (200)</option>
-                <option value="300">Light (300)</option>
-                <option value="400">Normal (400)</option>
-                <option value="500">Medium (500)</option>
-                <option value="600">Semi Bold (600)</option>
-                <option value="700">Bold (700)</option>
-                <option value="800">Extra Bold (800)</option>
-                <option value="900">Black (900)</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer?.rotation || 0}°</label>
-              <Slider value={[currentLayer?.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={-180} max={180} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
+      <DraggableDialog 
+        open={activePropertyModal === 'format'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Format' : 'Format'}
+        icon={<Sliders className="h-5 w-5 text-violet-400" />}
+        className="max-w-md"
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer?.fontSize}</label>
+            <Slider value={[currentLayer?.fontSize || 48]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={200} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={activePropertyModal === 'color'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Couleur du texte' : 'Text color'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="flex gap-2 items-center">
-              <input type="color" value={currentLayer?.color || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-16 h-16 rounded cursor-pointer" />
-              <input type="text" value={currentLayer?.color || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="flex-1 bg-white/10 text-white rounded-lg px-3 py-2 text-sm" />
-            </div>
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{language === 'fr' ? 'Espacement lettres' : 'Letter spacing'}: {currentLayer?.letterSpacing || 0}</label>
+            <Slider value={[currentLayer?.letterSpacing || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { letterSpacing: v })} min={-5} max={20} step={0.5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={activePropertyModal === 'maxwidth'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Maximize2 className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Largeur max' : 'Max width'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <p className="text-white/60 text-xs">{language === 'fr' ? 'Limite la largeur du texte (0 = illimitée)' : 'Limits text width (0 = unlimited)'}</p>
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{currentLayer?.maxWidth || 0}px</label>
-              <Slider value={[currentLayer?.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={10} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{language === 'fr' ? 'Poids' : 'Weight'}</label>
+            <select
+              value={currentLayer?.fontWeight || 400}
+              onChange={(e) => updateLayer(selectedLayer, { fontWeight: parseInt(e.target.value) })}
+              className="w-full bg-white/10 text-white rounded-lg p-2 text-sm"
+            >
+              <option value="100">Thin (100)</option>
+              <option value="200">Extra Light (200)</option>
+              <option value="300">Light (300)</option>
+              <option value="400">Normal (400)</option>
+              <option value="500">Medium (500)</option>
+              <option value="600">Semi Bold (600)</option>
+              <option value="700">Bold (700)</option>
+              <option value="800">Extra Bold (800)</option>
+              <option value="900">Black (900)</option>
+            </select>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={activePropertyModal === 'opacity'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Droplet className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Opacité' : 'Opacity'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{currentLayer?.opacity || 100}%</label>
-              <Slider value={[currentLayer?.opacity || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={0} max={100} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{language === 'fr' ? 'Rotation' : 'Rotation'}: {currentLayer?.rotation || 0}°</label>
+            <Slider value={[currentLayer?.rotation || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { rotation: v })} min={-180} max={180} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DraggableDialog>
 
-      <Dialog open={activePropertyModal === 'align'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <AlignCenter className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Alignement' : 'Alignment'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'left' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
-              <AlignLeft className="h-6 w-6 mx-auto" />
-              <span className="text-xs mt-2 block">{language === 'fr' ? 'Gauche' : 'Left'}</span>
-            </button>
-            <button onClick={() => updateLayer(selectedLayer, { align: 'center' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'center' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
-              <AlignCenter className="h-6 w-6 mx-auto" />
-              <span className="text-xs mt-2 block">Centre</span>
-            </button>
-            <button onClick={() => updateLayer(selectedLayer, { align: 'right' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'right' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
-              <AlignRight className="h-6 w-6 mx-auto" />
-              <span className="text-xs mt-2 block">{language === 'fr' ? 'Droite' : 'Right'}</span>
-            </button>
+      <DraggableDialog 
+        open={activePropertyModal === 'color'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Couleur du texte' : 'Text color'}
+        icon={<Palette className="h-5 w-5 text-violet-400" />}
+      >
+        <div className="space-y-3">
+          <div className="flex gap-2 items-center">
+            <input type="color" value={currentLayer?.color || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="w-16 h-16 rounded cursor-pointer" />
+            <input type="text" value={currentLayer?.color || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { color: e.target.value })} className="flex-1 bg-white/10 text-white rounded-lg px-3 py-2 text-sm" />
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DraggableDialog>
 
-      <Dialog open={activePropertyModal === 'background'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Square className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Arrière-plan' : 'Background'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="flex gap-2 items-center">
-              <input type="color" value={currentLayer?.backgroundColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { backgroundColor: e.target.value })} className="w-16 h-16 rounded cursor-pointer" />
-              <input type="text" value={currentLayer?.backgroundColor || 'transparent'} onChange={(e) => updateLayer(selectedLayer, { backgroundColor: e.target.value })} className="flex-1 bg-white/10 text-white rounded-lg px-3 py-2 text-sm" placeholder="transparent" />
-            </div>
+      <DraggableDialog 
+        open={activePropertyModal === 'maxwidth'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Largeur max' : 'Max width'}
+        icon={<Maximize2 className="h-5 w-5 text-violet-400" />}
+      >
+        <div className="space-y-3">
+          <p className="text-white/60 text-xs">{language === 'fr' ? 'Limite la largeur du texte (0 = illimitée)' : 'Limits text width (0 = unlimited)'}</p>
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{currentLayer?.maxWidth || 0}px</label>
+            <Slider value={[currentLayer?.maxWidth || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { maxWidth: v })} min={0} max={canvasSize.width} step={10} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DraggableDialog>
 
-      <Dialog open={activePropertyModal === 'layout'} onOpenChange={(open) => !open && setActivePropertyModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Layout className="h-5 w-5 text-violet-400" />
-              Padding & Radius
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">Padding: {currentLayer?.padding || 0}px</label>
-              <Slider value={[currentLayer?.padding || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { padding: v })} min={0} max={100} step={2} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-white/60 text-sm">{language === 'fr' ? 'Bordure arrondie' : 'Border radius'}: {currentLayer?.borderRadius || 0}px</label>
-              <Slider value={[currentLayer?.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={50} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
-            </div>
+      <DraggableDialog 
+        open={activePropertyModal === 'opacity'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Opacité' : 'Opacity'}
+        icon={<Droplet className="h-5 w-5 text-violet-400" />}
+      >
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{currentLayer?.opacity || 100}%</label>
+            <Slider value={[currentLayer?.opacity || 100]} onValueChange={([v]) => updateLayer(selectedLayer, { opacity: v })} min={0} max={100} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DraggableDialog>
 
-        {/* Effect Mini Modals */}
-        <Dialog open={activeEffectModal === 'curved'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Circle className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Texte en cercle' : 'Curved text'}
-            </DialogTitle>
-          </DialogHeader>
+      <DraggableDialog 
+        open={activePropertyModal === 'align'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Alignement' : 'Alignment'}
+        icon={<AlignCenter className="h-5 w-5 text-violet-400" />}
+      >
+        <div className="grid grid-cols-3 gap-3">
+          <button onClick={() => updateLayer(selectedLayer, { align: 'left' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'left' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
+            <AlignLeft className="h-6 w-6 mx-auto" />
+            <span className="text-xs mt-2 block">{language === 'fr' ? 'Gauche' : 'Left'}</span>
+          </button>
+          <button onClick={() => updateLayer(selectedLayer, { align: 'center' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'center' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
+            <AlignCenter className="h-6 w-6 mx-auto" />
+            <span className="text-xs mt-2 block">Centre</span>
+          </button>
+          <button onClick={() => updateLayer(selectedLayer, { align: 'right' })} className={cn("p-4 rounded-lg transition-all", currentLayer?.align === 'right' ? "bg-violet-500/30 text-violet-300 border-2 border-violet-500" : "bg-white/10 text-white/60 hover:bg-white/20")}>
+            <AlignRight className="h-6 w-6 mx-auto" />
+            <span className="text-xs mt-2 block">{language === 'fr' ? 'Droite' : 'Right'}</span>
+          </button>
+        </div>
+      </DraggableDialog>
+
+      <DraggableDialog 
+        open={activePropertyModal === 'background'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title={language === 'fr' ? 'Arrière-plan' : 'Background'}
+        icon={<Square className="h-5 w-5 text-violet-400" />}
+      >
+        <div className="space-y-3">
+          <div className="flex gap-2 items-center">
+            <input type="color" value={currentLayer?.backgroundColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { backgroundColor: e.target.value })} className="w-16 h-16 rounded cursor-pointer" />
+            <input type="text" value={currentLayer?.backgroundColor || 'transparent'} onChange={(e) => updateLayer(selectedLayer, { backgroundColor: e.target.value })} className="flex-1 bg-white/10 text-white rounded-lg px-3 py-2 text-sm" placeholder="transparent" />
+          </div>
+        </div>
+      </DraggableDialog>
+
+      <DraggableDialog 
+        open={activePropertyModal === 'layout'} 
+        onOpenChange={(open) => !open && setActivePropertyModal(null)}
+        title="Padding & Radius"
+        icon={<Layout className="h-5 w-5 text-violet-400" />}
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">Padding: {currentLayer?.padding || 0}px</label>
+            <Slider value={[currentLayer?.padding || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { padding: v })} min={0} max={100} step={2} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-white/60 text-sm">{language === 'fr' ? 'Bordure arrondie' : 'Border radius'}: {currentLayer?.borderRadius || 0}px</label>
+            <Slider value={[currentLayer?.borderRadius || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { borderRadius: v })} min={0} max={50} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+          </div>
+        </div>
+      </DraggableDialog>
+
+        {/* Effect Mini Modals - Now Draggable */}
+        <DraggableDialog 
+          open={activeEffectModal === 'curved'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Texte en cercle' : 'Curved text'}
+          icon={<Circle className="h-5 w-5 text-violet-400" />}
+        >
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Rayon' : 'Radius'}: {currentLayer?.curveRadius || 100}</label>
@@ -5605,17 +5579,14 @@ Réponds en JSON avec:
               </button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'stroke'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
-              {language === 'fr' ? 'Contour' : 'Stroke'}
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'stroke'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Contour' : 'Stroke'}
+          icon={<svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>}
+        >
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
               <input type="color" value={currentLayer?.strokeColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { strokeColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
@@ -5625,17 +5596,14 @@ Réponds en JSON avec:
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'shadow'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="8" strokeWidth={2}/><path d="M12 4v16M4 12h16" strokeWidth={1} opacity={0.3}/></svg>
-              {language === 'fr' ? 'Ombre' : 'Shadow'}
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'shadow'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Ombre' : 'Shadow'}
+          icon={<svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="8" strokeWidth={2}/><path d="M12 4v16M4 12h16" strokeWidth={1} opacity={0.3}/></svg>}
+        >
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
               <input type="color" value={currentLayer?.shadowColor || '#000000'} onChange={(e) => updateLayer(selectedLayer, { shadowColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
@@ -5660,17 +5628,14 @@ Réponds en JSON avec:
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'glow'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-violet-400" />
-              {language === 'fr' ? 'Lueur' : 'Glow'}
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'glow'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Lueur' : 'Glow'}
+          icon={<Sparkles className="h-5 w-5 text-violet-400" />}
+        >
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
               <input type="color" value={currentLayer?.glowColor || '#ffffff'} onChange={(e) => updateLayer(selectedLayer, { glowColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
@@ -5681,17 +5646,14 @@ Réponds en JSON avec:
               <Slider value={[currentLayer?.glowSize || 10]} onValueChange={([v]) => updateLayer(selectedLayer, { glowSize: v })} min={5} max={40} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'halo'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth={2}/><circle cx="12" cy="12" r="9" strokeWidth={1} strokeDasharray="2 2"/></svg>
-              Halo
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'halo'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title="Halo"
+          icon={<svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" strokeWidth={2}/><circle cx="12" cy="12" r="9" strokeWidth={1} strokeDasharray="2 2"/></svg>}
+        >
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
               <input type="color" value={currentLayer?.haloColor || '#FFD700'} onChange={(e) => updateLayer(selectedLayer, { haloColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
@@ -5702,17 +5664,14 @@ Réponds en JSON avec:
               <Slider value={[currentLayer?.haloSize || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { haloSize: v })} min={5} max={50} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'neon'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              Néon
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'neon'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title="Néon"
+          icon={<svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+        >
           <div className="space-y-3">
             <div className="flex gap-2 items-center">
               <input type="color" value={currentLayer?.neonColor || '#ff00ff'} onChange={(e) => updateLayer(selectedLayer, { neonColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
@@ -5723,17 +5682,14 @@ Réponds en JSON avec:
               <Slider value={[currentLayer?.neonIntensity || 15]} onValueChange={([v]) => updateLayer(selectedLayer, { neonIntensity: v })} min={5} max={30} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'reflection'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
-              {language === 'fr' ? 'Reflet' : 'Reflection'}
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'reflection'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Reflet' : 'Reflection'}
+          icon={<svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>}
+        >
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Opacité' : 'Opacity'}: {currentLayer?.reflectionOpacity || 40}%</label>
@@ -5744,34 +5700,28 @@ Réponds en JSON avec:
               <Slider value={[currentLayer?.reflectionGap || 0]} onValueChange={([v]) => updateLayer(selectedLayer, { reflectionGap: v })} min={-200} max={500} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'sparkle'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <span className="text-violet-400">✨</span>
-              {language === 'fr' ? 'Scintillement' : 'Sparkle'}
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'sparkle'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Scintillement' : 'Sparkle'}
+          icon={<span className="text-violet-400">✨</span>}
+        >
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-white/60 text-sm">{language === 'fr' ? 'Intensité' : 'Intensity'}: {currentLayer?.sparkleIntensity || 50}%</label>
               <Slider value={[currentLayer?.sparkleIntensity || 50]} onValueChange={([v]) => updateLayer(selectedLayer, { sparkleIntensity: v })} min={10} max={100} step={5} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
-      <Dialog open={activeEffectModal === 'gradient'} onOpenChange={(open) => !open && setActiveEffectModal(null)}>
-        <DialogContent className="bg-gray-900 border-white/10 text-white max-w-sm">
-          <DialogHeader className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20">
-            <DialogTitle className="flex items-center gap-2">
-              <span className="text-violet-400">🌈</span>
-              {language === 'fr' ? 'Dégradé texte' : 'Text gradient'}
-            </DialogTitle>
-          </DialogHeader>
+        <DraggableDialog 
+          open={activeEffectModal === 'gradient'} 
+          onOpenChange={(open) => !open && setActiveEffectModal(null)}
+          title={language === 'fr' ? 'Dégradé texte' : 'Text gradient'}
+          icon={<span className="text-violet-400">🌈</span>}
+        >
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => updateLayer(selectedLayer, { gradientDirection: 'horizontal' })} className={cn("p-2 rounded-lg text-sm", (currentLayer?.gradientDirection || 'horizontal') === 'horizontal' ? "bg-pink-500/30 text-pink-300" : "bg-white/10 text-white/60")}>
@@ -5787,8 +5737,7 @@ Réponds en JSON avec:
               <input type="color" value={currentLayer?.gradientColor2 || '#00ffff'} onChange={(e) => updateLayer(selectedLayer, { gradientColor2: e.target.value })} className="w-10 h-10 rounded cursor-pointer" />
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </DraggableDialog>
 
         {/* Mockup Magic Fill Modal */}
         <Dialog open={showMockupModal} onOpenChange={(open) => {
