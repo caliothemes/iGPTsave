@@ -42,7 +42,8 @@ Deno.serve(async (req) => {
       'FeatureCard',
       'ArtDirector',
       'EffectPreset',
-      'EffectCategory'
+      'EffectCategory',
+      'ConversationalQA'
     ];
 
     const exportData = {
