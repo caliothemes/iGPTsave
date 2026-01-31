@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from "@/lib/utils";
-import { X, Users } from 'lucide-react';
+import { X, Users, RefreshCw } from 'lucide-react';
+import { useLanguage } from '@/components/LanguageContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
 
 
 function TypingIndicator() {
