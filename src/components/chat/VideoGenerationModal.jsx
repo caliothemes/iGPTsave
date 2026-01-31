@@ -901,8 +901,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     </div>
                     <p className="text-green-100 text-sm leading-relaxed">
                       {language === 'fr' 
-                        ? 'La génération de votre vidéo est en cours, cela peut prendre jusqu\'à 10min. Ne baissez/fermez pas cette fenêtre pendant le processus. iGPT vous remercie de votre patience...'
-                        : 'Your video generation is in progress, it may take up to 10min. Do not minimize/close this window during the process. iGPT thanks you for your patience...'}
+                        ? 'La génération de votre vidéo est en cours, cela peut prendre de 2 à 10 min en fonction du modèle et de sa file d\'attente. Ne baissez/fermez pas cette fenêtre pendant le processus. iGPT vous remercie de votre patience...'
+                        : 'Your video generation is in progress, it may take 2 to 10 min depending on the model and its queue. Do not minimize/close this window during the process. iGPT thanks you for your patience...'}
                     </p>
                   </div>
                 </motion.div>
