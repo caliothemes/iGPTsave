@@ -2131,7 +2131,21 @@ ${qaKnowledge}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                       >
-                        <MessageBubble message={msg} isStreaming={msg.isStreaming} user={user} />
+                        <MessageBubble 
+                          message={msg} 
+                          isStreaming={msg.isStreaming} 
+                          user={user}
+                          onPromptClick={(prompt) => {
+                            setInputValue(prompt);
+                            setTimeout(() => {
+                              if (inputRef.current) {
+                                inputRef.current.style.height = 'auto';
+                                inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                                inputRef.current.focus();
+                              }
+                            }, 0);
+                          }}
+                        />
                       </motion.div>
                     )}
 

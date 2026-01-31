@@ -18,7 +18,7 @@ function TypingIndicator() {
   );
 }
 
-export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion...", user }) {
+export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion...", user, onPromptClick }) {
   const { language } = useLanguage();
   const isUser = message.role === 'user';
   const isWarning = message.content?.includes('Nouveau sujet détecté') || message.content?.includes('New subject detected') || message.content?.includes('Ajout de texte détecté') || message.content?.includes('Text addition detected');
@@ -226,18 +226,32 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "R�
                   {message.content}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(message.content);
-                  toast.success(language === 'fr' ? 'Prompt copié' : 'Prompt copied');
-                }}
-                className="w-full bg-violet-600 hover:bg-violet-700"
-              >
-                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                {language === 'fr' ? 'Copier le prompt' : 'Copy prompt'}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(message.content);
+                    toast.success(language === 'fr' ? 'Prompt copié' : 'Prompt copied');
+                  }}
+                  className="flex-1 bg-violet-600 hover:bg-violet-700"
+                >
+                  <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  {language === 'fr' ? 'Copier le prompt' : 'Copy prompt'}
+                </Button>
+                {onPromptClick && (
+                  <Button
+                    onClick={() => {
+                      onPromptClick(message.content);
+                      setShowPromptModal(false);
+                    }}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    {language === 'fr' ? 'Réutiliser' : 'Reuse'}
+                  </Button>
+                )}
+              </div>
             </div>
           </DialogContent>
         </Dialog>
