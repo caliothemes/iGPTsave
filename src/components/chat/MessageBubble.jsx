@@ -15,9 +15,11 @@ function TypingIndicator() {
 }
 
 export default function MessageBubble({ message, isStreaming, thinkingText = "Réflexion...", user }) {
+  const { language } = useLanguage();
   const isUser = message.role === 'user';
   const isWarning = message.content?.includes('Nouveau sujet détecté') || message.content?.includes('New subject detected') || message.content?.includes('Ajout de texte détecté') || message.content?.includes('Text addition detected');
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showPromptModal, setShowPromptModal] = useState(false);
 
   return (
     <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
