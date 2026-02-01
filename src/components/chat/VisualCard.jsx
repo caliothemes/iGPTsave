@@ -200,9 +200,11 @@ export default function VisualCard({
             
             // Only draw main text if NO reflection (to avoid doubling)
             if (!layer.reflection) {
-              ctx.fillText(layer.text, scaledX, scaledY);
+              lines.forEach((line, i) => {
+                ctx.fillText(line, scaledX, startY + i * lineHeight);
+              });
             }
-            
+
             // Reflection effect
             if (layer.reflection) {
               const textHeight = scaledFontSize;
@@ -241,8 +243,10 @@ export default function VisualCard({
               // Also draw main text (after reflection so it's on top)
               ctx.globalAlpha = 1;
               ctx.fillStyle = layer.color;
-              ctx.fillText(layer.text, scaledX, scaledY);
-            }
+              lines.forEach((line, i) => {
+                ctx.fillText(line, scaledX, startY + i * lineHeight);
+              });
+              }
             
             ctx.restore();
           }
