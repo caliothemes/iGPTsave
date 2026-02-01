@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video, Pencil, Users } from 'lucide-react';
+import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video, Pencil, Users, Folder, FolderPlus } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -136,6 +136,9 @@ export default function Home() {
   const [showCanvaTextModal, setShowCanvaTextModal] = useState(false);
   const [canvaTexts, setCanvaTexts] = useState([]);
   const [canvaDecompose, setCanvaDecompose] = useState(false);
+  const [folders, setFolders] = useState([]);
+  const [showFolderMoveDialog, setShowFolderMoveDialog] = useState(false);
+  const [movingVisual, setMovingVisual] = useState(null);
 
 
   const messagesEndRef = useRef(null);
@@ -171,6 +174,18 @@ export default function Home() {
         setConversationalQAs(qas);
       } catch (e) {
         console.error('Failed to load conversational QAs:', e);
+      }
+
+      // Load folders (only if user is authenticated)
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (isAuth) {
+          const currentUser = await base44.auth.me();
+          const foldersData = await base44.entities.Folder.filter({ user_email: currentUser.email }, 'order');
+          setFolders(foldersData);
+        }
+      } catch (e) {
+        console.error('Failed to load folders:', e);
       }
       
       try {
@@ -2203,9 +2218,9 @@ ${qaKnowledge}
                               setCropVisual(v);
                               setShowCropModal(true);
                             }}
-                            onFolderClick={() => {
-                              // Rediriger vers MyVisuals
-                              window.location.href = createPageUrl('MyVisuals');
+                            onFolderClick={(v) => {
+                              setMovingVisual(v);
+                              setShowFolderMoveDialog(true);
                             }}
                             onEffectApply={async (visual, effect) => {
                               // Générer directement avec l'effet et l'image actuelle
@@ -3468,6 +3483,58 @@ ${qaKnowledge}
         currentTexts={canvaTexts}
         isActive={canvaMode}
       />
+
+      {/* Move to Folder Dialog */}
+      <Dialog open={showFolderMoveDialog} onOpenChange={setShowFolderMoveDialog}>
+        <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>{language === 'fr' ? 'Déplacer vers un dossier' : 'Move to folder'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            <button
+              onClick={async () => {
+                if (movingVisual?.id && user) {
+                  await base44.entities.Visual.update(movingVisual.id, { folder_id: null });
+                  setMessages(prev => prev.map(m => 
+                    m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: null } } : m
+                  ));
+                  setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: null } : v));
+                }
+                setShowFolderMoveDialog(false);
+                setMovingVisual(null);
+              }}
+              className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all"
+            >
+              {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
+            </button>
+            {folders.map(folder => (
+              <button
+                key={folder.id}
+                onClick={async () => {
+                  if (movingVisual?.id && user) {
+                    await base44.entities.Visual.update(movingVisual.id, { folder_id: folder.id });
+                    setMessages(prev => prev.map(m => 
+                      m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: folder.id } } : m
+                    ));
+                    setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: folder.id } : v));
+                  }
+                  setShowFolderMoveDialog(false);
+                  setMovingVisual(null);
+                }}
+                className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all flex items-center gap-2"
+              >
+                <Folder className={cn("h-4 w-4", `text-${folder.color}-500`)} />
+                {folder.name}
+              </button>
+            ))}
+            {folders.length === 0 && (
+              <p className="text-white/40 text-sm text-center py-4">
+                {language === 'fr' ? 'Aucun dossier. Créez-en un depuis "Mes visuels".' : 'No folders. Create one from "My visuals".'}
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
       );
       }
