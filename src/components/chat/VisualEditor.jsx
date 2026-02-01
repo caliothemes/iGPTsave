@@ -1408,10 +1408,11 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
                 });
                 const effectiveWidth = layer.maxWidth || maxWidth;
                 const lineHeight = layer.fontSize * 1.2;
-                const totalHeight = layer.fontSize + (lines.length - 1) * lineHeight;
+                const totalHeight = lines.length * lineHeight;
+                const startY = layer.y - (lines.length - 1) * lineHeight / 2;
                 const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
                 const boxX = textX - 5;
-                const boxY = layer.y - layer.fontSize * 0.85 - 5;
+                const boxY = startY - layer.fontSize * 0.85 - 5;
                 const boxWidth = effectiveWidth + 10;
                 const boxHeight = totalHeight + 10;
                 
@@ -1964,12 +1965,13 @@ Réponds en JSON avec:
       });
       const effectiveWidth = layer.maxWidth || maxWidth;
       const lineHeight = layer.fontSize * 1.2;
-      const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
+      const totalHeight = lines.length * lineHeight;
+      const startY = layer.y - (lines.length - 1) * lineHeight / 2;
       const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
       const boxX = textX - 5;
-      const boxY = layer.y - layer.fontSize * 0.85 - 5;
+      const boxY = startY - layer.fontSize * 0.85 - 5;
       const boxWidth = effectiveWidth + 10;
-      const boxHeight = textHeight + 10;
+      const boxHeight = totalHeight + 10;
       
       // Check middle-right handle (width only for text)
       if (Math.abs(x - (boxX + boxWidth)) < threshold && Math.abs(y - (boxY + boxHeight/2)) < threshold) {
@@ -4237,9 +4239,10 @@ Réponds en JSON avec:
                 });
                 const effectiveWidth = currentLayer.maxWidth || maxWidth;
                 const lineHeight = currentLayer.fontSize * 1.2;
-                const totalHeight = currentLayer.fontSize + (lines.length - 1) * lineHeight;
+                const totalHeight = lines.length * lineHeight;
+                const startY = currentLayer.y - (lines.length - 1) * lineHeight / 2;
                 const textX = currentLayer.x - (currentLayer.align === 'center' ? effectiveWidth/2 : currentLayer.align === 'right' ? effectiveWidth : 0);
-                const boxY = currentLayer.y - currentLayer.fontSize * 0.85 - 5;
+                const boxY = startY - currentLayer.fontSize * 0.85 - 5;
                 
                 return (
                   <div 
