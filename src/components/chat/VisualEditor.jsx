@@ -2035,10 +2035,13 @@ Réponds en JSON avec:
         });
         const effectiveWidth = layer.maxWidth || maxWidth;
         const lineHeight = layer.fontSize * 1.2;
-        const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
+        const totalHeight = lines.length * lineHeight;
+        const startY = layer.y - (lines.length - 1) * lineHeight / 2;
         const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
+        const boxY = startY - layer.fontSize * 0.85;
+        const boxHeight = totalHeight;
         
-        hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y - layer.fontSize + textHeight;
+        hit = x >= textX && x <= textX + effectiveWidth && y >= boxY && y <= boxY + boxHeight;
       } else if (layer.type !== 'background') {
         // For shapes, images, textures
         hit = x >= layer.x && x <= layer.x + layer.width && y >= layer.y && y <= layer.y + layer.height;
@@ -2185,10 +2188,13 @@ Réponds en JSON avec:
         });
         const effectiveWidth = layer.maxWidth || maxWidth;
         const lineHeight = layer.fontSize * 1.2;
-        const textHeight = layer.fontSize + (lines.length - 1) * lineHeight;
+        const totalHeight = lines.length * lineHeight;
+        const startY = layer.y - (lines.length - 1) * lineHeight / 2;
         const textX = layer.x - (layer.align === 'center' ? effectiveWidth/2 : layer.align === 'right' ? effectiveWidth : 0);
+        const boxY = startY - layer.fontSize * 0.85;
+        const boxHeight = totalHeight;
         
-        hit = x >= textX && x <= textX + effectiveWidth && y >= layer.y - layer.fontSize && y <= layer.y - layer.fontSize + textHeight;
+        hit = x >= textX && x <= textX + effectiveWidth && y >= boxY && y <= boxY + boxHeight;
       } else {
         hit = x >= layer.x && x <= layer.x + layer.width && y >= layer.y && y <= layer.y + layer.height;
       }
