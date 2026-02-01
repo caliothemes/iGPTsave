@@ -139,6 +139,9 @@ export default function Home() {
   const [folders, setFolders] = useState([]);
   const [showFolderMoveDialog, setShowFolderMoveDialog] = useState(false);
   const [movingVisual, setMovingVisual] = useState(null);
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderColor, setNewFolderColor] = useState('violet');
 
 
   const messagesEndRef = useRef(null);
@@ -3485,54 +3488,156 @@ ${qaKnowledge}
       />
 
       {/* Move to Folder Dialog */}
-      <Dialog open={showFolderMoveDialog} onOpenChange={setShowFolderMoveDialog}>
+      <Dialog open={showFolderMoveDialog} onOpenChange={(open) => {
+        setShowFolderMoveDialog(open);
+        if (!open) {
+          setMovingVisual(null);
+          setCreatingFolder(false);
+          setNewFolderName('');
+          setNewFolderColor('violet');
+        }
+      }}>
         <DialogContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 text-white">
           <DialogHeader>
-            <DialogTitle>{language === 'fr' ? 'Déplacer vers un dossier' : 'Move to folder'}</DialogTitle>
+            <DialogTitle>
+              {creatingFolder 
+                ? (language === 'fr' ? 'Créer un nouveau dossier' : 'Create new folder')
+                : (language === 'fr' ? 'Déplacer vers un dossier' : 'Move to folder')}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            <button
-              onClick={async () => {
-                if (movingVisual?.id && user) {
-                  await base44.entities.Visual.update(movingVisual.id, { folder_id: null });
-                  setMessages(prev => prev.map(m => 
-                    m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: null } } : m
-                  ));
-                  setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: null } : v));
-                }
-                setShowFolderMoveDialog(false);
-                setMovingVisual(null);
-              }}
-              className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all"
-            >
-              {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
-            </button>
-            {folders.map(folder => (
+          
+          {creatingFolder ? (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-white/60 mb-2 block">
+                  {language === 'fr' ? 'Nom du dossier' : 'Folder name'}
+                </label>
+                <Input
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  placeholder={language === 'fr' ? 'Nom du dossier' : 'Folder name'}
+                  className="bg-white/5 border-white/10 text-white"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-sm text-white/60 mb-2 block">
+                  {language === 'fr' ? 'Couleur' : 'Color'}
+                </label>
+                <div className="flex gap-2">
+                  {[
+                    { value: 'violet', class: 'bg-violet-500' },
+                    { value: 'blue', class: 'bg-blue-500' },
+                    { value: 'emerald', class: 'bg-emerald-500' },
+                    { value: 'amber', class: 'bg-amber-500' },
+                    { value: 'rose', class: 'bg-rose-500' }
+                  ].map(color => (
+                    <button
+                      key={color.value}
+                      onClick={() => setNewFolderColor(color.value)}
+                      className={cn(
+                        "h-8 w-8 rounded-full transition-all",
+                        color.class,
+                        newFolderColor === color.value && "ring-2 ring-white ring-offset-2 ring-offset-gray-900"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {
+                    setCreatingFolder(false);
+                    setNewFolderName('');
+                    setNewFolderColor('violet');
+                  }}
+                  className="flex-1"
+                >
+                  {language === 'fr' ? 'Annuler' : 'Cancel'}
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (!newFolderName.trim() || !user) return;
+                    
+                    const newFolder = await base44.entities.Folder.create({
+                      name: newFolderName.trim(),
+                      user_email: user.email,
+                      color: newFolderColor,
+                      order: folders.length
+                    });
+                    
+                    setFolders([...folders, newFolder]);
+                    
+                    // Déplacer le visuel vers ce nouveau dossier
+                    if (movingVisual?.id) {
+                      await base44.entities.Visual.update(movingVisual.id, { folder_id: newFolder.id });
+                      setMessages(prev => prev.map(m => 
+                        m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: newFolder.id } } : m
+                      ));
+                      setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: newFolder.id } : v));
+                    }
+                    
+                    setCreatingFolder(false);
+                    setNewFolderName('');
+                    setNewFolderColor('violet');
+                    setShowFolderMoveDialog(false);
+                    setMovingVisual(null);
+                  }}
+                  className="flex-1 bg-violet-600 hover:bg-violet-700"
+                  disabled={!newFolderName.trim()}
+                >
+                  {language === 'fr' ? 'Créer et déplacer' : 'Create and move'}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-96 overflow-y-auto">
               <button
-                key={folder.id}
+                onClick={() => setCreatingFolder(true)}
+                className="w-full p-3 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 text-left transition-all flex items-center gap-2 text-violet-300"
+              >
+                <FolderPlus className="h-4 w-4" />
+                {language === 'fr' ? 'Créer un nouveau dossier' : 'Create new folder'}
+              </button>
+              <button
                 onClick={async () => {
                   if (movingVisual?.id && user) {
-                    await base44.entities.Visual.update(movingVisual.id, { folder_id: folder.id });
+                    await base44.entities.Visual.update(movingVisual.id, { folder_id: null });
                     setMessages(prev => prev.map(m => 
-                      m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: folder.id } } : m
+                      m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: null } } : m
                     ));
-                    setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: folder.id } : v));
+                    setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: null } : v));
                   }
                   setShowFolderMoveDialog(false);
                   setMovingVisual(null);
                 }}
-                className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all flex items-center gap-2"
+                className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all"
               >
-                <Folder className={cn("h-4 w-4", `text-${folder.color}-500`)} />
-                {folder.name}
+                {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
               </button>
-            ))}
-            {folders.length === 0 && (
-              <p className="text-white/40 text-sm text-center py-4">
-                {language === 'fr' ? 'Aucun dossier. Créez-en un depuis "Mes visuels".' : 'No folders. Create one from "My visuals".'}
-              </p>
-            )}
-          </div>
+              {folders.map(folder => (
+                <button
+                  key={folder.id}
+                  onClick={async () => {
+                    if (movingVisual?.id && user) {
+                      await base44.entities.Visual.update(movingVisual.id, { folder_id: folder.id });
+                      setMessages(prev => prev.map(m => 
+                        m.visual?.id === movingVisual.id ? { ...m, visual: { ...m.visual, folder_id: folder.id } } : m
+                      ));
+                      setSessionVisuals(prev => prev.map(v => v.id === movingVisual.id ? { ...v, folder_id: folder.id } : v));
+                    }
+                    setShowFolderMoveDialog(false);
+                    setMovingVisual(null);
+                  }}
+                  className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all flex items-center gap-2"
+                >
+                  <Folder className={cn("h-4 w-4", `text-${folder.color}-500`)} />
+                  {folder.name}
+                </button>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
       </div>

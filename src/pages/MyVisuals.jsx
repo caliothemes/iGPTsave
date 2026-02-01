@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight, Wand2, Video, Scissors, Folder, FolderPlus, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight, Wand2, Video, Scissors, Folder, FolderPlus, Edit2, Trash2, MoreVertical, X } from 'lucide-react';
 import { toast } from 'sonner';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
@@ -57,6 +57,9 @@ export default function MyVisuals() {
   const [isLoading, setIsLoading] = useState(true);
   const VISUALS_PER_PAGE = 15;
   const visualRefs = useRef({});
+  const [creatingFolderInMove, setCreatingFolderInMove] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderColor, setNewFolderColor] = useState('violet');
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -823,38 +826,132 @@ export default function MyVisuals() {
           />
 
           {/* Move to Folder Dialog */}
-          <Dialog open={selectedVisualsForMove.length > 0} onOpenChange={(open) => !open && setSelectedVisualsForMove([])}>
+          <Dialog open={selectedVisualsForMove.length > 0} onOpenChange={(open) => {
+            if (!open) {
+              setSelectedVisualsForMove([]);
+              setCreatingFolderInMove(false);
+              setNewFolderName('');
+              setNewFolderColor('violet');
+            }
+          }}>
             <DialogContent className="bg-[#1a1625] border-white/10 text-white">
               <DialogHeader>
-                <DialogTitle>{language === 'fr' ? 'Déplacer vers un dossier' : 'Move to folder'}</DialogTitle>
+                <DialogTitle>
+                  {creatingFolderInMove
+                    ? (language === 'fr' ? 'Créer un nouveau dossier' : 'Create new folder')
+                    : (language === 'fr' ? 'Déplacer vers un dossier' : 'Move to folder')}
+                </DialogTitle>
               </DialogHeader>
-              <div className="space-y-2">
-                <button
-                  onClick={() => {
-                    selectedVisualsForMove.forEach(id => handleMoveToFolder(id, null));
-                    setSelectedVisualsForMove([]);
-                  }}
-                  className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all"
-                >
-                  {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
-                </button>
-                {folders.map(folder => {
-                  const colorClass = colorOptions.find(c => c.value === folder.color)?.class || 'bg-violet-500';
-                  return (
-                    <button
-                      key={folder.id}
+              
+              {creatingFolderInMove ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-white/60 mb-2 block">
+                      {language === 'fr' ? 'Nom du dossier' : 'Folder name'}
+                    </label>
+                    <Input
+                      value={newFolderName}
+                      onChange={(e) => setNewFolderName(e.target.value)}
+                      placeholder={language === 'fr' ? 'Nom du dossier' : 'Folder name'}
+                      className="bg-white/5 border-white/10 text-white"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-white/60 mb-2 block">
+                      {language === 'fr' ? 'Couleur' : 'Color'}
+                    </label>
+                    <div className="flex gap-2">
+                      {colorOptions.map(color => (
+                        <button
+                          key={color.value}
+                          onClick={() => setNewFolderColor(color.value)}
+                          className={cn(
+                            "h-8 w-8 rounded-full transition-all",
+                            color.class,
+                            newFolderColor === color.value && "ring-2 ring-white ring-offset-2 ring-offset-[#1a1625]"
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
                       onClick={() => {
-                        selectedVisualsForMove.forEach(id => handleMoveToFolder(id, folder.id));
+                        setCreatingFolderInMove(false);
+                        setNewFolderName('');
+                        setNewFolderColor('violet');
+                      }}
+                      className="flex-1"
+                    >
+                      {language === 'fr' ? 'Annuler' : 'Cancel'}
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        if (!newFolderName.trim()) return;
+                        const user = await base44.auth.me();
+                        
+                        const newFolder = await base44.entities.Folder.create({
+                          name: newFolderName.trim(),
+                          user_email: user.email,
+                          color: newFolderColor,
+                          order: folders.length
+                        });
+                        
+                        setFolders([...folders, newFolder]);
+                        
+                        // Déplacer les visuels vers ce nouveau dossier
+                        selectedVisualsForMove.forEach(id => handleMoveToFolder(id, newFolder.id));
+                        
+                        setCreatingFolderInMove(false);
+                        setNewFolderName('');
+                        setNewFolderColor('violet');
                         setSelectedVisualsForMove([]);
                       }}
-                      className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all flex items-center gap-2"
+                      className="flex-1 bg-violet-600 hover:bg-violet-700"
+                      disabled={!newFolderName.trim()}
                     >
-                      <Folder className={cn("h-4 w-4", colorClass.replace('bg-', 'text-'))} />
-                      {folder.name}
-                    </button>
-                  );
-                })}
-              </div>
+                      {language === 'fr' ? 'Créer et déplacer' : 'Create and move'}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <button
+                    onClick={() => setCreatingFolderInMove(true)}
+                    className="w-full p-3 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 text-left transition-all flex items-center gap-2 text-violet-300"
+                  >
+                    <FolderPlus className="h-4 w-4" />
+                    {language === 'fr' ? 'Créer un nouveau dossier' : 'Create new folder'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      selectedVisualsForMove.forEach(id => handleMoveToFolder(id, null));
+                      setSelectedVisualsForMove([]);
+                    }}
+                    className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all"
+                  >
+                    {language === 'fr' ? 'Retirer du dossier' : 'Remove from folder'}
+                  </button>
+                  {folders.map(folder => {
+                    const colorClass = colorOptions.find(c => c.value === folder.color)?.class || 'bg-violet-500';
+                    return (
+                      <button
+                        key={folder.id}
+                        onClick={() => {
+                          selectedVisualsForMove.forEach(id => handleMoveToFolder(id, folder.id));
+                          setSelectedVisualsForMove([]);
+                        }}
+                        className="w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-all flex items-center gap-2"
+                      >
+                        <Folder className={cn("h-4 w-4", colorClass.replace('bg-', 'text-'))} />
+                        {folder.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </DialogContent>
           </Dialog>
 
