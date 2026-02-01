@@ -1034,27 +1034,32 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
             
             // Draw background box with padding and border-radius FIRST (for pub_ads style)
             if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-              const metrics = ctx.measureText(layer.text);
-              const textWidth = metrics.width;
+              // Calculate max width across all lines
+              let maxLineWidth = 0;
+              lines.forEach(line => {
+                const metrics = ctx.measureText(line);
+                maxLineWidth = Math.max(maxLineWidth, metrics.width);
+              });
+              
               const padding = layer.padding || 28;
               const borderRadius = layer.borderRadius || 18;
               
               ctx.fillStyle = layer.backgroundColor;
               
-              // Calculate box position based on text alignment
+              // Calculate box position based on text alignment and multi-line height
               let boxX;
               if (layer.align === 'center') {
-                boxX = layer.x - textWidth / 2 - padding;
+                boxX = layer.x - maxLineWidth / 2 - padding;
               } else if (layer.align === 'right') {
-                boxX = layer.x - textWidth - padding;
+                boxX = layer.x - maxLineWidth - padding;
               } else {
                 // left or default
                 boxX = layer.x - padding;
               }
               
-              const boxY = layer.y - layer.fontSize * 0.85 - padding;
-              const boxWidth = textWidth + padding * 2;
-              const boxHeight = layer.fontSize * 1.15 + padding * 2;
+              const boxY = startY - layer.fontSize * 0.85 - padding;
+              const boxWidth = maxLineWidth + padding * 2;
+              const boxHeight = totalHeight + padding * 2;
               
               // Draw rounded rectangle
               const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
@@ -2749,27 +2754,32 @@ Réponds en JSON avec:
               
               // Draw background box FIRST (for pub_ads style)
               if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-                const metrics = exportCtx.measureText(layer.text);
-                const textWidth = metrics.width;
+                // Calculate max width across all lines
+                let maxLineWidth = 0;
+                linesExport.forEach(line => {
+                  const metrics = exportCtx.measureText(line);
+                  maxLineWidth = Math.max(maxLineWidth, metrics.width);
+                });
+                
                 const padding = layer.padding || 28;
                 const borderRadius = layer.borderRadius || 18;
                 
                 exportCtx.fillStyle = layer.backgroundColor;
                 
-                // Calculate box position based on text alignment
+                // Calculate box position based on text alignment and multi-line height
                 let boxX;
                 if (layer.align === 'center') {
-                  boxX = layer.x - textWidth / 2 - padding;
+                  boxX = layer.x - maxLineWidth / 2 - padding;
                 } else if (layer.align === 'right') {
-                  boxX = layer.x - textWidth - padding;
+                  boxX = layer.x - maxLineWidth - padding;
                 } else {
                   // left or default
                   boxX = layer.x - padding;
                 }
                 
-                const boxY = layer.y - layer.fontSize * 0.85 - padding;
-                const boxWidth = textWidth + padding * 2;
-                const boxHeight = layer.fontSize * 1.15 + padding * 2;
+                const boxY = startYExport - layer.fontSize * 0.85 - padding;
+                const boxWidth = maxLineWidth + padding * 2;
+                const boxHeight = totalHeightExport + padding * 2;
                 
                 // Draw rounded rectangle
                 const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
