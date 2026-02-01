@@ -116,10 +116,10 @@ export default function VisualCard({
           bgImage.src = visual.original_image_url || visual.image_url;
         });
         
-        // Get original metadata dimensions
+        // Get original metadata dimensions (what we saved in the editor)
         let metadataWidth = bgImage.naturalWidth;
         let metadataHeight = bgImage.naturalHeight;
-        
+
         if (visual.dimensions) {
           const [w, h] = visual.dimensions.split('x').map(Number);
           if (w && h) {
@@ -127,14 +127,14 @@ export default function VisualCard({
             metadataHeight = h;
           }
         }
-        
-        // Use actual image dimensions for canvas
-        const width = bgImage.naturalWidth;
-        const height = bgImage.naturalHeight;
-        
-        // Calculate scale factor if metadata differs from actual image size
-        const scaleX = width / metadataWidth;
-        const scaleY = height / metadataHeight;
+
+        // For composition, use metadata dimensions (same as editor saved at)
+        const width = metadataWidth;
+        const height = metadataHeight;
+
+        // No scaling needed - layers are already at metadata scale
+        const scaleX = 1;
+        const scaleY = 1;
         
         const canvas = document.createElement('canvas');
         canvas.width = width;

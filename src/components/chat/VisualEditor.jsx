@@ -2380,47 +2380,48 @@ Réponds en JSON avec:
     const scaleToOriginal = originalWidth / canvasSize.width;
     
     // Scale layers back to original size for saving - PRESERVE ALL PROPERTIES
+    const scaleBackFactor = originalWidth / canvasSize.width;
     const layersToSave = layers.map(layer => {
           if (layer.type === 'text') {
             return {
               ...layer, // Keep ALL properties
-              x: layer.x / (canvasSize.width / originalWidth),
-              y: layer.y / (canvasSize.width / originalWidth),
-              fontSize: layer.fontSize / (canvasSize.width / originalWidth),
-              maxWidth: layer.maxWidth ? layer.maxWidth / (canvasSize.width / originalWidth) : 0,
-              padding: layer.padding ? layer.padding / (canvasSize.width / originalWidth) : 0,
-              borderRadius: layer.borderRadius ? layer.borderRadius / (canvasSize.width / originalWidth) : 0,
-              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2,
-              shadowBlur: layer.shadowBlur ? layer.shadowBlur / (canvasSize.width / originalWidth) : 6,
-              shadowOffsetX: layer.shadowOffsetX ? layer.shadowOffsetX / (canvasSize.width / originalWidth) : 3,
-              shadowOffsetY: layer.shadowOffsetY ? layer.shadowOffsetY / (canvasSize.width / originalWidth) : 3,
-              glowSize: layer.glowSize ? layer.glowSize / (canvasSize.width / originalWidth) : 10,
-              haloSize: layer.haloSize ? layer.haloSize / (canvasSize.width / originalWidth) : 15,
-              curveRadius: layer.curveRadius ? layer.curveRadius / (canvasSize.width / originalWidth) : 100,
+              x: layer.x * scaleBackFactor,
+              y: layer.y * scaleBackFactor,
+              fontSize: layer.fontSize * scaleBackFactor,
+              maxWidth: layer.maxWidth ? layer.maxWidth * scaleBackFactor : 0,
+              padding: layer.padding ? layer.padding * scaleBackFactor : 0,
+              borderRadius: layer.borderRadius ? layer.borderRadius * scaleBackFactor : 0,
+              strokeWidth: layer.strokeWidth ? layer.strokeWidth * scaleBackFactor : 2,
+              shadowBlur: layer.shadowBlur ? layer.shadowBlur * scaleBackFactor : 6,
+              shadowOffsetX: layer.shadowOffsetX ? layer.shadowOffsetX * scaleBackFactor : 3,
+              shadowOffsetY: layer.shadowOffsetY ? layer.shadowOffsetY * scaleBackFactor : 3,
+              glowSize: layer.glowSize ? layer.glowSize * scaleBackFactor : 10,
+              haloSize: layer.haloSize ? layer.haloSize * scaleBackFactor : 15,
+              curveRadius: layer.curveRadius ? layer.curveRadius * scaleBackFactor : 100,
+              letterSpacing: (layer.letterSpacing || 0) * scaleBackFactor,
               sparkleIntensity: layer.sparkleIntensity || 50,
               neonIntensity: layer.neonIntensity || 15,
-              letterSpacing: layer.letterSpacing || 0,
               reflectionOpacity: layer.reflectionOpacity || 40,
-              reflectionGap: layer.reflectionGap || 0,
+              reflectionGap: (layer.reflectionGap || 0) * scaleBackFactor,
             };
           } else if (layer.type === 'image' || layer.type === 'shape') {
             return {
               ...layer, // Keep ALL properties
-              x: layer.x / (canvasSize.width / originalWidth),
-              y: layer.y / (canvasSize.width / originalWidth),
-              width: layer.width / (canvasSize.width / originalWidth),
-              height: layer.height / (canvasSize.width / originalWidth),
-              borderRadius: layer.borderRadius ? layer.borderRadius / (canvasSize.width / originalWidth) : 0,
-              strokeWidth: layer.strokeWidth ? layer.strokeWidth / (canvasSize.width / originalWidth) : 2,
-              shadowBlur: layer.shadowBlur ? layer.shadowBlur / (canvasSize.width / originalWidth) : 10,
-              glowSize: layer.glowSize ? layer.glowSize / (canvasSize.width / originalWidth) : 10,
-              haloSize: layer.haloSize ? layer.haloSize / (canvasSize.width / originalWidth) : 15,
+              x: layer.x * scaleBackFactor,
+              y: layer.y * scaleBackFactor,
+              width: layer.width * scaleBackFactor,
+              height: layer.height * scaleBackFactor,
+              borderRadius: layer.borderRadius ? layer.borderRadius * scaleBackFactor : 0,
+              strokeWidth: layer.strokeWidth ? layer.strokeWidth * scaleBackFactor : 2,
+              shadowBlur: layer.shadowBlur ? layer.shadowBlur * scaleBackFactor : 10,
+              glowSize: layer.glowSize ? layer.glowSize * scaleBackFactor : 10,
+              haloSize: layer.haloSize ? layer.haloSize * scaleBackFactor : 15,
               reflectionOpacity: layer.reflectionOpacity || 40,
-              reflectionGap: layer.reflectionGap || 2,
-              clipX: layer.clipX ? layer.clipX / (canvasSize.width / originalWidth) : undefined,
-              clipY: layer.clipY ? layer.clipY / (canvasSize.width / originalWidth) : undefined,
-              clipWidth: layer.clipWidth ? layer.clipWidth / (canvasSize.width / originalWidth) : undefined,
-              clipHeight: layer.clipHeight ? layer.clipHeight / (canvasSize.width / originalWidth) : undefined,
+              reflectionGap: (layer.reflectionGap || 2) * scaleBackFactor,
+              clipX: layer.clipX ? layer.clipX * scaleBackFactor : undefined,
+              clipY: layer.clipY ? layer.clipY * scaleBackFactor : undefined,
+              clipWidth: layer.clipWidth ? layer.clipWidth * scaleBackFactor : undefined,
+              clipHeight: layer.clipHeight ? layer.clipHeight * scaleBackFactor : undefined,
             };
           }
       return layer; // background layers - keep as is
@@ -4910,7 +4911,7 @@ Réponds en JSON avec:
                     {/* Font Size */}
                     <div className="space-y-2">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Taille' : 'Size'}: {layer.fontSize}px</label>
-                      <Slider value={[layer.fontSize]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontSize: v })} min={5} max={120} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+                      <Slider value={[layer.fontSize]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { fontSize: v })} min={4} max={120} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
                     {/* Font Weight */}
@@ -5449,7 +5450,7 @@ Réponds en JSON avec:
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-white/60 text-sm">{language === 'fr' ? 'Taille' : 'Size'}: {currentLayer?.fontSize}</label>
-            <Slider value={[currentLayer?.fontSize || 48]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={12} max={200} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+            <Slider value={[currentLayer?.fontSize || 48]} onValueChange={([v]) => updateLayer(selectedLayer, { fontSize: v })} min={4} max={200} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
           </div>
           <div className="space-y-2">
             <label className="text-white/60 text-sm">{language === 'fr' ? 'Espacement lettres' : 'Letter spacing'}: {currentLayer?.letterSpacing || 0}</label>
