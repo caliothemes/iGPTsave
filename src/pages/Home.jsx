@@ -2203,6 +2203,10 @@ ${qaKnowledge}
                               setCropVisual(v);
                               setShowCropModal(true);
                             }}
+                            onFolderClick={() => {
+                              // Rediriger vers MyVisuals
+                              window.location.href = createPageUrl('MyVisuals');
+                            }}
                             onEffectApply={async (visual, effect) => {
                               // Générer directement avec l'effet et l'image actuelle
                               if (!user) {
