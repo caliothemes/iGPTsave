@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Search, Grid, List, Heart, Download, Pencil, ChevronLeft, ChevronRight, Wand2, Video, Scissors, Folder, FolderPlus, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import { toast } from 'sonner';
 import PageWrapper from '@/components/PageWrapper';
 import VisualCard from '@/components/chat/VisualCard';
 import { useLanguage } from '@/components/LanguageContext';
@@ -423,6 +424,37 @@ export default function MyVisuals() {
     setVisuals(prev => prev.map(v => v.id === visualId ? { ...v, folder_id: folderId || null } : v));
   };
 
+  const handleDuplicateVisual = async (visual) => {
+    try {
+      const user = await base44.auth.me();
+      const { id, created_date, updated_date, version, downloaded, isPurchased, ...visualData } = visual;
+      
+      const duplicatedVisual = await base44.entities.Visual.create({
+        ...visualData,
+        user_email: user.email,
+        title: visual.title ? `${visual.title} (Copie)` : 'Copie',
+        downloaded: false,
+        version: 1
+      });
+      
+      setVisuals(prev => [duplicatedVisual, ...prev]);
+      
+      // Scroll to top to see the duplicated visual
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      toast.success(
+        language === 'fr' ? '✨ Visuel dupliqué avec succès' : '✨ Visual duplicated successfully',
+        { duration: 2000 }
+      );
+    } catch (error) {
+      console.error('Duplication error:', error);
+      toast.error(
+        language === 'fr' ? 'Erreur lors de la duplication' : 'Duplication error',
+        { duration: 2000 }
+      );
+    }
+  };
+
   const openFolderDialog = (folder = null) => {
     if (folder) {
       setEditingFolder(folder);
@@ -637,6 +669,7 @@ export default function MyVisuals() {
                       }}
                       onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
                       onFolderClick={(visual) => setSelectedVisualsForMove([visual.id])}
+                      onDuplicate={handleDuplicateVisual}
                       isRegenerating={false}
                       canDownload={true}
                       compact={false}
