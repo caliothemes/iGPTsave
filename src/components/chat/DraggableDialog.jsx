@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle, DialogPortal } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 
 export default function DraggableDialog({ open, onOpenChange, title, icon, children, className }) {
@@ -51,27 +52,40 @@ export default function DraggableDialog({ open, onOpenChange, title, icon, child
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        ref={dialogRef}
-        className={cn("bg-gray-900 border-white/10 text-white max-w-sm", className)}
-        style={{
-          transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
-          cursor: isDragging ? 'grabbing' : 'default'
-        }}
-        onMouseDown={handleMouseDown}
-      >
-        <DialogHeader 
-          data-dialog-header 
-          className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20 cursor-grab active:cursor-grabbing select-none"
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPortal>
+        <DialogPrimitive.Content 
+          ref={dialogRef}
+          className={cn(
+            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-sm gap-4 border bg-gray-900 border-white/10 text-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg",
+            className
+          )}
+          style={{
+            transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
+            cursor: isDragging ? 'grabbing' : 'default'
+          }}
+          onMouseDown={handleMouseDown}
         >
-          <DialogTitle className="flex items-center gap-2 pointer-events-none">
-            {icon}
-            {title}
-          </DialogTitle>
-        </DialogHeader>
-        {children}
-      </DialogContent>
-    </Dialog>
+          <DialogHeader 
+            data-dialog-header 
+            className="bg-violet-500/10 -m-6 mb-4 p-4 border-b border-violet-500/20 cursor-grab active:cursor-grabbing select-none"
+          >
+            <DialogTitle className="flex items-center gap-2 pointer-events-none">
+              {icon}
+              {title}
+            </DialogTitle>
+          </DialogHeader>
+          {children}
+          <DialogPrimitive.Close
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    </DialogPrimitive.Root>
   );
 }
