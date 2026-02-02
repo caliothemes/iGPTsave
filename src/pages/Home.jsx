@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Send, Loader2, Plus, Mic, Palette, SlidersHorizontal, Upload, X, Heart, ChevronDown, ChevronRight, Wand2, Sparkles, Scissors, Video, Pencil, Users, Folder, FolderPlus } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
