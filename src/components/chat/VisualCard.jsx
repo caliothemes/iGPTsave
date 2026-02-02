@@ -555,7 +555,7 @@ export default function VisualCard({
               </button>
             )}
 
-            {!isVideo && onFolderClick && (
+            {onFolderClick && (
               <button
                 onClick={() => onFolderClick(visual)}
                 disabled={isRegenerating}
@@ -566,7 +566,7 @@ export default function VisualCard({
               </button>
             )}
 
-            {!isVideo && onDuplicate && (
+            {onDuplicate && (
               <button
                 onClick={() => onDuplicate(visual)}
                 disabled={isRegenerating}
