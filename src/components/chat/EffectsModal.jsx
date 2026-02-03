@@ -98,8 +98,9 @@ function EffectThumbnail({ effect, onApply, categories, isGenerating }) {
           {[2, 3, 4, 5].map(count => (
             <button
               key={count}
-              onClick={() => handleClick(count)}
+              onClick={(e) => handleClick(e, count)}
               disabled={isGenerating}
+              type="button"
               className="flex-1 px-2 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 hover:border-emerald-500/60 text-emerald-300 text-xs font-medium transition-all disabled:opacity-50"
             >
               x{count}
