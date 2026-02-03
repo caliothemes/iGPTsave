@@ -2272,6 +2272,24 @@ ${qaKnowledge}
                               setEffectsVisual(visual);
                               setShowEffectsModal(true);
                             }}
+                            onDuplicate={async (visual) => {
+                              try {
+                                const { id, created_date, updated_date, version, downloaded, isPurchased, ...visualData } = visual;
+                                
+                                const duplicatedVisual = await base44.entities.Visual.create({
+                                  ...visualData,
+                                  user_email: user.email,
+                                  title: visual.title ? `${visual.title} (Copie)` : 'Copie',
+                                  downloaded: false,
+                                  version: 1
+                                });
+                                
+                                setSessionVisuals(prev => [duplicatedVisual, ...prev]);
+                                setTotalVisualsCount(prev => prev + 1);
+                              } catch (error) {
+                                console.error('Duplication error:', error);
+                              }
+                            }}
                             onPromptClick={(prompt) => {
                               setInputValue(prompt);
                               setTimeout(() => {
