@@ -260,14 +260,8 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onGenerat
                     categories={categories}
                     isGenerating={generatingEffect === effect.id}
                     onApply={async (eff, count) => {
-                      const scrollPos = scrollContainerRef.current?.scrollTop || 0;
-                      setGeneratingEffect(eff.id);
-                      await onApplyEffect(eff, count);
-                      setGeneratingEffect(null);
-                      if (scrollContainerRef.current) {
-                        scrollContainerRef.current.scrollTop = scrollPos;
-                      }
                       onClose();
+                      await onApplyEffect(eff, count);
                     }}
                   />
                 ))}
