@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from '@/lib/utils';
 
-function EffectThumbnail({ effect, onClick, categories }) {
+function EffectThumbnail({ effect, onApply, onGenerateVariants, categories, isGenerating }) {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -35,13 +35,14 @@ function EffectThumbnail({ effect, onClick, categories }) {
   }, [isHovered]);
 
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-500/50 transition-all"
-    >
-      <div className="aspect-square relative overflow-hidden">
+    <div className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all">
+      <button
+        onClick={() => onApply(effect, 1)}
+        disabled={isGenerating}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="w-full aspect-square relative overflow-hidden disabled:opacity-50"
+      >
         {images.length > 0 ? (
           <>
             {images.map((img, idx) => (
@@ -80,23 +81,41 @@ function EffectThumbnail({ effect, onClick, categories }) {
             )}
           </div>
         )}
-      </div>
+      </button>
+      
+      {/* Name and Variants Buttons */}
       <div className="p-2">
-        <p className="text-white text-xs font-medium line-clamp-2">
+        <p className="text-white text-xs font-medium line-clamp-2 mb-2">
           {language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr)}
         </p>
+        <div className="flex gap-1">
+          {[2, 3, 4, 5].map(count => (
+            <button
+              key={count}
+              onClick={(e) => {
+                e.stopPropagation();
+                onGenerateVariants(effect, count);
+              }}
+              disabled={isGenerating}
+              className="flex-1 px-2 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 hover:border-emerald-500/60 text-emerald-300 text-xs font-medium transition-all disabled:opacity-50"
+            >
+              x{count}
+            </button>
+          ))}
+        </div>
       </div>
-    </button>
+    </div>
   );
 }
 
-export default function EffectsModal({ isOpen, onClose, onApplyEffect, onSelectEffect }) {
+export default function EffectsModal({ isOpen, onClose, onApplyEffect, onGenerateVariants }) {
   const { language } = useLanguage();
   const [effects, setEffects] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [generatingEffect, setGeneratingEffect] = useState(null);
 
   useEffect(() => {
     loadEffects();
@@ -228,19 +247,24 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onSelectE
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {filteredEffects.map((effect) => (
                   <EffectThumbnail
                     key={effect.id}
                     effect={effect}
                     categories={categories}
-                    onClick={() => {
-                      if (onSelectEffect) {
-                        onSelectEffect(effect);
-                      } else if (onApplyEffect) {
-                        onApplyEffect(effect);
-                        onClose();
-                      }
+                    isGenerating={generatingEffect === effect.id}
+                    onApply={async (eff, count) => {
+                      setGeneratingEffect(eff.id);
+                      await onApplyEffect(eff, count);
+                      setGeneratingEffect(null);
+                      onClose();
+                    }}
+                    onGenerateVariants={async (eff, count) => {
+                      setGeneratingEffect(eff.id);
+                      await onGenerateVariants(eff, count);
+                      setGeneratingEffect(null);
+                      onClose();
                     }}
                   />
                 ))}

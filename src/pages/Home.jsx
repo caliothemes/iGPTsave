@@ -148,15 +148,6 @@ export default function Home() {
   const [newFolderColor, setNewFolderColor] = useState('violet');
   const [showEffectsModal, setShowEffectsModal] = useState(false);
   const [effectsVisual, setEffectsVisual] = useState(null);
-  const [selectedEffect, setSelectedEffect] = useState(null);
-  const [showEffectVariantsModal, setShowEffectVariantsModal] = useState(false);
-
-  // Auto-open variants modal when effect is selected
-  useEffect(() => {
-    if (selectedEffect) {
-      setShowEffectVariantsModal(true);
-    }
-  }, [selectedEffect]);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -3475,23 +3466,130 @@ ${qaKnowledge}
           setShowEffectsModal(false);
           setEffectsVisual(null);
         }}
-        onSelectEffect={(effect) => {
-          setSelectedEffect(effect);
-          setShowEffectsModal(false);
-        }}
-      />
-
-      {/* Effect Variants Modal */}
-      <EffectVariantsModal
-        isOpen={showEffectVariantsModal}
-        onClose={() => {
-          setShowEffectVariantsModal(false);
-          setSelectedEffect(null);
-        }}
-        effect={selectedEffect}
-        onGenerate={async (variantCount) => {
+        onApplyEffect={async (effect, variantCount) => {
           const visual = effectsVisual;
           const effect = selectedEffect;
+
+          // Vérifier les crédits
+          if (!user) {
+            if (guestPrompts >= 3) {
+              setShowGuestCreditsModal(true);
+              return;
+            }
+          } else if (credits) {
+            const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+            const isUnlimited = credits?.subscription_type === 'unlimited';
+            const isAdmin = user?.role === 'admin';
+
+            if (!isAdmin && !isUnlimited && totalCredits < variantCount) {
+              setShowNoCreditsModal(true);
+              return;
+            }
+          }
+
+          setIsGenerating(true);
+          setCurrentVisual(visual);
+
+          const effectName = language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr);
+          setMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: `✨ ${language === 'fr' ? 'Génération de' : 'Generating'} ${variantCount} ${language === 'fr' ? 'variante(s) de l\'effet' : 'variant(s) of effect'} "${effectName}"...`, 
+            isStreaming: true 
+          }]);
+
+          try {
+            const generatedVariants = [];
+
+            // Générer N variantes en parallèle
+            const promises = Array(variantCount).fill(null).map(async (_, index) => {
+              let finalPrompt = effect.prompt;
+              
+              // Variante 1 = effet exact, variantes 2+ = variations de vue
+              if (index > 0) {
+                const viewVariations = [
+                  'subtle camera angle shift, slightly different perspective',
+                  'minor viewpoint adjustment, gentle angle variation',
+                  'slight camera position change, alternative view angle',
+                  'soft perspective shift, different camera placement'
+                ];
+                finalPrompt = `${effect.prompt}, ${viewVariations[(index - 1) % viewVariations.length]}`;
+              }
+              
+              const result = await base44.integrations.Core.GenerateImage({
+                prompt: finalPrompt,
+                existing_image_urls: [visual.original_image_url || visual.image_url]
+              });
+              return result.url;
+            });
+
+            const urls = await Promise.all(promises);
+
+            // Créer les visuels
+            for (let i = 0; i < urls.length; i++) {
+              const visualData = {
+                user_email: user?.email || 'anonymous',
+                conversation_id: currentConversation?.id,
+                image_url: urls[i],
+                original_image_url: urls[i],
+                title: `${visual.title} - ${effectName} (${i + 1}/${variantCount})`,
+                original_prompt: `${visual.original_prompt} • EFFET: ${effectName}`,
+                image_prompt: effect.prompt,
+                dimensions: visual.dimensions,
+                visual_type: visual.visual_type,
+                parent_visual_id: visual.id,
+                version: (visual.version || 1) + 1
+              };
+
+              let newVisual;
+              if (user) {
+                // Déduire 1 crédit par variante
+                if (credits.free_downloads > 0) {
+                  await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
+                  setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
+                } else if (credits.paid_credits > 0) {
+                  await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
+                  setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
+                }
+
+                newVisual = await base44.entities.Visual.create(visualData);
+                setSessionVisuals(prev => [newVisual, ...prev]);
+                setTotalVisualsCount(prev => prev + 1);
+              } else {
+                // Pour les invités, créer un ID temporaire unique
+                newVisual = { ...visualData, id: `temp-${Date.now()}-${i}` };
+              }
+
+              generatedVariants.push(newVisual);
+            }
+
+            // Afficher les variantes en miniatures
+            setMessages(prev => [
+              ...prev.slice(0, -1),
+              { 
+                role: 'assistant', 
+                content: `✨ ${language === 'fr' ? 'Variantes générées ! Cliquez sur une image pour la sélectionner.' : 'Variants generated! Click on an image to select it.'}`,
+                effectVariants: generatedVariants
+              }
+            ]);
+
+            // Sélectionner automatiquement la première variante
+            if (generatedVariants.length > 0) {
+              setCurrentVisual(generatedVariants[0]);
+              setVisualsHistory(prev => [...prev, ...generatedVariants]);
+            }
+
+          } catch (error) {
+            console.error(error);
+            setMessages(prev => [
+              ...prev.slice(0, -1),
+              { role: 'assistant', content: t('error') }
+            ]);
+          }
+
+          setIsGenerating(false);
+        }}
+        onGenerateVariants={async (effect, variantCount) => {
+          const visual = effectsVisual;
 
           // Vérifier les crédits
           if (!user) {
