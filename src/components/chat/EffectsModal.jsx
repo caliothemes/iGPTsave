@@ -35,7 +35,9 @@ function EffectThumbnail({ effect, onApply, categories, isGenerating }) {
   }, [isHovered]);
 
   const handleClick = (e, count) => {
+    e.preventDefault();
     e.stopPropagation();
+    if (isGenerating) return;
     onApply(effect, count);
   };
 
