@@ -5301,6 +5301,12 @@ Réponds en JSON avec:
                       <Slider value={[layer.opacity]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { opacity: v })} min={10} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                     </div>
 
+                    {/* Coins arrondis - toujours disponible */}
+                    <div className="space-y-2">
+                      <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Coins arrondis' : 'Border Radius'}: {layer.borderRadius || 0}px</label>
+                      <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={Math.min(layer.width, layer.height) / 2} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
+                    </div>
+
                     {/* Effects */}
                     <div className="space-y-3">
                       <label className="text-white/70 text-sm font-medium">{language === 'fr' ? 'Effets' : 'Effects'}</label>
@@ -5330,10 +5336,6 @@ Réponds en JSON avec:
                           <input type="color" value={layer.strokeColor || '#000000'} onChange={(e) => updateLayer(propertiesModalLayer, { strokeColor: e.target.value })} className="w-8 h-8 rounded cursor-pointer" />
                           <Slider value={[layer.strokeWidth || 2]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { strokeWidth: v })} min={1} max={20} step={1} className="flex-1 [&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                           <span className="text-white/60 text-sm w-12">{layer.strokeWidth || 2}px</span>
-                        </div>
-                        <div className="pt-2">
-                          <label className="text-white/60 text-sm">{language === 'fr' ? 'Arrondi' : 'Radius'}: {layer.borderRadius || 0}px</label>
-                          <Slider value={[layer.borderRadius || 0]} onValueChange={([v]) => updateLayer(propertiesModalLayer, { borderRadius: v })} min={0} max={100} step={1} className="[&_[role=slider]]:bg-violet-500 [&_.bg-primary]:bg-violet-500" />
                         </div>
                       </div>
                     )}
