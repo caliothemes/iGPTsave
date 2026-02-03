@@ -99,11 +99,9 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onSelectE
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    if (isOpen) {
-      loadEffects();
-      loadCategories();
-    }
-  }, [isOpen]);
+    loadEffects();
+    loadCategories();
+  }, []);
 
   const loadEffects = async () => {
     setLoading(true);
