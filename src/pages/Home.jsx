@@ -3543,7 +3543,7 @@ ${qaKnowledge}
                 version: (visual.version || 1) + 1
               };
 
-              let newVisual = visualData;
+              let newVisual;
               if (user) {
                 // Déduire 1 crédit par variante
                 if (credits.free_downloads > 0) {
@@ -3557,6 +3557,9 @@ ${qaKnowledge}
                 newVisual = await base44.entities.Visual.create(visualData);
                 setSessionVisuals(prev => [newVisual, ...prev]);
                 setTotalVisualsCount(prev => prev + 1);
+              } else {
+                // Pour les invités, créer un ID temporaire unique
+                newVisual = { ...visualData, id: `temp-${Date.now()}-${i}` };
               }
 
               generatedVariants.push(newVisual);
