@@ -688,7 +688,7 @@ ${qaKnowledge}
         const isUnlimited = credits?.subscription_type === 'unlimited';
         const isAdmin = user?.role === 'admin';
 
-        if (!isAdmin && !isUnlimited && totalCredits <= 0) {
+        if (!isAdmin && !isUnlimited && totalCredits < variantCount) {
           setShowNoCreditsModal(true);
           setIsGenerating(false);
           return;
@@ -764,18 +764,36 @@ ${qaKnowledge}
 
 
       // CAS NORMAL: Génération d'image
-      // Déduire 1 crédit AVANT la génération
+      // Déduire variantCount crédits AVANT la génération
       if (user && credits) {
-        if (credits.free_downloads > 0) {
-          await base44.entities.UserCredits.update(credits.id, { free_downloads: credits.free_downloads - 1 });
-          setCredits(prev => ({ ...prev, free_downloads: prev.free_downloads - 1 }));
-        } else if (credits.paid_credits > 0) {
-          await base44.entities.UserCredits.update(credits.id, { paid_credits: credits.paid_credits - 1 });
-          setCredits(prev => ({ ...prev, paid_credits: prev.paid_credits - 1 }));
+        let creditsToDeduct = variantCount;
+        let newFreeDownloads = credits.free_downloads;
+        let newPaidCredits = credits.paid_credits;
+        
+        // Déduire d'abord des crédits gratuits
+        if (newFreeDownloads > 0) {
+          const deductFromFree = Math.min(creditsToDeduct, newFreeDownloads);
+          newFreeDownloads -= deductFromFree;
+          creditsToDeduct -= deductFromFree;
         }
+        
+        // Puis des crédits payants si nécessaire
+        if (creditsToDeduct > 0 && newPaidCredits > 0) {
+          newPaidCredits -= creditsToDeduct;
+        }
+        
+        await base44.entities.UserCredits.update(credits.id, { 
+          free_downloads: newFreeDownloads,
+          paid_credits: newPaidCredits
+        });
+        setCredits(prev => ({ 
+          ...prev, 
+          free_downloads: newFreeDownloads,
+          paid_credits: newPaidCredits
+        }));
       } else if (!user) {
         // Guest : incrémenter le compteur
-        const newCount = guestPrompts + 1;
+        const newCount = guestPrompts + variantCount;
         setGuestPrompts(newCount);
         localStorage.setItem('igpt_guest_prompts', newCount.toString());
       }
