@@ -1496,6 +1496,13 @@ ${qaKnowledge}
     setIsGenerating(false);
   };
 
+  const handleSend = () => {
+    if (!inputValue.trim() || isGenerating) return;
+    
+    setPendingPrompt(inputValue.trim());
+    setShowVariantSelector(true);
+  };
+
   const handleRegenerate = async (visual) => {
     // Vérification des crédits AVANT régénération
     if (!user) {
