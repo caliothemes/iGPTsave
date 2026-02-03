@@ -3468,7 +3468,6 @@ ${qaKnowledge}
         }}
         onApplyEffect={async (effect, variantCount) => {
           const visual = effectsVisual;
-          const effect = selectedEffect;
 
           // Vérifier les crédits
           if (!user) {
