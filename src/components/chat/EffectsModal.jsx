@@ -34,18 +34,20 @@ function EffectThumbnail({ effect, onApply, categories, isGenerating }) {
     }
   }, [isHovered]);
 
-  const handleClick = (count) => {
+  const handleClick = (e, count) => {
+    e.stopPropagation();
     onApply(effect, count);
   };
 
   return (
     <div className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all">
       <button
-        onClick={() => handleClick(1)}
+        onClick={(e) => handleClick(e, 1)}
         disabled={isGenerating}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="w-full aspect-square relative overflow-hidden disabled:opacity-50"
+        type="button"
       >
         {images.length > 0 ? (
           <>
