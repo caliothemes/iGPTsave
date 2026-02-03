@@ -961,6 +961,18 @@ ${qaKnowledge}
       
       for (let i = 0; i < variantCount; i++) {
         let result;
+        let variantPrompt = promptToUse;
+        
+        // Variante 1 = prompt exact, variantes 2+ = variations de vue
+        if (i > 0) {
+          const viewVariations = [
+            'subtle camera angle shift, slightly different perspective',
+            'minor viewpoint adjustment, gentle angle variation',
+            'slight camera position change, alternative view angle',
+            'soft perspective shift, different camera placement'
+          ];
+          variantPrompt = `${promptToUse}, ${viewVariations[(i - 1) % viewVariations.length]}`;
+        }
         
         // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
         if (currentAttachedImages.length > 0) {
@@ -970,7 +982,7 @@ ${qaKnowledge}
               { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
             ]);
 
-            const compositionPrompt = `Create this design: ${userMessage}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${promptToUse}`;
+            const compositionPrompt = `Create this design: ${userMessage}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${variantPrompt}`;
 
             result = await base44.integrations.Core.GenerateImage({
               prompt: compositionPrompt,
@@ -988,9 +1000,9 @@ ${qaKnowledge}
             throw compError;
           }
         } else {
-          // CAS NORMAL: Génération simple
+          // CAS NORMAL: Génération simple avec variation
           result = await base44.integrations.Core.GenerateImage({
-            prompt: promptToUse
+            prompt: variantPrompt
           });
         }
         
