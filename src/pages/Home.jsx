@@ -3471,10 +3471,10 @@ ${qaKnowledge}
         onSelectEffect={(effect) => {
           setSelectedEffect(effect);
           setShowEffectsModal(false);
-          // Délai plus court et garantir que la modal précédente est fermée
-          requestAnimationFrame(() => {
+          // Délai suffisant pour que la première modal se ferme complètement
+          setTimeout(() => {
             setShowEffectVariantsModal(true);
-          });
+          }, 150);
         }}
       />
 
