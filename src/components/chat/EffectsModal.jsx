@@ -90,7 +90,7 @@ function EffectThumbnail({ effect, onClick, categories }) {
   );
 }
 
-export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
+export default function EffectsModal({ isOpen, onClose, onApplyEffect, onSelectEffect }) {
   const { language } = useLanguage();
   const [effects, setEffects] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -237,8 +237,13 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect }) {
                     effect={effect}
                     categories={categories}
                     onClick={() => {
-                      onApplyEffect(effect);
-                      onClose();
+                      if (onSelectEffect) {
+                        onSelectEffect(effect);
+                        onClose();
+                      } else {
+                        onApplyEffect(effect);
+                        onClose();
+                      }
                     }}
                   />
                 ))}
