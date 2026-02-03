@@ -261,12 +261,6 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onGenerat
                       setGeneratingEffect(null);
                       onClose();
                     }}
-                    onGenerateVariants={async (eff, count) => {
-                      setGeneratingEffect(eff.id);
-                      await onApplyEffect(eff, count);
-                      setGeneratingEffect(null);
-                      onClose();
-                    }}
                   />
                 ))}
               </div>
