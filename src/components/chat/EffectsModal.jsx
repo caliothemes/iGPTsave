@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/components/LanguageContext';
 import { cn } from '@/lib/utils';
 
-function EffectThumbnail({ effect, onApply, onGenerateVariants, categories, isGenerating }) {
+function EffectThumbnail({ effect, onApply, categories, isGenerating }) {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -34,10 +34,14 @@ function EffectThumbnail({ effect, onApply, onGenerateVariants, categories, isGe
     }
   }, [isHovered]);
 
+  const handleClick = (count) => {
+    onApply(effect, count);
+  };
+
   return (
     <div className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-emerald-500/50 transition-all">
       <button
-        onClick={() => onApply(effect, 1)}
+        onClick={() => handleClick(1)}
         disabled={isGenerating}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -92,10 +96,7 @@ function EffectThumbnail({ effect, onApply, onGenerateVariants, categories, isGe
           {[2, 3, 4, 5].map(count => (
             <button
               key={count}
-              onClick={(e) => {
-                e.stopPropagation();
-                onGenerateVariants(effect, count);
-              }}
+              onClick={() => handleClick(count)}
               disabled={isGenerating}
               className="flex-1 px-2 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 hover:border-emerald-500/60 text-emerald-300 text-xs font-medium transition-all disabled:opacity-50"
             >
