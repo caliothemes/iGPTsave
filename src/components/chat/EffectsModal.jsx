@@ -261,9 +261,9 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onGenerat
                     effect={effect}
                     categories={categories}
                     isGenerating={generatingEffect === effect.id}
-                    onApply={async (eff, count) => {
+                    onApply={(eff, count) => {
                       onClose();
-                      await onApplyEffect(eff, count);
+                      onApplyEffect(eff, count);
                     }}
                   />
                 ))}
