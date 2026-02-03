@@ -683,7 +683,7 @@ export default function VisualCard({
       <EffectsModal
         isOpen={showEffectsModal}
         onClose={() => setShowEffectsModal(false)}
-        onApplyEffect={(effect) => onEffectApply?.(visual, effect)}
+        onApplyEffect={(effect, count) => onEffectApply?.(visual, effect, count)}
       />
 
       {/* Prompt Modal */}
