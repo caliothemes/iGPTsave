@@ -3518,9 +3518,22 @@ ${qaKnowledge}
             const generatedVariants = [];
 
             // Générer N variantes en parallèle
-            const promises = Array(variantCount).fill(null).map(async () => {
+            const promises = Array(variantCount).fill(null).map(async (_, index) => {
+              let finalPrompt = effect.prompt;
+              
+              // Variante 1 = effet exact, variantes 2+ = variations de vue
+              if (index > 0) {
+                const viewVariations = [
+                  'subtle camera angle shift, slightly different perspective',
+                  'minor viewpoint adjustment, gentle angle variation',
+                  'slight camera position change, alternative view angle',
+                  'soft perspective shift, different camera placement'
+                ];
+                finalPrompt = `${effect.prompt}, ${viewVariations[(index - 1) % viewVariations.length]}`;
+              }
+              
               const result = await base44.integrations.Core.GenerateImage({
-                prompt: effect.prompt,
+                prompt: finalPrompt,
                 existing_image_urls: [visual.original_image_url || visual.image_url]
               });
               return result.url;
