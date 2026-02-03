@@ -148,6 +148,8 @@ export default function Home() {
   const [newFolderColor, setNewFolderColor] = useState('violet');
   const [showEffectsModal, setShowEffectsModal] = useState(false);
   const [effectsVisual, setEffectsVisual] = useState(null);
+  const [showVariantSelector, setShowVariantSelector] = useState(false);
+  const [pendingPrompt, setPendingPrompt] = useState('');
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -514,10 +516,12 @@ export default function Home() {
     recognition.start();
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || isGenerating) return;
+  const handleSendWithVariants = async (variantCount = 1) => {
+    const userMessage = pendingPrompt || inputValue.trim();
+    if (!userMessage || isGenerating) return;
 
-    const userMessage = inputValue.trim();
+    setShowVariantSelector(false);
+    setPendingPrompt('');
     
     // ÉTAPE 1: Détecter l'intention (conversation vs génération)
     setIsGenerating(true);
@@ -952,11 +956,14 @@ ${qaKnowledge}
       
       console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
-      // Générer l'image
-      let result;
+      // Générer les images (une ou plusieurs variantes)
+      const results = [];
       
-      // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
-      if (currentAttachedImages.length > 0) {
+      for (let i = 0; i < variantCount; i++) {
+        let result;
+        
+        // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
+        if (currentAttachedImages.length > 0) {
         try {
             setMessages(prev => [
               ...prev.slice(0, -1),
@@ -976,26 +983,36 @@ ${qaKnowledge}
 
           console.log('✅ Image créée avec images attachées:', result.url);
 
-        } catch (compError) {
-          console.error('❌ Composition error:', compError);
-          throw compError;
+          } catch (compError) {
+            console.error('❌ Composition error:', compError);
+            throw compError;
+          }
+        } else {
+          // CAS NORMAL: Génération simple
+          result = await base44.integrations.Core.GenerateImage({
+            prompt: promptToUse
+          });
         }
-      } else {
-        // CAS NORMAL: Génération simple
-        result = await base44.integrations.Core.GenerateImage({
-          prompt: promptToUse
-        });
+        
+        if (result.url) {
+          results.push(result.url);
+        }
       }
 
-      // Traitement commun pour les deux cas (avec ou sans images attachées)
-      if (result.url) {
-        let finalImageUrl = result.url;
+      // Traitement des résultats
+      if (results.length > 0) {
+        const allVariants = [];
         
-        // Extract color palette from generated image
-        let extractedColors = selectedPalette?.colors;
-        if (!extractedColors) {
-          try {
-            const colorResult = await base44.integrations.Core.InvokeLLM({
+        for (let i = 0; i < results.length; i++) {
+          const result = { url: results[i] };
+        
+        // Pour la première variante, on extrait les couleurs et fait tout le traitement
+        let extractedColors = null;
+        if (i === 0) {
+          extractedColors = selectedPalette?.colors;
+          if (!extractedColors) {
+            try {
+              const colorResult = await base44.integrations.Core.InvokeLLM({
               prompt: 'Extract the 5 most dominant colors from this image as HEX codes. Return only an array of hex codes.',
               response_json_schema: {
                 type: "object",
@@ -1003,13 +1020,16 @@ ${qaKnowledge}
                   colors: { type: "array", items: { type: "string" } }
                 }
               },
-              file_urls: [result.url]
-            });
-            extractedColors = colorResult.colors;
-          } catch (e) {
-            console.error('Color extraction failed:', e);
+                file_urls: [result.url]
+              });
+              extractedColors = colorResult.colors;
+            } catch (e) {
+              console.error('Color extraction failed:', e);
+            }
           }
         }
+        
+        let finalImageUrl = result.url;
 
         // Si DA appliqué, extraire les textes de l'image pour les rendre éditables
         if (daApplied && !canvaMode) {
@@ -1362,53 +1382,75 @@ ${qaKnowledge}
 
         }
 
-        const visualData = {
-          user_email: user?.email || 'anonymous',
-          conversation_id: activeConversation?.id,
-          image_url: finalImageUrl,
-          original_image_url: result.url,
-          title: userMessage.slice(0, 50),
-          original_prompt: isModification 
-            ? `${currentVisual.original_prompt} • MODIFICATION: ${userMessage}`
-            : userMessage,
-          image_prompt: isModification ? finalPrompt : enhancedPrompt,
-          dimensions: dimensions,
-          visual_type: activeCategory?.id,
-          format_name: selectedFormat?.name || null,
-          category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
-          style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
-          color_palette: extractedColors,
-          editor_layers: editorLayers.length > 0 ? editorLayers : undefined,
-          art_director_name: selectedDA ? selectedDA.name : null,
-          attached_images: currentAttachedImages.length > 0 ? currentAttachedImages : undefined
-        };
+          const visualData = {
+            user_email: user?.email || 'anonymous',
+            conversation_id: activeConversation?.id,
+            image_url: finalImageUrl,
+            original_image_url: result.url,
+            title: variantCount > 1 ? `${userMessage.slice(0, 40)} (${i + 1}/${variantCount})` : userMessage.slice(0, 50),
+            original_prompt: isModification 
+              ? `${currentVisual.original_prompt} • MODIFICATION: ${userMessage}`
+              : userMessage,
+            image_prompt: isModification ? finalPrompt : enhancedPrompt,
+            dimensions: dimensions,
+            visual_type: activeCategory?.id,
+            format_name: selectedFormat?.name || null,
+            category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
+            style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
+            color_palette: i === 0 ? extractedColors : null,
+            editor_layers: i === 0 && editorLayers.length > 0 ? editorLayers : undefined,
+            art_director_name: selectedDA ? selectedDA.name : null,
+            attached_images: currentAttachedImages.length > 0 ? currentAttachedImages : undefined
+          };
 
-        console.log('📦 SAVE - Layers:', editorLayers.length, 'Canva:', canvaMode, 'Layers:', editorLayers);
+          console.log('📦 SAVE - Variant:', i + 1, 'Layers:', editorLayers.length);
 
-        let savedVisual = visualData;
-        if (user) {
-          savedVisual = await base44.entities.Visual.create(visualData);
-          setSessionVisuals(prev => [savedVisual, ...prev]);
+          let savedVisual = visualData;
+          if (user) {
+            savedVisual = await base44.entities.Visual.create(visualData);
+            setSessionVisuals(prev => [savedVisual, ...prev]);
+          } else {
+            savedVisual = { ...visualData, id: `temp-${Date.now()}-${i}` };
+          }
+          
+          allVariants.push(savedVisual);
         }
-
-        setCurrentVisual(savedVisual);
-        setVisualsHistory(prev => [...prev, savedVisual]); // Add to history
 
         const successMessage = isModification
           ? (language === 'fr' 
-              ? '✨ Modification appliquée ! Cependant, je suis obligé de créer une nouvelle image car je ne peux pas modifier directement l\'image précédente. J\'ai enrichi votre prompt original avec votre demande de modification pour générer cette nouvelle version.' 
-              : '✨ Modification applied! However, I had to create a new image as I cannot directly modify the previous one. I enriched your original prompt with your modification request to generate this new version.')
-          : `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`;
+              ? '✨ Modification appliquée !' 
+              : '✨ Modification applied!')
+          : (variantCount > 1 
+              ? `✨ ${variantCount} ${language === 'fr' ? 'variantes générées !' : 'variants generated!'}` 
+              : `✨ ${language === 'fr' ? 'Votre visuel est prêt !' : 'Your visual is ready!'}`);
 
-        // Add both text message AND visual card
-        setMessages(prev => [
-          ...prev.slice(0, -1), // Remove "generating" message
-          { role: 'assistant', content: successMessage },
-          { role: 'assistant', content: '', visual: savedVisual } // Separate visual card
-        ]);
+        // Si 1 seule variante, afficher normalement
+        if (variantCount === 1) {
+          setCurrentVisual(allVariants[0]);
+          setVisualsHistory(prev => [...prev, allVariants[0]]);
+          
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            { role: 'assistant', content: successMessage },
+            { role: 'assistant', content: '', visual: allVariants[0] }
+          ]);
+        } else {
+          // Plusieurs variantes, afficher en miniatures
+          setCurrentVisual(allVariants[0]);
+          setVisualsHistory(prev => [...prev, ...allVariants]);
+          
+          setMessages(prev => [
+            ...prev.slice(0, -1),
+            { 
+              role: 'assistant', 
+              content: `${successMessage} ${language === 'fr' ? 'Cliquez sur une image pour la sélectionner.' : 'Click on an image to select it.'}`,
+              effectVariants: allVariants
+            }
+          ]);
+        }
 
-        // Update conversation with new messages and visual_id
-        if (activeConversation && user) {
+        // Update conversation with new messages
+        if (activeConversation && user && allVariants.length > 0) {
           try {
             const updatedMessages = [
               ...(activeConversation.messages || []),
@@ -1418,9 +1460,9 @@ ${qaKnowledge}
             await base44.entities.Conversation.update(activeConversation.id, {
               messages: updatedMessages,
               title: activeConversation.title || userMessage.slice(0, 50),
-              visual_id: savedVisual.id
+              visual_id: allVariants[0].id
             });
-            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: savedVisual.id }));
+            setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: allVariants[0].id }));
           } catch (e) {
             console.error('Failed to update conversation:', e);
           }
@@ -2908,18 +2950,44 @@ ${qaKnowledge}
                   )} />
                 </button>
 
-                <Button
-                  onClick={handleSend}
-                  disabled={!inputValue.trim() || isGenerating}
-                  size="icon"
-                  className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
-                >
-                  {isGenerating ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
+                <div className="relative">
+                  <Button
+                    onClick={handleSend}
+                    disabled={!inputValue.trim() || isGenerating}
+                    size="icon"
+                    className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                  
+                  {/* Variant Selector */}
+                  <AnimatePresence>
+                    {showVariantSelector && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                        className="absolute bottom-full right-0 mb-2 bg-gray-800/95 backdrop-blur-xl border border-violet-500/30 rounded-xl p-2 shadow-2xl"
+                      >
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map(count => (
+                            <button
+                              key={count}
+                              onClick={() => handleSendWithVariants(count)}
+                              className="px-3 py-1.5 rounded-lg bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/30 hover:border-violet-500/60 text-violet-300 text-xs font-medium transition-all"
+                            >
+                              x{count}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* Tags sous le prompt - Collapsible en mobile uniquement */}
