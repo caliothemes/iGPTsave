@@ -120,6 +120,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onGenerat
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [generatingEffect, setGeneratingEffect] = useState(null);
+  const scrollContainerRef = React.useRef(null);
 
   useEffect(() => {
     loadEffects();
