@@ -151,6 +151,13 @@ export default function Home() {
   const [selectedEffect, setSelectedEffect] = useState(null);
   const [showEffectVariantsModal, setShowEffectVariantsModal] = useState(false);
 
+  // Auto-open variants modal when effect is selected
+  useEffect(() => {
+    if (selectedEffect) {
+      setShowEffectVariantsModal(true);
+    }
+  }, [selectedEffect]);
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
@@ -3471,10 +3478,6 @@ ${qaKnowledge}
         onSelectEffect={(effect) => {
           setSelectedEffect(effect);
           setShowEffectsModal(false);
-          // Délai suffisant pour que la première modal se ferme complètement
-          setTimeout(() => {
-            setShowEffectVariantsModal(true);
-          }, 150);
         }}
       />
 
