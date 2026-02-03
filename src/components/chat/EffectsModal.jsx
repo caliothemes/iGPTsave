@@ -239,8 +239,7 @@ export default function EffectsModal({ isOpen, onClose, onApplyEffect, onSelectE
                     onClick={() => {
                       if (onSelectEffect) {
                         onSelectEffect(effect);
-                        onClose();
-                      } else {
+                      } else if (onApplyEffect) {
                         onApplyEffect(effect);
                         onClose();
                       }

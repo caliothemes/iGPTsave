@@ -3470,6 +3470,7 @@ ${qaKnowledge}
         }}
         onSelectEffect={(effect) => {
           setSelectedEffect(effect);
+          setShowEffectsModal(false);
           setShowEffectVariantsModal(true);
         }}
       />
