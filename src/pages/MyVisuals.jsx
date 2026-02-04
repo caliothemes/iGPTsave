@@ -932,18 +932,6 @@ export default function MyVisuals() {
                   generatedVariants.push(newVisual);
                 }
 
-                // Ajouter à la liste (en début)
-                setVisuals(prev => [...generatedVariants, ...prev]);
-
-                // Reset filters and page to show new visuals
-                setCurrentPage(1);
-                setFilter('all');
-                setTypeFilter('all');
-                setFormatFilter('all');
-                setDaFilter('all');
-                setFolderFilter('all');
-                setSearch('');
-
                 toast.dismiss(loadingToast);
                 toast.success(
                   variantCount === 1 
@@ -951,10 +939,8 @@ export default function MyVisuals() {
                     : `✨ ${variantCount} ${language === 'fr' ? 'variantes créées !' : 'variants created!'}`
                 );
 
-                // Scroll to top after a small delay to ensure rendering
-                setTimeout(() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 100);
+                // Recharger complètement les visuels
+                window.location.reload();
 
               } catch (error) {
                 console.error(error);
