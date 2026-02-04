@@ -722,7 +722,7 @@ export default function MyVisuals() {
 
                           // Générer N variantes en parallèle
                           const promises = Array(count).fill(null).map(async (_, index) => {
-                            let finalPrompt = effect.prompt;
+                            let finalPrompt = `Using the provided reference image, apply this effect: ${effect.prompt}`;
                             
                             if (index > 0) {
                               const viewVariations = [
@@ -731,12 +731,14 @@ export default function MyVisuals() {
                                 'slight camera position change, alternative view angle',
                                 'soft perspective shift, different camera placement'
                               ];
-                              finalPrompt = `${effect.prompt}, ${viewVariations[(index - 1) % viewVariations.length]}`;
+                              finalPrompt = `Using the provided reference image, apply this effect: ${effect.prompt}, ${viewVariations[(index - 1) % viewVariations.length]}`;
                             }
+                            
+                            const imageUrl = visual.original_image_url || visual.image_url;
                             
                             const result = await base44.integrations.Core.GenerateImage({
                               prompt: finalPrompt,
-                              existing_image_urls: [visual.original_image_url || visual.image_url]
+                              existing_image_urls: [imageUrl]
                             });
                             return result.url;
                           });
