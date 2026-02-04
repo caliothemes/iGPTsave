@@ -1803,30 +1803,77 @@ ${qaKnowledge}
         setVisualsHistory(visuals);
         setCurrentVisual(visuals[visuals.length - 1]); // Most recent as current
 
+        // Group visuals by variant batches (same prompt, titles with (1/N), (2/N), etc.)
+        const variantGroups = [];
+        let currentGroup = [];
+        
+        for (let i = 0; i < visuals.length; i++) {
+          const visual = visuals[i];
+          
+          // Check if this is part of a variant batch
+          const isVariant = visual.title?.match(/\((\d+)\/(\d+)\)$/);
+          
+          if (isVariant) {
+            const [, current, total] = isVariant;
+            currentGroup.push(visual);
+            
+            // If this is the last variant in the batch, close the group
+            if (parseInt(current) === parseInt(total)) {
+              variantGroups.push([...currentGroup]);
+              currentGroup = [];
+            }
+          } else {
+            // Not a variant, add as single visual
+            if (currentGroup.length > 0) {
+              // Close previous group if any
+              variantGroups.push([...currentGroup]);
+              currentGroup = [];
+            }
+            variantGroups.push([visual]);
+          }
+        }
+        
+        // Add remaining group if any
+        if (currentGroup.length > 0) {
+          variantGroups.push([...currentGroup]);
+        }
+
         // Reconstruct messages with visuals attached
         const baseMessages = conv.messages || [];
         const reconstructedMessages = [];
-        let visualIdx = 0;
+        let groupIdx = 0;
 
         // For each message, attach visuals after assistant success messages
         for (let i = 0; i < baseMessages.length; i++) {
           reconstructedMessages.push(baseMessages[i]);
 
-          // If this is an assistant message indicating success, add the next visual
+          // If this is an assistant message indicating success, add the next visual/group
           if (baseMessages[i].role === 'assistant' && 
               (baseMessages[i].content.includes('prêt') || 
                baseMessages[i].content.includes('ready') ||
                baseMessages[i].content.includes('version') ||
+               baseMessages[i].content.includes('variantes générées') ||
+               baseMessages[i].content.includes('variants generated') ||
                baseMessages[i].content.includes('✨'))) {
-            // Add visual in chronological order
-            const visualToAdd = visuals[visualIdx];
-            if (visualToAdd) {
-              reconstructedMessages.push({
-                role: 'assistant',
-                content: '',
-                visual: visualToAdd
-              });
-              visualIdx++;
+            
+            const group = variantGroups[groupIdx];
+            if (group) {
+              if (group.length > 1) {
+                // Multiple variants: show as effectVariants
+                reconstructedMessages.push({
+                  role: 'assistant',
+                  content: '',
+                  effectVariants: group
+                });
+              } else {
+                // Single visual
+                reconstructedMessages.push({
+                  role: 'assistant',
+                  content: '',
+                  visual: group[0]
+                });
+              }
+              groupIdx++;
             }
           }
         }
