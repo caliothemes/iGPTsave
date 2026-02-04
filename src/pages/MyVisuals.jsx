@@ -60,6 +60,7 @@ export default function MyVisuals() {
   const [newFolderColor, setNewFolderColor] = useState('violet');
   const [showEffectsModal, setShowEffectsModal] = useState(false);
   const [effectsVisual, setEffectsVisual] = useState(null);
+  const [generatingEffects, setGeneratingEffects] = useState([]);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -696,6 +697,19 @@ export default function MyVisuals() {
                             : `✨ ${language === 'fr' ? 'Génération de' : 'Generating'} ${count} ${language === 'fr' ? 'variantes...' : 'variants...'}`
                         );
 
+                        // Scroll en haut immédiatement
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                        // Ajouter des placeholders de génération
+                        const effectName = language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr);
+                        const placeholders = Array(count).fill(null).map((_, i) => ({
+                          id: `generating-${Date.now()}-${i}`,
+                          isGenerating: true,
+                          title: `${visual.title} - ${effectName}`,
+                          dimensions: visual.dimensions
+                        }));
+                        setGeneratingEffects(placeholders);
+
                         try {
                           // Déduire crédits
                           let creditsToDeduct = count;
@@ -763,7 +777,8 @@ export default function MyVisuals() {
                             generatedVariants.push(newVisual);
                           }
 
-                          // Ajouter les nouvelles images en début de liste
+                          // Retirer les placeholders et ajouter les vraies images
+                          setGeneratingEffects([]);
                           setVisuals(prev => [...generatedVariants, ...prev]);
 
                           // Reset tous les filtres
@@ -782,10 +797,9 @@ export default function MyVisuals() {
                               : `✨ ${count} ${language === 'fr' ? 'variantes créées !' : 'variants created!'}`
                           );
 
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-
                         } catch (error) {
                           console.error(error);
+                          setGeneratingEffects([]);
                           toast.dismiss(loadingToast);
                           toast.error(language === 'fr' ? '❌ Erreur lors de la génération' : '❌ Generation error');
                         }
