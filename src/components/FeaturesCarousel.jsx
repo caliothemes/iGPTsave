@@ -85,15 +85,15 @@ export default function FeaturesCarousel({ onOpenImageEditExamples, onOpenVideoE
             >
               <CardComponent
                 onClick={handleClick}
-                className={`w-[200px] h-48 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-4 flex flex-col items-center justify-center text-center transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`w-[200px] min-h-48 rounded-2xl border border-white/10 bg-gradient-to-br ${feature.gradient} p-4 flex flex-col items-center justify-center text-center transition-all hover:scale-105 hover:shadow-2xl ${feature.action_type !== 'none' ? 'cursor-pointer' : 'cursor-default'}`}
               >
                 <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-sm mb-3">
                   <Icon className="h-5 w-5 text-white" />
                 </div>
-                <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">
+                <h3 className="text-white font-bold text-sm mb-2 leading-snug">
                   {title}
                 </h3>
-                <p className="text-white/80 text-xs leading-relaxed line-clamp-4">
+                <p className="text-white/80 text-xs leading-relaxed line-clamp-3">
                   {description}
                 </p>
               </CardComponent>
