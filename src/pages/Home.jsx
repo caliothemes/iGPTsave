@@ -1034,16 +1034,11 @@ ${qaKnowledge}
       if (results.length > 0) {
         const allVariants = [];
         
-        for (let i = 0; i < results.length; i++) {
-          const result = { url: results[i] };
-        
-        // Pour la première variante, on extrait les couleurs et fait tout le traitement
-        let extractedColors = null;
-        if (i === 0) {
-          extractedColors = selectedPalette?.colors;
-          if (!extractedColors) {
-            try {
-              const colorResult = await base44.integrations.Core.InvokeLLM({
+        // Extraire les couleurs UNE SEULE FOIS pour toutes les variantes
+        let extractedColors = selectedPalette?.colors;
+        if (!extractedColors) {
+          try {
+            const colorResult = await base44.integrations.Core.InvokeLLM({
               prompt: 'Extract the 5 most dominant colors from this image as HEX codes. Return only an array of hex codes.',
               response_json_schema: {
                 type: "object",
@@ -1051,14 +1046,16 @@ ${qaKnowledge}
                   colors: { type: "array", items: { type: "string" } }
                 }
               },
-                file_urls: [result.url]
-              });
-              extractedColors = colorResult.colors;
-            } catch (e) {
-              console.error('Color extraction failed:', e);
-            }
+              file_urls: [results[0]]
+            });
+            extractedColors = colorResult.colors;
+          } catch (e) {
+            console.error('Color extraction failed:', e);
           }
         }
+        
+        for (let i = 0; i < results.length; i++) {
+          const result = { url: results[i] };
         
         let finalImageUrl = result.url;
 
