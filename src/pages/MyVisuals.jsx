@@ -18,6 +18,7 @@ import VideoGenerationModal from '@/components/chat/VideoGenerationModal';
 import ADSModal from '@/components/chat/ADSModal';
 import CropModal from '@/components/chat/CropModal';
 import ImageEditModal from '@/components/chat/ImageEditModal';
+import EffectsModal from '@/components/chat/EffectsModal';
 
 export default function MyVisuals() {
   const { language } = useLanguage();
@@ -60,6 +61,8 @@ export default function MyVisuals() {
   const [creatingFolderInMove, setCreatingFolderInMove] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [newFolderColor, setNewFolderColor] = useState('violet');
+  const [showEffectsModal, setShowEffectsModal] = useState(false);
+  const [effectsVisual, setEffectsVisual] = useState(null);
 
   const t = {
     fr: { title: "Mes visuels", subtitle: "Retrouvez toutes vos créations", search: "Rechercher...", all: "Tous", favorites: "Favoris", downloaded: "Téléchargés", noVisuals: "Aucun visuel trouvé" },
@@ -672,6 +675,15 @@ export default function MyVisuals() {
                       }}
                       onImageEditOpen={() => handleOpenImageEdit(visual, credits)}
                       onFolderClick={(visual) => setSelectedVisualsForMove([visual.id])}
+                      onEffectApply={async (visual, effect, count) => {
+                        if (!effect) {
+                          setEffectsVisual(visual);
+                          setShowEffectsModal(true);
+                          return;
+                        }
+
+                        // Apply effect logic will be in modal
+                      }}
                       onDuplicate={handleDuplicateVisual}
                       isRegenerating={false}
                       canDownload={true}
@@ -823,6 +835,124 @@ export default function MyVisuals() {
             }}
             visual={imageEditVisual}
             onEditComplete={handleImageEditComplete}
+          />
+
+          <EffectsModal
+            isOpen={showEffectsModal}
+            onClose={() => {
+              setShowEffectsModal(false);
+              setEffectsVisual(null);
+            }}
+            onApplyEffect={async (selectedEffect, variantCount) => {
+              const visual = effectsVisual;
+              if (!visual) return;
+
+              // Vérifier les crédits
+              const user = await base44.auth.me();
+              const totalCredits = (credits?.free_downloads || 0) + (credits?.paid_credits || 0);
+              const isUnlimited = credits?.subscription_type === 'unlimited';
+              const isAdmin = user?.role === 'admin';
+
+              if (!isAdmin && !isUnlimited && totalCredits < variantCount) {
+                toast.error(language === 'fr' ? '💳 Crédits insuffisants' : '💳 Insufficient credits');
+                return;
+              }
+
+              setShowEffectsModal(false);
+
+              // Show loading toast
+              const loadingToast = toast.loading(
+                variantCount === 1 
+                  ? `✨ ${language === 'fr' ? 'Application de l\'effet...' : 'Applying effect...'}`
+                  : `✨ ${language === 'fr' ? 'Génération de' : 'Generating'} ${variantCount} ${language === 'fr' ? 'variantes...' : 'variants...'}`
+              );
+
+              try {
+                // Déduire crédits
+                let creditsToDeduct = variantCount;
+                let newFreeDownloads = credits.free_downloads;
+                let newPaidCredits = credits.paid_credits;
+                
+                if (newFreeDownloads > 0) {
+                  const deductFromFree = Math.min(creditsToDeduct, newFreeDownloads);
+                  newFreeDownloads -= deductFromFree;
+                  creditsToDeduct -= deductFromFree;
+                }
+                
+                if (creditsToDeduct > 0 && newPaidCredits > 0) {
+                  newPaidCredits -= creditsToDeduct;
+                }
+                
+                await base44.entities.UserCredits.update(credits.id, { 
+                  free_downloads: newFreeDownloads,
+                  paid_credits: newPaidCredits
+                });
+
+                const effectName = language === 'fr' ? selectedEffect.name_fr : (selectedEffect.name_en || selectedEffect.name_fr);
+                const generatedVariants = [];
+
+                // Générer N variantes en parallèle
+                const promises = Array(variantCount).fill(null).map(async (_, index) => {
+                  let finalPrompt = selectedEffect.prompt;
+                  
+                  if (index > 0) {
+                    const viewVariations = [
+                      'subtle camera angle shift, slightly different perspective',
+                      'minor viewpoint adjustment, gentle angle variation',
+                      'slight camera position change, alternative view angle',
+                      'soft perspective shift, different camera placement'
+                    ];
+                    finalPrompt = `${selectedEffect.prompt}, ${viewVariations[(index - 1) % viewVariations.length]}`;
+                  }
+                  
+                  const result = await base44.integrations.Core.GenerateImage({
+                    prompt: finalPrompt,
+                    existing_image_urls: [visual.original_image_url || visual.image_url]
+                  });
+                  return result.url;
+                });
+
+                const urls = await Promise.all(promises);
+
+                // Créer les visuels
+                for (let i = 0; i < urls.length; i++) {
+                  const newVisual = await base44.entities.Visual.create({
+                    user_email: user.email,
+                    image_url: urls[i],
+                    original_image_url: urls[i],
+                    title: `${visual.title} - ${effectName} (${i + 1}/${variantCount})`,
+                    original_prompt: `${visual.original_prompt} • EFFET: ${effectName}`,
+                    image_prompt: selectedEffect.prompt,
+                    dimensions: visual.dimensions,
+                    visual_type: visual.visual_type,
+                    parent_visual_id: visual.id,
+                    version: (visual.version || 1) + 1
+                  });
+
+                  generatedVariants.push(newVisual);
+                }
+
+                // Ajouter à la liste (en début)
+                setVisuals(prev => [...generatedVariants, ...prev]);
+
+                toast.dismiss(loadingToast);
+                toast.success(
+                  variantCount === 1 
+                    ? `✨ ${language === 'fr' ? 'Effet appliqué !' : 'Effect applied!'}`
+                    : `✨ ${variantCount} ${language === 'fr' ? 'variantes créées !' : 'variants created!'}`
+                );
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+              } catch (error) {
+                console.error(error);
+                toast.dismiss(loadingToast);
+                toast.error(language === 'fr' ? '❌ Erreur lors de la génération' : '❌ Generation error');
+              }
+
+              setEffectsVisual(null);
+            }}
           />
 
           {/* Move to Folder Dialog */}
