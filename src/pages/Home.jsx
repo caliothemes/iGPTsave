@@ -737,7 +737,8 @@ ${qaKnowledge}
         canvaMode: canvaMode,
         canvaTextsCount: canvaTexts.length,
         selectedFormat: selectedFormat ? selectedFormat.name : null,
-        selectedCategory: selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : null
+        selectedCategory: selectedCategory ? (selectedCategory?.name?.[language] || selectedCategory?.name?.fr) : null,
+        variantCount: variantCount > 1 ? variantCount : undefined
       }]);
 
       const generatingMessage = isModification 
