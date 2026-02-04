@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, ArrowRight } from 'lucide-react';
+import { X, Sparkles, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { useLanguage } from '@/components/LanguageContext';
 import { base44 } from '@/api/base44Client';
 
 export default function ImageEditExamplesModal({ isOpen, onClose }) {
   const { language } = useLanguage();
   const [examples, setExamples] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,11 +22,22 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
       setLoading(true);
       const data = await base44.entities.ImageEditExample.filter({ is_active: true }, 'order');
       setExamples(data);
+      setCurrentIndex(0);
     } catch (error) {
       console.error('Failed to load examples:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const currentExample = examples[currentIndex];
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? examples.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === examples.length - 1 ? 0 : prev + 1));
   };
 
   if (!isOpen) return null;
@@ -85,44 +98,77 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
-                {examples.map((example, idx) => (
+              <div className="space-y-6">
+                {/* Navigation */}
+                {examples.length > 1 && (
+                  <div className="flex items-center justify-between">
+                    <Button
+                      onClick={handlePrevious}
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      {language === 'fr' ? 'Précédent' : 'Previous'}
+                    </Button>
+                    <span className="text-sm text-white/60">
+                      {currentIndex + 1} / {examples.length}
+                    </span>
+                    <Button
+                      onClick={handleNext}
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                    >
+                      {language === 'fr' ? 'Suivant' : 'Next'}
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Current Example */}
+                <AnimatePresence mode="wait">
                   <motion.div
-                    key={example.id}
+                    key={currentIndex}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-xl overflow-hidden hover:border-orange-500/30 transition-all"
+                    exit={{ opacity: 0, y: -20 }}
+                    className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-xl overflow-hidden"
                   >
                     {/* Title */}
                     <div className="px-5 py-3 border-b border-white/10 bg-white/5">
-                      <h4 className="text-white font-semibold text-sm">
-                        {language === 'fr' ? example.title_fr : (example.title_en || example.title_fr)}
+                      <h4 className="text-white font-semibold text-center">
+                        {language === 'fr' ? currentExample.title_fr : (currentExample.title_en || currentExample.title_fr)}
                       </h4>
                     </div>
 
                     {/* Images Comparison */}
-                    <div className="p-5">
-                      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center max-w-4xl mx-auto">
                         {/* Before Images */}
-                        <div className="space-y-2">
-                          <div className="text-xs font-medium text-white/60 uppercase tracking-wide">
-                            {language === 'fr' ? 'Avant' : 'Before'}
+                        <div className="space-y-3">
+                          <div className="text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-600 text-white text-sm font-bold mb-2">
+                              1
+                            </span>
+                            <p className="text-xs font-medium text-white/60 uppercase tracking-wide">
+                              {language === 'fr' ? 'Avant' : 'Before'}
+                            </p>
                           </div>
-                          <div className={`grid ${example.before_image_url_2 ? 'grid-cols-2' : 'grid-cols-1'} gap-2`}>
-                            <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square">
+                          <div className={`grid ${currentExample.before_image_url_2 ? 'grid-cols-2' : 'grid-cols-1'} gap-2`}>
+                            <div className="relative rounded-lg overflow-hidden bg-black/20 max-w-[200px] mx-auto">
                               <img
-                                src={example.before_image_url}
+                                src={currentExample.before_image_url}
                                 alt="Before 1"
-                                className="w-full h-full object-cover"
+                                className="w-full h-auto object-contain"
                               />
                             </div>
-                            {example.before_image_url_2 && (
-                              <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square">
+                            {currentExample.before_image_url_2 && (
+                              <div className="relative rounded-lg overflow-hidden bg-black/20 max-w-[200px] mx-auto">
                                 <img
-                                  src={example.before_image_url_2}
+                                  src={currentExample.before_image_url_2}
                                   alt="Before 2"
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-auto object-contain"
                                 />
                               </div>
                             )}
@@ -130,29 +176,32 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
                         </div>
 
                         {/* Arrow */}
-                        <div className="flex justify-center">
-                          <div className="p-3 rounded-full bg-gradient-to-r from-orange-600 to-amber-600">
-                            <ArrowRight className="h-5 w-5 text-white" />
-                          </div>
+                        <div className="hidden md:flex justify-center">
+                          <ArrowRight className="h-8 w-8 text-orange-400" />
                         </div>
 
                         {/* After Image */}
-                        <div className="space-y-2">
-                          <div className="text-xs font-medium text-white/60 uppercase tracking-wide">
-                            {language === 'fr' ? 'Après' : 'After'}
+                        <div className="space-y-3">
+                          <div className="text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 text-white text-sm font-bold mb-2">
+                              2
+                            </span>
+                            <p className="text-xs font-medium text-white/60 uppercase tracking-wide">
+                              {language === 'fr' ? 'Après' : 'After'}
+                            </p>
                           </div>
-                          <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square">
+                          <div className="relative rounded-lg overflow-hidden bg-black/20 max-w-[200px] mx-auto">
                             <img
-                              src={example.after_image_url}
+                              src={currentExample.after_image_url}
                               alt="After"
-                              className="w-full h-full object-cover"
+                              className="w-full h-auto object-contain"
                             />
                           </div>
                         </div>
                       </div>
 
                       {/* Prompt */}
-                      <div className="mt-4 p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                      <div className="mt-6 p-4 rounded-lg bg-orange-500/10 border border-orange-500/20 max-w-2xl mx-auto">
                         <div className="flex items-start gap-2">
                           <Sparkles className="h-4 w-4 text-orange-400 flex-shrink-0 mt-0.5" />
                           <div>
@@ -160,14 +209,14 @@ export default function ImageEditExamplesModal({ isOpen, onClose }) {
                               {language === 'fr' ? 'Prompt utilisé :' : 'Prompt used:'}
                             </p>
                             <p className="text-sm text-orange-200/90 leading-relaxed">
-                              {example.prompt}
+                              {currentExample.prompt}
                             </p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                </AnimatePresence>
               </div>
             )}
           </div>
