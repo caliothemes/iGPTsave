@@ -3031,6 +3031,7 @@ ${qaKnowledge}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.9 }}
                         className="absolute bottom-full right-0 mb-2 bg-gradient-to-r from-violet-600 to-blue-600 backdrop-blur-xl border border-violet-500/30 rounded-xl p-2 shadow-2xl"
+                        style={{ zIndex: 100 }}
                       >
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map(count => (
