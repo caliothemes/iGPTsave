@@ -1425,7 +1425,7 @@ ${qaKnowledge}
             format_name: selectedFormat?.name || null,
             category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
             style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
-            color_palette: i === 0 ? extractedColors : null,
+            color_palette: extractedColors,
             editor_layers: i === 0 && editorLayers.length > 0 ? editorLayers : undefined,
             art_director_name: selectedDA ? selectedDA.name : null,
             attached_images: currentAttachedImages.length > 0 ? currentAttachedImages : undefined
