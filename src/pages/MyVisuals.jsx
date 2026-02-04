@@ -935,6 +935,9 @@ export default function MyVisuals() {
                 // Ajouter à la liste (en début)
                 setVisuals(prev => [...generatedVariants, ...prev]);
 
+                // Reset to page 1 to show new visuals
+                setCurrentPage(1);
+
                 toast.dismiss(loadingToast);
                 toast.success(
                   variantCount === 1 
