@@ -150,7 +150,7 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
               )}
 
               {/* Tags sous la bulle pour user */}
-              {isUser && (message.selectedFormat || message.selectedCategory || message.artDirector || message.canvaMode) && (
+              {isUser && (message.selectedFormat || message.selectedCategory || message.artDirector || message.canvaMode || message.variantCount) && (
                 <div className="mt-2 flex items-center gap-2 flex-wrap">
                   {message.selectedFormat && (
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-green-600/20 border border-green-500/30 text-green-300">
@@ -174,6 +174,11 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       <span>Canva {message.canvaTextsCount > 0 && `(${message.canvaTextsCount})`}</span>
+                    </div>
+                  )}
+                  {message.variantCount && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-600/20 border border-emerald-500/30 text-emerald-300">
+                      <span>x{message.variantCount}</span>
                     </div>
                   )}
                 </div>
