@@ -2982,7 +2982,7 @@ ${qaKnowledge}
                         <button
                           key={count}
                           onClick={() => handleSendWithVariants(count)}
-                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white text-xs font-medium transition-all"
+                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 border border-violet-400/60 hover:border-violet-300/80 text-white text-xs font-bold transition-all shadow-lg shadow-violet-500/40"
                         >
                           x{count}
                         </button>
