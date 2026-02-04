@@ -152,7 +152,8 @@ export default function AdminBackup() {
               'StorePurchase', 'SubscriptionPlan', 'CreditPack', 'AppSettings',
               'Newsletter', 'NewsletterTemplate', 'FAQItem', 'LegalSection',
               'EditorAsset', 'GeneratedText', 'AppPresentation', 'Visit',
-              'FeatureCard', 'ArtDirector', 'StoryAnimation'
+              'FeatureCard', 'ArtDirector', 'StoryAnimation', 'EffectPreset',
+              'EffectCategory', 'ConversationalQA', 'Folder'
             ].map(entity => (
               <div key={entity} className="text-blue-200/80">• {entity}</div>
             ))}

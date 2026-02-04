@@ -43,7 +43,8 @@ Deno.serve(async (req) => {
       'ArtDirector',
       'EffectPreset',
       'EffectCategory',
-      'ConversationalQA'
+      'ConversationalQA',
+      'Folder'
     ];
 
     const exportData = {
