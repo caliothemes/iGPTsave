@@ -914,7 +914,7 @@ export default function MyVisuals() {
 
                 const urls = await Promise.all(promises);
 
-                // Créer les visuels
+                // Créer les visuels en série pour garantir l'ordre
                 for (let i = 0; i < urls.length; i++) {
                   const newVisual = await base44.entities.Visual.create({
                     user_email: user.email,
@@ -932,6 +932,18 @@ export default function MyVisuals() {
                   generatedVariants.push(newVisual);
                 }
 
+                // Ajouter les nouvelles images en début de liste
+                setVisuals(prev => [...generatedVariants, ...prev]);
+
+                // Reset tous les filtres pour être sûr de voir les nouvelles images
+                setCurrentPage(1);
+                setFilter('all');
+                setTypeFilter('all');
+                setFormatFilter('all');
+                setDaFilter('all');
+                setFolderFilter('all');
+                setSearch('');
+
                 toast.dismiss(loadingToast);
                 toast.success(
                   variantCount === 1 
@@ -939,8 +951,8 @@ export default function MyVisuals() {
                     : `✨ ${variantCount} ${language === 'fr' ? 'variantes créées !' : 'variants created!'}`
                 );
 
-                // Recharger complètement les visuels
-                window.location.reload();
+                // Scroll en haut
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
               } catch (error) {
                 console.error(error);
