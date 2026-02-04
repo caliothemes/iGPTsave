@@ -495,7 +495,14 @@ export default function MyVisuals() {
   }
 
   return (
-    <PageWrapper requireAuth fullWidth>
+    <>
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `}</style>
+      <PageWrapper requireAuth fullWidth>
       {({ credits }) => (
         <div className="space-y-6">
           <div className="mb-8">
@@ -643,6 +650,42 @@ export default function MyVisuals() {
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+                {/* Generating placeholders */}
+                {generatingEffects.map((placeholder) => (
+                  <motion.div
+                    key={placeholder.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="rounded-lg overflow-hidden bg-gradient-to-br from-violet-600/20 to-purple-600/20 backdrop-blur-sm border border-violet-500/30"
+                  >
+                    <div 
+                      className="relative overflow-hidden bg-gradient-to-br from-violet-500/10 to-purple-500/10" 
+                      style={{ aspectRatio: placeholder.dimensions ? placeholder.dimensions.split('x').map(Number).join('/') : '1/1' }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center space-y-3">
+                          <Loader2 className="h-12 w-12 text-violet-400 animate-spin mx-auto" />
+                          <p className="text-white/80 text-sm font-medium px-4">
+                            {language === 'fr' ? 'Génération en cours...' : 'Generating...'}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Animated shimmer overlay */}
+                      <div 
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                        style={{
+                          animation: 'shimmer 2s infinite',
+                          backgroundSize: '200% 100%'
+                        }}
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="h-4 bg-white/10 rounded animate-pulse mb-2" />
+                      <div className="h-3 bg-white/5 rounded animate-pulse w-2/3" />
+                    </div>
+                  </motion.div>
+                ))}
+
                 {paginatedVisuals.map((visual) => (
                   <div 
                     key={visual.id} 
@@ -1257,6 +1300,7 @@ export default function MyVisuals() {
           </Dialog>
         </div>
       )}
-    </PageWrapper>
+      </PageWrapper>
+    </>
   );
 }
