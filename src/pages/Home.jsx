@@ -2970,84 +2970,88 @@ ${qaKnowledge}
                   style={{ height: '24px' }}
                 />
 
-                <button 
-                  onClick={() => imageInputRef.current?.click()}
-                  className="p-2 text-white/40 hover:text-white/60 transition-colors"
-                  disabled={attachedImages.length >= 6}
-                >
-                  <div className="relative">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2"/>
-                      <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-                      <path d="M21 15l-5-5L5 21" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    <svg className="h-3.5 w-3.5 absolute -bottom-1 -right-1 bg-green-500 rounded-full text-black p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={handleVoiceInput}
-                  className="relative p-2 transition-all"
-                >
-                  {isRecording && (
+                {/* Variant Selector or Action Buttons */}
+                <AnimatePresence mode="wait">
+                  {showVariantSelector ? (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute inset-0 flex items-center justify-center"
+                      key="variant-selector"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="flex gap-1"
                     >
-                      <div className="w-10 h-10 rounded-full bg-red-500/30 animate-pulse flex items-center justify-center">
-                      </div>
+                      {[1, 2, 3, 4, 5].map(count => (
+                        <button
+                          key={count}
+                          onClick={() => handleSendWithVariants(count)}
+                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white text-xs font-medium transition-all"
+                        >
+                          x{count}
+                        </button>
+                      ))}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="action-buttons"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="flex items-center gap-2"
+                    >
+                      <button 
+                        onClick={() => imageInputRef.current?.click()}
+                        className="p-2 text-white/40 hover:text-white/60 transition-colors"
+                        disabled={attachedImages.length >= 6}
+                      >
+                        <div className="relative">
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                            <path d="M21 15l-5-5L5 21" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                          <svg className="h-3.5 w-3.5 absolute -bottom-1 -right-1 bg-green-500 rounded-full text-black p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                          </svg>
+                        </div>
+                      </button>
+
+                      <button 
+                        onClick={handleVoiceInput}
+                        className="relative p-2 transition-all"
+                      >
+                        {isRecording && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute inset-0 flex items-center justify-center"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-red-500/30 animate-pulse flex items-center justify-center">
+                            </div>
+                          </motion.div>
+                        )}
+                        <Mic className={cn(
+                          "transition-all relative z-10",
+                          isRecording 
+                            ? "h-6 w-6 text-red-500" 
+                            : "h-5 w-5 text-white/40 hover:text-white/60"
+                        )} />
+                      </button>
+
+                      <Button
+                        onClick={handleSend}
+                        disabled={!inputValue.trim() || isGenerating}
+                        size="icon"
+                        className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
+                      >
+                        {isGenerating ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4" />
+                        )}
+                      </Button>
                     </motion.div>
                   )}
-                  <Mic className={cn(
-                    "transition-all relative z-10",
-                    isRecording 
-                      ? "h-6 w-6 text-red-500" 
-                      : "h-5 w-5 text-white/40 hover:text-white/60"
-                  )} />
-                </button>
-
-                <div className="relative">
-                  <Button
-                    onClick={handleSend}
-                    disabled={!inputValue.trim() || isGenerating}
-                    size="icon"
-                    className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                  </Button>
-                  
-                  {/* Variant Selector */}
-                  <AnimatePresence>
-                    {showVariantSelector && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                        className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-blue-600 backdrop-blur-xl border border-violet-500/30 rounded-xl p-2 shadow-2xl"
-                        style={{ zIndex: 9999 }}
-                      >
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map(count => (
-                            <button
-                              key={count}
-                              onClick={() => handleSendWithVariants(count)}
-                              className="px-3 py-1.5 rounded-lg bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/30 hover:border-violet-500/60 text-violet-300 text-xs font-medium transition-all"
-                            >
-                              x{count}
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                </AnimatePresence>
               </div>
 
               {/* Tags sous le prompt - Collapsible en mobile uniquement */}
