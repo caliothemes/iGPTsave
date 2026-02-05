@@ -26,7 +26,7 @@ function TypingIndicator() {
         <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1.2s' }} />
         <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1.2s' }} />
       </div>
-      <span className="text-xs text-violet-300/70 font-medium tabular-nums">
+      <span className="px-2 py-0.5 rounded-md bg-violet-500/20 border border-violet-400/30 text-xs text-violet-300 font-medium tabular-nums">
         {seconds}s
       </span>
     </div>
