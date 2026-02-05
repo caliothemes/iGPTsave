@@ -821,18 +821,19 @@ export default function MyVisuals() {
                             generatedVariants.push(newVisual);
                           }
 
-                          // Retirer les placeholders et ajouter les vraies images
+                          // Retirer les placeholders
                           setGeneratingEffects([]);
-                          setVisuals(prev => [...generatedVariants, ...prev]);
 
-                          // Reset tous les filtres
-                          setCurrentPage(1);
-                          setFilter('all');
-                          setTypeFilter('all');
-                          setFormatFilter('all');
-                          setDaFilter('all');
-                          setFolderFilter('all');
-                          setSearch('');
+                          // Insérer les nouvelles images juste après l'image source
+                          setVisuals(prev => {
+                            const sourceIndex = prev.findIndex(v => v.id === visual.id);
+                            if (sourceIndex === -1) {
+                              return [...generatedVariants, ...prev];
+                            }
+                            const newVisuals = [...prev];
+                            newVisuals.splice(sourceIndex + 1, 0, ...generatedVariants);
+                            return newVisuals;
+                          });
 
                           toast.dismiss(loadingToast);
                           toast.success(
