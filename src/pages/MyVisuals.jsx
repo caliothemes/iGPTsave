@@ -658,43 +658,41 @@ export default function MyVisuals() {
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-                {/* Generating placeholders */}
-                {generatingEffects.map((placeholder) => (
-                  <motion.div
-                    key={placeholder.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="rounded-lg overflow-hidden bg-gradient-to-br from-violet-600/20 to-purple-600/20 backdrop-blur-sm border border-violet-500/30"
-                  >
-                    <div 
-                      className="relative overflow-hidden bg-gradient-to-br from-violet-500/10 to-purple-500/10" 
-                      style={{ aspectRatio: placeholder.dimensions ? placeholder.dimensions.split('x').map(Number).join('/') : '1/1' }}
-                    >
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center space-y-3">
-                          <Loader2 className="h-12 w-12 text-violet-400 animate-spin mx-auto" />
-                          <p className="text-white/80 text-sm font-medium px-4">
-                            {language === 'fr' ? 'Génération en cours...' : 'Generating...'}
-                          </p>
-                        </div>
-                      </div>
-                      {/* Animated shimmer overlay */}
-                      <div 
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                        style={{
-                          animation: 'shimmer 2s infinite',
-                          backgroundSize: '200% 100%'
-                        }}
-                      />
-                    </div>
-                    <div className="p-4">
-                      <div className="h-4 bg-white/10 rounded animate-pulse mb-2" />
-                      <div className="h-3 bg-white/5 rounded animate-pulse w-2/3" />
-                    </div>
-                  </motion.div>
-                ))}
-
                 {paginatedVisuals.map((visual) => (
+                  visual.isGenerating ? (
+                    <motion.div
+                      key={visual.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="rounded-lg overflow-hidden bg-gradient-to-br from-violet-600/20 to-purple-600/20 backdrop-blur-sm border border-violet-500/30"
+                    >
+                      <div 
+                        className="relative overflow-hidden bg-gradient-to-br from-violet-500/10 to-purple-500/10" 
+                        style={{ aspectRatio: visual.dimensions ? visual.dimensions.split('x').map(Number).join('/') : '1/1' }}
+                      >
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center space-y-3">
+                            <Loader2 className="h-12 w-12 text-violet-400 animate-spin mx-auto" />
+                            <p className="text-white/80 text-sm font-medium px-4">
+                              {language === 'fr' ? 'Génération en cours...' : 'Generating...'}
+                            </p>
+                          </div>
+                        </div>
+                        {/* Animated shimmer overlay */}
+                        <div 
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                          style={{
+                            animation: 'shimmer 2s infinite',
+                            backgroundSize: '200% 100%'
+                          }}
+                        />
+                      </div>
+                      <div className="p-4">
+                        <div className="h-4 bg-white/10 rounded animate-pulse mb-2" />
+                        <div className="h-3 bg-white/5 rounded animate-pulse w-2/3" />
+                      </div>
+                    </motion.div>
+                  ) : (
                   <div 
                     key={visual.id} 
                     className="relative"
@@ -747,6 +745,25 @@ export default function MyVisuals() {
                             ? `✨ ${language === 'fr' ? 'Application de l\'effet...' : 'Applying effect...'}`
                             : `✨ ${language === 'fr' ? 'Génération de' : 'Generating'} ${count} ${language === 'fr' ? 'variantes...' : 'variants...'}`
                         );
+
+                        // Ajouter des placeholders de génération juste après l'image source
+                        const effectName = language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr);
+                        const placeholders = Array(count).fill(null).map((_, i) => ({
+                          id: `generating-${Date.now()}-${i}`,
+                          isGenerating: true,
+                          title: `${visual.title} - ${effectName}`,
+                          dimensions: visual.dimensions
+                        }));
+                        
+                        setVisuals(prev => {
+                          const sourceIndex = prev.findIndex(v => v.id === visual.id);
+                          if (sourceIndex === -1) {
+                            return [...placeholders, ...prev];
+                          }
+                          const newVisuals = [...prev];
+                          newVisuals.splice(sourceIndex + 1, 0, ...placeholders);
+                          return newVisuals;
+                        });
 
                         try {
                           // Déduire crédits
@@ -818,13 +835,17 @@ export default function MyVisuals() {
                           // Retirer les placeholders
                           setGeneratingEffects([]);
 
-                          // Insérer les nouvelles images juste après l'image source
+                          // Remplacer les placeholders par les vraies images
                           setVisuals(prev => {
-                            const sourceIndex = prev.findIndex(v => v.id === visual.id);
+                            // Retirer tous les placeholders
+                            const withoutPlaceholders = prev.filter(v => !v.isGenerating);
+                            // Trouver l'image source
+                            const sourceIndex = withoutPlaceholders.findIndex(v => v.id === visual.id);
                             if (sourceIndex === -1) {
-                              return [...generatedVariants, ...prev];
+                              return [...generatedVariants, ...withoutPlaceholders];
                             }
-                            const newVisuals = [...prev];
+                            // Insérer juste après
+                            const newVisuals = [...withoutPlaceholders];
                             newVisuals.splice(sourceIndex + 1, 0, ...generatedVariants);
                             return newVisuals;
                           });
@@ -837,10 +858,11 @@ export default function MyVisuals() {
                           );
 
                         } catch (error) {
-                          console.error(error);
-                          setGeneratingEffects([]);
-                          toast.dismiss(loadingToast);
-                          toast.error(language === 'fr' ? '❌ Erreur lors de la génération' : '❌ Generation error');
+                         console.error(error);
+                         // Retirer les placeholders en cas d'erreur
+                         setVisuals(prev => prev.filter(v => !v.isGenerating));
+                         toast.dismiss(loadingToast);
+                         toast.error(language === 'fr' ? '❌ Erreur lors de la génération' : '❌ Generation error');
                         }
                       }}
                       onDuplicate={handleDuplicateVisual}
@@ -853,6 +875,7 @@ export default function MyVisuals() {
                       hideEditButton={true}
                     />
                   </div>
+                  )
                 ))}
               </div>
 
