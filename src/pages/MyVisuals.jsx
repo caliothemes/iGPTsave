@@ -212,12 +212,19 @@ export default function MyVisuals() {
       format: 'digital'
     });
 
-    setVisuals(prev => [newVisual, ...prev]);
+    // Insérer la vidéo juste après l'image source
+    setVisuals(prev => {
+      const sourceIndex = prev.findIndex(v => v.id === videoVisual.id);
+      if (sourceIndex === -1) {
+        return [newVisual, ...prev];
+      }
+      const newVisuals = [...prev];
+      newVisuals.splice(sourceIndex + 1, 0, newVisual);
+      return newVisuals;
+    });
+    
     setShowVideoModal(false);
     setVideoVisual(null);
-
-    // Scroll to top to see the new video
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCropComplete = async (newImageUrl) => {
@@ -741,19 +748,6 @@ export default function MyVisuals() {
                             : `✨ ${language === 'fr' ? 'Génération de' : 'Generating'} ${count} ${language === 'fr' ? 'variantes...' : 'variants...'}`
                         );
 
-                        // Scroll en haut immédiatement
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                        // Ajouter des placeholders de génération
-                        const effectName = language === 'fr' ? effect.name_fr : (effect.name_en || effect.name_fr);
-                        const placeholders = Array(count).fill(null).map((_, i) => ({
-                          id: `generating-${Date.now()}-${i}`,
-                          isGenerating: true,
-                          title: `${visual.title} - ${effectName}`,
-                          dimensions: visual.dimensions
-                        }));
-                        setGeneratingEffects(placeholders);
-
                         try {
                           // Déduire crédits
                           let creditsToDeduct = count;
@@ -1097,17 +1091,16 @@ export default function MyVisuals() {
                   generatedVariants.push(newVisual);
                 }
 
-                // Ajouter les nouvelles images en début de liste
-                setVisuals(prev => [...generatedVariants, ...prev]);
-
-                // Reset tous les filtres pour être sûr de voir les nouvelles images
-                setCurrentPage(1);
-                setFilter('all');
-                setTypeFilter('all');
-                setFormatFilter('all');
-                setDaFilter('all');
-                setFolderFilter('all');
-                setSearch('');
+                // Insérer les nouvelles images juste après l'image source
+                setVisuals(prev => {
+                  const sourceIndex = prev.findIndex(v => v.id === visual.id);
+                  if (sourceIndex === -1) {
+                    return [...generatedVariants, ...prev];
+                  }
+                  const newVisuals = [...prev];
+                  newVisuals.splice(sourceIndex + 1, 0, ...generatedVariants);
+                  return newVisuals;
+                });
 
                 toast.dismiss(loadingToast);
                 toast.success(
@@ -1115,9 +1108,6 @@ export default function MyVisuals() {
                     ? `✨ ${language === 'fr' ? 'Effet appliqué !' : 'Effect applied!'}`
                     : `✨ ${variantCount} ${language === 'fr' ? 'variantes créées !' : 'variants created!'}`
                 );
-
-                // Scroll en haut
-                window.scrollTo({ top: 0, behavior: 'smooth' });
 
               } catch (error) {
                 console.error(error);
