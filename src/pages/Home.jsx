@@ -1536,7 +1536,7 @@ ${qaKnowledge}
 
           const visualData = {
             user_email: user?.email || 'anonymous',
-            conversation_id: activeConversation?.id,
+            conversation_id: currentConversation?.id,
             image_url: finalImageUrl,
             original_image_url: result.url,
             title: variantCount > 1 ? `${userMessage.slice(0, 40)} (${i + 1}/${variantCount})` : userMessage.slice(0, 50),
@@ -1602,16 +1602,16 @@ ${qaKnowledge}
         }
 
         // Update conversation with new messages
-        if (activeConversation && user && allVariants.length > 0) {
+        if (currentConversation && user && allVariants.length > 0) {
           try {
             const updatedMessages = [
-              ...(activeConversation.messages || []),
+              ...(currentConversation.messages || []),
               { role: 'user', content: userMessage },
               { role: 'assistant', content: successMessage }
             ];
-            await base44.entities.Conversation.update(activeConversation.id, {
+            await base44.entities.Conversation.update(currentConversation.id, {
               messages: updatedMessages,
-              title: activeConversation.title || userMessage.slice(0, 50),
+              title: currentConversation.title || userMessage.slice(0, 50),
               visual_id: allVariants[0].id
             });
             setCurrentConversation(prev => ({ ...prev, messages: updatedMessages, visual_id: allVariants[0].id }));
@@ -1630,11 +1630,11 @@ ${qaKnowledge}
       });
 
       // Update conversation with error
-      if (activeConversation && user) {
+      if (currentConversation && user) {
         try {
-          await base44.entities.Conversation.update(activeConversation.id, {
+          await base44.entities.Conversation.update(currentConversation.id, {
             messages: [
-              ...(activeConversation.messages || []),
+              ...(currentConversation.messages || []),
               { role: 'user', content: userMessage },
               { role: 'assistant', content: errorMsg }
             ]
