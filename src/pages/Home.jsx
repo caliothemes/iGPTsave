@@ -1147,25 +1147,48 @@ ${qaKnowledge}
 
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `You must create EXACTLY ${canvaTexts.length} separate text layers for this image.
+              prompt: `Analyze this image in detail and create EXACTLY ${canvaTexts.length} beautifully styled text layers.
 
               The ${canvaTexts.length} texts to place are:
               ${canvaTexts.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
 
-              IMPORTANT RULES:
-              - Create ONE layer per text (total: ${canvaTexts.length} layers)
-              - Each layer must contain ONLY its corresponding text, nothing else
-              - Do NOT add any additional words like "CRITICAL", "IMPORTANT", etc.
-              - Analyze the image to find free space areas
-              - Avoid placing text over important visual elements
-              - Choose colors with excellent contrast for readability
-              - Use transparent backgrounds
-              - Font size: first text 60-80px, others 40-60px
-              - Position intelligently based on composition
-              - Center aligned
+              CRITICAL ANALYSIS INSTRUCTIONS:
+              1. COLOR EXTRACTION & HARMONY:
+                 - Extract the dominant and accent colors from the image
+                 - Choose text colors that create STRONG CONTRAST with the background
+                 - Use colors from the image palette OR complementary colors for harmony
+                 - Text color must be clearly readable (dark on light areas, light on dark areas)
+              
+              2. INTELLIGENT POSITIONING:
+                 - Analyze the image composition and identify free/empty spaces
+                 - Avoid placing text over faces, products, or important visual elements
+                 - Distribute texts across the image (top, middle, bottom zones)
+                 - Keep 60-100px margin from canvas edges
+                 - Place titles in prominent areas, subtitles in secondary zones
+              
+              3. PROFESSIONAL STYLING:
+                 - First text (title): 64-88px, bold (700-900), eye-catching
+                 - Other texts: 42-58px, medium-bold (600-700)
+                 - Use semi-transparent backgrounds ONLY when needed for readability (rgba with 0.75-0.92 opacity)
+                 - Background colors: extract from image OR use complementary shades
+                 - Padding: 16-28px for comfort
+                 - Border radius: 8-16px for modern look
+                 - Font weight: vary between 600-900 for hierarchy
+              
+              4. TYPOGRAPHY & ALIGNMENT:
+                 - Vary alignment based on position (left, center, right)
+                 - Center alignment for main titles
+                 - Left/right for secondary texts based on composition
+                 - Consider visual balance
+              
+              5. VISUAL EFFECTS (when appropriate):
+                 - Add subtle shadows for depth when text is over busy backgrounds
+                 - Use stroke/outline for texts over complex images
+                 - Ensure all effects enhance readability
 
               Canvas size: ${width}x${height}px
-              Return a JSON object with a "layers" array containing exactly ${canvaTexts.length} layers.`,
+              
+              Return ONE layer per text with professional styling that matches the image aesthetic.`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -1180,7 +1203,12 @@ ${qaKnowledge}
                         fontSize: { type: "number" },
                         color: { type: "string" },
                         backgroundColor: { type: "string" },
-                        fontWeight: { type: "number" }
+                        fontWeight: { type: "number" },
+                        align: { type: "string" },
+                        padding: { type: "number" },
+                        borderRadius: { type: "number" },
+                        shadow: { type: "boolean" },
+                        stroke: { type: "boolean" }
                       }
                     }
                   }
@@ -1194,30 +1222,31 @@ ${qaKnowledge}
                 id: `layer-${Date.now()}-${idx}`,
                 type: 'text',
                 text: layer.text,
-                x: width / 2,
+                x: Math.max(80, Math.min(layer.x || width / 2, width - 80)),
                 y: Math.max(80, Math.min(layer.y || (height / (canvaTexts.length + 1)) * (idx + 1), height - 80)),
                 fontSize: Math.max(layer.fontSize || (idx === 0 ? 72 : 48), 30),
                 fontFamily: 'Arial',
                 fontWeight: layer.fontWeight || 700,
                 color: layer.color || '#ffffff',
                 backgroundColor: layer.backgroundColor || 'transparent',
-                padding: 20,
-                borderRadius: 12,
+                padding: Math.max(layer.padding || 20, 16),
+                borderRadius: Math.max(layer.borderRadius || 12, 8),
                 opacity: 100,
-                align: 'center',
-                bold: true,
+                align: layer.align || 'center',
+                bold: layer.fontWeight >= 700,
                 italic: false,
-                shadow: false,
-                stroke: false,
-                letterSpacing: 0
+                shadow: layer.shadow || false,
+                stroke: layer.stroke || false,
+                letterSpacing: 0,
+                visible: true
               }));
-              console.log('✅ IA styling OK:', editorLayers);
+              console.log('✅ IA styling appliqué avec analyse complète:', editorLayers);
             } else {
               throw new Error('No layers from AI');
             }
           } catch (aiError) {
-            console.error('❌ IA error:', aiError);
-            // Fallback manuel
+            console.error('❌ IA error, utilisation du fallback simple:', aiError);
+            // Fallback manuel simple - centré
             editorLayers = canvaTexts.map((text, idx) => ({
               id: `layer-${Date.now()}-${idx}`,
               type: 'text',
@@ -1237,9 +1266,10 @@ ${qaKnowledge}
               italic: false,
               shadow: false,
               stroke: false,
-              letterSpacing: 0
+              letterSpacing: 0,
+              visible: true
             }));
-            console.log('✅ Fallback layers:', editorLayers);
+            console.log('⚠️ Fallback simple utilisé (IA indisponible)');
           }
         }
 
@@ -1659,22 +1689,48 @@ ${qaKnowledge}
           
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `You must create EXACTLY ${canvaTextsToRegenerate.length} separate text layers for this image.
-              
+              prompt: `Analyze this image in detail and create EXACTLY ${canvaTextsToRegenerate.length} beautifully styled text layers.
+
               The ${canvaTextsToRegenerate.length} texts to place are:
               ${canvaTextsToRegenerate.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
+
+              CRITICAL ANALYSIS INSTRUCTIONS:
+              1. COLOR EXTRACTION & HARMONY:
+                 - Extract the dominant and accent colors from the image
+                 - Choose text colors that create STRONG CONTRAST with the background
+                 - Use colors from the image palette OR complementary colors for harmony
+                 - Text color must be clearly readable (dark on light areas, light on dark areas)
               
-              IMPORTANT RULES:
-              - Create ONE layer per text (total: ${canvaTextsToRegenerate.length} layers)
-              - Each layer must contain ONLY its corresponding text, nothing else
-              - Analyze the image to find free space areas
-              - Choose colors with excellent contrast for readability
-              - Use transparent backgrounds
-              - Font size: first text 60-80px, others 40-60px
-              - Position intelligently based on composition
-              - Center aligned
+              2. INTELLIGENT POSITIONING:
+                 - Analyze the image composition and identify free/empty spaces
+                 - Avoid placing text over faces, products, or important visual elements
+                 - Distribute texts across the image (top, middle, bottom zones)
+                 - Keep 60-100px margin from canvas edges
+                 - Place titles in prominent areas, subtitles in secondary zones
               
-              Canvas size: ${width}x${height}px`,
+              3. PROFESSIONAL STYLING:
+                 - First text (title): 64-88px, bold (700-900), eye-catching
+                 - Other texts: 42-58px, medium-bold (600-700)
+                 - Use semi-transparent backgrounds ONLY when needed for readability (rgba with 0.75-0.92 opacity)
+                 - Background colors: extract from image OR use complementary shades
+                 - Padding: 16-28px for comfort
+                 - Border radius: 8-16px for modern look
+                 - Font weight: vary between 600-900 for hierarchy
+              
+              4. TYPOGRAPHY & ALIGNMENT:
+                 - Vary alignment based on position (left, center, right)
+                 - Center alignment for main titles
+                 - Left/right for secondary texts based on composition
+                 - Consider visual balance
+              
+              5. VISUAL EFFECTS (when appropriate):
+                 - Add subtle shadows for depth when text is over busy backgrounds
+                 - Use stroke/outline for texts over complex images
+                 - Ensure all effects enhance readability
+
+              Canvas size: ${width}x${height}px
+              
+              Return ONE layer per text with professional styling that matches the image aesthetic.`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -1689,7 +1745,12 @@ ${qaKnowledge}
                         fontSize: { type: "number" },
                         color: { type: "string" },
                         backgroundColor: { type: "string" },
-                        fontWeight: { type: "number" }
+                        fontWeight: { type: "number" },
+                        align: { type: "string" },
+                        padding: { type: "number" },
+                        borderRadius: { type: "number" },
+                        shadow: { type: "boolean" },
+                        stroke: { type: "boolean" }
                       }
                     }
                   }
@@ -1703,22 +1764,23 @@ ${qaKnowledge}
                 id: `layer-${Date.now()}-${idx}`,
                 type: 'text',
                 text: layer.text,
-                x: width / 2,
+                x: Math.max(80, Math.min(layer.x || width / 2, width - 80)),
                 y: Math.max(80, Math.min(layer.y || (height / (canvaTextsToRegenerate.length + 1)) * (idx + 1), height - 80)),
                 fontSize: Math.max(layer.fontSize || (idx === 0 ? 72 : 48), 30),
                 fontFamily: 'Arial',
                 fontWeight: layer.fontWeight || 700,
                 color: layer.color || '#ffffff',
                 backgroundColor: layer.backgroundColor || 'transparent',
-                padding: 20,
-                borderRadius: 12,
+                padding: Math.max(layer.padding || 20, 16),
+                borderRadius: Math.max(layer.borderRadius || 12, 8),
                 opacity: 100,
-                align: 'center',
-                bold: true,
+                align: layer.align || 'center',
+                bold: layer.fontWeight >= 700,
                 italic: false,
-                shadow: false,
-                stroke: false,
-                letterSpacing: 0
+                shadow: layer.shadow || false,
+                stroke: layer.stroke || false,
+                letterSpacing: 0,
+                visible: true
               }));
             }
           } catch (e) {
