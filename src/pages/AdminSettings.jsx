@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Globe, Layout, MessageSquare, Building2 } from 'lucide-react';
+import { Loader2, Save, Globe, Layout, MessageSquare, Building2, Wand2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { cn } from "@/lib/utils";
 import ReactQuill from 'react-quill';
@@ -42,7 +42,8 @@ export default function AdminSettings() {
     company_phone: '',
     company_logo: '',
     da_intro_fr: '',
-    da_intro_en: ''
+    da_intro_en: '',
+    canva_ai_prompt: ''
   });
 
   useEffect(() => {
@@ -386,6 +387,32 @@ export default function AdminSettings() {
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-24"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Canva Mode AI Prompt */}
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-pink-600/20">
+              <Wand2 className="h-5 w-5 text-pink-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Prompt IA Mode Canva</h2>
+              <p className="text-sm text-white/50">Personnalisez le prompt envoyé à l'IA pour placer et styliser les textes Canva</p>
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm text-white/60 mb-2">Prompt système (laissez vide pour utiliser le prompt par défaut)</label>
+            <Textarea
+              value={settings.canva_ai_prompt}
+              onChange={(e) => setSettings(prev => ({ ...prev, canva_ai_prompt: e.target.value }))}
+              placeholder="Laissez vide pour utiliser le prompt par défaut. Variables disponibles: {canvaTextsCount}, {width}, {height}, {canvaTextsList}"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-48 font-mono text-xs"
+            />
+            <p className="text-xs text-white/40 mt-2">
+              💡 Ce prompt sera utilisé pour analyser l'image et placer intelligemment les textes avec les bons styles
+            </p>
           </div>
         </div>
 
