@@ -1142,48 +1142,43 @@ ${qaKnowledge}
 
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this image in detail and create EXACTLY ${canvaTexts.length} beautifully styled text layers.
+              prompt: `Analyze this image's composition and create EXACTLY ${canvaTexts.length} text layers positioned in EMPTY SPACES.
 
-              The ${canvaTexts.length} texts to place are:
+              Texts to place:
               ${canvaTexts.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
 
-              CRITICAL ANALYSIS INSTRUCTIONS:
-              1. COLOR EXTRACTION & HARMONY:
-                 - Extract the dominant and accent colors from the image
-                 - Choose text colors that create STRONG CONTRAST with the background
-                 - Use colors from the image palette OR complementary colors for harmony
-                 - Text color must be clearly readable (dark on light areas, light on dark areas)
+              STEP 1: IDENTIFY EMPTY ZONES
+              - Scan the image for empty/blank areas (solid backgrounds, sky, plain surfaces)
+              - Detect where products, faces, objects, or busy patterns are located
+              - Mark safe zones: corners, edges, uniform backgrounds
               
-              2. INTELLIGENT POSITIONING:
-                 - Analyze the image composition and identify free/empty spaces
-                 - Avoid placing text over faces, products, or important visual elements
-                 - Distribute texts across the image (top, middle, bottom zones)
-                 - Keep 60-100px margin from canvas edges
-                 - Place titles in prominent areas, subtitles in secondary zones
+              STEP 2: POSITION TEXTS IN EMPTY ZONES
+              - Place texts ONLY in identified empty zones
+              - NEVER place text over products, faces, or central objects
+              - Distribute across top/bottom/left/right empty areas
+              - Maintain 80-120px margin from edges
+              - If center is busy → place texts in corners/edges
+              - If center is empty → can use center for main title
               
-              3. PROFESSIONAL STYLING:
-                 - First text (title): 64-88px, bold (700-900), eye-catching
-                 - Other texts: 42-58px, medium-bold (600-700)
-                 - Use semi-transparent backgrounds ONLY when needed for readability (rgba with 0.75-0.92 opacity)
-                 - Background colors: extract from image OR use complementary shades
-                 - Padding: 16-28px for comfort
-                 - Border radius: 8-16px for modern look
-                 - Font weight: vary between 600-900 for hierarchy
+              STEP 3: COLOR & CONTRAST
+              - Extract colors from empty zones where text will be placed
+              - Choose contrasting colors (dark text on light zones, light text on dark zones)
+              - Background colors: semi-transparent (rgba, 0.8-0.92 opacity) ONLY if needed
               
-              4. TYPOGRAPHY & ALIGNMENT:
-                 - Vary alignment based on position (left, center, right)
-                 - Center alignment for main titles
-                 - Left/right for secondary texts based on composition
-                 - Consider visual balance
+              STEP 4: STYLING
+              - Title: 68-88px, bold (800-900), prominent empty zone
+              - Subtexts: 44-58px, medium (600-700), secondary empty zones
+              - Padding: 18-32px, Border radius: 10-18px
+              - Font weight variations for hierarchy
               
-              5. VISUAL EFFECTS (when appropriate):
-                 - Add subtle shadows for depth when text is over busy backgrounds
-                 - Use stroke/outline for texts over complex images
-                 - Ensure all effects enhance readability
+              STEP 5: EFFECTS FOR READABILITY
+              - shadow: true if text over textured/busy background
+              - stroke: true if text needs extra contrast
+              - backgroundColor: use ONLY when necessary (preferred: rely on contrast)
 
-              Canvas size: ${width}x${height}px
+              Canvas: ${width}x${height}px
               
-              Return ONE layer per text with professional styling that matches the image aesthetic.`,
+              CRITICAL: Analyze WHERE empty spaces are FIRST, then position texts there.`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -1291,26 +1286,40 @@ ${qaKnowledge}
             ctx.drawImage(bgImage, 0, 0, width, height);
 
             editorLayers.forEach((layer) => {
-              if (layer.type === 'text' && layer.text) {
+              if (layer.type === 'text' && layer.text && layer.visible !== false) {
                 ctx.save();
+                
                 const fontWeight = layer.fontWeight || 700;
                 const fontStyle = `${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
                 ctx.font = fontStyle;
-                ctx.fillStyle = layer.color;
                 ctx.textAlign = layer.align || 'center';
+                ctx.textBaseline = 'middle';
 
                 const metrics = ctx.measureText(layer.text);
                 const textWidth = metrics.width;
+                const textHeight = layer.fontSize;
 
+                // Calculate box position based on alignment
+                const padding = layer.padding || 20;
+                const borderRadius = layer.borderRadius || 12;
+                let boxX = layer.x - textWidth / 2 - padding;
+                if (layer.align === 'left') boxX = layer.x - padding;
+                if (layer.align === 'right') boxX = layer.x - textWidth - padding;
+                
+                const boxY = layer.y - textHeight / 2 - padding;
+                const boxWidth = textWidth + padding * 2;
+                const boxHeight = textHeight + padding * 2;
+
+                // Apply shadow if enabled
+                if (layer.shadow) {
+                  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                  ctx.shadowBlur = 12;
+                  ctx.shadowOffsetX = 0;
+                  ctx.shadowOffsetY = 4;
+                }
+
+                // Draw background with proper color
                 if (layer.backgroundColor && layer.backgroundColor !== 'transparent') {
-                  const padding = layer.padding || 20;
-                  const borderRadius = layer.borderRadius || 12;
-                  let boxX = layer.x - textWidth / 2 - padding;
-                  if (layer.align === 'left') boxX = layer.x - padding;
-                  const boxY = layer.y - layer.fontSize * 0.85 - padding;
-                  const boxWidth = textWidth + padding * 2;
-                  const boxHeight = layer.fontSize * 1.15 + padding * 2;
-
                   ctx.fillStyle = layer.backgroundColor;
                   const radius = Math.min(borderRadius, boxWidth / 2, boxHeight / 2);
                   ctx.beginPath();
@@ -1325,10 +1334,25 @@ ${qaKnowledge}
                   ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
                   ctx.closePath();
                   ctx.fill();
-                  ctx.fillStyle = layer.color;
                 }
 
+                // Reset shadow for text
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Draw stroke if enabled
+                if (layer.stroke) {
+                  ctx.strokeStyle = '#000000';
+                  ctx.lineWidth = 3;
+                  ctx.strokeText(layer.text, layer.x, layer.y);
+                }
+
+                // Draw text with proper color
+                ctx.fillStyle = layer.color;
                 ctx.fillText(layer.text, layer.x, layer.y);
+                
                 ctx.restore();
               }
             });
@@ -1964,10 +1988,26 @@ ${qaKnowledge}
       original_image_url: originalImageUrl
     };
 
-    // Update in messages history
-    setMessages(prev => prev.map(m => 
-      m.visual?.id === updatedVisual.id ? { ...m, visual: updatedVisual } : m
-    ));
+    // Update in messages history (including effectVariants arrays)
+    setMessages(prev => prev.map(m => {
+      // Update direct visual cards
+      if (m.visual?.id === updatedVisual.id) {
+        return { ...m, visual: updatedVisual };
+      }
+      // Update visual inside effectVariants arrays
+      if (m.effectVariants && Array.isArray(m.effectVariants)) {
+        const hasVariant = m.effectVariants.some(v => v.id === updatedVisual.id);
+        if (hasVariant) {
+          return {
+            ...m,
+            effectVariants: m.effectVariants.map(v => 
+              v.id === updatedVisual.id ? updatedVisual : v
+            )
+          };
+        }
+      }
+      return m;
+    }));
 
     setCurrentVisual(updatedVisual);
     setSessionVisuals(prev => prev.map(v => v.id === updatedVisual.id ? updatedVisual : v));
