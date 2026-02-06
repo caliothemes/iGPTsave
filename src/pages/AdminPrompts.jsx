@@ -392,10 +392,19 @@ export default function AdminPrompts() {
                       {example.example_text_fr}
                     </p>
                     {example.example_text_en && (
-                      <p className="text-white text-sm">
+                      <p className="text-white text-sm mb-2">
                         <span className="text-white/40 text-xs">EN: </span>
                         {example.example_text_en}
                       </p>
+                    )}
+                    {example.tags && example.tags.length > 0 && (
+                      <div className="flex gap-1.5 flex-wrap mt-2">
+                        {example.tags.map((tag, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded-full bg-violet-600/20 text-violet-300 text-xs">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
                   {example.image_url && (
@@ -646,6 +655,22 @@ export default function AdminPrompts() {
                   placeholder="Ex: for a modern Italian restaurant with a warm atmosphere, orange and gold tones"
                   className="bg-white/5 border-white/10 text-white min-h-20"
                 />
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-2 block">Tags (optionnel)</label>
+                <Input
+                  value={editingExample.tags?.join(', ') || ''}
+                  onChange={(e) => {
+                    const tagsArray = e.target.value.split(',').map(t => t.trim()).filter(t => t);
+                    setEditingExample({ ...editingExample, tags: tagsArray });
+                  }}
+                  placeholder="Image produit, E-commerce, Lifestyle (séparés par des virgules)"
+                  className="bg-white/5 border-white/10 text-white"
+                />
+                <p className="text-xs text-white/40 mt-1">
+                  Les tags s'afficheront sous le texte de l'exemple côté front
+                </p>
               </div>
 
               <div>

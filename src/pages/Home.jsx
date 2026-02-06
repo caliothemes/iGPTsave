@@ -2813,9 +2813,20 @@ ${qaKnowledge}
           className="text-left w-full px-3 py-2 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-400/20 hover:border-violet-400/40 rounded-lg text-violet-100 text-xs transition-all flex flex-col md:flex-row md:items-center gap-3"
         >
           <div className="flex-1">
-            "{language === 'fr' 
-              ? example.example_text_fr 
-              : (example.example_text_en || example.example_text_fr)}"
+            <div className="mb-1.5">
+              "{language === 'fr' 
+                ? example.example_text_fr 
+                : (example.example_text_en || example.example_text_fr)}"
+            </div>
+            {example.tags && example.tags.length > 0 && (
+              <div className="flex gap-1.5 flex-wrap mt-2">
+                {example.tags.map((tag, tagIdx) => (
+                  <span key={tagIdx} className="px-2 py-0.5 rounded-full bg-violet-600/30 text-violet-200 text-[10px] font-medium">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
           {example.image_url && (
             <img 
@@ -3822,9 +3833,18 @@ ${qaKnowledge}
               >
                 <div className="flex-1">
                   <span className="text-violet-300 text-xs font-medium">#{idx + 1}</span>
-                  <p className="mt-1">"{language === 'fr' 
+                  <p className="mt-1 mb-2">"{language === 'fr' 
                     ? example.example_text_fr 
                     : (example.example_text_en || example.example_text_fr)}"</p>
+                  {example.tags && example.tags.length > 0 && (
+                    <div className="flex gap-1.5 flex-wrap mt-2">
+                      {example.tags.map((tag, tagIdx) => (
+                        <span key={tagIdx} className="px-2 py-0.5 rounded-full bg-violet-600/30 text-violet-200 text-[10px] font-medium">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {example.image_url && (
                   <img 
