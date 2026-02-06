@@ -3241,7 +3241,7 @@ ${qaKnowledge}
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10 max-h-96 overflow-y-auto">
-                    {CATEGORIES.filter(c => ['logo_picto', 'logo_complet', 'image', 'print', 'social', 'mockup', 'product', 'design_3d', 'video', 'free_prompt'].includes(c.id)).map(cat => (
+                    {CATEGORIES.filter(c => ['logo_picto', 'logo_complet', 'image', 'print', 'social', 'mockup', 'product', 'design_3d', 'pub_ads', 'video', 'free_prompt'].includes(c.id)).map(cat => (
                       <DropdownMenuItem 
                         key={cat.id}
                         onClick={() => handleCategorySelect({ ...cat, expertMode: expertMode[cat.id] || false })}
