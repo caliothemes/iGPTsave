@@ -1275,11 +1275,10 @@ ${qaKnowledge}
 
         console.log('📊 LAYERS FINAL:', editorLayers);
 
-        // Composer l'image avec les textes SAUF en mode Canva (évite doublons éditeur)
-        // En mode Canva: image_url = original (sans textes), layers seuls
-        // L'éditeur affichera correctement: image originale + layers
-        if (editorLayers.length > 0 && !canvaMode) {
-          console.log('🎨 Composition:', editorLayers.length, 'layers');
+        // Composer l'image avec les textes pour affichage dans les cards
+        // Les layers seront aussi stockés pour permettre l'édition
+        if (editorLayers.length > 0) {
+          console.log('🎨 Composition des textes sur l\'image:', editorLayers.length, 'layers');
           try {
             const canvas = document.createElement('canvas');
             canvas.width = width;
@@ -1456,7 +1455,7 @@ ${qaKnowledge}
             category_name: activeCategory?.name?.[language] || activeCategory?.name?.fr || null,
             style: selectedStyle?.name?.[language] || selectedStyle?.name?.fr || null,
             color_palette: extractedColors,
-            editor_layers: i === 0 && editorLayers.length > 0 ? editorLayers : undefined,
+            editor_layers: editorLayers.length > 0 ? editorLayers : undefined,
             art_director_name: selectedDA ? selectedDA.name : null,
             attached_images: currentAttachedImages.length > 0 ? currentAttachedImages : undefined
           };
