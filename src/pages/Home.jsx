@@ -333,6 +333,11 @@ export default function Home() {
     setCurrentPromptExamples(examples);
     console.log('📚 Exemples chargés pour', categoryId, ':', examples.length, 'exemples');
     
+    // Ouvrir l'assistant automatiquement si des exemples existent
+    if (examples.length > 0) {
+      setAssistantOpen(true);
+    }
+    
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
