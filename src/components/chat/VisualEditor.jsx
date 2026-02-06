@@ -323,8 +323,10 @@ export default function VisualEditor({ visual, onSave, onClose, onCancel }) {
 
   // Load base image - use image_url as base (it contains cropped version if cropped)
       useEffect(() => {
-        // Use image_url which reflects current state (cropped if cropped, original if not)
-        const baseUrl = visual.image_url;
+        // CRITICAL: If we have editor_layers (Canva texts), use original_image_url (without composed texts)
+        // Otherwise use image_url (which may have composed texts from first generation)
+        const hasEditorLayers = visual.editor_layers && Array.isArray(visual.editor_layers) && visual.editor_layers.length > 0;
+        const baseUrl = hasEditorLayers && visual.original_image_url ? visual.original_image_url : visual.image_url;
         setOriginalImageUrl(baseUrl);
         
         // If we have saved layers, preload their images first

@@ -1142,58 +1142,103 @@ ${qaKnowledge}
 
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `You are a professional graphic designer. Analyze this image and create ${canvaTexts.length} text layers with SOPHISTICATED, ELEGANT styling.
+              prompt: `You are an elite art director. Analyze this image with precision and create ${canvaTexts.length} text layers with MAGAZINE-QUALITY design.
 
               Texts to place:
-              ${canvaTexts.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
+              ${canvaTexts.map((text, i) => `${i + 1}. "${text}" ${i === 0 ? '(MAIN TITLE)' : i === 1 ? '(SECONDARY)' : '(ACCENT)'}`).join('\n')}
 
-              DESIGN PHILOSOPHY - PROFESSIONAL HIERARCHY:
+              ═══════════════════════════════════
+              PHASE 1: COMPOSITION ANALYSIS
+              ═══════════════════════════════════
               
-              1️⃣ FIRST TEXT (Main title/headline):
-              - Size: 52-72px (NOT bigger - subtlety is key)
-              - Weight: 700-800 (bold but not extra-bold)
-              - Style: Clean, readable, impactful
-              - Position: Strategic empty zone (top/bottom third)
-              - Background: Minimal or none (use shadow/stroke instead when possible)
+              🔍 Identify image zones:
+              - OCCUPIED: faces, products, logos, complex objects, patterns → FORBIDDEN for text
+              - EMPTY: solid colors, sky, blur backgrounds, gradient zones → PERFECT for text
+              - EDGE ZONES: corners, borders with uniform backgrounds → GOOD for accents
               
-              2️⃣ SECOND TEXT (Secondary info):
-              - Size: 32-42px (significantly smaller than title)
-              - Weight: 500-600 (medium, NOT bold)
-              - Style: Elegant, supporting
-              - Position: Different zone than title
-              - Background: Subtle or transparent
+              📐 Apply design rules:
+              - Golden ratio positioning (avoid dead center unless deliberately minimal)
+              - Maintain 120-180px margin from canvas edges
+              - Distribute texts using thirds grid (imagine 3x3 grid on canvas)
+              - NEVER overlap texts unless intentional layering effect
               
-              3️⃣ THIRD+ TEXTS (Accents/details):
-              - Size: 22-36px (small, discreet)
-              - Weight: 400-500 (regular to medium)
-              - Style: Minimal, complementary
-              - Position: Corners, edges, subtle placements
-              - Background: Mostly transparent
-
-              POSITIONING - INTELLIGENT COMPOSITION:
-              - Scan image for products/faces/objects → AVOID those areas
-              - Identify empty zones: sky, plain backgrounds, negative space
-              - Use rule of thirds: top-left, top-right, bottom-left, bottom-right
-              - 100-150px margin from edges
-              - Create visual balance, not symmetry
+              ═══════════════════════════════════
+              PHASE 2: TYPOGRAPHIC HIERARCHY
+              ═══════════════════════════════════
               
-              COLOR & CONTRAST - SOPHISTICATED PALETTE:
-              - Extract 2-3 dominant colors from image
-              - Text colors: use extracted colors OR their complements
-              - Contrast: ensure readability (WCAG AA minimum)
-              - Backgrounds: MINIMAL use, prefer rgba(0,0,0,0.4) or rgba(255,255,255,0.85)
-              - Avoid pure white/black unless necessary
+              1️⃣ TITLE (#1 - Primary Message):
+              SIZE: 48-68px (elegant restraint)
+              WEIGHT: 600-750 (semi-bold to bold, NOT black)
+              POSITION: Upper/lower third in largest empty zone
+              STYLE: Editorial, clean, commanding presence
+              EFFECTS: Minimal - subtle shadow OR stroke only if low contrast
               
-              EFFECTS - USE SPARINGLY:
-              - shadow: true ONLY if text needs depth (textured backgrounds)
-              - stroke: true ONLY if extreme contrast needed
-              - Default: NO effects, rely on color contrast and smart positioning
-              - Padding: 12-24px (tight, modern)
-              - Border radius: 6-12px (subtle, not chunky)
-
+              2️⃣ SECONDARY (#2 - Supporting Info):
+              SIZE: 28-38px (40-60% of title size)
+              WEIGHT: 400-550 (regular to medium, lighter than title)
+              POSITION: Opposite zone from title (visual balance)
+              STYLE: Refined, complementary, breathing room
+              EFFECTS: Usually none - pure color contrast
+              
+              3️⃣+ ACCENTS (#3-4 - Details/CTAs):
+              SIZE: 18-28px (discrete, non-intrusive)
+              WEIGHT: 300-500 (light to medium)
+              POSITION: Corners, edges, strategic empty pockets
+              STYLE: Subtle, finishing touches
+              EFFECTS: None - minimalist approach
+              
+              ═══════════════════════════════════
+              PHASE 3: COLOR MASTERY
+              ═══════════════════════════════════
+              
+              🎨 Extract image palette:
+              - Identify 3-5 dominant colors from image
+              - Note light vs dark zones
+              
+              💡 Choose text colors intelligently:
+              - Light zones → Dark text (#1a1a1a, #2c2c2c, deep navy)
+              - Dark zones → Light text (#f5f5f5, #e8e8e8, soft white)
+              - Colored zones → Complementary or extracted accent colors
+              
+              📦 Background usage (ONLY when needed):
+              - Prefer NO background (pure color contrast)
+              - If necessary: rgba with 0.65-0.82 opacity
+              - Colors: black/white semi-transparent OR extracted image colors
+              - Padding: 14-22px (compact, modern)
+              - Border radius: 6-10px (subtle curves)
+              
+              ═══════════════════════════════════
+              PHASE 4: EFFECTS PHILOSOPHY
+              ═══════════════════════════════════
+              
+              ⚡ Default: NO effects (clean, pure)
+              
+              shadow: true ONLY if:
+              - Text over busy/textured background AND color contrast insufficient
+              - Values: blur 8-14px, offset 2-4px, opacity 0.4-0.6
+              
+              stroke: true ONLY if:
+              - Extreme contrast needed (colorful text on colorful bg)
+              - Width: 1-2px max (subtle outline)
+              
+              🚫 NEVER use:
+              - Multiple effects together (pick ONE if needed)
+              - Heavy backgrounds on all texts
+              - Excessive padding/border radius
+              
+              ═══════════════════════════════════
+              EXAMPLES OF EXCELLENCE:
+              ═══════════════════════════════════
+              
+              Product on white bg → Dark text, no effects, strategic placement
+              Landscape with sky → White text in sky zone, minimal shadow
+              Abstract gradient → Contrast color from palette, no background
+              Busy pattern → Strategic empty pockets, subtle backgrounds if needed
+              
               Canvas: ${width}x${height}px
               
-              GOLDEN RULE: Less is more. Create a clean, professional, editorial-style design. Think Vogue, Apple, Nike - not circus poster.`,
+              ═══════════════════════════════════
+              YOUR MISSION: Create a design that looks professionally art-directed, not AI-generated. Think high-end magazine spread, luxury brand campaign, or Apple product page.`,
               response_json_schema: {
                 type: "object",
                 properties: {
