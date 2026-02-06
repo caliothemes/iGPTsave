@@ -327,10 +327,11 @@ export default function Home() {
     setOpenSubmenu(null);
     setOpenNestedSubmenu(null);
     
-    // Load all prompt examples for this category
+    // Load all prompt examples for this category (utiliser l'ID réel de la catégorie parente)
     const categoryId = category.id;
     const examples = promptExamples.filter(e => e.category === categoryId);
     setCurrentPromptExamples(examples);
+    console.log('📚 Exemples chargés pour', categoryId, ':', examples.length, 'exemples');
     
     setTimeout(() => inputRef.current?.focus(), 100);
   };
