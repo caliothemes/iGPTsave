@@ -1049,6 +1049,25 @@ export default function MyVisuals() {
                   : `✨ ${language === 'fr' ? 'Génération de' : 'Generating'} ${variantCount} ${language === 'fr' ? 'variantes...' : 'variants...'}`
               );
 
+              // Ajouter des placeholders de génération juste après l'image source
+              const effectName = language === 'fr' ? selectedEffect.name_fr : (selectedEffect.name_en || selectedEffect.name_fr);
+              const placeholders = Array(variantCount).fill(null).map((_, i) => ({
+                id: `generating-effect-${Date.now()}-${i}`,
+                isGenerating: true,
+                title: `${visual.title} - ${effectName}`,
+                dimensions: visual.dimensions
+              }));
+              
+              setVisuals(prev => {
+                const sourceIndex = prev.findIndex(v => v.id === visual.id);
+                if (sourceIndex === -1) {
+                  return [...placeholders, ...prev];
+                }
+                const newVisuals = [...prev];
+                newVisuals.splice(sourceIndex + 1, 0, ...placeholders);
+                return newVisuals;
+              });
+
               try {
                 // Déduire crédits
                 let creditsToDeduct = variantCount;
@@ -1114,13 +1133,17 @@ export default function MyVisuals() {
                   generatedVariants.push(newVisual);
                 }
 
-                // Insérer les nouvelles images juste après l'image source
+                // Remplacer les placeholders par les vraies images
                 setVisuals(prev => {
-                  const sourceIndex = prev.findIndex(v => v.id === visual.id);
+                  // Retirer tous les placeholders
+                  const withoutPlaceholders = prev.filter(v => !v.isGenerating);
+                  // Trouver l'image source
+                  const sourceIndex = withoutPlaceholders.findIndex(v => v.id === visual.id);
                   if (sourceIndex === -1) {
-                    return [...generatedVariants, ...prev];
+                    return [...generatedVariants, ...withoutPlaceholders];
                   }
-                  const newVisuals = [...prev];
+                  // Insérer juste après
+                  const newVisuals = [...withoutPlaceholders];
                   newVisuals.splice(sourceIndex + 1, 0, ...generatedVariants);
                   return newVisuals;
                 });
@@ -1134,6 +1157,8 @@ export default function MyVisuals() {
 
               } catch (error) {
                 console.error(error);
+                // Retirer les placeholders en cas d'erreur
+                setVisuals(prev => prev.filter(v => !v.isGenerating));
                 toast.dismiss(loadingToast);
                 toast.error(language === 'fr' ? '❌ Erreur lors de la génération' : '❌ Generation error');
               }
