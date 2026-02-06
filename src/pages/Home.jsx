@@ -866,19 +866,6 @@ ${qaKnowledge}
             // Mockup avec mise en scène réaliste - ADAPTÉ AU FORMAT
             const isVertical = dimensions.split('x').map(Number)[1] > dimensions.split('x').map(Number)[0];
             enhancedPrompt = `professional product mockup staging for ${userMessage}, realistic scene composition ${isVertical ? 'vertical portrait format' : 'horizontal landscape format'}, studio lighting, high-end presentation, contextual environment, natural shadows and reflections, photorealistic rendering, commercial photography style --no text --no letters --no typography`;
-          } else if (activeCategory?.id === 'pub_ads') {
-            // Publicité - Utiliser le prompt admin si disponible, sinon prompt par défaut
-            const pubAdsTemplate = promptTemplates.find(t => t.category === 'pub_ads');
-            const adminPrompt = settings.ads_base_prompt;
-
-            if (adminPrompt) {
-              enhancedPrompt = adminPrompt.replace('{userMessage}', userMessage).replace('{message}', userMessage);
-            } else if (pubAdsTemplate) {
-              const templateText = language === 'fr' ? pubAdsTemplate.prompt_fr : (pubAdsTemplate.prompt_en || pubAdsTemplate.prompt_fr);
-              enhancedPrompt = templateText.replace('{userMessage}', userMessage).replace('{message}', userMessage);
-            } else {
-              enhancedPrompt = `advertising background image for ${userMessage}, professional ad backdrop, commercial photography style, clean and uncluttered background perfect for adding text overlays, marketing visual design, attention-grabbing composition, space for headlines and call-to-action, brand-oriented imagery --no text --no letters --no typography --no words --no writing`;
-            }
           } else {
             enhancedPrompt = `${userMessage}, photorealistic, detailed, high quality`;
           }
@@ -1450,92 +1437,7 @@ ${qaKnowledge}
           }
         }
 
-        if (activeCategory?.id === 'pub_ads') {
-          console.log('🎨 Génération automatique de calques publicitaires...');
-          try {
 
-              const layersResult = await base44.integrations.Core.InvokeLLM({
-                prompt: `Analyze this advertising image and create 2-3 short, punchy text elements: "${userMessage}". 
-
-                CRITICAL TEXT GUIDELINES:
-                - Keep texts SHORT (2-6 words max per text)
-                - Headline: 2-4 words, bold and catchy
-                - Subtext: 3-6 words, descriptive
-                - CTA: 1-3 words (ex: "BUY NOW", "DISCOVER", "ORDER TODAY")
-
-                DESIGN & COLOR:
-                - Extract 1-2 dominant vibrant colors from the image
-                - Use BOLD, eye-catching semi-transparent backgrounds (rgba with 0.88-0.95 opacity)
-                - Colors: hot pink, electric blue, deep purple, neon orange, vivid red
-                - Large padding: 28-35px for impact
-                - Border radius: 16-22px for modern look
-
-                POSITIONING (Canvas ${width}x${height}px):
-                - Spread texts across different areas (top, middle, bottom)
-                - Leave 80px+ margin from edges
-                - Don't cluster texts together
-
-                FONTS & SIZES:
-                - Headline: 56-72px, bold (700-900 weight), Arial or Montserrat
-                - Subtext: 38-48px, medium-bold (600-700), Arial
-                - CTA: 42-52px, extra-bold (800-900), Arial
-                - ALWAYS use textAlign: 'left' (never center or right)`,
-                response_json_schema: {
-                  type: "object",
-                  properties: {
-                    layers: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          type: { type: "string" },
-                          text: { type: "string" },
-                          x: { type: "number" },
-                          y: { type: "number" },
-                          fontSize: { type: "number" },
-                          fontFamily: { type: "string" },
-                          fontWeight: { type: "number" },
-                          color: { type: "string" },
-                          backgroundColor: { type: "string" },
-                          padding: { type: "number" },
-                          borderRadius: { type: "number" }
-                        }
-                      }
-                    }
-                  }
-                },
-                file_urls: [result.url]
-              });
-
-            if (layersResult.layers && layersResult.layers.length > 0) {
-              editorLayers = layersResult.layers.map((layer, idx) => ({
-                id: `layer-${Date.now()}-${idx}`,
-                type: 'text',
-                text: layer.text || '',
-                x: Math.max(80, Math.min(layer.x || 100, width - 250)),
-                y: Math.max(80, Math.min(layer.y || 100, height - 150)),
-                fontSize: layer.fontSize || 48,
-                fontFamily: layer.fontFamily || 'Arial',
-                fontWeight: layer.fontWeight || 700,
-                color: layer.color || '#ffffff',
-                backgroundColor: layer.backgroundColor || 'rgba(255,20,147,0.9)',
-                padding: Math.max(layer.padding || 28, 25),
-                borderRadius: Math.max(layer.borderRadius || 18, 12),
-                opacity: 100,
-                visible: true,
-                align: layer.textAlign || 'left',
-                bold: true,
-                italic: false,
-                shadow: false,
-                stroke: false
-              }));
-              console.log('✅ Calques PUB créés:', editorLayers);
-            }
-          } catch (e) {
-            console.error('❌ Échec calques pub:', e);
-          }
-
-        }
 
           const visualData = {
             user_email: user?.email || 'anonymous',
