@@ -1143,18 +1143,18 @@ ${qaKnowledge}
           try {
             // Use custom admin prompt if available, otherwise use default
             const customPrompt = settings.canva_ai_prompt;
-            let finalPrompt = '';
+            let canvaAIPrompt = '';
             
             if (customPrompt && customPrompt.trim()) {
               // Replace variables in custom prompt
-              finalPrompt = customPrompt
+              canvaAIPrompt = customPrompt
                 .replace('{canvaTextsCount}', canvaTexts.length)
                 .replace('{width}', width)
                 .replace('{height}', height)
                 .replace('{canvaTextsList}', canvaTexts.map((text, i) => `${i + 1}. "${text}"`).join('\n'));
             } else {
               // Default prompt
-              finalPrompt = `You are an elite art director. Analyze this image with precision and create ${canvaTexts.length} text layers with MAGAZINE-QUALITY design.
+              canvaAIPrompt = `You are an elite art director. Analyze this image with precision and create ${canvaTexts.length} text layers with MAGAZINE-QUALITY design.
 
               Texts to place:
               ${canvaTexts.map((text, i) => `${i + 1}. "${text}" ${i === 0 ? '(MAIN TITLE)' : i === 1 ? '(SECONDARY)' : '(ACCENT)'}`).join('\n')}
@@ -1254,7 +1254,7 @@ ${qaKnowledge}
             }
             
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: finalPrompt,
+              prompt: canvaAIPrompt,
               response_json_schema: {
                 type: "object",
                 properties: {
