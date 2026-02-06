@@ -2781,6 +2781,12 @@ ${qaKnowledge}
                           </p>
 
 {/* Example prompts cliquables - Condensé sur mobile */}
+{(() => {
+  console.log('🔍 RENDER Assistant - currentPromptExamples.length:', currentPromptExamples.length);
+  console.log('🔍 RENDER Assistant - selectedCategory:', selectedCategory?.id);
+  console.log('🔍 RENDER Assistant - assistantOpen:', assistantOpen);
+  return null;
+})()}
 {currentPromptExamples.length > 0 && (
   <div className="mt-3 pt-3 border-t border-violet-500/20">
     <p className="text-violet-300 text-[11px] font-medium mb-1.5">
