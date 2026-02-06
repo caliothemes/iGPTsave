@@ -995,16 +995,26 @@ ${qaKnowledge}
         
         // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
         if (currentAttachedImages.length > 0) {
-        try {
+          try {
             setMessages(prev => [
               ...prev.slice(0, -1),
               { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
             ]);
 
-            const compositionPrompt = `Create this design: ${userMessage}. Use the provided reference images in the composition. Integrate them naturally and make sure they are visible in the final result. ${variantPrompt}`;
+            // Pour la composition, utiliser le prompt brut de l'utilisateur avec variation si besoin
+            let compositionBasePrompt = userMessage;
+            if (i > 0) {
+              const viewVariations = [
+                'subtle camera angle shift, slightly different perspective',
+                'minor viewpoint adjustment, gentle angle variation',
+                'slight camera position change, alternative view angle',
+                'soft perspective shift, different camera placement'
+              ];
+              compositionBasePrompt = `${userMessage}, ${viewVariations[(i - 1) % viewVariations.length]}`;
+            }
 
             result = await base44.integrations.Core.GenerateImage({
-              prompt: compositionPrompt,
+              prompt: compositionBasePrompt,
               existing_image_urls: currentAttachedImages
             });
 
@@ -1012,7 +1022,7 @@ ${qaKnowledge}
               throw new Error(language === 'fr' ? 'Erreur lors de la génération' : 'Generation error');
             }
 
-          console.log('✅ Image créée avec images attachées:', result.url);
+            console.log('✅ Image créée avec images attachées:', result.url);
 
           } catch (compError) {
             console.error('❌ Composition error:', compError);
