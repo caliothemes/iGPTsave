@@ -274,12 +274,12 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, currentVisual]);
 
-  // Auto-open assistant when conditions are met
+  // Auto-open assistant when conditions are met OR when examples are available
   useEffect(() => {
-    if (selectedCategory && selectedCategory.id !== 'free_prompt' && inputValue.trim().length > 10 && !isGenerating) {
+    if (selectedCategory && selectedCategory.id !== 'free_prompt' && (inputValue.trim().length > 10 || currentPromptExamples.length > 0) && !isGenerating) {
       setAssistantOpen(true);
     }
-  }, [selectedCategory, inputValue, isGenerating]);
+  }, [selectedCategory, inputValue, isGenerating, currentPromptExamples]);
 
   const getUserName = () => {
     if (!user) return '';
