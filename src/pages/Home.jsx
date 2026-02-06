@@ -1142,43 +1142,58 @@ ${qaKnowledge}
 
           try {
             const aiResult = await base44.integrations.Core.InvokeLLM({
-              prompt: `Analyze this image's composition and create EXACTLY ${canvaTexts.length} text layers positioned in EMPTY SPACES.
+              prompt: `You are a professional graphic designer. Analyze this image and create ${canvaTexts.length} text layers with SOPHISTICATED, ELEGANT styling.
 
               Texts to place:
               ${canvaTexts.map((text, i) => `${i + 1}. "${text}"`).join('\n')}
 
-              STEP 1: IDENTIFY EMPTY ZONES
-              - Scan the image for empty/blank areas (solid backgrounds, sky, plain surfaces)
-              - Detect where products, faces, objects, or busy patterns are located
-              - Mark safe zones: corners, edges, uniform backgrounds
+              DESIGN PHILOSOPHY - PROFESSIONAL HIERARCHY:
               
-              STEP 2: POSITION TEXTS IN EMPTY ZONES
-              - Place texts ONLY in identified empty zones
-              - NEVER place text over products, faces, or central objects
-              - Distribute across top/bottom/left/right empty areas
-              - Maintain 80-120px margin from edges
-              - If center is busy → place texts in corners/edges
-              - If center is empty → can use center for main title
+              1️⃣ FIRST TEXT (Main title/headline):
+              - Size: 52-72px (NOT bigger - subtlety is key)
+              - Weight: 700-800 (bold but not extra-bold)
+              - Style: Clean, readable, impactful
+              - Position: Strategic empty zone (top/bottom third)
+              - Background: Minimal or none (use shadow/stroke instead when possible)
               
-              STEP 3: COLOR & CONTRAST
-              - Extract colors from empty zones where text will be placed
-              - Choose contrasting colors (dark text on light zones, light text on dark zones)
-              - Background colors: semi-transparent (rgba, 0.8-0.92 opacity) ONLY if needed
+              2️⃣ SECOND TEXT (Secondary info):
+              - Size: 32-42px (significantly smaller than title)
+              - Weight: 500-600 (medium, NOT bold)
+              - Style: Elegant, supporting
+              - Position: Different zone than title
+              - Background: Subtle or transparent
               
-              STEP 4: STYLING
-              - Title: 68-88px, bold (800-900), prominent empty zone
-              - Subtexts: 44-58px, medium (600-700), secondary empty zones
-              - Padding: 18-32px, Border radius: 10-18px
-              - Font weight variations for hierarchy
+              3️⃣ THIRD+ TEXTS (Accents/details):
+              - Size: 22-36px (small, discreet)
+              - Weight: 400-500 (regular to medium)
+              - Style: Minimal, complementary
+              - Position: Corners, edges, subtle placements
+              - Background: Mostly transparent
+
+              POSITIONING - INTELLIGENT COMPOSITION:
+              - Scan image for products/faces/objects → AVOID those areas
+              - Identify empty zones: sky, plain backgrounds, negative space
+              - Use rule of thirds: top-left, top-right, bottom-left, bottom-right
+              - 100-150px margin from edges
+              - Create visual balance, not symmetry
               
-              STEP 5: EFFECTS FOR READABILITY
-              - shadow: true if text over textured/busy background
-              - stroke: true if text needs extra contrast
-              - backgroundColor: use ONLY when necessary (preferred: rely on contrast)
+              COLOR & CONTRAST - SOPHISTICATED PALETTE:
+              - Extract 2-3 dominant colors from image
+              - Text colors: use extracted colors OR their complements
+              - Contrast: ensure readability (WCAG AA minimum)
+              - Backgrounds: MINIMAL use, prefer rgba(0,0,0,0.4) or rgba(255,255,255,0.85)
+              - Avoid pure white/black unless necessary
+              
+              EFFECTS - USE SPARINGLY:
+              - shadow: true ONLY if text needs depth (textured backgrounds)
+              - stroke: true ONLY if extreme contrast needed
+              - Default: NO effects, rely on color contrast and smart positioning
+              - Padding: 12-24px (tight, modern)
+              - Border radius: 6-12px (subtle, not chunky)
 
               Canvas: ${width}x${height}px
               
-              CRITICAL: Analyze WHERE empty spaces are FIRST, then position texts there.`,
+              GOLDEN RULE: Less is more. Create a clean, professional, editorial-style design. Think Vogue, Apple, Nike - not circus poster.`,
               response_json_schema: {
                 type: "object",
                 properties: {
@@ -1212,25 +1227,25 @@ ${qaKnowledge}
                 id: `layer-${Date.now()}-${idx}`,
                 type: 'text',
                 text: layer.text,
-                x: Math.max(80, Math.min(layer.x || width / 2, width - 80)),
-                y: Math.max(80, Math.min(layer.y || (height / (canvaTexts.length + 1)) * (idx + 1), height - 80)),
-                fontSize: Math.max(layer.fontSize || (idx === 0 ? 72 : 48), 30),
-                fontFamily: 'Arial',
-                fontWeight: layer.fontWeight || 700,
+                x: Math.max(100, Math.min(layer.x || width / 2, width - 100)),
+                y: Math.max(100, Math.min(layer.y || (height / (canvaTexts.length + 1)) * (idx + 1), height - 100)),
+                fontSize: Math.max(Math.min(layer.fontSize || 48, 80), 20),
+                fontFamily: layer.fontFamily || 'Arial',
+                fontWeight: layer.fontWeight || (idx === 0 ? 700 : 500),
                 color: layer.color || '#ffffff',
                 backgroundColor: layer.backgroundColor || 'transparent',
-                padding: Math.max(layer.padding || 20, 16),
-                borderRadius: Math.max(layer.borderRadius || 12, 8),
+                padding: Math.max(Math.min(layer.padding || 18, 32), 10),
+                borderRadius: Math.max(Math.min(layer.borderRadius || 10, 18), 4),
                 opacity: 100,
-                align: layer.align || 'center',
-                bold: layer.fontWeight >= 700,
+                align: layer.align || 'left',
+                bold: (layer.fontWeight || (idx === 0 ? 700 : 500)) >= 700,
                 italic: false,
-                shadow: layer.shadow || false,
-                stroke: layer.stroke || false,
+                shadow: layer.shadow === true,
+                stroke: layer.stroke === true,
                 letterSpacing: 0,
                 visible: true
               }));
-              console.log('✅ IA styling appliqué avec analyse complète:', editorLayers);
+              console.log('✅ IA styling professionnel appliqué:', editorLayers);
             } else {
               throw new Error('No layers from AI');
             }
