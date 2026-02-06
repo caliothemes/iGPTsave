@@ -1250,7 +1250,11 @@ ${qaKnowledge}
               Canvas: ${width}x${height}px
               
               ═══════════════════════════════════
-              YOUR MISSION: Create a design that looks professionally art-directed, not AI-generated. Think high-end magazine spread, luxury brand campaign, or Apple product page.`,
+              YOUR MISSION: Create a design that looks professionally art-directed, not AI-generated. Think high-end magazine spread, luxury brand campaign, or Apple product page.`;
+            }
+            
+            const aiResult = await base44.integrations.Core.InvokeLLM({
+              prompt: finalPrompt,
               response_json_schema: {
                 type: "object",
                 properties: {
