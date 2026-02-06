@@ -1058,6 +1058,8 @@ ${qaKnowledge}
           const result = { url: results[i] };
         
         let finalImageUrl = result.url;
+        let editorLayers = [];
+        const [width, height] = dimensions.split('x').map(Number);
 
         // Si DA appliqué, extraire les textes de l'image pour les rendre éditables
         if (daApplied && !canvaMode) {
@@ -1134,14 +1136,7 @@ ${qaKnowledge}
           }
         }
 
-        // Generate editor layers
-        let editorLayers = [];
-
-        console.log('🔍 AVANT TOUT - canvaMode:', canvaMode, 'canvaTexts:', canvaTexts);
-
-        const [width, height] = dimensions.split('x').map(Number);
-
-        // MODE CANVA: Créer les calques avec IA pour couleurs
+        // MODE CANVA: Créer les calques avec IA pour couleurs (POUR CHAQUE VARIANTE)
         if (canvaMode && canvaTexts && canvaTexts.length > 0) {
           console.log('🎨 Mode Canva - IA styling pour', canvaTexts.length, 'textes');
 
