@@ -1001,20 +1001,9 @@ ${qaKnowledge}
               { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
             ]);
 
-            // Pour la composition, utiliser le prompt brut de l'utilisateur avec variation si besoin
-            let compositionBasePrompt = userMessage;
-            if (i > 0) {
-              const viewVariations = [
-                'subtle camera angle shift, slightly different perspective',
-                'minor viewpoint adjustment, gentle angle variation',
-                'slight camera position change, alternative view angle',
-                'soft perspective shift, different camera placement'
-              ];
-              compositionBasePrompt = `${userMessage}, ${viewVariations[(i - 1) % viewVariations.length]}`;
-            }
-
+            // Utiliser le prompt enrichi avec catégorie + DA pour respecter le format
             result = await base44.integrations.Core.GenerateImage({
-              prompt: compositionBasePrompt,
+              prompt: variantPrompt,
               existing_image_urls: currentAttachedImages
             });
 
