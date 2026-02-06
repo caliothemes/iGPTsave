@@ -862,6 +862,10 @@ ${qaKnowledge}
           } else if (activeCategory?.id === 'social') {
             // Design à plat pour social (NE PAS MODIFIER - fonctionne bien)
             enhancedPrompt = `flat graphic design for ${userMessage}, complete frontal view on entire surface, flat horizontal composition, ZERO perspective, ZERO angle, flat lay photography style, thematic elements, professional backdrop --no text --no letters --no typography --no perspective --no angle --no 3d --no tilt --no shadow --no mockup --no cutout --no cropped --no cut --no edge --no corner --no fold --no rotation --no depth --no isometric`;
+          } else if (activeCategory?.id === 'mockup') {
+            // Mockup avec mise en scène réaliste - ADAPTÉ AU FORMAT
+            const isVertical = dimensions.split('x').map(Number)[1] > dimensions.split('x').map(Number)[0];
+            enhancedPrompt = `professional product mockup staging for ${userMessage}, realistic scene composition ${isVertical ? 'vertical portrait format' : 'horizontal landscape format'}, studio lighting, high-end presentation, contextual environment, natural shadows and reflections, photorealistic rendering, commercial photography style --no text --no letters --no typography`;
           } else if (activeCategory?.id === 'pub_ads') {
             // Publicité - Utiliser le prompt admin si disponible, sinon prompt par défaut
             const pubAdsTemplate = promptTemplates.find(t => t.category === 'pub_ads');
