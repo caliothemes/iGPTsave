@@ -1511,6 +1511,9 @@ ${qaKnowledge}
             }
           ]);
         }
+        
+        // Fermer l'assistant après génération pour voir les images
+        setAssistantOpen(false);
 
         // Update conversation with new messages
         if (currentConversation && user && allVariants.length > 0) {
@@ -1829,6 +1832,9 @@ ${qaKnowledge}
           { role: 'assistant', content: t('newVersion') },
           { role: 'assistant', content: '', visual: newVisual }
         ]);
+        
+        // Fermer l'assistant après régénération
+        setAssistantOpen(false);
       }
     } catch (error) {
       console.error(error);
