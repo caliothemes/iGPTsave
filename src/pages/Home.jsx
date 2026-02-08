@@ -148,8 +148,7 @@ export default function Home() {
   const [newFolderColor, setNewFolderColor] = useState('violet');
   const [showEffectsModal, setShowEffectsModal] = useState(false);
   const [effectsVisual, setEffectsVisual] = useState(null);
-  const [showVariantSelector, setShowVariantSelector] = useState(false);
-  const [pendingPrompt, setPendingPrompt] = useState('');
+  const [selectedVariantCount, setSelectedVariantCount] = useState(1);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -523,11 +522,8 @@ export default function Home() {
   };
 
   const handleSendWithVariants = async (variantCount = 1) => {
-    const userMessage = pendingPrompt || inputValue.trim();
+    const userMessage = inputValue.trim();
     if (!userMessage || isGenerating) return;
-
-    setShowVariantSelector(false);
-    setPendingPrompt('');
     
     // ÉTAPE 1: Détecter l'intention (conversation vs génération)
     setIsGenerating(true);
@@ -1556,9 +1552,7 @@ ${qaKnowledge}
 
   const handleSend = () => {
     if (!inputValue.trim() || isGenerating) return;
-    
-    setPendingPrompt(inputValue.trim());
-    setShowVariantSelector(true);
+    handleSendWithVariants(selectedVariantCount);
   };
 
   const handleRegenerate = async (visual) => {
@@ -3121,34 +3115,8 @@ ${qaKnowledge}
                   style={{ height: '24px' }}
                 />
 
-                {/* Variant Selector or Action Buttons */}
-                <AnimatePresence mode="wait">
-                  {showVariantSelector ? (
-                    <motion.div
-                      key="variant-selector"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="flex gap-1"
-                    >
-                      {[1, 2, 3, 4, 5].map(count => (
-                        <button
-                          key={count}
-                          onClick={() => handleSendWithVariants(count)}
-                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 border border-violet-400/60 hover:border-violet-300/80 text-white text-xs font-bold transition-all shadow-lg shadow-violet-500/40"
-                        >
-                          x{count}
-                        </button>
-                      ))}
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="action-buttons"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="flex items-center gap-2"
-                    >
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
                       <button 
                         onClick={() => imageInputRef.current?.click()}
                         className="p-2 text-white/40 hover:text-white/60 transition-colors"
@@ -3188,21 +3156,19 @@ ${qaKnowledge}
                         )} />
                       </button>
 
-                      <Button
-                        onClick={handleSend}
-                        disabled={!inputValue.trim() || isGenerating}
-                        size="icon"
-                        className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
-                      >
-                        {isGenerating ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Send className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                  <Button
+                    onClick={handleSend}
+                    disabled={!inputValue.trim() || isGenerating}
+                    size="icon"
+                    className="h-9 w-9 rounded-full bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
 
               {/* Tags sous le prompt - Collapsible en mobile uniquement */}
@@ -3280,6 +3246,34 @@ ${qaKnowledge}
                         )}
                       >
                         {cat?.name?.[language] || cat?.name?.fr || 'N/A'}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Tag Variantes */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={cn(
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all border flex items-center gap-1.5",
+                      selectedVariantCount > 1
+                        ? "bg-green-600 border-green-500 text-white shadow-lg shadow-green-500/30"
+                        : "bg-cyan-600/10 border-cyan-500/20 text-cyan-300 hover:bg-cyan-600/20"
+                    )}>
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      x{selectedVariantCount}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-900/95 backdrop-blur-xl border border-white/10">
+                    {[1, 2, 3, 4, 5].map(count => (
+                      <DropdownMenuItem 
+                        key={count}
+                        onClick={() => setSelectedVariantCount(count)}
+                        className="text-white"
+                      >
+                        x{count} {language === 'fr' ? 'variante' : 'variant'}{count > 1 ? 's' : ''}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
