@@ -972,11 +972,15 @@ ${qaKnowledge}
       
       console.log(isModification ? '🔄 Modification détectée - Prompt enrichi:' : '🎨 Nouveau prompt:', promptToUse);
 
-      // Générer les images (une ou plusieurs variantes)
-      const results = [];
-      
-      for (let i = 0; i < variantCount; i++) {
-        let result;
+      // Générer les images EN PARALLÈLE (une ou plusieurs variantes)
+      if (currentAttachedImages.length > 0) {
+        setMessages(prev => [
+          ...prev.slice(0, -1),
+          { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
+        ]);
+      }
+
+      const promises = Array(variantCount).fill(null).map(async (_, i) => {
         let variantPrompt = promptToUse;
         
         // Variante 1 = prompt exact, variantes 2+ = variations de vue
@@ -990,41 +994,29 @@ ${qaKnowledge}
           variantPrompt = `${promptToUse}, ${viewVariations[(i - 1) % viewVariations.length]}`;
         }
         
-        // CAS AVEC IMAGES ATTACHÉES: Composition avec InvokeLLM
+        // CAS AVEC IMAGES ATTACHÉES: Composition
         if (currentAttachedImages.length > 0) {
-          try {
-            setMessages(prev => [
-              ...prev.slice(0, -1),
-              { role: 'assistant', content: language === 'fr' ? '🎨 Création avec vos images...' : '🎨 Creating with your images...', isStreaming: true }
-            ]);
+          const result = await base44.integrations.Core.GenerateImage({
+            prompt: variantPrompt,
+            existing_image_urls: currentAttachedImages
+          });
 
-            // Utiliser le prompt enrichi avec catégorie + DA pour respecter le format
-            result = await base44.integrations.Core.GenerateImage({
-              prompt: variantPrompt,
-              existing_image_urls: currentAttachedImages
-            });
-
-            if (!result.url) {
-              throw new Error(language === 'fr' ? 'Erreur lors de la génération' : 'Generation error');
-            }
-
-            console.log('✅ Image créée avec images attachées:', result.url);
-
-          } catch (compError) {
-            console.error('❌ Composition error:', compError);
-            throw compError;
+          if (!result.url) {
+            throw new Error(language === 'fr' ? 'Erreur lors de la génération' : 'Generation error');
           }
+
+          console.log('✅ Image créée avec images attachées:', result.url);
+          return result.url;
         } else {
           // CAS NORMAL: Génération simple avec variation
-          result = await base44.integrations.Core.GenerateImage({
+          const result = await base44.integrations.Core.GenerateImage({
             prompt: variantPrompt
           });
+          return result.url;
         }
-        
-        if (result.url) {
-          results.push(result.url);
-        }
-      }
+      });
+
+      const results = await Promise.all(promises);
 
       // Traitement des résultats
       if (results.length > 0) {
