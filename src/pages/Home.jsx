@@ -2883,7 +2883,7 @@ ${qaKnowledge}
                       {/* Bouton pour fermer en bas à droite */}
                       <button
                         onClick={() => setAssistantOpen(false)}
-                        className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 hover:text-white transition-colors shadow-lg"
+                        className="absolute bottom-3 right-3 p-1 rounded-lg hover:bg-violet-500/20 text-violet-300 hover:text-white transition-colors"
                       >
                         <ChevronDown className="h-4 w-4" />
                       </button>
