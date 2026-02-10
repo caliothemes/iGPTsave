@@ -3888,6 +3888,7 @@ ${qaKnowledge}
       <PromptCreatorModal
         isOpen={showPromptCreator}
         onClose={() => setShowPromptCreator(false)}
+        selectedCategory={selectedCategory}
         onPromptGenerated={(prompt) => {
           setInputValue(prompt);
           setTimeout(() => {

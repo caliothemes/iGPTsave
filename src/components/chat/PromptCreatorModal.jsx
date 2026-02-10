@@ -8,7 +8,7 @@ import { base44 } from '@/api/base44Client';
 import { useLanguage } from '@/components/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function PromptCreatorModal({ isOpen, onClose, onPromptGenerated }) {
+export default function PromptCreatorModal({ isOpen, onClose, onPromptGenerated, selectedCategory }) {
   const { language } = useLanguage();
   const [step, setStep] = useState('choice'); // 'choice', 'image', 'info'
   const [isGenerating, setIsGenerating] = useState(false);
@@ -90,21 +90,43 @@ Return ONLY the generated prompt, nothing else.`,
 
     setIsGenerating(true);
     try {
+      // Déterminer le type de visuel en fonction de la catégorie
+      const categoryName = selectedCategory?.name?.[language] || selectedCategory?.name?.fr || '';
+      const categoryId = selectedCategory?.id || '';
+      
+      let visualType = 'visual/design';
+      if (categoryId.includes('logo')) {
+        visualType = 'logo';
+      } else if (categoryId === 'print') {
+        visualType = 'print design (flyer, poster, business card)';
+      } else if (categoryId === 'social') {
+        visualType = 'social media post';
+      } else if (categoryId === 'mockup') {
+        visualType = 'product mockup';
+      } else if (categoryId === 'image') {
+        visualType = 'image/visual';
+      } else if (categoryId === 'design_3d') {
+        visualType = '3D design';
+      } else if (categoryId === 'pub_ads') {
+        visualType = 'advertising visual';
+      }
+
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an expert creative director and prompt engineer. Based on the following brand information, create an EXCEPTIONAL and DETAILED prompt for generating a professional visual/logo/design.
+        prompt: `You are an expert creative director and prompt engineer. Based on the following brand information, create an EXCEPTIONAL and DETAILED prompt for generating a professional ${visualType}.
 
 Brand Information:
 ${brandName ? `- Brand name: ${brandName}` : ''}
 ${slogan ? `- Slogan: ${slogan}` : ''}
 ${activity ? `- Domain/Activity: ${activity}` : ''}
 ${description ? `- Description: ${description}` : ''}
+${categoryName ? `- Target format: ${categoryName}` : ''}
 
 Create a prompt that includes:
 1. Visual concept that reflects the brand identity
-2. Professional style and aesthetic
+2. Professional style and aesthetic appropriate for ${visualType}
 3. Sophisticated color palette
 4. Modern design elements
-5. Typography suggestions (if relevant)
+5. Typography suggestions (if relevant for ${visualType})
 6. Mood and atmosphere
 7. Technical specifications for high-quality rendering
 
@@ -114,6 +136,7 @@ The prompt must be:
 - Ready to use with image generation AI
 - In ${language === 'fr' ? 'French' : 'English'}
 - Optimized to create something UNIQUE and MEMORABLE
+- Specifically tailored for creating a ${visualType}
 
 Return ONLY the generated prompt, nothing else.`,
         response_json_schema: {
