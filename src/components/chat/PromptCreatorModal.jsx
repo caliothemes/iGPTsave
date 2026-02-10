@@ -83,8 +83,8 @@ Return ONLY the generated prompt, nothing else.`,
   };
 
   const handleGenerateFromInfo = async () => {
-    if (!brandName.trim() && !activity.trim()) {
-      alert(language === 'fr' ? 'Veuillez renseigner au moins le nom de la marque ou le domaine d\'activité' : 'Please provide at least the brand name or activity domain');
+    if (!description.trim()) {
+      alert(language === 'fr' ? 'Veuillez renseigner la description' : 'Please provide a description');
       return;
     }
 
@@ -305,7 +305,7 @@ Return ONLY the generated prompt, nothing else.`,
             >
               <div>
                 <label className="text-sm text-white/60 mb-2 block">
-                  {language === 'fr' ? 'Nom de la marque' : 'Brand name'}
+                  {language === 'fr' ? 'Nom de la marque (optionnel)' : 'Brand name (optional)'}
                 </label>
                 <Input
                   value={brandName}
@@ -331,7 +331,7 @@ Return ONLY the generated prompt, nothing else.`,
 
               <div>
                 <label className="text-sm text-white/60 mb-2 block">
-                  {language === 'fr' ? 'Domaine d\'activité' : 'Activity domain'}
+                  {language === 'fr' ? 'Domaine d\'activité (optionnel)' : 'Activity domain (optional)'}
                 </label>
                 <Input
                   value={activity}
@@ -344,7 +344,7 @@ Return ONLY the generated prompt, nothing else.`,
 
               <div>
                 <label className="text-sm text-white/60 mb-2 block">
-                  {language === 'fr' ? 'Description (optionnel)' : 'Description (optional)'}
+                  {language === 'fr' ? 'Description *' : 'Description *'}
                 </label>
                 <Textarea
                   value={description}
@@ -366,7 +366,7 @@ Return ONLY the generated prompt, nothing else.`,
                 </Button>
                 <Button
                   onClick={handleGenerateFromInfo}
-                  disabled={isGenerating || (!brandName.trim() && !activity.trim())}
+                  disabled={isGenerating || !description.trim()}
                   className="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700"
                 >
                   {isGenerating ? (
