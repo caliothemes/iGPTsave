@@ -58,7 +58,8 @@ export default function AdminPrompts() {
     { value: 'design_3d', label: 'Design Texte 3D' },
     { value: 'textures', label: 'Textures' },
     { value: 'illustrations', label: 'Illustrations' },
-    { value: 'icones_picto', label: 'Icônes Picto' }
+    { value: 'icones_picto', label: 'Icônes Picto' },
+    { value: 'free_prompt', label: 'Prompt 100% libre' }
   ];
 
   useEffect(() => {
