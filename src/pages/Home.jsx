@@ -277,10 +277,10 @@ export default function Home() {
 
   // Auto-open assistant when conditions are met OR when examples are available (only before first generation)
   useEffect(() => {
-    if (selectedCategory && (inputValue.trim().length > 10 || currentPromptExamples.length > 0) && !isGenerating && messages.length === 0) {
+    if ((inputValue.trim().length > 10 || currentPromptExamples.length > 0) && !isGenerating && messages.length === 0) {
       setAssistantOpen(true);
     }
-  }, [selectedCategory, inputValue, isGenerating, currentPromptExamples, messages.length]);
+  }, [inputValue, isGenerating, currentPromptExamples, messages.length]);
 
   const getUserName = () => {
     if (!user) return '';
