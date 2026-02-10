@@ -46,6 +46,7 @@ import LoadingProgress from '@/components/LoadingProgress';
 import EffectsModal from '@/components/chat/EffectsModal';
 import EffectVariantsModal from '@/components/chat/EffectVariantsModal';
 import EffectVariantsRow from '@/components/chat/EffectVariantsRow';
+import PromptCreatorModal from '@/components/chat/PromptCreatorModal';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -149,6 +150,7 @@ export default function Home() {
   const [showEffectsModal, setShowEffectsModal] = useState(false);
   const [effectsVisual, setEffectsVisual] = useState(null);
   const [selectedVariantCount, setSelectedVariantCount] = useState(1);
+  const [showPromptCreator, setShowPromptCreator] = useState(false);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -3870,6 +3872,22 @@ ${qaKnowledge}
         }}
         currentTexts={canvaTexts}
         isActive={canvaMode}
+      />
+
+      {/* Prompt Creator Modal */}
+      <PromptCreatorModal
+        isOpen={showPromptCreator}
+        onClose={() => setShowPromptCreator(false)}
+        onPromptGenerated={(prompt) => {
+          setInputValue(prompt);
+          setTimeout(() => {
+            if (inputRef.current) {
+              inputRef.current.style.height = 'auto';
+              inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+              inputRef.current.focus();
+            }
+          }, 100);
+        }}
       />
 
       {/* Effects Modal */}
