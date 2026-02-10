@@ -2844,15 +2844,25 @@ ${qaKnowledge}
     </button>
     {/* Desktop: Bouton voir plus si > 1 exemple */}
     {currentPromptExamples.length > 1 && (
-      <button
-        onClick={() => setShowExamplesModal(true)}
-        className="hidden md:flex w-full mt-2 px-3 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 rounded-lg text-violet-200 text-xs font-medium transition-all items-center justify-center gap-2"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-        {language === 'fr' ? 'Voir d\'autres exemples de prompt' : 'See more prompt examples'}
-      </button>
+      <div className="hidden md:flex gap-2 mt-2">
+        <button
+          onClick={() => setShowExamplesModal(true)}
+          className="flex-1 px-3 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 rounded-lg text-violet-200 text-xs font-medium transition-all flex items-center justify-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          {language === 'fr' ? 'Voir d\'autres exemples de prompt' : 'See more prompt examples'}
+        </button>
+
+        <button
+          onClick={() => setShowPromptCreator(true)}
+          className="flex-1 px-3 py-2 bg-gradient-to-r from-pink-600/30 to-rose-600/30 hover:from-pink-600/40 hover:to-rose-600/40 border border-pink-500/40 hover:border-pink-500/60 rounded-lg text-pink-200 text-xs font-bold transition-all flex items-center justify-center gap-2"
+        >
+          <Sparkles className="w-4 h-4" />
+          Prompt Creator
+        </button>
+      </div>
     )}
     <p className="text-violet-300/60 text-[10px] mt-1.5 hidden md:block">
       {language === 'fr' ? '👆 Cliquez pour ajouter un exemple' : '👆 Click to add an example'}
