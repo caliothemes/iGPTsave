@@ -277,10 +277,10 @@ export default function Home() {
 
   // Auto-open assistant when conditions are met OR when examples are available (only before first generation)
   useEffect(() => {
-    if ((inputValue.trim().length > 3 || currentPromptExamples.length > 0) && !isGenerating && messages.length === 0) {
+    if (currentPromptExamples.length > 0 && !isGenerating && messages.length === 0) {
       setAssistantOpen(true);
     }
-  }, [inputValue, isGenerating, currentPromptExamples, messages.length]);
+  }, [isGenerating, currentPromptExamples, messages.length]);
 
   const getUserName = () => {
     if (!user) return '';
@@ -2731,7 +2731,7 @@ ${qaKnowledge}
 
             {/* AI Assistant Suggestions */}
             <AnimatePresence>
-              {(inputValue.trim().length > 3 || currentPromptExamples.length > 0) && !isGenerating && (
+              {currentPromptExamples.length > 0 && !isGenerating && (
                 assistantOpen ? (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
