@@ -2731,7 +2731,7 @@ ${qaKnowledge}
 
             {/* AI Assistant Suggestions */}
             <AnimatePresence>
-              {selectedCategory && (inputValue.trim().length > 10 || currentPromptExamples.length > 0) && !isGenerating && (
+              {(inputValue.trim().length > 10 || currentPromptExamples.length > 0) && !isGenerating && (
                 assistantOpen ? (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
