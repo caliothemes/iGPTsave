@@ -58,7 +58,7 @@ export default function Sidebar({
       // Load actual total visuals count if user is logged in
       if (user) {
         try {
-          const allVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-created_date', 10000);
+          const allVisuals = await base44.entities.Visual.filter({ user_email: user.email });
           setActualTotalCount(allVisuals.length);
         } catch (e) {
           console.error('Failed to load total visuals:', e);
