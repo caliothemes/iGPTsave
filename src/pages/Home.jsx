@@ -211,7 +211,7 @@ export default function Home() {
           } else {
             const newCredits = await base44.entities.UserCredits.create({
               user_email: currentUser.email,
-              free_downloads: 15,
+              free_downloads: 150,
               paid_credits: 0,
               subscription_type: 'free',
               last_free_reset: new Date().toISOString()
