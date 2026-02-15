@@ -182,7 +182,25 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 setTimeout(() => {
                   const modelName = provider === 'wan' ? 'Wan v2.6 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
                   const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
-                  const videoAspectRatio = provider === 'replicate' ? aspectRatio : provider === 'sora' ? soraAspectRatio : '16:9';
+                  
+                  // Calculate aspect ratio for Wan based on source image dimensions
+                  let videoAspectRatio;
+                  if (provider === 'replicate') {
+                    videoAspectRatio = aspectRatio;
+                  } else if (provider === 'sora') {
+                    videoAspectRatio = soraAspectRatio;
+                  } else if (provider === 'wan') {
+                    // Wan keeps source image ratio
+                    if (visual.dimensions) {
+                      const [w, h] = visual.dimensions.split('x').map(Number);
+                      if (w === h) videoAspectRatio = '1:1';
+                      else if (w > h) videoAspectRatio = '16:9';
+                      else videoAspectRatio = '9:16';
+                    } else {
+                      videoAspectRatio = '1:1'; // default
+                    }
+                  }
+                  
                   onVideoGenerated(statusResponse.data.video_url, promptWithMetadata, videoAspectRatio);
                   onClose();
                 }, 500);
