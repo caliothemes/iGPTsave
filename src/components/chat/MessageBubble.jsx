@@ -134,7 +134,7 @@ export default function MessageBubble({ message, isStreaming, thinkingText = "RÃ
                   ul: ({ children }) => <ul className="my-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>,
                   ol: ({ children }) => <ol className="my-2 ml-4 list-decimal space-y-1 text-sm">{children}</ol>,
                   li: ({ children }) => <li className="my-0.5">{children}</li>,
-                  strong: ({ children }) => <strong className="font-semibold text-violet-300">{children}</strong>,
+                  strong: ({ children }) => <strong className={isUser ? "font-normal" : "font-semibold text-violet-300"}>{children}</strong>,
                 }}
               >
                 {message.content}
