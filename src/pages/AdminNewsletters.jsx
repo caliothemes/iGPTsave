@@ -82,6 +82,19 @@ export default function AdminNewsletters() {
     let html = template.html_content;
     html = html.replace('{{DATE}}', new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }));
 
+    // Replace {{BLOCKS}} with blocks from template
+    if (template.blocks_json) {
+      try {
+        const loadedBlocks = JSON.parse(template.blocks_json);
+        const blocksHtml = loadedBlocks.map(b => b.html).join('\n\n');
+        html = html.replace('{{BLOCKS}}', blocksHtml);
+      } catch (e) {
+        html = html.replace('{{BLOCKS}}', '');
+      }
+    } else {
+      html = html.replace('{{BLOCKS}}', '');
+    }
+
     // Build visuals sections - 10 items per category (5x2 grid)
     let visualsHtml = '';
     Object.values(visualsByCategory).forEach(category => {
