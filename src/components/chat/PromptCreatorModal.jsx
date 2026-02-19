@@ -247,26 +247,30 @@ Return ONLY the generated prompt, nothing else.`,
               className="space-y-4 py-4"
             >
               {!uploadedImage ? (
-                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-violet-500/30 hover:border-violet-500/50 rounded-xl cursor-pointer bg-violet-500/5 hover:bg-violet-500/10 transition-all">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="h-12 w-12 text-violet-400 mb-3" />
-                    <p className="mb-2 text-sm text-white/60">
-                      <span className="font-semibold">
-                        {language === 'fr' ? 'Cliquez pour uploader' : 'Click to upload'}
-                      </span>
-                    </p>
-                    <p className="text-xs text-white/40">
-                      PNG, JPG, JPEG
-                    </p>
-                  </div>
+                <>
+                  <label htmlFor="prompt-creator-upload" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-violet-500/30 hover:border-violet-500/50 rounded-xl cursor-pointer bg-violet-500/5 hover:bg-violet-500/10 transition-all">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
+                      <Upload className="h-12 w-12 text-violet-400 mb-3" />
+                      <p className="mb-2 text-sm text-white/60">
+                        <span className="font-semibold">
+                          {language === 'fr' ? 'Cliquez pour uploader' : 'Click to upload'}
+                        </span>
+                      </p>
+                      <p className="text-xs text-white/40">
+                        PNG, JPG, JPEG
+                      </p>
+                    </div>
+                  </label>
                   <input
+                    id="prompt-creator-upload"
                     type="file"
                     className="hidden"
                     accept="image/*"
                     onChange={handleImageUpload}
                     disabled={isGenerating}
                   />
-                </label>
+                </>
+              
               ) : (
                 <div className="relative">
                   <img
