@@ -2842,9 +2842,9 @@ ${qaKnowledge}
       </svg>
       {language === 'fr' ? 'Voir les exemples de prompt' : 'See prompt examples'}
     </button>
-    {/* Desktop: Bouton voir plus si > 1 exemple */}
+    {/* Boutons voir plus et Prompt Creator - visibles sur mobile aussi */}
     {currentPromptExamples.length > 1 && (
-      <div className="hidden md:flex gap-2 mt-2">
+      <div className="flex gap-2 mt-2">
         <button
           onClick={() => setShowExamplesModal(true)}
           className="flex-1 px-3 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 hover:border-violet-500/50 rounded-lg text-violet-200 text-xs font-medium transition-all flex items-center justify-center gap-2"
@@ -2852,7 +2852,8 @@ ${qaKnowledge}
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          {language === 'fr' ? 'Voir d\'autres exemples de prompt' : 'See more prompt examples'}
+          <span className="hidden sm:inline">{language === 'fr' ? 'Voir d\'autres exemples de prompt' : 'See more prompt examples'}</span>
+          <span className="sm:hidden">{language === 'fr' ? 'Exemples' : 'Examples'}</span>
         </button>
 
         <button
@@ -2860,7 +2861,8 @@ ${qaKnowledge}
           className="flex-1 px-3 py-2 bg-gradient-to-r from-pink-600/30 to-rose-600/30 hover:from-pink-600/40 hover:to-rose-600/40 border border-pink-500/40 hover:border-pink-500/60 rounded-lg text-pink-200 text-xs font-bold transition-all flex items-center justify-center gap-2"
         >
           <Sparkles className="w-4 h-4" />
-          Prompt Creator
+          <span className="hidden sm:inline">Prompt Creator</span>
+          <span className="sm:hidden">Creator</span>
         </button>
       </div>
     )}
