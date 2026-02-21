@@ -23,12 +23,12 @@ Deno.serve(async (req) => {
     const durationNum = Number(duration);
     let creditsRequired;
     if (model === 'sora') {
-      creditsRequired = durationNum == 4 ? 30 : durationNum == 8 ? 50 : 70;
+      creditsRequired = durationNum == 4 ? 300 : durationNum == 8 ? 500 : 700;
       console.log(`Sora credits calculation: duration=${durationNum} → credits=${creditsRequired}`);
     } else if (model === 'wan') {
-      creditsRequired = duration === 10 ? 30 : 20;
+      creditsRequired = duration === 10 ? 300 : 200;
     } else {
-      creditsRequired = duration === 10 ? 25 : 15;
+      creditsRequired = duration === 10 ? 300 : 200;
     }
 
     // Check credits
