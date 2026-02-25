@@ -2578,50 +2578,39 @@ ${qaKnowledge}
                                 setTotalVisualsCount(prev => prev + 1);
                               } catch (error) {
                                 console.error('Duplication error:', error);
-                              }
-                            }}
-                            onPromptClick={(prompt) => {
-                              setInputValue(prompt);
-                              setTimeout(() => {
-                                if (inputRef.current) {
-                                  inputRef.current.style.height = 'auto';
-                                  inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-                                  inputRef.current.focus();
                                 }
-                              }, 0);
-                            }}
-                            onVideoGenerated={handleVideoGenerated}
-                            onBackToImage={handleBackToImage}
-                            onCropComplete={(newUrl) => {
-                              setMessages(prev => prev.map((m, i) => 
-                                i === idx && m.visual ? { ...m, visual: { ...m.visual, image_url: newUrl } } : m
-                              ));
-                              if (currentVisual?.id === msg.visual.id) {
-                                setCurrentVisual({ ...msg.visual, image_url: newUrl });
-                              }
-                            }}
-                            isRegenerating={isGenerating && msg.visual?.id === currentVisual?.id}
-                            canDownload={canDownload}
-                            hasWatermark={hasWatermark}
-                            showValidation={true}
-                            showActions={true}
-                            onValidate={(action) => {
-                              if (action === 'edit') {
-                                handleOpenEditor(msg.visual);
-                              }
-                            }}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </React.Fragment>
-                ))}
-              </AnimatePresence>
+                                }}
+                                }}
+                                onDuplicate={async (visual) => {
+                                try {
+                                const { id, created_date, updated_date, version, downloaded, isPurchased, ...visualData } = visual;
 
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
-        )}
+                                const duplicatedVisual = await base44.entities.Visual.create({
+                                ...visualData,
+                                user_email: user.email,
+                                title: visual.title ? `${visual.title} (Copie)` : 'Copie',
+                                downloaded: false,
+                                version: 1
+                                });
+
+                                setSessionVisuals(prev => [duplicatedVisual, ...prev]);
+                                setTotalVisualsCount(prev => prev + 1);
+                                } catch (error) {
+                                console.error('Duplication error:', error);
+                                }
+                                }}
+                                onRegenerate={handleRegenerate}
+                                onDownload={handleDownload}
+                                onVideoGenerated={handleVideoGenerated}
+                                onBackToImage={handleBackToImage}
+                                onCropComplete={(newUrl, idx) => {
+                                setMessages(prev => prev.map((m, i) => 
+                                i === idx && m.visual ? { ...m, visual: { ...m.visual, image_url: newUrl } } : m
+                                ));
+                                }}
+                                onOpenFavorites={() => setShowFavoritesModal(true)}
+                                />
+                                )}
 
         {/* Input Area */}
         <div className={cn(
