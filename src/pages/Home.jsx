@@ -2339,131 +2339,69 @@ ${qaKnowledge}
 
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4 py-6 pb-96">
-            <div className="max-w-3xl mx-auto space-y-4">
-              <AnimatePresence>
-                {messages.map((msg, idx) => (
-                  <React.Fragment key={idx}>
-                    {/* Message bubble */}
-                    {msg.content && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                      >
-                        <MessageBubble 
-                          message={msg} 
-                          isStreaming={msg.isStreaming} 
-                          user={user}
-                          onPromptClick={(prompt) => {
-                            setInputValue(prompt);
-                            setTimeout(() => {
-                              if (inputRef.current) {
-                                inputRef.current.style.height = 'auto';
-                                inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-                                inputRef.current.focus();
-                              }
-                            }, 0);
-                          }}
-                        />
-                      </motion.div>
-                    )}
-
-                    {/* Effect Variants Row - Miniatures cliquables */}
-                    {msg.effectVariants && msg.effectVariants.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex justify-center mb-4"
-                      >
-                        <EffectVariantsRow
-                          variants={msg.effectVariants}
-                          selectedVariant={currentVisual}
-                          onSelectVariant={(variant) => {
-                            setCurrentVisual(variant);
-                            // Ajouter le visual card sélectionné juste après
-                            setMessages(prev => {
-                              // Trouver l'index du message avec effectVariants
-                              const variantsIdx = prev.findIndex(m => m === msg);
-                              // Chercher si un visual card existe déjà juste après
-                              const nextMsg = prev[variantsIdx + 1];
-                              
-                              if (nextMsg && nextMsg.visual && !nextMsg.content) {
-                                // Remplacer le visual existant
-                                const newMsgs = [...prev];
-                                newMsgs[variantsIdx + 1] = { role: 'assistant', content: '', visual: variant };
-                                return newMsgs;
-                              } else {
-                                // Insérer un nouveau visual card
-                                const newMsgs = [...prev];
-                                newMsgs.splice(variantsIdx + 1, 0, { role: 'assistant', content: '', visual: variant });
-                                return newMsgs;
-                              }
-                            });
-                          }}
-                        />
-                      </motion.div>
-                    )}
-
-                    {/* Visual card - right after the message if it has one */}
-                    {msg.visual && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex justify-center"
-                      >
-                        <div className="w-full max-w-md relative">
-                          {/* Favorites Button - Only on last visual */}
-                          {idx === messages.length - 1 && (
-                            <button
-                              onClick={() => setShowFavoritesModal(true)}
-                              className="absolute -right-3 top-3 z-40 flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm hover:bg-white/20 border border-white/20 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 translate-x-full"
-                            >
-                              <Heart className={cn("h-3.5 w-3.5", favoriteVisuals.length > 0 && "fill-white")} />
-                              <span className="text-xs font-medium whitespace-nowrap">
-                                {language === 'fr' ? 'Mes favoris' : 'My favorites'}
-                              </span>
-                              {favoriteVisuals.length > 0 && (
-                                <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
-                                  {favoriteVisuals.length}
-                                </span>
-                              )}
-                            </button>
-                          )}
-
-                          <VisualCard
-                            visual={msg.visual}
-                            onRegenerate={handleRegenerate}
-                            onDownload={handleDownload}
-                            onToggleFavorite={async (v) => {
-                              if (user && v.id) {
-                                await base44.entities.Visual.update(v.id, { is_favorite: !v.is_favorite });
-                                setMessages(prev => prev.map((m, i) => 
-                                  i === idx && m.visual ? { ...m, visual: { ...m.visual, is_favorite: !v.is_favorite } } : m
-                                ));
-                                if (currentVisual?.id === v.id) {
-                                  setCurrentVisual({ ...v, is_favorite: !v.is_favorite });
-                                }
-                              }
-                            }}
-                            onEdit={() => handleOpenEditor(msg.visual)}
-                            onImageEditOpen={(v) => {
-                              setImageEditVisual(v);
-                              setShowImageEditModal(true);
-                            }}
-                            onVideoOpen={(v) => {
-                              setVideoVisual(v);
-                              setShowVideoModal(true);
-                            }}
-                            onCropOpen={(v) => {
-                              setCropVisual(v);
-                              setShowCropModal(true);
-                            }}
-                            onFolderClick={(v) => {
-                              setMovingVisual(v);
-                              setShowFolderMoveDialog(true);
-                            }}
-                            onEffectApply={async (visual, effect, count) => {
+          <MessagesContainer
+            messages={messages}
+            user={user}
+            currentVisual={currentVisual}
+            favoriteVisuals={favoriteVisuals}
+            isGenerating={isGenerating}
+            canDownload={canDownload}
+            hasWatermark={hasWatermark}
+            onPromptClick={(prompt) => {
+              setInputValue(prompt);
+              setTimeout(() => {
+                if (inputRef.current) {
+                  inputRef.current.style.height = 'auto';
+                  inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+                  inputRef.current.focus();
+                }
+              }, 0);
+            }}
+            onSelectVariant={(variant, variantsIdx) => {
+              setCurrentVisual(variant);
+              setMessages(prev => {
+                const nextMsg = prev[variantsIdx + 1];
+                
+                if (nextMsg && nextMsg.visual && !nextMsg.content) {
+                  const newMsgs = [...prev];
+                  newMsgs[variantsIdx + 1] = { role: 'assistant', content: '', visual: variant };
+                  return newMsgs;
+                } else {
+                  const newMsgs = [...prev];
+                  newMsgs.splice(variantsIdx + 1, 0, { role: 'assistant', content: '', visual: variant });
+                  return newMsgs;
+                }
+              });
+            }}
+            onToggleFavorite={async (visual, idx) => {
+              if (user && visual.id) {
+                await base44.entities.Visual.update(visual.id, { is_favorite: !visual.is_favorite });
+                setMessages(prev => prev.map((m, i) => 
+                  i === idx && m.visual ? { ...m, visual: { ...m.visual, is_favorite: !visual.is_favorite } } : m
+                ));
+                if (currentVisual?.id === visual.id) {
+                  setCurrentVisual({ ...visual, is_favorite: !visual.is_favorite });
+                }
+              }
+            }}
+            onEdit={handleOpenEditor}
+            onImageEditOpen={(v) => {
+              setImageEditVisual(v);
+              setShowImageEditModal(true);
+            }}
+            onVideoOpen={(v) => {
+              setVideoVisual(v);
+              setShowVideoModal(true);
+            }}
+            onCropOpen={(v) => {
+              setCropVisual(v);
+              setShowCropModal(true);
+            }}
+            onFolderClick={(v) => {
+              setMovingVisual(v);
+              setShowFolderMoveDialog(true);
+            }}
+            onEffectApply={async (visual, effect, count) => {
                               if (!effect) {
                                 // Just open the modal
                                 setEffectsVisual(visual);
