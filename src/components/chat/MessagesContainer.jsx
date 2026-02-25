@@ -114,13 +114,13 @@ export default function MessagesContainer({
                       onDownload={onDownload}
                       onToggleFavorite={() => onToggleFavorite(msg.visual, idx)}
                       onEdit={() => onEdit(msg.visual)}
-                      onImageEditOpen={onImageEditOpen}
-                      onVideoOpen={onVideoOpen}
-                      onCropOpen={onCropOpen}
-                      onFolderClick={onFolderClick}
-                      onEffectApply={onEffectApply}
-                      onDuplicate={onDuplicate}
-                      onPromptClick={onPromptClick}
+                      onImageEditOpen={(v) => onImageEditOpen(v)}
+                      onVideoOpen={(v) => onVideoOpen(v)}
+                      onCropOpen={(v) => onCropOpen(v)}
+                      onFolderClick={(v) => onFolderClick(v)}
+                      onEffectApply={(v, e, c) => onEffectApply(v, e, c)}
+                      onDuplicate={(v) => onDuplicate(v)}
+                      onPromptClick={(p) => onPromptClick(p)}
                       onVideoGenerated={onVideoGenerated}
                       onBackToImage={onBackToImage}
                       onCropComplete={(newUrl) => onCropComplete(newUrl, idx)}
