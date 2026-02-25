@@ -270,9 +270,7 @@ export default function Home() {
     init();
   }, []);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, currentVisual]);
+
 
   // Auto-open assistant when conditions are met OR when examples are available (only before first generation)
   useEffect(() => {
