@@ -151,7 +151,6 @@ export default function Home() {
   const [selectedVariantCount, setSelectedVariantCount] = useState(1);
   const [showPromptCreator, setShowPromptCreator] = useState(false);
 
-  const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
   const inputRef = useRef(null);
