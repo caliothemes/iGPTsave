@@ -2578,39 +2578,20 @@ ${qaKnowledge}
                                 setTotalVisualsCount(prev => prev + 1);
                               } catch (error) {
                                 console.error('Duplication error:', error);
-                                }
-                                }}
-                                }}
-                                onDuplicate={async (visual) => {
-                                try {
-                                const { id, created_date, updated_date, version, downloaded, isPurchased, ...visualData } = visual;
-
-                                const duplicatedVisual = await base44.entities.Visual.create({
-                                ...visualData,
-                                user_email: user.email,
-                                title: visual.title ? `${visual.title} (Copie)` : 'Copie',
-                                downloaded: false,
-                                version: 1
-                                });
-
-                                setSessionVisuals(prev => [duplicatedVisual, ...prev]);
-                                setTotalVisualsCount(prev => prev + 1);
-                                } catch (error) {
-                                console.error('Duplication error:', error);
-                                }
-                                }}
-                                onRegenerate={handleRegenerate}
-                                onDownload={handleDownload}
-                                onVideoGenerated={handleVideoGenerated}
-                                onBackToImage={handleBackToImage}
-                                onCropComplete={(newUrl, idx) => {
-                                setMessages(prev => prev.map((m, i) => 
+                              }
+                            }}
+                            onRegenerate={handleRegenerate}
+                            onDownload={handleDownload}
+                            onVideoGenerated={handleVideoGenerated}
+                            onBackToImage={handleBackToImage}
+                            onCropComplete={(newUrl, idx) => {
+                              setMessages(prev => prev.map((m, i) => 
                                 i === idx && m.visual ? { ...m, visual: { ...m.visual, image_url: newUrl } } : m
-                                ));
-                                }}
-                                onOpenFavorites={() => setShowFavoritesModal(true)}
-                                />
-                                )}
+                              ));
+                            }}
+                            onOpenFavorites={() => setShowFavoritesModal(true)}
+                          />
+                        )}
 
         {/* Input Area */}
         <div className={cn(
