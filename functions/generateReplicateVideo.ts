@@ -112,10 +112,13 @@ Deno.serve(async (req) => {
     } else {
       // Kling v2.5 Turbo Pro
       modelEndpoint = 'https://api.replicate.com/v1/models/kwaivgi/kling-v2.5-turbo-pro/predictions';
+      // Kling API accepts: "16:9", "9:16", "1:1"
+      const klingAspectRatio = aspect_ratio || '16:9';
+      console.log(`Kling aspect_ratio: ${klingAspectRatio}`);
       input = {
         prompt: prompt || 'Cinematic motion, smooth camera movement',
         duration: duration === 10 ? 10 : 5,
-        aspect_ratio: aspect_ratio
+        aspect_ratio: klingAspectRatio
       };
       if (image_url) {
         input.start_image = image_url;
