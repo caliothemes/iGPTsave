@@ -705,6 +705,31 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                   </div>
                   )}
 
+            {/* Aspect Ratio - Only for Wan */}
+            {provider === 'wan' && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Format vidéo' : 'Video format'}
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {['1:1', '9:16', '16:9'].map(ratio => (
+                  <button
+                    key={ratio}
+                    onClick={() => setWanAspectRatio(ratio)}
+                    disabled={isGenerating}
+                    className={`px-3 py-2 rounded-lg border transition-all text-sm disabled:opacity-50 ${
+                      wanAspectRatio === ratio
+                        ? 'bg-blue-600 border-blue-500 text-white'
+                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    }`}
+                  >
+                    {ratio}
+                  </button>
+                ))}
+              </div>
+            </div>
+            )}
+
             {/* Audio Upload - Only show for Wan */}
           {provider === 'wan' && (
             <div className="mb-4">
