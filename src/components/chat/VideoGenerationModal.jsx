@@ -119,10 +119,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
         if (provider === 'replicate') {
           payload.aspect_ratio = aspectRatio;
-        }
-
-        if (provider === 'sora') {
+        } else if (provider === 'sora') {
           payload.aspect_ratio = soraAspectRatio;
+        } else if (provider === 'wan') {
+          payload.aspect_ratio = wanAspectRatio;
         }
 
         if (provider === 'wan' && audioFile) {
