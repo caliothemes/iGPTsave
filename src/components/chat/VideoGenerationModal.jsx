@@ -13,7 +13,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const { language } = useLanguage();
   const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', 'runway', or 'sora'
   const [prompt, setPrompt] = useState('');
-  const [aspectRatio, setAspectRatio] = useState('1:1');
+  const [aspectRatio, setAspectRatio] = useState('16:9');
+  const [wanAspectRatio, setWanAspectRatio] = useState('16:9');
   const [duration, setDuration] = useState(5);
   const [soraAspectRatio, setSoraAspectRatio] = useState('16:9');
   const [audioFile, setAudioFile] = useState(null);
