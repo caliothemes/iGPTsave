@@ -3424,8 +3424,8 @@ Réponds en JSON avec:
                 setUploadingUserImage(true);
                 try {
                   const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                  addImageLayer(file_url, 150, 150);
-                  showHelp(language === 'fr' ? '💡 Image ajoutée ! Redimensionnez et déplacez-la.' : '💡 Image added! Resize and move it.');
+                  const {w:_w,h:_h} = await new Promise(res=>{ const i=new Image(); i.onload=()=>res({w:i.width,h:i.height}); i.src=file_url; });
+                  const _r=Math.min(200/_w,200/_h,1); addImageLayer(file_url,Math.round(_w*_r),Math.round(_h*_r)); showHelp(language==='fr'?'💡 Image ajoutée ! Redimensionnez et déplacez-la.':'💡 Image added! Resize and move it.');
                 } catch (err) {
                   console.error(err);
                 }
