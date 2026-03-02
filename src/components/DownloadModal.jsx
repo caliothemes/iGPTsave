@@ -29,18 +29,32 @@ export default function DownloadModal({ isOpen, onClose, visual, onDownload, vid
     setDownloading(true);
     
     try {
-      // For videos, direct download (no conversion)
+      // For videos, fetch as blob then download (works on mobile)
       if (videoOnly) {
         const videoUrl = visual.video_url || visual.image_url;
-        // Extract original extension from URL or default to mp4
-        const urlExt = videoUrl.split('.').pop().split('?')[0] || 'mp4';
-        const link = document.createElement('a');
-        link.href = videoUrl;
-        link.download = `${visual.title || 'video'}.${urlExt}`;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const urlExt = videoUrl.split('.').pop().split('?')[0].toLowerCase() || 'mp4';
+        const ext = ['mp4', 'webm', 'mov'].includes(urlExt) ? urlExt : 'mp4';
+        try {
+          const response = await fetch(videoUrl);
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = `${visual.title || 'video'}.${ext}`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        } catch {
+          // Fallback
+          const link = document.createElement('a');
+          link.href = videoUrl;
+          link.download = `${visual.title || 'video'}.${ext}`;
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
         onDownload?.();
         onClose();
       } else {
