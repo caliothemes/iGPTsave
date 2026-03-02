@@ -98,11 +98,16 @@ Deno.serve(async (req) => {
     } else if (model === 'wan') {
       // Wan v2.6 I2V
       modelEndpoint = 'https://api.replicate.com/v1/models/wan-video/wan-2.6-i2v/predictions';
+      // Map aspect_ratio to Wan's accepted values
+      const wanAspectMap = { '16:9': '16:9', '9:16': '9:16', '1:1': '1:1' };
+      const wanAspectRatio = wanAspectMap[aspect_ratio] || '16:9';
+      console.log(`Wan aspect_ratio: ${wanAspectRatio}`);
       input = {
         image: image_url,
         prompt: prompt,
         duration: Number(duration), // API expects integer
         resolution: "720p",
+        aspect_ratio: wanAspectRatio,
         enable_prompt_expansion: true,
         multi_shots: false
       };
