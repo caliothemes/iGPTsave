@@ -58,8 +58,10 @@ export default function Sidebar({
       // Load actual total visuals count if user is logged in
       if (user) {
         try {
-          const allVisuals = await base44.entities.Visual.filter({ user_email: user.email });
-          setActualTotalCount(allVisuals.length);
+          // Use list with a high limit to get the real count
+          const countVisuals = await base44.entities.Visual.filter({ user_email: user.email }, '-created_date', 1);
+          // We just need the count from the parent page's totalVisualsCount prop
+          // Nothing to do here - rely on totalVisualsCount prop instead
         } catch (e) {
           console.error('Failed to load total visuals:', e);
         }
