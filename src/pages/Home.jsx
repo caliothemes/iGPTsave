@@ -223,7 +223,7 @@ export default function Home() {
           const visuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10);
           setSessionVisuals(visuals);
 
-          const allVisuals = await base44.entities.Visual.filter({ user_email: currentUser.email });
+          const allVisuals = await base44.entities.Visual.filter({ user_email: currentUser.email }, '-created_date', 10000);
           setTotalVisualsCount(allVisuals.length);
 
           const urlParams = new URLSearchParams(window.location.search);
