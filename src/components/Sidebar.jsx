@@ -179,7 +179,7 @@ export default function Sidebar({
                    onClick={() => onSelectVisual && onSelectVisual({ openModal: true })}
                    className="mt-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white text-xs transition-all inline-block"
                  >
-                   {t('seeAll')} ({actualTotalCount || totalVisualsCount || visuals.length})
+                   {t('seeAll')} ({totalVisualsCount || visuals.length})
                  </button>
                 )}
               </CollapsibleContent>
