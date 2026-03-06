@@ -1853,96 +1853,81 @@ ${qaKnowledge}
     setCurrentVisual(null);
     setVisualsHistory([]);
 
-    // Load ALL visuals associated with this conversation for history
     try {
-      const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, 'created_date'); // Oldest first
+      const visuals = await base44.entities.Visual.filter({ conversation_id: conv.id }, 'created_date');
+      
       if (visuals.length > 0) {
         setVisualsHistory(visuals);
-        setCurrentVisual(visuals[visuals.length - 1]); // Most recent as current
+        setCurrentVisual(visuals[visuals.length - 1]);
 
-        // Group visuals by variant batches (same prompt, titles with (1/N), (2/N), etc.)
+        // Group visuals by variant batches
         const variantGroups = [];
         let currentGroup = [];
         
-        for (let i = 0; i < visuals.length; i++) {
-          const visual = visuals[i];
-          
-          // Check if this is part of a variant batch
+        for (const visual of visuals) {
           const isVariant = visual.title?.match(/\((\d+)\/(\d+)\)$/);
-          
           if (isVariant) {
             const [, current, total] = isVariant;
             currentGroup.push(visual);
-            
-            // If this is the last variant in the batch, close the group
             if (parseInt(current) === parseInt(total)) {
               variantGroups.push([...currentGroup]);
               currentGroup = [];
             }
           } else {
-            // Not a variant, add as single visual
             if (currentGroup.length > 0) {
-              // Close previous group if any
               variantGroups.push([...currentGroup]);
               currentGroup = [];
             }
             variantGroups.push([visual]);
           }
         }
-        
-        // Add remaining group if any
-        if (currentGroup.length > 0) {
-          variantGroups.push([...currentGroup]);
-        }
+        if (currentGroup.length > 0) variantGroups.push([...currentGroup]);
 
-        // Reconstruct messages with visuals attached
+        // Build messages: interleave text messages with visual cards
+        // Strategy: pair each user message with the next visual group
         const baseMessages = conv.messages || [];
         const reconstructedMessages = [];
         let groupIdx = 0;
 
-        // For each message, attach visuals after assistant success messages
-        for (let i = 0; i < baseMessages.length; i++) {
-          reconstructedMessages.push(baseMessages[i]);
-
-          // If this is an assistant message indicating success, add the next visual/group
-          if (baseMessages[i].role === 'assistant' && 
-              (baseMessages[i].content.includes('prêt') || 
-               baseMessages[i].content.includes('ready') ||
-               baseMessages[i].content.includes('version') ||
-               baseMessages[i].content.includes('variantes générées') ||
-               baseMessages[i].content.includes('variants generated') ||
-               baseMessages[i].content.includes('✨'))) {
-            
+        for (const msg of baseMessages) {
+          reconstructedMessages.push(msg);
+          // After each user message, insert the corresponding visual group
+          if (msg.role === 'user' && groupIdx < variantGroups.length) {
             const group = variantGroups[groupIdx];
-            if (group) {
-              if (group.length > 1) {
-                // Multiple variants: show as effectVariants
-                reconstructedMessages.push({
-                  role: 'assistant',
-                  content: '',
-                  effectVariants: group
-                });
-              } else {
-                // Single visual
-                reconstructedMessages.push({
-                  role: 'assistant',
-                  content: '',
-                  visual: group[0]
-                });
-              }
-              groupIdx++;
+            if (group.length > 1) {
+              reconstructedMessages.push({
+                role: 'assistant',
+                content: '',
+                effectVariants: group
+              });
+            } else {
+              reconstructedMessages.push({
+                role: 'assistant',
+                content: '',
+                visual: group[0]
+              });
             }
+            groupIdx++;
           }
+        }
+
+        // If there are more visuals than user messages, append the remaining ones
+        while (groupIdx < variantGroups.length) {
+          const group = variantGroups[groupIdx];
+          if (group.length > 1) {
+            reconstructedMessages.push({ role: 'assistant', content: '', effectVariants: group });
+          } else {
+            reconstructedMessages.push({ role: 'assistant', content: '', visual: group[0] });
+          }
+          groupIdx++;
         }
 
         setMessages(reconstructedMessages);
 
-        // Set category based on visual type
         if (visuals[0]?.visual_type) {
           setSelectedCategory({ id: visuals[0].visual_type });
         }
       } else {
-        // No visuals, just show messages
         setMessages(conv.messages || []);
       }
     } catch (e) {
