@@ -316,10 +316,10 @@ export default function Home() {
     }
 
     setSelectedCategory(category);
-    const prompt = category.selectedSubmenu 
-      ? (category.selectedSubmenu.prompt?.[language] || '')
-      : (category.prompt?.[language] || '');
-    setInputValue(prompt + ' ');
+    if (!inputValue.trim()) {
+      const p = category.selectedSubmenu?.prompt?.[language] || category.prompt?.[language] || '';
+      setInputValue(p + ' ');
+    }
     setCategoryDropdownOpen(false);
     setOpenSubmenu(null);
     setOpenNestedSubmenu(null);
