@@ -782,6 +782,56 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                   </div>
                   )}
 
+            {/* Aspect Ratio - Only for Seedance */}
+            {provider === 'seedance' && (
+            <div className="mb-4">
+              <label className="text-white/80 text-sm mb-2 block">
+                {language === 'fr' ? 'Format vidéo' : 'Video format'}
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {['1:1', '3:4', '16:9', '9:16'].map(ratio => (
+                  <button
+                    key={ratio}
+                    onClick={() => setSeedanceAspectRatio(ratio)}
+                    disabled={isGenerating}
+                    className={`px-3 py-2 rounded-lg border transition-all text-sm disabled:opacity-50 ${
+                      seedanceAspectRatio === ratio
+                        ? 'bg-cyan-600 border-cyan-500 text-white'
+                        : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    }`}
+                  >
+                    {ratio}
+                  </button>
+                ))}
+              </div>
+            </div>
+            )}
+
+            {/* Generate Audio toggle - Only for Seedance */}
+            {provider === 'seedance' && (
+            <div className="mb-4">
+              <button
+                onClick={() => setSeedanceGenerateAudio(!seedanceGenerateAudio)}
+                disabled={isGenerating}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 hover:border-cyan-500/30 transition-all disabled:opacity-50"
+              >
+                <div className={`flex-shrink-0 w-11 h-6 rounded-full transition-all ${seedanceGenerateAudio ? 'bg-cyan-600' : 'bg-white/20'}`}>
+                  <div className={`w-5 h-5 mt-0.5 rounded-full bg-white transition-transform duration-200 ${seedanceGenerateAudio ? 'translate-x-5 ml-0.5' : 'translate-x-0.5'}`} />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-white text-sm font-medium">
+                    {language === 'fr' ? 'Générer de l\'audio' : 'Generate audio'}
+                  </p>
+                  <p className="text-white/50 text-xs">
+                    {language === 'fr'
+                      ? 'L\'IA synchronise automatiquement des sons avec la vidéo'
+                      : 'AI automatically synchronizes sounds with the video'}
+                  </p>
+                </div>
+              </button>
+            </div>
+            )}
+
             {/* Aspect Ratio - Only for Wan */}
             {provider === 'wan' && (
             <div className="mb-4">
