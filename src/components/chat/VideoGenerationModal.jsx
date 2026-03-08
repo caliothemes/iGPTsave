@@ -955,6 +955,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </div>
           </div>
 
+          </>) /* fin du bloc conditionnel provider !== null */}
+
           {/* Progress Bar */}
           {isGenerating && (
             <div className="mb-4">
