@@ -1025,7 +1025,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             </Button>
             <Button
               onClick={handleGenerate}
-              disabled={(!autoPrompt && !prompt.trim()) || isGenerating}
+              disabled={!provider || (!autoPrompt && !prompt.trim()) || isGenerating}
               className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
             >
               {isGenerating ? (
