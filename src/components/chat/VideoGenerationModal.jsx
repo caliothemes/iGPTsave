@@ -28,6 +28,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const [showGuestCreditsModal, setShowGuestCreditsModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const optionsRef = React.useRef(null);
 
   React.useEffect(() => {
     if (isOpen) {
