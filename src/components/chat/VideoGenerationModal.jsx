@@ -92,6 +92,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     }, 1000);
 
     try {
+      if (!provider) return; // sécurité si aucun modèle sélectionné
+
       if (provider === 'replicate' || provider === 'wan' || provider === 'sora' || provider === 'seedance') {
         // Replicate Kling/Wan/Sora generation
         setProgress(10);
