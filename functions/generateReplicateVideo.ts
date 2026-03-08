@@ -155,15 +155,24 @@ Deno.serve(async (req) => {
     console.log('Model endpoint:', modelEndpoint);
     console.log('Model input:', JSON.stringify(input, null, 2));
 
-    // Call Replicate API
-    const response = await fetch(modelEndpoint, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${REPLICATE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ input })
-    });
+    // Call Replicate API with timeout to avoid gateway 502
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+
+    let response;
+    try {
+      response = await fetch(modelEndpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${REPLICATE_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input }),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const responseText = await response.text();
     console.log('Replicate response status:', response.status);
