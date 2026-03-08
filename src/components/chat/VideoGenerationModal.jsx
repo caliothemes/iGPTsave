@@ -999,7 +999,28 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                       </div>
                       </div>
                       )}
-            {provider === 'sora' ? (
+            {provider === 'seedance' ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDuration(8)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 8 ? 'bg-cyan-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  8s
+                </button>
+                <button
+                  onClick={() => setDuration(12)}
+                  disabled={isGenerating}
+                  className={`flex-1 px-4 py-2 rounded-lg transition-all ${
+                    duration === 12 ? 'bg-cyan-600 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  } disabled:opacity-50`}
+                >
+                  12s
+                </button>
+              </div>
+            ) : provider === 'sora' ? (
               <div className="flex gap-2">
                 <button
                   onClick={() => setDuration(4)}
