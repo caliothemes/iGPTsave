@@ -541,7 +541,14 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           </div>
 
           {/* Tout ce qui suit n'est affiché que si un modèle est sélectionné */}
-          {provider !== null && (<div>
+          {provider !== null && (<div ref={optionsRef}>
+          <div className="flex items-center gap-3 mb-4 mt-1">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-white/60 text-xs font-medium tracking-wide uppercase">
+              {language === 'fr' ? 'Réglez vos options' : 'Configure your options'}
+            </span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
 
           {/* Service Info */}
           <div className={`mb-4 p-3 rounded-xl border ${
