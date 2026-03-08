@@ -61,6 +61,12 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     } else {
       setDuration(5);
     }
+    // Scroll to options when a provider is selected
+    if (provider !== null) {
+      setTimeout(() => {
+        optionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
   }, [provider]);
 
   const handleGenerate = async () => {
