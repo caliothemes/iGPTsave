@@ -946,21 +946,21 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 </svg>
                 {provider === 'sora'
                   ? (duration === 4 
-                      ? (language === 'fr' ? '300 crédits' : '300 credits')
+                      ? (language === 'fr' ? '295 crédits' : '295 credits')
                       : duration === 8
-                      ? (language === 'fr' ? '500 crédits' : '500 credits')
-                      : (language === 'fr' ? '700 crédits' : '700 credits'))
+                      ? (language === 'fr' ? '495 crédits' : '495 credits')
+                      : (language === 'fr' ? '695 crédits' : '695 credits'))
                   : provider === 'seedance'
                   ? (duration === 8
                       ? (language === 'fr' ? '165 crédits' : '165 credits')
                       : (language === 'fr' ? '185 crédits' : '185 credits'))
                   : provider === 'replicate' 
                   ? (duration === 5 
-                      ? (language === 'fr' ? '200 crédits' : '200 credits') 
-                      : (language === 'fr' ? '300 crédits' : '300 credits'))
+                      ? (language === 'fr' ? '195 crédits' : '195 credits') 
+                      : (language === 'fr' ? '295 crédits' : '295 credits'))
                   : (duration === 5 
-                      ? (language === 'fr' ? '200 crédits' : '200 credits') 
-                      : (language === 'fr' ? '300 crédits' : '300 credits'))}
+                      ? (language === 'fr' ? '195 crédits' : '195 credits') 
+                      : (language === 'fr' ? '295 crédits' : '295 credits'))}
               </span>
             </div>
           </div>
