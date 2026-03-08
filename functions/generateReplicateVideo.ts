@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5, model = 'kling', audio_url } = body;
+    const { image_url, additional_images = [], prompt, aspect_ratio = "16:9", duration = 5, model = 'kling', audio_url, generate_audio = true } = body;
 
     console.log('[BACKEND DEBUG] Raw request body:', JSON.stringify(body, null, 2));
     console.log('[BACKEND DEBUG] Extracted duration:', duration, 'Type:', typeof duration);
