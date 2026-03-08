@@ -530,11 +530,11 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                  </div>
                 </div>
                 <div className="space-y-1">
-                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '85%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '80%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '70%' }].map(item => (
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '85%', color: 'from-violet-500 to-violet-400' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '80%', color: 'from-cyan-500 to-cyan-400' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '70%', color: 'from-orange-500 to-amber-400' }].map(item => (
                     <div key={item.label} className="flex items-center gap-2">
                       <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
                       <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: item.w }} />
+                        <div className={`h-full bg-gradient-to-r ${item.color}`} style={{ width: item.w }} />
                       </div>
                     </div>
                   ))}
