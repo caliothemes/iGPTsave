@@ -519,7 +519,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           </div>
 
           {/* Tout ce qui suit n'est affiché que si un modèle est sélectionné */}
-          {provider !== null && (<>
+          {provider !== null && (<div>
 
           {/* Service Info */}
           <div className={`mb-4 p-3 rounded-xl border ${
