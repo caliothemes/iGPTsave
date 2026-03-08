@@ -25,6 +25,9 @@ Deno.serve(async (req) => {
     if (model === 'sora') {
       creditsRequired = durationNum == 4 ? 300 : durationNum == 8 ? 500 : 700;
       console.log(`Sora credits calculation: duration=${durationNum} → credits=${creditsRequired}`);
+    } else if (model === 'seedance') {
+      creditsRequired = durationNum >= 12 ? 185 : 165;
+      console.log(`Seedance credits calculation: duration=${durationNum} → credits=${creditsRequired}`);
     } else if (model === 'wan') {
       creditsRequired = duration === 10 ? 300 : 200;
     } else {
