@@ -374,6 +374,18 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 <div className="text-[10px] text-white/70">Turbo Pro</div>
               </button>
               <button
+                onClick={() => setProvider('seedance')}
+                disabled={isGenerating}
+                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                  provider === 'seedance'
+                    ? 'bg-cyan-600 border-cyan-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                }`}
+              >
+                <div className="font-bold">Seedance 1.5</div>
+                <div className="text-[10px] text-white/70">Pro 1080p + Audio</div>
+              </button>
+              <button
                 onClick={() => setProvider('wan')}
                 disabled={isGenerating}
                 className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
