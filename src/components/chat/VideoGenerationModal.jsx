@@ -197,6 +197,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     videoAspectRatio = aspectRatio;
                   } else if (provider === 'sora') {
                     videoAspectRatio = soraAspectRatio;
+                  } else if (provider === 'seedance') {
+                    videoAspectRatio = seedanceAspectRatio;
                   } else if (provider === 'wan') {
                     // Wan keeps source image ratio
                     if (visual.dimensions) {
