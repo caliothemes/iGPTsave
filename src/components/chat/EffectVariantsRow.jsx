@@ -3,21 +3,33 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/components/LanguageContext';
 
+function getThumbnailSize(dimensions) {
+  if (!dimensions) return { width: 128, height: 128 };
+  const [w, h] = dimensions.split('x').map(Number);
+  if (!w || !h) return { width: 128, height: 128 };
+  const base = 128;
+  if (w >= h) return { width: base, height: Math.round(base * h / w) };
+  return { width: Math.round(base * w / h), height: base };
+}
+
 export default function EffectVariantsRow({ variants, onSelectVariant, selectedVariant }) {
   const { language } = useLanguage();
 
   return (
     <div className="w-full overflow-x-auto pb-2">
-      <div className="flex gap-3 min-w-min">
-        {variants.map((variant, idx) => (
+      <div className="flex gap-3 min-w-min items-end">
+        {variants.map((variant, idx) => {
+          const { width, height } = getThumbnailSize(variant.dimensions);
+          return (
           <motion.button
             key={variant.id || idx}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.1 }}
             onClick={() => onSelectVariant(variant)}
+            style={{ width, height }}
             className={cn(
-              "relative flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden border-2 transition-all hover:scale-105",
+              "relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all hover:scale-105",
               selectedVariant?.id === variant.id
                 ? "border-emerald-500 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-500/50"
                 : "border-white/20 hover:border-emerald-500/50"
