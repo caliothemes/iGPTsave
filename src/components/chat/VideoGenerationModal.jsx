@@ -457,7 +457,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                  <div>
                    <span className="font-bold text-sm">Wan v2.6</span>
                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'wan' ? 'bg-blue-500/30 text-blue-200' : 'bg-white/10 text-white/50'}`}>I2V 720p</span>
-                   <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Audio</span>
+                   <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">{language === 'fr' ? 'Audio IA' : 'AI Audio'}</span>
                  </div>
                  <div className="text-right">
                    <div className={`text-[10px] ${provider === 'wan' ? 'text-blue-300' : 'text-white/40'}`}>5s / 10s</div>
