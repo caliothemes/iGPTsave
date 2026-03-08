@@ -557,24 +557,24 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                  provider === 'replicate' ? 'text-violet-300/80' : provider === 'wan' ? 'text-blue-300/80' : provider === 'sora' ? 'text-pink-300/80' : provider === 'seedance' ? 'text-cyan-300/80' : 'text-amber-200/80'
                 }`}>
                  {provider === 'replicate'
-                   ? (language === 'fr' 
-                       ? <>Vidéo cinématographique pro.<br />5s = 200 crédits, 10s = 300 crédits</> 
-                       : <>Professional cinematic video.<br />5s = 200 credits, 10s = 300 credits</>)
-                    : provider === 'wan'
-                    ? (language === 'fr'
-                        ? <>Vidéo produit en 720p avec audio optionnel.<br />5s = 200 crédits, 10s = 300 crédits</>
-                        : <>Product video in 720p with optional audio.<br />5s = 200 credits, 10s = 300 credits</>)
-                    : provider === 'sora'
-                    ? (language === 'fr'
-                        ? <>Génération ultra-réaliste par OpenAI.<br />4s = 300 crédits, 8s = 500 crédits, 12s = 700 crédits</>
-                        : <>Ultra-realistic generation by OpenAI.<br />4s = 300 credits, 8s = 500 credits, 12s = 700 credits</>)
-                    : provider === 'seedance'
-                    ? (language === 'fr'
-                        ? <>Vidéo 1080p HD avec audio IA synchronisé.<br />8s = 165 crédits, 12s = 185 crédits</>
-                        : <>1080p HD video with synchronized AI audio.<br />8s = 165 credits, 12s = 185 credits</>)
-                    : (language === 'fr'
-                        ? <>Animation fluide HD uniquement en 16:9.<br />5s = 200 crédits, 10s = 300 crédits</>
-                        : <>Smooth HD animation 16:9 only.<br />5s = 200 credits, 10s = 300 credits</>)}
+                    ? (language === 'fr' 
+                        ? <>Vidéo cinématographique pro.<br />5s = 195 crédits, 10s = 295 crédits</> 
+                        : <>Professional cinematic video.<br />5s = 195 credits, 10s = 295 credits</>)
+                     : provider === 'wan'
+                     ? (language === 'fr'
+                         ? <>Vidéo produit en 720p avec audio optionnel.<br />5s = 195 crédits, 10s = 295 crédits</>
+                         : <>Product video in 720p with optional audio.<br />5s = 195 credits, 10s = 295 credits</>)
+                     : provider === 'sora'
+                     ? (language === 'fr'
+                         ? <>Génération ultra-réaliste par OpenAI.<br />4s = 295 crédits, 8s = 495 crédits, 12s = 695 crédits</>
+                         : <>Ultra-realistic generation by OpenAI.<br />4s = 295 credits, 8s = 495 credits, 12s = 695 credits</>)
+                     : provider === 'seedance'
+                     ? (language === 'fr'
+                         ? <>Vidéo 1080p HD avec audio IA synchronisé.<br />8s = 165 crédits, 12s = 185 crédits</>
+                         : <>1080p HD video with synchronized AI audio.<br />8s = 165 credits, 12s = 185 credits</>)
+                     : (language === 'fr'
+                         ? <>Animation fluide HD uniquement en 16:9.<br />5s = 195 crédits, 10s = 295 crédits</>
+                         : <>Smooth HD animation 16:9 only.<br />5s = 195 credits, 10s = 295 credits</>)}
                 </p>
               </div>
             </div>
