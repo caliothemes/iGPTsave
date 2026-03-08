@@ -127,6 +127,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           payload.aspect_ratio = soraAspectRatio;
         } else if (provider === 'wan') {
           payload.aspect_ratio = wanAspectRatio;
+        } else if (provider === 'seedance') {
+          payload.aspect_ratio = seedanceAspectRatio;
+          payload.generate_audio = seedanceGenerateAudio;
         }
 
         if (provider === 'wan' && audioFile) {
