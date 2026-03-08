@@ -489,7 +489,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 <div className="flex items-center justify-between mb-2">
                  <div>
                    <span className="font-bold text-sm">Sora 2 Pro</span>
-                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'sora' ? 'bg-pink-500/30 text-pink-200' : 'bg-white/10 text-white/50'}`}>OpenAI + Audio</span>
+                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'sora' ? 'bg-pink-500/30 text-pink-200' : 'bg-white/10 text-white/50'}`}>OpenAI</span>
+                   <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🎵 Audio</span>
                  </div>
                  <div className="text-right">
                    <div className={`text-[10px] ${provider === 'sora' ? 'text-pink-300' : 'text-white/40'}`}>4s / 8s / 12s</div>
