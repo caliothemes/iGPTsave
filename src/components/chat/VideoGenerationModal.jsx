@@ -374,9 +374,13 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
 
           {/* Provider Selection avec points forts intégrés */}
           <div className="mb-4">
-            <label className="text-white/80 text-sm mb-2 block">
-              {language === 'fr' ? 'Choisissez un service de génération' : 'Choose a generation service'}
-            </label>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-white/60 text-xs font-medium tracking-wide uppercase">
+                {language === 'fr' ? 'Choisissez un service de génération' : 'Choose a generation service'}
+              </span>
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
             <div className="grid grid-cols-1 gap-2">
               {/* Kling */}
               <button
