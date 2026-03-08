@@ -423,7 +423,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 <div className="flex items-center justify-between mb-2">
                  <div>
                    <span className="font-bold text-sm">Seedance 1.5</span>
-                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'seedance' ? 'bg-cyan-500/30 text-cyan-200' : 'bg-white/10 text-white/50'}`}>Pro 1080p + Audio IA</span>
+                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'seedance' ? 'bg-cyan-500/30 text-cyan-200' : 'bg-white/10 text-white/50'}`}>Pro 1080p</span>
+                   <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🎵 Audio IA</span>
                  </div>
                  <div className="text-right">
                    <div className={`text-[10px] ${provider === 'seedance' ? 'text-cyan-300' : 'text-white/40'}`}>8s / 12s</div>
