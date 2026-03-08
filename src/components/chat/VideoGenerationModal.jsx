@@ -355,320 +355,161 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             />
           </div>
 
-          {/* Provider Selection */}
+          {/* Provider Selection avec points forts intégrés */}
           <div className="mb-4">
             <label className="text-white/80 text-sm mb-2 block">
-              {language === 'fr' ? 'Service de génération' : 'Generation service'}
+              {language === 'fr' ? 'Choisissez un service de génération' : 'Choose a generation service'}
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
+              {/* Kling */}
               <button
                 onClick={() => setProvider('replicate')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`w-full px-4 py-3 rounded-xl border transition-all text-left disabled:opacity-50 ${
                   provider === 'replicate'
-                    ? 'bg-violet-600 border-violet-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    ? 'bg-violet-600/20 border-violet-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="font-bold">Kling v2.5</div>
-                <div className="text-[10px] text-white/70">Turbo Pro</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="font-bold text-sm">Kling v2.5</span>
+                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'replicate' ? 'bg-violet-500/30 text-violet-200' : 'bg-white/10 text-white/50'}`}>Turbo Pro</span>
+                  </div>
+                  <span className={`text-[10px] ${provider === 'replicate' ? 'text-violet-300' : 'text-white/40'}`}>5s / 10s</span>
+                </div>
+                <div className="space-y-1">
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '95%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '90%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '90%' }].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
+                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: item.w }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </button>
+
+              {/* Seedance */}
               <button
                 onClick={() => setProvider('seedance')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`w-full px-4 py-3 rounded-xl border transition-all text-left disabled:opacity-50 ${
                   provider === 'seedance'
-                    ? 'bg-cyan-600 border-cyan-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    ? 'bg-cyan-600/20 border-cyan-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="font-bold">Seedance 1.5</div>
-                <div className="text-[10px] text-white/70">Pro 1080p + Audio</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="font-bold text-sm">Seedance 1.5</span>
+                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'seedance' ? 'bg-cyan-500/30 text-cyan-200' : 'bg-white/10 text-white/50'}`}>Pro 1080p + Audio IA</span>
+                  </div>
+                  <span className={`text-[10px] ${provider === 'seedance' ? 'text-cyan-300' : 'text-white/40'}`}>8s / 12s</span>
+                </div>
+                <div className="space-y-1">
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '98%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '95%' }, { label: language === 'fr' ? 'Qualité 1080p' : '1080p quality', w: '100%' }].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
+                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: item.w }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </button>
+
+              {/* Wan */}
               <button
                 onClick={() => setProvider('wan')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`w-full px-4 py-3 rounded-xl border transition-all text-left disabled:opacity-50 ${
                   provider === 'wan'
-                    ? 'bg-violet-600 border-violet-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    ? 'bg-blue-600/20 border-blue-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="font-bold">Wan v2.6</div>
-                <div className="text-[10px] text-white/70">I2V 720p</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="font-bold text-sm">Wan v2.6</span>
+                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'wan' ? 'bg-blue-500/30 text-blue-200' : 'bg-white/10 text-white/50'}`}>I2V 720p + Audio</span>
+                  </div>
+                  <span className={`text-[10px] ${provider === 'wan' ? 'text-blue-300' : 'text-white/40'}`}>5s / 10s</span>
+                </div>
+                <div className="space-y-1">
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '90%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '85%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '95%' }].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
+                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: item.w }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </button>
+
+              {/* Sora */}
               <button
                 onClick={() => setProvider('sora')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`w-full px-4 py-3 rounded-xl border transition-all text-left disabled:opacity-50 ${
                   provider === 'sora'
-                    ? 'bg-violet-600 border-violet-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    ? 'bg-pink-600/20 border-pink-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="font-bold">Sora 2 Pro</div>
-                <div className="text-[10px] text-white/70">OpenAI</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="font-bold text-sm">Sora 2 Pro</span>
+                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'sora' ? 'bg-pink-500/30 text-pink-200' : 'bg-white/10 text-white/50'}`}>OpenAI + Audio</span>
+                  </div>
+                  <span className={`text-[10px] ${provider === 'sora' ? 'text-pink-300' : 'text-white/40'}`}>4s / 8s / 12s</span>
+                </div>
+                <div className="space-y-1">
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '100%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '100%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '85%' }].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
+                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-pink-500 to-rose-400" style={{ width: item.w }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </button>
+
+              {/* RunwayML */}
               <button
                 onClick={() => setProvider('runway')}
                 disabled={isGenerating}
-                className={`px-4 py-3 rounded-lg border transition-all text-sm font-medium disabled:opacity-50 ${
+                className={`w-full px-4 py-3 rounded-xl border transition-all text-left disabled:opacity-50 ${
                   provider === 'runway'
-                    ? 'bg-violet-600 border-violet-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                    ? 'bg-amber-600/20 border-amber-500 text-white'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <div className="font-bold">RunwayML</div>
-                <div className="text-[10px] text-white/70">Gen-3 Alpha Turbo</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="font-bold text-sm">RunwayML</span>
+                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'runway' ? 'bg-amber-500/30 text-amber-200' : 'bg-white/10 text-white/50'}`}>Gen-3 Alpha Turbo</span>
+                  </div>
+                  <span className={`text-[10px] ${provider === 'runway' ? 'text-amber-300' : 'text-white/40'}`}>5s / 10s</span>
+                </div>
+                <div className="space-y-1">
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '85%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '80%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '75%' }].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
+                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: item.w }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </button>
             </div>
-            </div>
+          </div>
 
-            {/* Provider Features */}
-            <div className="mb-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 space-y-2">
-                {provider === 'sora' && (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '100%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '100%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo produit' : 'Product video'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '85%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix formats' : 'Format choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '40%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix durées' : 'Duration choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400" style={{ width: '75%' }} />
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-white/10 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">Audio</span>
-                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">{language === 'fr' ? 'Animation de texte' : 'Text animation'}</span>
-                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {provider === 'seedance' && (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '98%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '95%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Qualité image' : 'Image quality'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '100%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix formats' : 'Format choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '90%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix durées' : 'Duration choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '65%' }} />
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-white/10 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">Audio {language === 'fr' ? '(génération IA)' : '(AI generated)'}</span>
-                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">1080p HD</span>
-                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {provider === 'replicate' && (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '95%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '90%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo produit' : 'Product video'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '90%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix formats' : 'Format choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '75%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix durées' : 'Duration choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400" style={{ width: '40%' }} />
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-white/10 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">Audio</span>
-                        <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">{language === 'fr' ? 'Animation de texte' : 'Text animation'}</span>
-                        <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {provider === 'wan' && (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '90%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '85%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo produit' : 'Product video'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '95%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix formats' : 'Format choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '20%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix durées' : 'Duration choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400" style={{ width: '40%' }} />
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-white/10 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">Audio</span>
-                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">{language === 'fr' ? 'Animation de texte' : 'Text animation'}</span>
-                        <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {provider === 'runway' && (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '85%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '80%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Vidéo produit' : 'Product video'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '75%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix formats' : 'Format choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '25%' }} />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix durées' : 'Duration choices'}</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400" style={{ width: '40%' }} />
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-white/10 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">Audio</span>
-                        <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white text-xs font-medium">{language === 'fr' ? 'Animation de texte' : 'Text animation'}</span>
-                        <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+          {/* Tout ce qui suit n'est affiché que si un modèle est sélectionné */}
+          {provider !== null && (<>
 
           {/* Service Info */}
           <div className={`mb-4 p-3 rounded-xl border ${
