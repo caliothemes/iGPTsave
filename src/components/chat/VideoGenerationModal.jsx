@@ -30,6 +30,14 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
   const [elapsedTime, setElapsedTime] = useState(0);
 
   React.useEffect(() => {
+    if (isOpen) {
+      setProvider(null);
+      setPrompt('');
+      setAutoPrompt(false);
+    }
+  }, [isOpen]);
+
+  React.useEffect(() => {
     const loadPromptExamples = async () => {
       try {
         const examples = await base44.entities.VideoPromptExample.filter({ is_active: true }, 'order');
