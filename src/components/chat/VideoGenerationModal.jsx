@@ -188,7 +188,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 setProgress(100);
                 
                 setTimeout(() => {
-                  const modelName = provider === 'wan' ? 'Wan v2.6 I2V' : provider === 'sora' ? 'Sora 2 Pro' : 'Kling v2.5 Pro';
+                  const modelName = provider === 'wan' ? 'Wan v2.6 I2V' : provider === 'sora' ? 'Sora 2 Pro' : provider === 'seedance' ? 'Seedance 1.5 Pro' : 'Kling v2.5 Pro';
                   const promptWithMetadata = `[${modelName}] [${duration}s] ${finalPrompt}`;
                   
                   // Calculate aspect ratio for Wan based on source image dimensions
