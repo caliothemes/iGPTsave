@@ -57,7 +57,8 @@ export default function EffectVariantsRow({ variants, onSelectVariant, selectedV
               </div>
             )}
           </motion.button>
-        ))}
+          );
+        })}
       </div>
       <p className="text-white/40 text-xs mt-2 text-center">
         {language === 'fr' 
