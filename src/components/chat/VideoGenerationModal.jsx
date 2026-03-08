@@ -421,11 +421,14 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <span className="font-bold text-sm">Seedance 1.5</span>
-                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'seedance' ? 'bg-cyan-500/30 text-cyan-200' : 'bg-white/10 text-white/50'}`}>Pro 1080p + Audio IA</span>
-                  </div>
-                  <span className={`text-[10px] ${provider === 'seedance' ? 'text-cyan-300' : 'text-white/40'}`}>8s / 12s</span>
+                 <div>
+                   <span className="font-bold text-sm">Seedance 1.5</span>
+                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'seedance' ? 'bg-cyan-500/30 text-cyan-200' : 'bg-white/10 text-white/50'}`}>Pro 1080p + Audio IA</span>
+                 </div>
+                 <div className="text-right">
+                   <div className={`text-[10px] ${provider === 'seedance' ? 'text-cyan-300' : 'text-white/40'}`}>8s / 12s</div>
+                   <div className={`text-[10px] font-medium ${provider === 'seedance' ? 'text-cyan-200' : 'text-white/30'}`}>165 – 185 {language === 'fr' ? 'crédits' : 'credits'}</div>
+                 </div>
                 </div>
                 <div className="space-y-1">
                   {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '98%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '95%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '88%' }].map(item => (
