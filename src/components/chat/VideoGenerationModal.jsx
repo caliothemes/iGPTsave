@@ -47,6 +47,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
     // Reset duration when provider changes
     if (provider === 'sora') {
       setDuration(4);
+    } else if (provider === 'seedance') {
+      setDuration(8);
     } else {
       setDuration(5);
     }
