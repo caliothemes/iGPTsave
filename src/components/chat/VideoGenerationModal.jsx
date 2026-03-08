@@ -476,7 +476,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                   <span className={`text-[10px] ${provider === 'sora' ? 'text-pink-300' : 'text-white/40'}`}>4s / 8s / 12s</span>
                 </div>
                 <div className="space-y-1">
-                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '100%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '100%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '85%' }].map(item => (
+                  {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '100%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '100%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '98%' }].map(item => (
                     <div key={item.label} className="flex items-center gap-2">
                       <span className="text-[10px] text-white/50 w-20 shrink-0">{item.label}</span>
                       <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
