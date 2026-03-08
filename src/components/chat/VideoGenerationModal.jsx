@@ -517,11 +517,14 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <span className="font-bold text-sm">RunwayML</span>
-                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'runway' ? 'bg-amber-500/30 text-amber-200' : 'bg-white/10 text-white/50'}`}>Gen-3 Alpha Turbo</span>
-                  </div>
-                  <span className={`text-[10px] ${provider === 'runway' ? 'text-amber-300' : 'text-white/40'}`}>5s / 10s</span>
+                 <div>
+                   <span className="font-bold text-sm">RunwayML</span>
+                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'runway' ? 'bg-amber-500/30 text-amber-200' : 'bg-white/10 text-white/50'}`}>Gen-3 Alpha Turbo</span>
+                 </div>
+                 <div className="text-right">
+                   <div className={`text-[10px] ${provider === 'runway' ? 'text-amber-300' : 'text-white/40'}`}>5s / 10s</div>
+                   <div className={`text-[10px] font-medium ${provider === 'runway' ? 'text-amber-200' : 'text-white/30'}`}>195 – 295 {language === 'fr' ? 'crédits' : 'credits'}</div>
+                 </div>
                 </div>
                 <div className="space-y-1">
                   {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '85%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '80%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '70%' }].map(item => (
