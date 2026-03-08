@@ -1119,7 +1119,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 </>
               )}
             </div>
-          </div>
+          </div>}
         </motion.div>
       </motion.div>
 
