@@ -678,6 +678,8 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
               ? 'bg-blue-500/10 border-blue-500/20'
               : provider === 'sora'
               ? 'bg-pink-500/10 border-pink-500/20'
+              : provider === 'seedance'
+              ? 'bg-cyan-500/10 border-cyan-500/20'
               : 'bg-amber-500/10 border-amber-500/20'
           }`}>
             <div className="flex items-start gap-2">
