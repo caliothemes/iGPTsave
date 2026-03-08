@@ -113,7 +113,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
         const payload = {
           image_url: visual.image_url,
           prompt: finalPrompt,
-          model: provider === 'wan' ? 'wan' : provider === 'sora' ? 'sora' : 'kling'
+          model: provider === 'wan' ? 'wan' : provider === 'sora' ? 'sora' : provider === 'seedance' ? 'seedance' : 'kling'
         };
         
         // Explicitly add duration
