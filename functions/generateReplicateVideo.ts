@@ -80,7 +80,23 @@ Deno.serve(async (req) => {
     let modelEndpoint;
     let input;
     
-    if (model === 'sora') {
+    if (model === 'seedance') {
+      // Seedance 1.5 Pro by ByteDance
+      modelEndpoint = 'https://api.replicate.com/v1/models/bytedance/seedance-1.5-pro/predictions';
+      input = {
+        prompt: prompt,
+        duration: Number(duration),
+        resolution: '1080p',
+        aspect_ratio: aspect_ratio || '16:9',
+        fps: 24,
+        generate_audio: generate_audio !== false,
+        camera_fixed: false
+      };
+      if (image_url) {
+        input.image = image_url;
+      }
+      console.log('Seedance 1.5 Pro final input:', JSON.stringify(input, null, 2));
+    } else if (model === 'sora') {
       // Sora 2 Pro - uses "seconds" parameter directly, NOT "length"
       modelEndpoint = 'https://api.replicate.com/v1/models/openai/sora-2-pro/predictions';
       
