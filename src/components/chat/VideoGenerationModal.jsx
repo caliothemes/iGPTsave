@@ -475,6 +475,54 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                     </div>
                   </>
                 )}
+                {provider === 'seedance' && (
+                  <>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Réalisme' : 'Realism'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '98%' }} />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Cohérence' : 'Coherence'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '95%' }} />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Qualité image' : 'Image quality'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '100%' }} />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix formats' : 'Format choices'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '90%' }} />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white text-xs font-medium whitespace-nowrap">{language === 'fr' ? 'Choix durées' : 'Duration choices'}</span>
+                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400" style={{ width: '65%' }} />
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-white/10 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white text-xs font-medium">Audio {language === 'fr' ? '(génération IA)' : '(AI generated)'}</span>
+                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white text-xs font-medium">1080p HD</span>
+                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </>
+                )}
                 {provider === 'replicate' && (
                   <>
                     <div className="flex items-center justify-between gap-3">
