@@ -1043,7 +1043,7 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
           </div>
 
           {/* Provider Footer */}
-          <div className="mt-6 pt-4 border-t border-white/10">
+          {provider && <div className="mt-6 pt-4 border-t border-white/10">
             <div className="flex items-center gap-3">
               {provider === 'replicate' ? (
                 <>
