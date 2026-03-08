@@ -11,7 +11,7 @@ import { createPageUrl } from '@/utils';
 
 export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated, user, credits, guestPrompts }) {
   const { language } = useLanguage();
-  const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', 'runway', 'sora', 'seedance'
+  const [provider, setProvider] = useState(null); // null = aucun sélectionné
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('16:9');
   const [wanAspectRatio, setWanAspectRatio] = useState('16:9');
