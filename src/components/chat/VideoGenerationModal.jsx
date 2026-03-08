@@ -485,11 +485,14 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <span className="font-bold text-sm">Sora 2 Pro</span>
-                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'sora' ? 'bg-pink-500/30 text-pink-200' : 'bg-white/10 text-white/50'}`}>OpenAI + Audio</span>
-                  </div>
-                  <span className={`text-[10px] ${provider === 'sora' ? 'text-pink-300' : 'text-white/40'}`}>4s / 8s / 12s</span>
+                 <div>
+                   <span className="font-bold text-sm">Sora 2 Pro</span>
+                   <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${provider === 'sora' ? 'bg-pink-500/30 text-pink-200' : 'bg-white/10 text-white/50'}`}>OpenAI + Audio</span>
+                 </div>
+                 <div className="text-right">
+                   <div className={`text-[10px] ${provider === 'sora' ? 'text-pink-300' : 'text-white/40'}`}>4s / 8s / 12s</div>
+                   <div className={`text-[10px] font-medium ${provider === 'sora' ? 'text-pink-200' : 'text-white/30'}`}>295 – 695 {language === 'fr' ? 'crédits' : 'credits'}</div>
+                 </div>
                 </div>
                 <div className="space-y-1">
                   {[{ label: language === 'fr' ? 'Réalisme' : 'Realism', w: '100%' }, { label: language === 'fr' ? 'Cohérence' : 'Coherence', w: '100%' }, { label: language === 'fr' ? 'Vidéo produit' : 'Product video', w: '98%' }].map(item => (
