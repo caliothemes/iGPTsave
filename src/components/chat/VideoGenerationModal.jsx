@@ -11,12 +11,14 @@ import { createPageUrl } from '@/utils';
 
 export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoGenerated, user, credits, guestPrompts }) {
   const { language } = useLanguage();
-  const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', 'runway', or 'sora'
+  const [provider, setProvider] = useState('replicate'); // 'replicate', 'wan', 'runway', 'sora', 'seedance'
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState('16:9');
   const [wanAspectRatio, setWanAspectRatio] = useState('16:9');
   const [duration, setDuration] = useState(5);
   const [soraAspectRatio, setSoraAspectRatio] = useState('16:9');
+  const [seedanceAspectRatio, setSeedanceAspectRatio] = useState('16:9');
+  const [seedanceGenerateAudio, setSeedanceGenerateAudio] = useState(true);
   const [audioFile, setAudioFile] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
