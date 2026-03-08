@@ -1085,7 +1085,9 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
             <div className="flex justify-center mt-2">
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium ${
                 provider === 'sora' 
-                  ? 'bg-pink-500/20 border-pink-500/30 text-pink-300' 
+                  ? 'bg-pink-500/20 border-pink-500/30 text-pink-300'
+                  : provider === 'seedance'
+                  ? 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300'
                   : 'bg-violet-500/20 border-violet-500/30 text-violet-300'
               }`}>
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1097,6 +1099,10 @@ export default function VideoGenerationModal({ visual, isOpen, onClose, onVideoG
                       : duration === 8
                       ? (language === 'fr' ? '500 crédits' : '500 credits')
                       : (language === 'fr' ? '700 crédits' : '700 credits'))
+                  : provider === 'seedance'
+                  ? (duration === 8
+                      ? (language === 'fr' ? '165 crédits' : '165 credits')
+                      : (language === 'fr' ? '185 crédits' : '185 credits'))
                   : provider === 'replicate' 
                   ? (duration === 5 
                       ? (language === 'fr' ? '200 crédits' : '200 credits') 
