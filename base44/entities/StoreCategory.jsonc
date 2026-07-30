@@ -1,0 +1,31 @@
+{
+  "name": "StoreCategory",
+  "type": "object",
+  "properties": {
+    "name_fr": {
+      "type": "string",
+      "description": "Nom en fran\u00e7ais"
+    },
+    "name_en": {
+      "type": "string",
+      "description": "Nom en anglais"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Identifiant unique (logo_picto, logo_complet, mockup...)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name_fr",
+    "slug"
+  ]
+}

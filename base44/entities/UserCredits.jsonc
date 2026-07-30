@@ -1,0 +1,43 @@
+{
+  "name": "UserCredits",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email de l'utilisateur"
+    },
+    "free_downloads": {
+      "type": "number",
+      "default": 150,
+      "description": "Messages gratuits restants ce mois"
+    },
+    "paid_credits": {
+      "type": "number",
+      "default": 0,
+      "description": "Cr\u00e9dits achet\u00e9s"
+    },
+    "subscription_type": {
+      "type": "string",
+      "enum": [
+        "free",
+        "limited",
+        "unlimited"
+      ],
+      "default": "free",
+      "description": "Type d'abonnement"
+    },
+    "subscription_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de fin d'abonnement"
+    },
+    "last_free_reset": {
+      "type": "string",
+      "format": "date",
+      "description": "Date du dernier reset des messages gratuits"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}

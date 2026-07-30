@@ -1,0 +1,35 @@
+{
+  "name": "FAQItem",
+  "type": "object",
+  "properties": {
+    "question_fr": {
+      "type": "string",
+      "description": "Question en fran\u00e7ais"
+    },
+    "question_en": {
+      "type": "string",
+      "description": "Question en anglais"
+    },
+    "answer_fr": {
+      "type": "string",
+      "description": "R\u00e9ponse en fran\u00e7ais"
+    },
+    "answer_en": {
+      "type": "string",
+      "description": "R\u00e9ponse en anglais"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "question_fr",
+    "answer_fr"
+  ]
+}

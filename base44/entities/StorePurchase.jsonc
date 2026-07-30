@@ -1,0 +1,36 @@
+{
+  "name": "StorePurchase",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email de l'acheteur"
+    },
+    "store_item_id": {
+      "type": "string",
+      "description": "ID du produit achet\u00e9"
+    },
+    "visual_id": {
+      "type": "string",
+      "description": "ID du visuel achet\u00e9"
+    },
+    "price_paid": {
+      "type": "number",
+      "description": "Prix pay\u00e9 en cr\u00e9dits"
+    },
+    "item_title": {
+      "type": "string",
+      "description": "Titre du produit au moment de l'achat"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL de l'image"
+    }
+  },
+  "required": [
+    "user_email",
+    "store_item_id",
+    "visual_id",
+    "price_paid"
+  ]
+}

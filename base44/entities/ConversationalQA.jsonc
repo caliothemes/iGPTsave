@@ -1,0 +1,43 @@
+{
+  "name": "ConversationalQA",
+  "type": "object",
+  "properties": {
+    "question_fr": {
+      "type": "string",
+      "description": "Question en fran\u00e7ais"
+    },
+    "answer_fr": {
+      "type": "string",
+      "description": "R\u00e9ponse en fran\u00e7ais"
+    },
+    "question_en": {
+      "type": "string",
+      "description": "Question en anglais"
+    },
+    "answer_en": {
+      "type": "string",
+      "description": "R\u00e9ponse en anglais"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Mots-cl\u00e9s pour d\u00e9tecter la question",
+      "default": []
+    },
+    "priority": {
+      "type": "number",
+      "default": 0,
+      "description": "Priorit\u00e9 (plus \u00e9lev\u00e9 = plus important)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "question_fr",
+    "answer_fr"
+  ]
+}

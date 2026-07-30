@@ -1,0 +1,52 @@
+{
+  "name": "Sticker",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Titre du sticker"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL de l'image du sticker"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Prompt utilis\u00e9 pour g\u00e9n\u00e9rer le sticker"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email de l'utilisateur cr\u00e9ateur (null si biblioth\u00e8que iGPT)"
+    },
+    "is_shared": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si true, sticker dans biblioth\u00e8que iGPT partag\u00e9e"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "emoji",
+        "illustration",
+        "icon",
+        "decoratif",
+        "autre"
+      ],
+      "default": "illustration",
+      "description": "Cat\u00e9gorie du sticker"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags pour recherche",
+      "default": []
+    }
+  },
+  "required": [
+    "title",
+    "image_url",
+    "prompt"
+  ]
+}

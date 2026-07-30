@@ -1,0 +1,54 @@
+{
+  "name": "Story",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email de l'utilisateur cr\u00e9ateur"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre de la story"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Liste des images avec leurs transitions et dur\u00e9es"
+    },
+    "text_layers": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Calques de texte",
+      "default": []
+    },
+    "sticker_layers": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Calques de stickers",
+      "default": []
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "URL de la miniature (premi\u00e8re image)"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Dur\u00e9e totale en secondes"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "URL de la vid\u00e9o export\u00e9e"
+    }
+  },
+  "required": [
+    "user_email",
+    "title",
+    "images"
+  ]
+}

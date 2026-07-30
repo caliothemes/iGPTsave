@@ -1,0 +1,28 @@
+{
+  "name": "Folder",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du dossier"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email de l'utilisateur propri\u00e9taire"
+    },
+    "color": {
+      "type": "string",
+      "default": "violet",
+      "description": "Couleur du dossier (violet, blue, emerald, amber, rose)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    }
+  },
+  "required": [
+    "name",
+    "user_email"
+  ]
+}

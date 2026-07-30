@@ -1,0 +1,57 @@
+{
+  "name": "PromptExample",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "logo_picto",
+        "logo_complet",
+        "print",
+        "social",
+        "image",
+        "mockup",
+        "product",
+        "design_3d",
+        "textures",
+        "illustrations",
+        "icones_picto",
+        "pub_ads"
+      ],
+      "description": "Cat\u00e9gorie du format"
+    },
+    "example_text_fr": {
+      "type": "string",
+      "description": "Texte d'exemple en fran\u00e7ais"
+    },
+    "example_text_en": {
+      "type": "string",
+      "description": "Texte d'exemple en anglais"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL de l'image thumbnail de l'exemple"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags pour cat\u00e9goriser l'exemple",
+      "default": []
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "category",
+    "example_text_fr"
+  ]
+}

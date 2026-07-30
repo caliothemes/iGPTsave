@@ -1,0 +1,36 @@
+{
+  "name": "GeneratedText",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "visual_id": {
+      "type": "string",
+      "description": "ID du visuel associ\u00e9"
+    },
+    "text": {
+      "type": "string",
+      "description": "Texte g\u00e9n\u00e9r\u00e9"
+    },
+    "text_type": {
+      "type": "string",
+      "enum": [
+        "title",
+        "slogan",
+        "description",
+        "cta",
+        "tagline"
+      ],
+      "description": "Type de texte"
+    },
+    "is_saved": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "user_email",
+    "text"
+  ]
+}

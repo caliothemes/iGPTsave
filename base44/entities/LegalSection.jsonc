@@ -1,0 +1,36 @@
+{
+  "name": "LegalSection",
+  "type": "object",
+  "properties": {
+    "title_fr": {
+      "type": "string",
+      "description": "Titre en fran\u00e7ais"
+    },
+    "title_en": {
+      "type": "string",
+      "description": "Titre en anglais"
+    },
+    "content_fr": {
+      "type": "string",
+      "description": "Contenu en fran\u00e7ais"
+    },
+    "content_en": {
+      "type": "string",
+      "description": "Contenu en anglais"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Nom de l'ic\u00f4ne (lucide)",
+      "default": "FileText"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    }
+  },
+  "required": [
+    "title_fr",
+    "content_fr"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "name": "AppPresentation",
+  "type": "object",
+  "properties": {
+    "section": {
+      "type": "string",
+      "enum": [
+        "header",
+        "digital",
+        "print",
+        "ai_images",
+        "editor",
+        "footer"
+      ],
+      "description": "Section de la pr\u00e9sentation"
+    },
+    "title_fr": {
+      "type": "string"
+    },
+    "title_en": {
+      "type": "string"
+    },
+    "description_fr": {
+      "type": "string"
+    },
+    "description_en": {
+      "type": "string"
+    },
+    "items_fr": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Liste d'\u00e9l\u00e9ments (pour les colonnes)"
+    },
+    "items_en": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL de l'image (pour l'\u00e9diteur)"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Nom de l'ic\u00f4ne Lucide"
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "section"
+  ]
+}

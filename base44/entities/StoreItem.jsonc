@@ -1,0 +1,63 @@
+{
+  "name": "StoreItem",
+  "type": "object",
+  "properties": {
+    "visual_id": {
+      "type": "string",
+      "description": "ID du visuel r\u00e9f\u00e9renc\u00e9"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titre du produit"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description du produit"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Mots-cl\u00e9s pour la recherche",
+      "default": []
+    },
+    "price_credits": {
+      "type": "number",
+      "description": "Prix en cr\u00e9dits/messages"
+    },
+    "category_slugs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Cat\u00e9gories du produit (peut \u00eatre dans plusieurs cat\u00e9gories)",
+      "default": []
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL de l'image (copie depuis Visual)"
+    },
+    "dimensions": {
+      "type": "string",
+      "description": "Dimensions du visuel (ex: 1080x1080)",
+      "default": "1080x1080"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "sales_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre de ventes"
+    }
+  },
+  "required": [
+    "visual_id",
+    "title",
+    "price_credits",
+    "category_slugs",
+    "image_url"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "name": "ArtDirector",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email de l'utilisateur propri\u00e9taire"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nom du directeur artistique"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL du logo"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description de la direction artistique"
+    },
+    "activity": {
+      "type": "string",
+      "description": "Secteur d'activit\u00e9"
+    },
+    "website": {
+      "type": "string",
+      "description": "Site web de la marque/entreprise"
+    },
+    "color_palette": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Palette de 3 couleurs principales (hex)",
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "style_keywords": {
+      "type": "string",
+      "description": "Mots-cl\u00e9s de style"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "user_email",
+    "name",
+    "activity",
+    "color_palette"
+  ]
+}

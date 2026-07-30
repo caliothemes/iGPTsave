@@ -1,0 +1,34 @@
+{
+  "name": "NewsletterTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom du template"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description du template"
+    },
+    "html_content": {
+      "type": "string",
+      "description": "Contenu HTML du template"
+    },
+    "blocks_json": {
+      "type": "string",
+      "description": "Blocs JSON pour le mode visuel"
+    },
+    "preview_image": {
+      "type": "string",
+      "description": "URL de l'image d'aper\u00e7u"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "html_content"
+  ]
+}

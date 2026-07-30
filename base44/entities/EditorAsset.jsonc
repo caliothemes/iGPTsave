@@ -1,0 +1,43 @@
+{
+  "name": "EditorAsset",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "texture",
+        "illustration",
+        "gradient"
+      ],
+      "description": "Type d'asset"
+    },
+    "name_fr": {
+      "type": "string",
+      "description": "Nom en fran\u00e7ais"
+    },
+    "name_en": {
+      "type": "string",
+      "description": "Nom en anglais"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Prompt pour g\u00e9n\u00e9ration IA"
+    },
+    "preview_url": {
+      "type": "string",
+      "description": "URL de pr\u00e9visualisation"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "type",
+    "name_fr"
+  ]
+}

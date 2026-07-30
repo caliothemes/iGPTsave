@@ -1,0 +1,50 @@
+{
+  "name": "VideoPromptExample",
+  "type": "object",
+  "properties": {
+    "prompt_fr": {
+      "type": "string",
+      "description": "Texte du prompt en fran\u00e7ais"
+    },
+    "prompt_en": {
+      "type": "string",
+      "description": "Texte du prompt en anglais"
+    },
+    "short_desc_fr": {
+      "type": "string",
+      "description": "Description courte en fran\u00e7ais (pour le bouton)"
+    },
+    "short_desc_en": {
+      "type": "string",
+      "description": "Description courte en anglais (pour le bouton)"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji ou ic\u00f4ne pour le bouton",
+      "default": "\ud83c\udfac"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "replicate",
+        "wan",
+        "runway",
+        "all"
+      ],
+      "default": "all",
+      "description": "Pour quel provider ce prompt est optimis\u00e9"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "prompt_fr",
+    "short_desc_fr"
+  ]
+}

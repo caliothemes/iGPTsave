@@ -1,0 +1,44 @@
+{
+  "name": "CreditPack",
+  "type": "object",
+  "properties": {
+    "pack_id": {
+      "type": "string",
+      "description": "Identifiant unique du pack"
+    },
+    "credits": {
+      "type": "number",
+      "description": "Nombre de cr\u00e9dits/messages"
+    },
+    "price": {
+      "type": "number",
+      "description": "Prix en euros"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "description": "ID du prix Stripe pour ce pack"
+    },
+    "bonus_credits": {
+      "type": "number",
+      "default": 0,
+      "description": "Cr\u00e9dits bonus offerts"
+    },
+    "is_popular": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "pack_id",
+    "credits",
+    "price"
+  ]
+}

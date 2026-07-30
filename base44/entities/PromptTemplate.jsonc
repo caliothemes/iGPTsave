@@ -1,0 +1,56 @@
+{
+  "name": "PromptTemplate",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "logo_picto",
+        "logo_complet",
+        "image",
+        "print",
+        "social",
+        "mockup",
+        "product",
+        "design_3d"
+      ],
+      "description": "Cat\u00e9gorie principale"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Sous-cat\u00e9gorie (ex: carte_visite, flyer, etc.)"
+    },
+    "prompt_fr": {
+      "type": "string",
+      "description": "Template de prompt en fran\u00e7ais"
+    },
+    "prompt_en": {
+      "type": "string",
+      "description": "Template de prompt en anglais"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description du prompt"
+    },
+    "assistant_text_fr": {
+      "type": "string",
+      "description": "Texte de l'assistant iGPT en fran\u00e7ais pour cette cat\u00e9gorie"
+    },
+    "assistant_text_en": {
+      "type": "string",
+      "description": "Texte de l'assistant iGPT en anglais pour cette cat\u00e9gorie"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "category",
+    "prompt_fr"
+  ]
+}

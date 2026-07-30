@@ -1,0 +1,58 @@
+{
+  "name": "EffectPreset",
+  "type": "object",
+  "properties": {
+    "name_fr": {
+      "type": "string",
+      "description": "Nom de l'effet en fran\u00e7ais"
+    },
+    "name_en": {
+      "type": "string",
+      "description": "Nom de l'effet en anglais"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Cat\u00e9gories de l'effet (slugs)"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Prompt \u00e0 appliquer \u00e0 l'image"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "URL de la miniature 1"
+    },
+    "thumbnail_url_2": {
+      "type": "string",
+      "description": "URL de la miniature 2"
+    },
+    "thumbnail_url_3": {
+      "type": "string",
+      "description": "URL de la miniature 3"
+    },
+    "thumbnail_url_4": {
+      "type": "string",
+      "description": "URL de la miniature 4"
+    },
+    "thumbnail_url_5": {
+      "type": "string",
+      "description": "URL de la miniature 5"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name_fr",
+    "categories",
+    "prompt"
+  ]
+}

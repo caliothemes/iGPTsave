@@ -1,0 +1,57 @@
+{
+  "name": "FeatureCard",
+  "type": "object",
+  "properties": {
+    "title_fr": {
+      "type": "string",
+      "description": "Titre en fran\u00e7ais"
+    },
+    "title_en": {
+      "type": "string",
+      "description": "Titre en anglais"
+    },
+    "description_fr": {
+      "type": "string",
+      "description": "Description en fran\u00e7ais"
+    },
+    "description_en": {
+      "type": "string",
+      "description": "Description en anglais"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Nom de l'ic\u00f4ne Lucide (Sparkles, Pencil, Video, Upload, ShoppingBag, etc.)"
+    },
+    "gradient": {
+      "type": "string",
+      "description": "Classes Tailwind pour le gradient (ex: from-violet-600 to-purple-600)"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "open_image_edit",
+        "open_video_examples",
+        "link_to_store"
+      ],
+      "default": "none",
+      "description": "Type d'action au clic"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la carte est active"
+    }
+  },
+  "required": [
+    "title_fr",
+    "description_fr",
+    "icon",
+    "gradient"
+  ]
+}

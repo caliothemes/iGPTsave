@@ -1,0 +1,48 @@
+{
+  "name": "StoryAnimation",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nom de l'animation"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "transition",
+        "text",
+        "image_effect"
+      ],
+      "description": "Type d'animation"
+    },
+    "css_animation": {
+      "type": "string",
+      "description": "Animation CSS ou classe Tailwind"
+    },
+    "duration": {
+      "type": "number",
+      "default": 1,
+      "description": "Dur\u00e9e en secondes"
+    },
+    "preview_url": {
+      "type": "string",
+      "description": "URL de pr\u00e9visualisation GIF/vid\u00e9o"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "Miniature de l'animation"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

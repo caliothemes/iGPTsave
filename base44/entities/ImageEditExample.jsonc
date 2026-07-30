@@ -1,0 +1,44 @@
+{
+  "name": "ImageEditExample",
+  "type": "object",
+  "properties": {
+    "title_fr": {
+      "type": "string",
+      "description": "Titre de l'exemple en fran\u00e7ais"
+    },
+    "title_en": {
+      "type": "string",
+      "description": "Titre de l'exemple en anglais"
+    },
+    "before_image_url": {
+      "type": "string",
+      "description": "URL de l'image avant modification"
+    },
+    "before_image_url_2": {
+      "type": "string",
+      "description": "URL de la 2\u00e8me image avant modification (optionnelle)"
+    },
+    "after_image_url": {
+      "type": "string",
+      "description": "URL de l'image apr\u00e8s modification"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Prompt de modification utilis\u00e9"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordre d'affichage"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "before_image_url",
+    "after_image_url",
+    "prompt"
+  ]
+}

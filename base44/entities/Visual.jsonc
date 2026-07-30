@@ -1,0 +1,122 @@
+{
+  "name": "Visual",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "conversation_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "original_image_url": {
+      "type": "string",
+      "description": "URL de l'image originale non modifi\u00e9e (pour revenir en arri\u00e8re)"
+    },
+    "visual_type": {
+      "type": "string",
+      "enum": [
+        "logo",
+        "carte_visite",
+        "flyer",
+        "post_instagram",
+        "story_instagram",
+        "post_facebook",
+        "post_linkedin",
+        "affiche",
+        "banner",
+        "autre"
+      ]
+    },
+    "dimensions": {
+      "type": "string",
+      "description": "Dimensions du visuel (ex: 1080x1080)"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "print",
+        "digital"
+      ]
+    },
+    "format_name": {
+      "type": "string",
+      "description": "Nom du format choisi (ex: Carr\u00e9 1:1, Story 9:16)"
+    },
+    "category_name": {
+      "type": "string",
+      "description": "Nom de la cat\u00e9gorie choisie"
+    },
+    "original_prompt": {
+      "type": "string",
+      "description": "Prompt original de l'utilisateur"
+    },
+    "image_prompt": {
+      "type": "string",
+      "description": "Prompt d\u00e9taill\u00e9 envoy\u00e9 \u00e0 l'IA"
+    },
+    "style": {
+      "type": "string",
+      "description": "Style visuel choisi"
+    },
+    "color_palette": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Palette de couleurs utilis\u00e9e"
+    },
+    "art_director_name": {
+      "type": "string",
+      "description": "Nom du directeur artistique appliqu\u00e9"
+    },
+    "folder_id": {
+      "type": "string",
+      "description": "ID du dossier contenant ce visuel"
+    },
+    "is_favorite": {
+      "type": "boolean",
+      "default": false
+    },
+    "downloaded": {
+      "type": "boolean",
+      "default": false
+    },
+    "version": {
+      "type": "number",
+      "default": 1
+    },
+    "parent_visual_id": {
+      "type": "string",
+      "description": "ID du visuel parent si r\u00e9g\u00e9n\u00e9r\u00e9"
+    },
+    "editor_layers": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Calques de l'\u00e9diteur magique"
+    },
+    "in_portfolio": {
+      "type": "boolean",
+      "default": false,
+      "description": "Affich\u00e9 dans le portfolio public"
+    },
+    "attached_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs des images attach\u00e9es utilis\u00e9es pour la g\u00e9n\u00e9ration"
+    }
+  },
+  "required": [
+    "user_email",
+    "image_url"
+  ]
+}

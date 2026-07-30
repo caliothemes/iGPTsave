@@ -1,0 +1,77 @@
+{
+  "name": "SubscriptionPlan",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Identifiant unique du plan (free, limited, unlimited)"
+    },
+    "name_fr": {
+      "type": "string"
+    },
+    "name_en": {
+      "type": "string"
+    },
+    "price_monthly": {
+      "type": "number",
+      "description": "Prix mensuel en euros"
+    },
+    "price_yearly": {
+      "type": "number",
+      "description": "Prix annuel en euros (avec r\u00e9duction)"
+    },
+    "messages_per_month": {
+      "type": "number",
+      "description": "Nombre de messages par mois (-1 pour illimit\u00e9)"
+    },
+    "messages_per_year": {
+      "type": "number",
+      "description": "Nombre de messages par an (-1 pour illimit\u00e9)"
+    },
+    "stripe_price_id_monthly": {
+      "type": "string",
+      "description": "ID du prix Stripe pour l'abonnement mensuel"
+    },
+    "stripe_price_id_yearly": {
+      "type": "string",
+      "description": "ID du prix Stripe pour l'abonnement annuel"
+    },
+    "features_fr": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "features_en": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "icon": {
+      "type": "string",
+      "description": "Nom de l'ic\u00f4ne Lucide"
+    },
+    "gradient": {
+      "type": "string",
+      "description": "Classes CSS pour le gradient"
+    },
+    "is_popular": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "plan_id",
+    "name_fr",
+    "price_monthly"
+  ]
+}
